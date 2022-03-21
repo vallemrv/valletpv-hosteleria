@@ -1,0 +1,62 @@
+<style media="screen">
+  .row-select{
+     transition: .5s ease;
+     height: 3em;
+     margin:  5px;
+  }
+  .row-selected{
+    box-shadow: 0 0 0 5px #000000;
+    transition: .5s ease;
+  }
+  ._FF5733{ background-color: #FF5733; }
+  ._AF7AC5{ background-color: #AF7AC5; }
+  ._48C9B0{ background-color: #48C9B0; }
+  ._F7DC6F{ background-color: #F7DC6F; }
+  ._8E44AD{ background-color: #8E44AD; }
+  ._62B4EC{ background-color: #62B4EC; }
+  ._9BEC62{ background-color: #9BEC62; }
+  ._EC7962{ background-color: #EC7962; }
+  ._2F689D{ background-color: #2F689D; }
+  ._822BF1{ background-color: #822BF1; }
+  ._DAC4F6{ background-color: #DAC4F6; }
+  ._D7A2A3{ background-color: #D7A2A3; }
+  ._FFA2F1{ background-color: #FFA2F1; }
+  ._D2A2FF{ background-color: #D2A2FF; }
+  ._ADA2FF{ background-color: #ADA2FF; }
+  ._A2CCFF{ background-color: #A2CCFF; }
+  ._A2F2FF{ background-color: #A2F2FF; }
+  ._A2FFED{ background-color: #A2FFED; }
+  ._C5FFA2{ background-color: #C5FFA2; }
+  ._FBFFA2{ background-color: #FBFFA2; }
+
+</style>
+
+
+
+<div class='container'>
+    <div class="row">
+        <div onclick="on_click('_FF5733', 'id_{{widget.name}}');" class="_FF5733 col-1 row-select" ></div>
+        <div onclick="on_click('_AF7AC5', 'id_{{widget.name}}');" class="_AF7AC5 col-1 row-select" ></div>
+        <div onclick="on_click('_48C9B0', 'id_{{widget.name}}');" class="_48C9B0 col-1 row-select" ></div>
+        <div onclick="on_click('_F7DC6F', 'id_{{widget.name}}');" class="_F7DC6F col-1 row-select" ></div>
+        <div onclick="on_click('_8E44AD', 'id_{{widget.name}}');" class="_8E44AD col-1 row-select" ></div>
+        <div onclick="on_click('_62B4EC', 'id_{{widget.name}}');" class="_62B4EC col-1 row-select" ></div>
+        <div onclick="on_click('_9BEC62', 'id_{{widget.name}}');" class="_9BEC62 col-1 row-select" ></div>
+        <div onclick="on_click('_EC7962', 'id_{{widget.name}}');" class="_EC7962 col-1 row-select" ></div>
+        <div onclick="on_click('_2F689D', 'id_{{widget.name}}');" class="_2F689D col-1 row-select" ></div>
+        <div onclick="on_click('_822BF1', 'id_{{widget.name}}');" class="_822BF1 col-1 row-select" ></div>
+        <div onclick="on_click('_DAC4F6', 'id_{{widget.name}}');" class="_DAC4F6 col-1 row-select" ></div>
+        <div onclick="on_click('_D7A2A3', 'id_{{widget.name}}');" class="_D7A2A3 col-1 row-select" ></div>
+        <div onclick="on_click('_FFA2F1', 'id_{{widget.name}}');" class="_FFA2F1 col-1 row-select" ></div>
+        <div onclick="on_click('_D2A2FF', 'id_{{widget.name}}');" class="_D2A2FF col-1 row-select" ></div>
+        <div onclick="on_click('_ADA2FF', 'id_{{widget.name}}');" class="_ADA2FF col-1 row-select" ></div>
+        <div onclick="on_click('_A2CCFF', 'id_{{widget.name}}');" class="_A2CCFF col-1 row-select" ></div>
+        <div onclick="on_click('_A2F2FF', 'id_{{widget.name}}');" class="_A2F2FF col-1 row-select" ></div>
+        <div onclick="on_click('_A2FFED', 'id_{{widget.name}}');" class="_A2FFED col-1 row-select" ></div>
+        <div onclick="on_click('_C5FFA2', 'id_{{widget.name}}');" class="_C5FFA2 col-1 row-select" ></div>
+        <div onclick="on_click('_FBFFA2', 'id_{{widget.name}}');" class="_FBFFA2 col-1 row-select" ></div>
+    </div>
+    <input type="hidden" name="{{widget.name}}"
+           value='{%if widget.value %} {{widget.value}} {% else %} null {% endif %}'
+           id='id_{{widget.name}}'>
+</div>

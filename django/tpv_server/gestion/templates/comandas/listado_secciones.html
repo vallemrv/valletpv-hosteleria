@@ -1,0 +1,96 @@
+{% extends "base_admin.html" %}
+{% block content %}
+{% load global_tag %}
+{% load gestion_tag %}
+{% include "controls/listado.html" %}
+{% include "controls/dg_edicion.html" %}
+
+<div id="app">
+  <valle-listado v-bind:titulo='titulo'
+                 v-bind:cabeceras='cabeceras'
+                 v-bind:mensaje='mensaje'
+                 v-bind:items='items'
+                 v-on:action-click='action_click'
+                 v-on:onsubmit="onsubmit"
+                 v-bind:ocultar_plus=true></valle-listado>
+
+  <valle-dg-edicion v-bind:fields='fields'
+                    v-bind:model='model'
+                    ref="dg_edicion"
+                    name='seccion'
+                    v-on:onsubmit="onsubmit_dg"
+                    ></valle-dg-edicion>
+
+</div>
+
+<script type="text/javascript">
+  Vue.use(Toasted);
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el:'#app',
+    data:{
+      titulo: 'Secciones Comanda',
+      cabeceras: ['Nombre',  'Promocion', "Descuento", "Icono" ],
+      mensaje: 'Agregar nueva seccion',
+      items: [
+        {% for l in listado %}
+            { cols: ['{{l.nombre}}', '{{l.es_promocion}}', '{{l.descuento}}', '{{l.icono}}'],
+              botones: [{tipo:'edit', icon:'fa-edit'},
+                        {tipo:'ver', icon:'fa-search' }],
+              obj: {"id":{{l.id}}, "nombre": '{{l.nombre}}', "es_promocion": '{{l.es_promocion}}',
+                    "descuento": '{{l.descuento}}', "icono": '{{l.icono}}'}
+            },
+        {% endfor %}
+      ],
+      fields: [
+           {% for field in form %}
+              {
+               name: '{{field.name}}',
+               label: '{{ field.label }}',
+               html: '{{ field|get_control_vue }}',
+              },
+           {% endfor %}
+         ]
+      ,
+      titulo_dg: "Seccion nueva",
+      model: [ "nombre", "es_promocion", "descuento", "icono"],
+      isNuevo: false,
+    },
+    methods:{
+        action_click: function(obj, tipo){
+          var cx = this;
+          if (tipo=="edit"){
+             this.nuevo = false;
+             obj.obj.item = obj
+             this.$refs.dg_edicion.show(obj.obj, "Editar sección");
+          }else if (tipo=='ver') {
+             location.href = '{% url "gestion:lista_teclas_seccion_com" id=1 %}'.replace('1', obj.obj.id)
+          }
+        },
+        onsubmit: function(data){ //para el buscador de objetos....
+          var cx = this;
+          $.post('{% url "gestion:lista_teclas_seccion_com" %}', data, function(res){
+              cx.items = res;
+          });
+        },
+        onsubmit_dg: function(data, obj){
+          var url = '';
+          var cx = this;
+          if (!this.nuevo){
+             url = '{% url "gestion:edit_seccion_com" id=1 %}'.replace('1', obj.id)
+          }
+          $.post(url, data, function(res){
+            if(obj != null){
+               var index = cx.items.indexOf(obj.item);
+               cx.items.splice(index, 1, res);
+             }else{
+               cx.items.push(res);
+             }
+          });
+          this.$refs.dg_edicion.hide();
+        }
+    }
+  })
+</script>
+
+{% endblock content %}

@@ -1,0 +1,87 @@
+{% load global_tag %}
+<template id="listado">
+ <div>
+  <div class="bg-light page-header">
+    <div class="row">
+      <div class="col-12 col-md-7">
+          <h3 >[[titulo]]</h3>
+      </div>
+      <div class="col-12 col-md-5 ">
+        <form v-show="!ocultar_find" id="find" onsubmit="return false;" class="form-inline my-2 my-lg-0" method="post">
+            {% csrf_token %}
+            <input class="form-control mr-sm-2 mb-md-1" type="text" name="filter" placeholder="Buscar" aria-label="Search">
+            <button  class="btn btn-outline-success my-2 my-sm-0 mb-md-1" type="submit"
+                    v-on:click="onsubmit();">Buscar</button>
+            <button v-if="!ocultar_plus" class="btn btn-primary my-2 my-sm-0 ml-1 mb-md-1" v-on:click="onclick(null, 'nuevo')">
+               <span class="fa fa-plus"></span>
+            </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+   <div v-if='items.length > 0' class="bg-light p-3 mb-3 content-table">
+     <table class="table table-striped">
+       <thead>
+         <tr>
+           <th v-for='c in cabeceras'>
+             [[c]]
+            </th>
+           <th class="text-right">Acciones</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr v-for='item in items'>
+           <td v-for='col in item.cols'>
+             <div v-if="is_color(col)"
+                  :style="{ backgroundColor: col, width: '140px', height: '40px'}"
+                  ></div>
+             <span v-else> [[is_bool(col)]] </span>
+           </td>
+           <td class="text-right">
+             <a v-for='btn in item.botones' v-on:click="onclick(item, btn.tipo)" class="btn btn-primary btn-accion">
+               <span class="fa" v-bind:class="btn.icon"></span></a>
+           </td>
+         </tr>
+       </tbody>
+     </table>
+   </div>
+
+   <div v-else class="jumbotron jumbotron-fluid">
+     <div class="container pl-3">
+         <h1 class="display-3">Upps!</h1>
+         <p class="lead">No se ha encotrado ningún dato que mostrar....</p>
+     </div>
+   </div>
+  </div>
+</template>
+
+
+<script type="text/javascript">
+  Vue.component('valle-listado',{
+     delimiters: ['[[', ']]'],
+     template: '#listado',
+     props:['titulo', 'cabeceras', 'items',  'mensaje', 'size', "ocultar_plus", "ocultar_find"],
+     data:{
+       size: '100%',
+     },
+     methods:{
+        onclick: function(item, tipo){
+            this.$emit("action-click", item, tipo);
+            return false;
+        },
+        onsubmit: function(){
+          this.$emit("onsubmit", $('#find').serialize())
+        },
+        is_color: function(str){
+          return String(str).startsWith("#");
+        },
+        is_bool: function(str){
+          var aux = String(str).toUpperCase();
+          if (aux == "FALSE" || aux == "TRUE")
+               return aux == 'TRUE' ? 'SI' : 'NO'
+          return str
+        }
+     }
+  });
+</script>

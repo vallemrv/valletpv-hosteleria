@@ -1,0 +1,189 @@
+{% extends "base_admin.html" %}
+{% block content %}
+{% load global_tag %}
+{% load gestion_tag %}
+{% include "controls/listado.html" %}
+{% include "controls/dg_edicion.html" %}
+{% include "controls/dg_botonera.html" %}
+
+<div id="app">
+   {% if seccion %}
+     <v-btn v-if="show_preview==true" fab button right fixed color="blue" @click="show_dialog_btn()">
+          <v-icon>visibility</v-icon>
+        </v-btn>
+    {% endif %}
+
+  <valle-listado v-bind:titulo='titulo'
+                 v-bind:cabeceras='cabeceras'
+                 v-bind:mensaje='mensaje'
+                 v-bind:items='items'
+                 v-bind:ocultar_find="ocultar_find"
+                 v-on:action-click='action_click'
+                 v-on:onsubmit="onsubmit_find"></valle-listado>
+
+  <valle-dg-edicion v-bind:fields='fields'
+                    v-bind:model='model'
+                    ref="dg_edicion"
+                    name='editar_orden'
+                    v-on:onsubmit="onsubmit_dg"
+                    ></valle-dg-edicion>
+
+  <valle-dg-edicion v-bind:fields='fields_tecla'
+                    ref="dg_edicion_tecla"
+                    v-bind:model='model_tecla'
+                    name='editar_tecla'
+                    v-on:onsubmit="onsubmit_dg_tecla"
+                    ></valle-dg-edicion>
+
+  <valle-dg-botonera  :botones='items'
+                      titulo_dg='Botones TPV'
+                      ref='dg_botonera'
+                      max_btn='18'
+                      ></valle-dg-botonera>
+</div>
+
+<script type="text/javascript">
+  Vue.use(Toasted);
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el:'#app',
+    data:{
+      show_preview: true,
+      ocultar_find:  {{listado|is_max:18}},
+      seccion: '{{seccion}}',
+      defaults: [["seccion", '{{seccion}}']],
+      titulo: 'Articulos comanda',
+      cabeceras: ['Nombre', 'Precio 1', "Precio 2", "Tipo", 'Orden'],
+      mensaje: 'Agregar articulo nuevo',
+      items: [
+        {% for l in listado %}
+            {{l.tecla|get_items_edit:l.orden}},
+        {% endfor %}
+      ],
+      fields: [
+           {% for field in form %}
+              {
+               name: '{{field.name}}',
+               label: '{{field.label }}',
+               html: '{{field|get_control_vue }}'
+              },
+           {% endfor %}
+         ],
+       fields_tecla: [
+            {% for field in form_teclas %}
+               {
+                name: '{{field.name}}',
+                label: '{{field.label }}',
+                html: '{{field|get_control_vue }}'
+               },
+            {% endfor %}
+          ],
+      model: [ "orden"],
+      model_tecla: [ "nombre", "p1", "p2", "orden", "tag", "ttf", "familia",
+                     "descripcion_r", "descripcion_t"],
+      isNuevo: false,
+    },
+    methods:{
+        show_dialog_btn: function(){
+           this.$refs.dg_botonera.show();
+        },
+        action_click: function(obj, tipo){
+          var cx = this;
+          if (tipo=="borrar"){
+            $.get('{% url "gestion:rm_tecla_com" id=1 idsec=0 %}'.replace('/1', "/"+obj.obj.id)
+            .replace('/0', "/"+this.seccion), function(res){
+                if (res == "success"){
+                  cx.items.splice(cx.items.indexOf(obj), 1);
+                  cx.ocultar_find =  cx.items.length >= 18;
+                  cx.show_preview = cx.items.length > 0;
+                }
+            });
+          }else if (tipo=="edit"){
+             this.nuevo = false;
+             obj.obj.item = obj
+             this.$refs.dg_edicion_tecla.show(obj.obj, 'Editar articulo');
+          }else if (tipo=="edit_orden"){
+             this.nuevo = false;
+             this.$refs.dg_edicion.show({id: obj.obj.id, orden: obj.cols[4]}, 'Editar orden');
+          }else if (tipo=="add"){
+            var cx = this;
+            var url = '{% url "gestion:add_teclascom" id=1 idsec=0 %}'.replace('/1', "/"+obj.obj.id)
+            url = url.replace('/0', "/"+this.seccion)
+            $.get(url, function(res){
+                  cx.items = res;
+                  cx.ocultar_find =  cx.items.length >= 18;
+                  cx.show_preview = cx.items.length > 0;
+            });
+          }else if (tipo=='nuevo'){
+            this.nuevo = true;
+            this.$refs.dg_edicion_tecla.show(null, 'Tecla nueva');
+          }else if (tipo=="sugerencias"){
+            location.href = '{% url "gestion:lista_sugerencias" id=1 %}'.replace('/1', "/"+obj.obj.id)
+          }else if (tipo=="ML"){
+            location.href = '{% url "gestion:lista_subteclas" id=1 %}'.replace('/1', "/"+obj.obj.id)
+          }else if (tipo=="GR"){
+            location.href = '{% url "gestion:lista_subteclas_grupo" id=1 %}'.replace('/1', "/"+obj.obj.id)
+          }
+        },
+        onsubmit_find: function(data){
+          var cx = this;
+          this.show_perview = false;
+          $.post('{% url "gestion:lista_teclas_seccion_com" id=1 %}'.replace('/1', "/"+this.seccion),
+                  data, function(res){
+              cx.items = res;
+          });
+        },
+        onsubmit_dg: function(data, obj){
+          var cx = this;
+          var url = '{% url "gestion:edit_teclascom_orden" id=1 idsec=0 %}'.replace('/1', "/"+obj.id)
+          url = url.replace('/0', "/"+this.seccion)
+          $.post(url, data, function(res){
+            if (res.success == false){
+                Vue.toasted.show('Todos los campos deben rellenarse..',  {
+                  'position': 'top-center',
+                  'fullWidth': true,
+                  'duration': 2000,
+                });
+            }else{
+             if(obj != null){
+               cx.items = res;
+               cx.$refs.dg_edicion.hide();
+             }
+            }
+          });
+
+        },
+        onsubmit_dg_tecla: function(data, obj){
+            var cx = this;
+            if (obj == null)
+              var url = '{% url "gestion:crear_tecla_add_teclascom" id=1 %}'.replace('/1', "/"+this.seccion);
+            else
+              var url = '{% url "gestion:edit_articulo" id=1 %}'.replace('/1', "/"+obj.id);
+
+              $.post(url, data, function(res){
+                 if (!res.success){
+                     Vue.toasted.show('Todos los campos deben rellenarse..',  {
+                       'position': 'top-center',
+                       'fullWidth': true,
+                       'duration': 2000,
+                     });
+                 }else{
+                   if (obj == null){
+                     cx.items.push(res);
+                   }else{
+                     var index = cx.items.indexOf(obj.item);
+                     cx.items.splice(index, 1, res);
+                   }
+                   cx.ocultar_find =  cx.items.length >= 18;
+                   cx.show_preview = cx.items.length > 0;
+                   cx.$refs.dg_edicion_tecla.hide();
+                 }
+              });
+
+
+        }
+      }
+  });
+</script>
+
+{% endblock content %}

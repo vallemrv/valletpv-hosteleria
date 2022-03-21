@@ -1,0 +1,108 @@
+<template id="dialogo-edicion">
+  <div class="text-xs-center" data-app=true>
+     <v-dialog v-model="show_dialog"
+               width="700"
+               >
+         <v-card>
+            <v-card-title
+              class="headline grey lighten-2"
+              primary-title
+            >
+             <v-btn icon left @click="show_dialog = false"><v-icon>close</v-icon></v-btn> [[titulo_dg]]
+            </v-card-title>
+
+        <v-card-text>
+          <form :id="name" onsubmit="return false;"  method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="form-group col-md-12" v-for="field in fields">
+                <label class='w-100 text-left text-capitalize' :for="field.name">[[field.label]]</label>
+                <div  v-html='decode(field.html)'></div>
+              </div>
+            </div>
+          </form>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="mr-1" color="#0277BD"  @click="onsubmit();"> Aceptar </v-btn>
+          <v-btn color="#D50000"  @click="hide();"> Cancelar </v-btn>
+        </v-card-actions>
+      </v-card>
+     </v-dialog>
+   </div>
+</template>
+
+<script type="text/javascript">
+  Vue.use(Vuetify);
+  Vue.component('valle-dg-edicion',{
+     delimiters: ['[[', ']]'],
+     template: '#dialogo-edicion',
+     props:['fields', "model", 'titulo_dg', 'defaults', 'show_dialog', 'name'],
+     data:{
+       obj: null,
+     },
+     mounted: function () {
+        $("#"+this.name).find("input[type=checkbox]").on('click', this.checked);
+     },
+     methods:{
+        checked: function(event, val){
+          $(function(){
+           $(event.currentTarget).val($(event.currentTarget).is(':checked'));
+         });
+        },
+        show: function(obj, titulo){
+          this.titulo_dg = titulo;
+          this.show_dialog = true;
+          this.obj = obj;
+          var self = this;
+
+          $(function() {
+            if(self.obj != null){
+               for(index in self.model){
+                  var name = self.model[index];
+                   if (String(self.obj[name]).startsWith("#")){
+                        self.change_color(self.obj[name], name);
+                    }else{
+                      var val = self.obj[name];
+                      
+                      if (val == "True") val = "true";
+                      else if (val == "False") val = "false";
+                      else if (!isNaN(parseFloat(val)) & String(val).includes(",")) val = val.replace(",", ".");
+                      else if (val == "None") val = undefined;
+                      var o = $("#"+self.name).find("#id_"+name).val(val);
+                     }
+                }
+             }else if (typeof self.defaults != 'undefined'){
+                for(index in self.defaults){
+                  var value = self.defaults[index];
+                  var o = $("#"+self.name).find("#id_"+value[0]).val(value[1]);
+                }
+             }
+          });
+        },
+        hide: function(){
+           this.obj = null
+           this.show_dialog = false;
+           $("#"+this.name)[0].reset();
+        },
+        onsubmit: function(){
+          this.$emit("onsubmit", $("#"+this.name).serialize(), this.obj);
+          $("#"+this.name)[0].reset();
+          this.show_dialog = true;
+        },
+        decode: function(str){
+        	return  $.parseHTML(str)[0].data;
+        },
+        change_color: function(value, name){
+            value = value.toUpperCase().replace("#", "_");
+            $(".row-select").removeClass("row-selected");
+            $("."+value).addClass("row-selected")
+            $("#"+this.name).find("#id_"+name).val(convertColor(value.replace("_","")));
+        }
+     }
+
+  });
+</script>

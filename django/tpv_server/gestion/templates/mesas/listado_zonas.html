@@ -1,0 +1,115 @@
+{% extends "base_admin.html" %}
+{% block content %}
+{% load global_tag %}
+{% load gestion_tag %}
+{% include "controls/listado.html" %}
+{% include "controls/dg_edicion.html" %}
+
+<div id="app">
+  <valle-listado v-bind:titulo='titulo'
+                 v-bind:cabeceras='cabeceras'
+                 v-bind:mensaje='mensaje'
+                 v-bind:items='items'
+                 v-on:action-click='action_click'
+                 v-on:onsubmit="onsubmit"></valle-listado>
+  <valle-dg-edicion v-bind:fields='fields'
+                    v-bind:model='model'
+                    ref="dg_edicion"
+                    name='familias'
+                    v-on:onsubmit="onsubmit_dg"
+                    ></valle-dg-edicion>
+
+</div>
+
+<script type="text/javascript">
+  Vue.use(Toasted);
+  new Vue({
+    delimiters: ['[[', ']]'],
+    el:'#app',
+    data:{
+      titulo: 'Rangos',
+      cabeceras: ['Nombre', 'Tarifa', "Color"],
+      mensaje: 'Agregar nueva zona',
+      items: [
+        {% for l in listado %}
+            { cols: ['{{l.nombre}}', '{{l.tarifa}}', rgbToHex('{{l.rgb}}') ],
+              botones: [{tipo:'edit', icon:'fa-edit'},
+                        {tipo:'borrar', icon:'fa-trash'},
+                        {tipo:'ver', icon:'fa-search' }],
+              obj: {"id":{{l.id}}, "nombre": '{{l.nombre}}', "tarifa":'{{l.tarifa}}',
+                    "rgb": rgbToHex('{{l.rgb}}')}
+            },
+        {% endfor %}
+      ],
+      fields: [
+           {% for field in form %}
+              {
+               name: '{{field.name}}',
+               label: '{{ field.label }}',
+               html: '{{ field|get_control_vue }}',
+              },
+           {% endfor %}
+         ]
+      ,
+      titulo_dg: "Zona nueva",
+      model: [ "nombre", "tarifa", "rgb"],
+      isNuevo: false,
+    },
+    methods:{
+        action_click: function(obj, tipo){
+          var cx = this;
+          if (tipo=="borrar"){
+            $.get('{% url "gestion:rm_zona" id=1 %}'.replace('1', obj.obj.id), function(res){
+                if (res == "success"){
+                  cx.items.splice(cx.items.indexOf(obj), 1)
+                }
+            });
+          }else if (tipo=="edit"){
+             this.nuevo = false;
+             obj.obj.item = obj
+             this.$refs.dg_edicion.show(obj.obj, "Editar zona");
+          }else if (tipo=="nuevo"){
+             this.nuevo = true;
+             this.$refs.dg_edicion.show(null, "Zona nueva");
+          }else if (tipo=='ver') {
+             location.href = '{% url "gestion:lista_mesas_by_zona" id=1 %}'.replace('1', obj.obj.id)
+          }
+        },
+        onsubmit: function(data){ //para el buscador de objetos....
+          var cx = this;
+          $.post('{% url "gestion:lista_mesas_by_zona" %}', data, function(res){
+              cx.items = res;
+          });
+        },
+        onsubmit_dg: function(data, obj){
+          var url = '';
+          var cx = this;
+          if (this.nuevo){
+             url = '{% url "gestion:add_zona"  %}'
+          }else{
+             url = '{% url "gestion:edit_zona" id=1 %}'.replace('1', obj.id)
+          }
+          $.post(url, data, function(res){
+            if (res.success){
+              if(obj != null){
+                 var index = cx.items.indexOf(obj.item);
+                 cx.items.splice(index, 1, res);
+               }else{
+                  cx.items.push(res);
+               }
+               cx.$refs.dg_edicion.hide();
+             }else{
+               Vue.toasted.show('Todos los campos deben rellenarse..',  {
+                 'position': 'top-center',
+                 'fullWidth': true,
+                 'duration': 2000,
+               });
+             }
+          });
+
+        }
+    }
+  })
+</script>
+
+{% endblock content %}

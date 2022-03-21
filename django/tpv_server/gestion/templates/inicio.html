@@ -1,0 +1,29 @@
+{% extends "base_admin.html" %}
+{% block content %}
+{% include "menus.html" %}
+
+<div id="app">
+  <valle-menu v-bind:titulo='titulo' v-bind:items='items'></valle-menu>
+</div>
+
+<script type="text/javascript">
+  var app = new Vue({
+      el: '#app',
+      data:{
+        titulo: "Menu principal",
+        items:[
+          {href: "{% url 'gestion:lista_camareros'  %}", titulo: "Camareros"},
+          {href: "{% url 'gestion:zonas'  %}", titulo: "Zonas"},
+          {href: "{% url 'gestion:mesas'  %}", titulo: "Mesas"},
+          {href: "{% url 'gestion:lista_familias'  %}", titulo: "Familias"},
+          {href: "{% url 'gestion:lista_secciones'  %}", titulo: "Secciones"},
+          {href: "{% url 'gestion:articulos'  %}", titulo: "Articulos"},
+          {href: "{% url 'gestion:modificar_secciones_comanda'  %}", titulo: "Teclas comanda"},
+          {href: "{% url 'gestion:subteclas'  %}", titulo: "Subteclas comanda"},
+          {href: "{% url 'gestion:sugerencias'  %}", titulo: "Sugerencias comanda"},
+          //{href: "{% url 'gestion:menu_sync'  %}", titulo: "Sincronizar"},
+        ]
+      }
+  })
+</script>
+{% endblock content %}
