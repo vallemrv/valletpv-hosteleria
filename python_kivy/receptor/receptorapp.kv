@@ -1,0 +1,253 @@
+#:import . components.pagenavigations
+
+<TituloDg@AnchorLayout>:
+    title: ''
+    anchor_x: 'center'
+    anchor_y: 'center'
+    Label:
+        text: root.title
+        font_size: '25dp'
+        size_hint: .9,.9
+
+
+
+<Mensajes>:
+    anchor_x: 'center'
+    anchor_y: 'top'
+    art: ''
+    title: 'Enviar mensajes'
+    canvas:
+        Color:
+            rgba: 0,0,0,.3
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    AnchorLayout:
+        anchor_x: "center"
+        anchor_x: 'center'
+        size_hint: .5, .5
+        canvas:
+            Color:
+                rgba: 1,1,1,1
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [20,]
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 5
+            TituloDg:
+                title: root.title
+                size_hint: 1, .2
+            BoxLayout:
+                size_hint: 1, None
+                height: "5dp"
+                Color:
+                    rgba: 0,0,0,1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            AnchorLayout:
+                anchor_x: "center"
+                anchor_x: 'center'
+                size_hint: 1,.8
+                BoxLayout:
+                    size_hint: .9,.9
+                    spacing: 5
+                    orientation: 'vertical'
+                    BoxLayout:
+                        spacing: 5
+                        TextInput:
+                            id: __msg
+                            size_hint: .8, 1
+                            font_size: '35dp'
+                        ButtonIcon:
+                            icon: res.FA_PLANE
+                            size_hint: .2, 1
+                            on_release: root.enviar(__msg.text)
+                    LabelIcon:
+                        clicable: True
+                        text: 'No queda de '+ root.art
+                        position: 'right'
+                        icon: res.FA_PLANE
+                        font_size: '20dp'
+                        on_release: root.enviar(self.text)
+                        bg_color: "#52BE80"
+                    LabelIcon:
+                        clicable: True
+                        text: 'Va a tardar un poco ' + root.art
+                        position: 'right'
+                        icon: res.FA_PLANE
+                        font_size: '20dp'
+                        on_release: root.enviar(self.text)
+                        bg_color: "#52BE80"
+                    ButtonIcon:
+                        icon: res.FA_EXIT
+                        on_release: root.close()
+                        bg_color: 1,1,1,1
+
+
+
+<LineasWidget>:
+    texto: ""
+    BoxLayout:
+        orientation: "horizontal"
+        LabelColor:
+            size_hint: .8, 1
+            clicable: True
+            font_size: "20dp"
+            text: root.texto
+            bg_color: root.bg_color
+            on_release: root.servido()
+        ButtonIcon:
+            size_hint: .2, 1
+            icon: res.FA_ENVELOPE
+            on_release: root.send_mensaje(root.texto)
+
+
+<PedidoWidget>:
+    lista: _lista
+    informacion: "Camarero Y mesa"
+    anchor_x: "center"
+    anchor_y: "center"
+    size_hint: 1, 1
+    BoxLayout:
+        size_hint: 1, 1
+        orientation: "vertical"
+        LabelColor:
+            font_size:  "20dp"
+            bg_color: "#52BE80"
+            size_hint: 1, .12
+            text: root.informacion
+        MenuListView:
+            row_height: dp(60)
+            size_hint: 1, .76
+            id: _lista
+            bg_color: '#ABB2B9'
+        BoxLayout:
+            size_hint: 1, .12
+            ButtonIcon:
+                icon: res.FA_CHECK
+                on_release: root.servir()
+            ButtonIcon:
+                icon: res.FA_TRASH
+                on_release: root.borrar_pedido()
+
+
+
+<LineasReceptorWidget>:
+    BoxLayout:
+        orientation: "horizontal"
+        LabelColor:
+            font_size: "25dp"
+            text: root.texto
+            size_hint: .8, 1
+        ButtonIcon:
+            icon: root.icon
+            on_release: root.controller.select(root)
+            size_hint: .2, 1
+
+
+<ReceptorPage>:
+    id_page: 'receptor'
+    title:  'Recepción'
+    content: __content
+    label_float: __label_float
+
+    ScrollView:
+        size_hint: 1, 1
+        GridLayout:
+            rows: 1
+            spacing: 5
+            size_hint: None, 1
+            width: len(self.children) * dp(300)
+            id: __content
+    FloatLabel:
+        id: __label_float
+        bg_color: 1, 1, 1, 1
+        text: "Los cambios se aplicaran al reiniciar..."
+        position: 'bottom'
+        duration: 2
+    FloatButtonsGroup:
+        FloatButton:
+            bg_color: "#9B59B6"
+            icon: res.FA_EXIT
+            on_release: root.exit_app()
+        FloatButton:
+            bg_color: "#F9E79F"
+            icon: res.FA_COGS
+            on_release: root.manager.navigate('listado-r')
+        FloatButton:
+            bg_color: "#EDBB99"
+            icon: res.FA_REFRESH
+            on_release: root.recargar()
+
+<NetworkPage>:
+    label_info : __label_info
+    text_input_url: _text_input_url
+    id_page: 'network'
+    title: 'Configuracion de Red'
+    BoxLayout:
+        size_hint: .9,0.9
+        orientation: 'vertical'
+        spacing: 5
+        BoxLayout:
+            size_hint: 1, .12
+            spacing: 5
+            TextInput:
+                border: 10,10,10,10
+                font_size: '35dp'
+                size_hint: .8, 1
+                id: _text_input_url
+            ButtonIcon:
+                icon: res.FA_ELLIPSE_H
+                size_hint: .2, 1
+                on_release: root.guardar_url()
+        LabelColor:
+            id: __label_info
+
+<ListaReceptorPage>:
+    id_page: 'listado-r'
+    title: 'Lista de receptores'
+    content: __content
+    label_float: __label_float
+    on_show: root.get_lista()
+    BoxLayout:
+        size_hint: .9,0.9
+        orientation: 'vertical'
+        MenuListView:
+            id: __content
+
+    FloatLabel:
+        id: __label_float
+        bg_color: 1, 1, 1, 1
+        text: "Los cambios se aplicaran al reiniciar..."
+        position: 'bottom'
+        duration: 2
+    FloatButton:
+        icon: res.FA_NETWORK
+        button_size: '45dp'
+        on_release: root.manager.navigate('network')
+
+<MainPageWidget>:
+    receptor: __receptor
+    label_float: __label_float
+    PageManager:
+        id: _manager
+        ReceptorPage:
+            id: __receptor
+            app: root.app
+            datos: root.datos
+            receptor_controller: root
+        ListaReceptorPage:
+            datos: root.datos
+        NetworkPage:
+            datos: root.datos
+
+    FloatLabel:
+        id: __label_float
+        bg_color: 1, 1, 1, 1
+        text: "Los cambios se aplicaran al reiniciar..."
+        position: 'bottom'
+        duration: 2

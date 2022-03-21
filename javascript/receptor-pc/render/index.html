@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Receptor Tpv</title>
+      <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+      <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+
+    <div id="app">
+      <div class="row">
+        <pedido v-for="(pedido, index) in pedidos"
+          :id='index'
+          :lineas="pedido.lineas"
+          :urgente="pedido.urgente"
+          :hora="pedido.hora"
+          :mesa="pedido.mesa"
+          :camarero="pedido.camarero"
+          :callback="rm_linea"
+          :obj="pedido" ></pedido>
+      </div>
+
+    </div>
+
+
+    <template >
+      <h1>{{nombre}}</h1>
+    </template>
+
+    <template id="pedido">
+        <div class="card col-3 p-0">
+           <div class="card-header text-center ">
+             <p v-if='urgente'>URGENTE</p>
+             <p class="p-0">Camarero: {{camarero}}</p>
+             <p class="p-0">Mesa: {{mesa}}</p>
+             <p class="p-0">Hora: {{hora}}</p>
+           </div>
+           <ul  class="list-group list-group-flush card-pedido">
+             <li v-for="linea in lineas" class="list-group-item">{{linea.can}} {{linea.nombre}} {{linea.precio}}</li>
+           </ul>
+           <div class="bg-ligth border">
+             <button v-on:click="callback(obj)" class="btn btn-primary btn-block btn-servido">servido</button>
+           </div>
+        </div>
+    </template>
+    <script src="index.js"></script>
+   </body>
+ </html>

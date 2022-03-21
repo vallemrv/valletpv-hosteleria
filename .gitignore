@@ -5,8 +5,13 @@ media*/
 test*/
 Test*/
 server_*
-!manage_template.py
 *.sqlite3
+node*
+**/control_impresoras/logo.png
+
+#excepciones
+!manage_template.py
+!test_ws/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

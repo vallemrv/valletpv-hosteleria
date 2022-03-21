@@ -1,0 +1,60 @@
+#:import LabelColor components.labels.LabelColor
+#:import ButtonIcon components.buttons.ButtonIcon
+#:import FloatButton components.floatbuttons
+#:import MenuListView components.listview.MenuListView
+#:import Form components.inputform
+#:import Spin components.spin
+#:import res components.resources.Res
+
+<PageManager>:
+    size_hint: 1,1
+
+<Page>:
+    content_page: _content_page
+    __head__: _header
+    __button_back__: _button_back
+    size_hint: 1, 1
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 1
+        spacing: 5
+        AnchorLayout
+            anchor_x: 'center'
+            anchor_y: 'center'
+            size_hint: 1, None
+            height: dp(50)
+            canvas:
+                Color:
+                    rgba: root.title_bg_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout:
+                id: _header
+                size_hint: .99,.9
+                LabelColor:
+                    size_hint: 1, 1
+                    text: root.title
+                    bg_color: root.title_bg_color
+                    border_size: 0
+                    font_size: '20dp'
+                ButtonIcon:
+                    id: _button_back
+                    size_hint: .2, 1
+                    icon: res.FA_ANGLE_LEFT
+                    orientation: 'horizontal'
+                    font_size: '12dp'
+                    border_size: 0
+                    bg_color: root.title_bg_color
+                    color: 0,0,0,1
+                    on_release: root.parent.back_page()
+
+        AnchorLayout:
+            id: _content_page
+            size_hint: 1, 1
+            canvas.before:
+                Color:
+                    rgba: root.bg_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+@Author: Manuel Rodriguez <valle>
+@Date:   2018-10-08T10:52:34+02:00
+@Email:  valle.mrv@gmail.com
+@Last modified by:   valle
+@Last modified time: 2018-12-29T15:19:20+01:00
+@License: Apache License v2.0
+-->
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <Button
+        android:layout_width="80sp"
+        android:layout_height="80sp"
+        android:id="@+id/btnSalir"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/salirxml"
+        android:layout_margin="5dp" />
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/btnImprimir"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnSalir"
+        android:layout_toStartOf="@+id/btnSalir"
+        android:layout_margin="5dp"
+        android:background="@drawable/imprimirxml" />
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/btnListado"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnImprimir"
+        android:layout_toStartOf="@+id/btnImprimir"
+        android:layout_margin="5dp"
+        android:background="@drawable/listaticketxml" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnSalir"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="5dp">
+
+        <LinearLayout
+            android:id="@+id/pneListados"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"></LinearLayout>
+    </ScrollView>
+</RelativeLayout>
