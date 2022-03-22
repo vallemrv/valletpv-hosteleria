@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -66,16 +67,17 @@ public class DbCamareros  extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getAll()
     {
         JSONArray lscam = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from camareros", null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject cam = new JSONObject();
-                cam.put("Nombre",res.getString(res.getColumnIndex("Nombre")));
+                cam.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
                 cam.put("ID", res.getString(res.getColumnIndex("ID")));
                 cam.put("Pass", res.getString(res.getColumnIndex("Pass")));
                 lscam.put(cam);
@@ -90,18 +92,6 @@ public class DbCamareros  extends SQLiteOpenHelper {
         return lscam;
     }
 
-
-    public int getCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("select count(*) from camareros", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-            s= cursor.getInt(0);
-        }
-        cursor.close();db.close();
-        return s;
-    }
 
     public void Vaciar(){
         SQLiteDatabase db = this.getWritableDatabase();

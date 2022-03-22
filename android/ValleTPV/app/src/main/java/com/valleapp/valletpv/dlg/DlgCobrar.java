@@ -2,26 +2,18 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.os.CountDownTimer;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.valleapp.valletpv.Interfaces.IControlador;
 import com.valleapp.valletpv.R;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 
 /**
  * Created by valle on 19/10/14.

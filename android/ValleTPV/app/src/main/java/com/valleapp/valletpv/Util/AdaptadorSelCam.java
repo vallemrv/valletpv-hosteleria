@@ -1,23 +1,18 @@
 package com.valleapp.valletpv.Util;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.valleapp.valletpv.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import com.valleapp.valletpv.R;
-
-import javax.sql.RowSetWriter;
 
 /**
  * Created by valle on 14/09/14.

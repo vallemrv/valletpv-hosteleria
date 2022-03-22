@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -47,7 +48,7 @@ public class DbCuenta extends SQLiteOpenHelper {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-           db.execSQL("DELETE FROM cuenta WHERE IDMesa <> "+Integer.toString(DbCuenta.IDMesa));
+           db.execSQL("DELETE FROM cuenta WHERE IDMesa <> "+ DbCuenta.IDMesa);
         }catch (SQLiteException e){
             e.printStackTrace();
             this.onCreate(db);
@@ -106,6 +107,7 @@ public class DbCuenta extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
         JSONArray lista = new JSONArray();
@@ -115,7 +117,7 @@ public class DbCuenta extends SQLiteOpenHelper {
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta WHERE IDMesa=" + id +
                     " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
-            while (res.isAfterLast() == false) {
+            while (!res.isAfterLast()) {
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
@@ -143,7 +145,7 @@ public class DbCuenta extends SQLiteOpenHelper {
 
     public Double getTotal(String id){
         SQLiteDatabase db = this.getReadableDatabase();
-        Double s = 0.0;
+        double s = 0.0;
 
         try {
             Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket FROM cuenta WHERE IDMesa=" + id, null);
@@ -173,16 +175,6 @@ public class DbCuenta extends SQLiteOpenHelper {
           }
         cursor.close();db.close();
         return s;
-    }
-
-    public void Vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-           db.execSQL("DELETE FROM cuenta");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
     }
 
     public void addArt(int can, int IDMesa,  JSONObject art){
@@ -248,6 +240,7 @@ public class DbCuenta extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getNuevos(String id) {
 
         JSONArray lista = new JSONArray();
@@ -257,7 +250,7 @@ public class DbCuenta extends SQLiteOpenHelper {
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can FROM cuenta WHERE IDMesa=" + id +" AND Estado = 'N'"+
                     " Group by IDArt, Nombre, Precio, Estado", null);
             res.moveToFirst();
-            while (res.isAfterLast() == false) {
+            while (!res.isAfterLast()) {
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));

@@ -1,45 +1,87 @@
 package com.valleapp.valletpv.Util;
 
-import java.util.List;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+
 
 public class HTTPRequest {
 
+    public String getParams(ContentValues params){
+        StringBuilder sbParams = new StringBuilder();
+        int i = 0;
+        for (String key : params.keySet()) {
+            try {
+                if (i != 0){
+                    sbParams.append("&");
+                }
+                sbParams.append(key).append("=")
+                        .append(URLEncoder.encode((String) params.get(key), "UTF-8"));
 
-    public HTTPRequest( String Url, List <NameValuePair> params, final String op, final Handler success){
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            i++;
+        }
+        return sbParams.toString();
+    }
+
+
+    public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler success){
         // Create a new HttpClient and Post Header
-
-        if(!Url.contains("http://")) Url = "http://"+Url;
-        final HttpClient httpclient = new DefaultHttpClient();
-        final HttpPost httppost = new HttpPost(Url);
+        HttpURLConnection conn = null;
+        Log.d("cagada", String.format("strUrl: %s, params: %s ", strUrl, op));
 
         try {
 
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            if(!strUrl.contains("http://")) strUrl = "http://"+ strUrl;
+            URL url = new URL(strUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept-Charset", "UTF-8");
 
+
+            Log.d("test", strUrl);
             // Execute HTTP Post Request
-            new Thread(){
+            HttpURLConnection finalConn = conn;
+             new Thread(){
                 public void run(){
+
                     try {
-                        HttpResponse response = httpclient.execute(httppost);
-                        HttpEntity entity = response.getEntity();
+
+
+                        DataOutputStream wr = new DataOutputStream(finalConn.getOutputStream());
+                        wr.writeBytes(getParams(params));
+                        wr.flush();
+                        wr.close();
+
+                        InputStream in = new BufferedInputStream(finalConn.getInputStream());
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                        StringBuilder result = new StringBuilder();
+                        String line;
+
+                        while ((line = reader.readLine()) != null) {
+
+                            result.append(line);
+                        }
 
                         Message msg = success.obtainMessage();
                         Bundle bundle = msg.getData();
                         if (bundle == null) bundle = new Bundle();
-                        bundle.putString("RESPONSE", EntityUtils.toString(entity));
+                        bundle.putString("RESPONSE", result.toString());
                         bundle.putString("op", op);
                         msg.setData(bundle);
                         success.sendMessage(msg);
@@ -62,6 +104,8 @@ public class HTTPRequest {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }finally {
+            if(conn != null) conn.disconnect();
         }
 
     }

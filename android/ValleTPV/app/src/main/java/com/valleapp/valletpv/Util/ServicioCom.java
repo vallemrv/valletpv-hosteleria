@@ -1,42 +1,19 @@
-/**
- * @Author: Manuel Rodriguez <valle>
- * @Date:   2018-12-29T15:47:15+01:00
- * @Email:  valle.mrv@gmail.com
- * @Last modified by:   valle
- * @Last modified time: 2018-12-30T00:47:17+01:00
- * @License: Apache License v2.0
- */
-
-
-
 package com.valleapp.valletpv.Util;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.text.format.DateFormat;
 import android.util.Log;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Logger;
 
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.db.DbCuenta;
@@ -44,6 +21,14 @@ import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbSecciones;
 import com.valleapp.valletpv.db.DbTeclas;
 import com.valleapp.valletpv.db.DbZonas;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class ServicioCom extends Service {
@@ -76,67 +61,74 @@ public class ServicioCom extends Service {
     JSONObject info_cobro = null;
 
     @SuppressLint("HandlerLeak")
-    private  final Handler controller_WS = new Handler(){
+    private  final Handler controller_WS = new Handler(Looper.getMainLooper()){
         public void handleMessage(Message msg){
             String res = msg.getData().getString("RESPONSE");
 
             try{
                 JSONObject aux = new JSONObject(res);
+
                 String op = aux.getString("OP");
                 Log.d("cagada", String.format("OP: %s, Response: %s ", op, res));
 
-                if (op.equals("OPENED")){
-                    List<NameValuePair> p = new ArrayList<>();
-                    p.add(new BasicNameValuePair("hora", ""));
-                    new HTTPRequest(server + "/sync/getupdate", p, "sync", controller_http);
-                }
-                else if (op.equals("CLOSED")){
-                    if (server != null && !server.equals("") && reconectar) {
-                        ws_manager = new WSClient(server + "/ws/comunicacion/comandas", controller_WS);
-                    }
-                }
-                else if (op.equals("MENSAJE")){
-                    if (controller_mesas != null) {
-                        genrateMensajeNotification(aux.getString("msg"));
-                    }
-                }
-                else if (op.equals("UPDATE")){
-                    String tabla = aux.getString("Tabla");
-                    if(tabla.equals("camareros")){
-                        new HTTPRequest(server + "/camareros/listado_activos", new ArrayList<NameValuePair>() , "cam", controller_http);
-                    }
+                switch (op) {
+                    case "OPENED":
+                        ContentValues p = new ContentValues();
+                        p.put("hora", "");
+                        new HTTPRequest(server + "/sync/getupdate", p, "sync", controller_http);
+                        break;
+                    case "CLOSED":
+                        if (server != null && !server.equals("") && reconectar) {
+                            ws_manager = new WSClient(server + "/ws/comunicacion/comandas", controller_WS);
+                        }
+                        break;
+                    case "MENSAJE":
+                        if (controller_mesas != null) {
+                            genrateMensajeNotification(aux.getString("msg"));
+                        }
+                        break;
+                    case "UPDATE":
+                        String tabla = aux.getString("Tabla");
+                        switch (tabla) {
+                            case "camareros":
+                                new HTTPRequest(server + "/camareros/listado_activos", new ContentValues(), "cam", controller_http);
+                                break;
+                            case "zonas":
+                                new HTTPRequest(server + "/mesas/lszonas", new ContentValues(), "zonas", controller_http);
+                                new HTTPRequest(server + "/mesas/lstodaslasmesas", new ContentValues(), "mesas", controller_http);
+                                break;
+                            case "secciones":
+                                new HTTPRequest(server + "/secciones/listado", new ContentValues(), "sec", controller_http);
+                                new HTTPRequest(server + "/articulos/lstodos", new ContentValues(), "art", controller_http);
+                                break;
+                            case "mesasabiertas":
+                                new HTTPRequest(server + "/mesas/lsmesasabiertas", new ContentValues(), "m", controller_http);
+                                new HTTPRequest(server + "/cuenta/lsaparcadas", new ContentValues(), "cuenta", controller_http);
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value: " + tabla);
+                        }
 
-                    else if(tabla.equals("zonas")){
-                        new HTTPRequest(server + "/mesas/lszonas", new ArrayList<NameValuePair>() , "zonas", controller_http);
-                        new HTTPRequest(server + "/mesas/lstodaslasmesas", new ArrayList<NameValuePair>() , "mesas", controller_http);
-                    }
+                        break;
+                    case "ECO_ECO":
+                        String code_res = aux.getString("code");
+                        eco = code.equals(code_res);
+                        break;
 
-                    else if(tabla.equals("secciones")){
-                        new HTTPRequest(server+"/secciones/listado",new ArrayList<NameValuePair>(),"sec", controller_http);
-                        new HTTPRequest(server+"/articulos/lstodos",new ArrayList<NameValuePair>(),"art", controller_http);
-                    }
-
-                    else if(tabla.equals("mesasabiertas")){
-                        new HTTPRequest(server + "/mesas/lsmesasabiertas", new ArrayList<NameValuePair>() , "m", controller_http);
-                        new HTTPRequest(server + "/cuenta/lsaparcadas", new ArrayList<NameValuePair>() , "cuenta", controller_http);
-                    }
-
-                }else if (op.equals("ECO_ECO")){
-                    String code_res = aux.getString("code");
-                    if (code.equals(code_res)) eco = true;
-                    else eco = false;
                 }
 
 
 
             }catch (JSONException e){
                 e.printStackTrace();
+                Log.d("cagada", String.format(" Response: %s ",  res));
+
             }
         }
     };
 
     @SuppressLint("HandlerLeak")
-    private final Handler controller_http = new Handler() {
+    private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
@@ -194,24 +186,24 @@ public class ServicioCom extends Service {
                         if(tb.length()>0){
                             for(int i=0;i<tb.length();i++){
                                String tabla = tb.getJSONObject(i).getString("Tabla");
-                                if(tabla.equals("Camareros")){
-                                   new HTTPRequest(server + "/camareros/listado_activos", new ArrayList<NameValuePair>() , "cam", controller_http);
+                                switch (tabla) {
+                                    case "Camareros":
+                                        new HTTPRequest(server + "/camareros/listado_activos", new ContentValues(), "cam", controller_http);
+                                        break;
+                                    case "Zonas":
+                                        new HTTPRequest(server + "/mesas/lszonas", new ContentValues(), "zonas", controller_http);
+                                        new HTTPRequest(server + "/mesas/lstodaslasmesas", new ContentValues(), "mesas", controller_http);
+                                        break;
+                                    case "Secciones":
+                                        new HTTPRequest(server + "/secciones/listado", new ContentValues(), "sec", controller_http);
+                                        new HTTPRequest(server + "/articulos/lstodos", new ContentValues(), "art", controller_http);
+                                        break;
+                                    case "MesasAbiertas":
+                                        new HTTPRequest(server + "/mesas/lsmesasabiertas", new ContentValues(), "m", controller_http);
+                                        new HTTPRequest(server + "/cuenta/lsaparcadas", new ContentValues(), "cuenta", controller_http);
+                                        break;
+
                                 }
-
-                               else if(tabla.equals("Zonas")){
-                                   new HTTPRequest(server + "/mesas/lszonas", new ArrayList<NameValuePair>() , "zonas", controller_http);
-                                   new HTTPRequest(server + "/mesas/lstodaslasmesas", new ArrayList<NameValuePair>() , "mesas", controller_http);
-                               }
-
-                               else if(tabla.equals("Secciones")){
-                                   new HTTPRequest(server+"/secciones/listado",new ArrayList<NameValuePair>(),"sec", controller_http);
-                                   new HTTPRequest(server+"/articulos/lstodos",new ArrayList<NameValuePair>(),"art", controller_http);
-                               }
-
-                               else if(tabla.equals("MesasAbiertas")){
-                                   new HTTPRequest(server + "/mesas/lsmesasabiertas", new ArrayList<NameValuePair>() , "m", controller_http);
-                                   new HTTPRequest(server + "/cuenta/lsaparcadas", new ArrayList<NameValuePair>() , "cuenta", controller_http);
-                               }
                             }
                         }
 
@@ -261,39 +253,39 @@ public class ServicioCom extends Service {
     }
 
     public void AbrirCajon() {
-        if(server!=null) new HTTPRequest(server + "/impresion/abrircajon", new ArrayList<NameValuePair>(), "abrir_cajon", controller_http);
+        if(server!=null) new HTTPRequest(server + "/impresion/abrircajon", new ContentValues(), "abrir_cajon", controller_http);
     }
 
 
 
     public void getTicket(Handler mostrarLsTicket, String IDTicket) {
-        List<NameValuePair> p = new ArrayList<NameValuePair>();
-        p.add(new BasicNameValuePair("id", IDTicket));
+        ContentValues p = new ContentValues();
+        p.put("id", IDTicket);
         new HTTPRequest(server + "/cuenta/lslineas", p, "ticket", mostrarLsTicket);
     }
 
     public void getLsTicket(Handler hLsTicket) {
-        new HTTPRequest(server+"/cuenta/lsticket",new ArrayList<NameValuePair>(),"lsticket", hLsTicket);
+        new HTTPRequest(server+"/cuenta/lsticket", new ContentValues(),"lsticket", hLsTicket);
     }
 
     public void imprimirTicket(String idTicket) {
-        List<NameValuePair> p = new ArrayList<NameValuePair>();
-        p.add(new BasicNameValuePair("id", idTicket));
-        p.add(new BasicNameValuePair("abrircajon", "False"));
-        p.add(new BasicNameValuePair("receptor_activo", "True"));
+        ContentValues p = new ContentValues();
+        p.put("id", idTicket);
+        p.put("abrircajon", "False");
+        p.put("receptor_activo", "True");
         new HTTPRequest(server + "/impresion/imprimir_ticket", p, "", controller_http);
     }
 
-    public void rmMesa(List<NameValuePair> p, String IDZona) {
+    public void rmMesa(ContentValues p) {
         new HTTPRequest(server+"/cuenta/rm", p ,"", controller_http);
     }
 
-    public void nuevoPedido(List<NameValuePair> obj)
+    public void nuevoPedido(ContentValues obj)
     {
         new HTTPRequest(server+"/cuenta/add", obj ,"", controller_http);
     }
 
-    public void cobrarCuenta(List<NameValuePair> obj, JSONObject info)
+    public void cobrarCuenta(ContentValues obj, JSONObject info)
     {
         info_cobro = info;
         new HTTPRequest(server+"/cuenta/cobrar", obj ,"cobrar", controller_http);
@@ -302,6 +294,7 @@ public class ServicioCom extends Service {
     @TargetApi(Build.VERSION_CODES.ECLAIR)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         String url = intent.getStringExtra("url");
         if (url != null) server = url;
         IniciarDB();
@@ -330,13 +323,12 @@ public class ServicioCom extends Service {
                     hay_conexion = false;
                     Date d = new Date();
                     code = DateFormat.format("yyyyMMddhhmmss", d.getTime()).toString();
-                    List<NameValuePair> p = new ArrayList<>();
-                    p.add(new BasicNameValuePair("code", code));
+                    ContentValues p = new ContentValues();
+                    p.put("code", code);
                     new HTTPRequest(server + "/sync/get_eco", p, "hay_conexion", controller_http);
                 }else {
                     if(ws_manager != null && ws_manager.opened){
-                       Log.d("cagada", String.format("No hay eco que pasa..... ECO %s Hay_conexion %s",eco, hay_conexion));
-                       ws_manager.close();
+                        ws_manager.close();
                        eco = true;
                     }
                 }
@@ -372,7 +364,7 @@ public class ServicioCom extends Service {
         this.controller_camareros = handler;
     }
 
-    public void PreImprimir(final List<NameValuePair> p) {
+    public void PreImprimir(final ContentValues p) {
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -382,45 +374,44 @@ public class ServicioCom extends Service {
         }, 500);
          }
 
-    public void opMesas(List<NameValuePair> p, String url) {
+    public void opMesas(ContentValues p, String url) {
         new HTTPRequest(url, p, "", controller_http);
     }
 
-    public void rmLinea(List<NameValuePair> p) {
+    public void rmLinea(ContentValues p) {
         new HTTPRequest(server+"/cuenta/rmlinea", p ,"", controller_http);
     }
 
     public void set_lista_autorizados(Handler controller, String lista, String camarero) {
-        List<NameValuePair> p = new ArrayList<>();
-        p.add(new BasicNameValuePair("lista", lista));
-        p.add(new BasicNameValuePair("camarero", camarero));
+        ContentValues p = new ContentValues();
+        p.put("lista", lista);
+        p.put("camarero", camarero);
         new HTTPRequest(server + "/camareros/sel_camareros", p, "autorizar", controller);
 
     }
 
     public void crear_pass(Handler controller, String cam, String pass) {
-        ArrayList<NameValuePair> p = new ArrayList<NameValuePair>();
-        p.add(new BasicNameValuePair("cam", cam));
-        p.add(new BasicNameValuePair("password", pass));
+        ContentValues p = new ContentValues();
+        p.put("cam", cam);
+        p.put("password", pass);
         new HTTPRequest(server + "/camareros/crear_password", p, "password", controller);
 
     }
 
     public void getLsSettings(Handler controller) {
-        ArrayList<NameValuePair> p = new ArrayList<NameValuePair>();
-        new HTTPRequest(server + "/receptores/get_lista", p, "get_lista", controller);
+        new HTTPRequest(server + "/receptores/get_lista", new ContentValues(), "get_lista", controller);
 
     }
 
     public void set_lista_settings(Handler controller, String lista) {
-        ArrayList<NameValuePair> p = new ArrayList<NameValuePair>();
-        p.add(new BasicNameValuePair("lista", lista));
+        ContentValues p = new ContentValues();
+        p.put("lista", lista);
         new HTTPRequest(server + "/receptores/set_settings", p, "set_lista", controller);
     }
 
     public void get_cuenta(Handler controller, String mesa_id) {
-        ArrayList<NameValuePair> p = new ArrayList<NameValuePair>();
-        p.add(new BasicNameValuePair("mesa_id", mesa_id));
+        ContentValues p = new ContentValues();
+        p.put("mesa_id", mesa_id);
         new HTTPRequest(server + "/cuenta/get_cuenta", p, "", controller);
     }
 

@@ -1,29 +1,21 @@
 package com.valleapp.valletpv.Util;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft_10;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.os.Build;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class WSClient {
 
     private WebSocketClient mWebSocketClient;
-    private Handler controller;
+    private final Handler controller;
     public boolean opened = false;
-
-    public void sendMessage(String s) {
-        mWebSocketClient.send(s);
-    }
 
     public void close(){
         mWebSocketClient.close();

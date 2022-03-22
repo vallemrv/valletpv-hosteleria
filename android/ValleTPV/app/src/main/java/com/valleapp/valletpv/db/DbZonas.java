@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -70,13 +71,14 @@ public class DbZonas extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getAll()
     {
         JSONArray lista = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from zonas", null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject cam = new JSONObject();
                 cam.put("Nombre",res.getString(res.getColumnIndex("Nombre")));
@@ -96,22 +98,4 @@ public class DbZonas extends SQLiteOpenHelper {
     }
 
 
-    public int getCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("select count(*) from zonas", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-          s = cursor.getInt(0);
-        }
-
-        cursor.close();db.close();
-        return  s;
-
-    }
-
-    public void Vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM zonas");
-    }
 }

@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -68,13 +69,14 @@ public class DbSecciones extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getAll()
     {
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "SELECT * FROM secciones ORDER BY Orden DESC" , null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject obj = new JSONObject();
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
@@ -93,25 +95,4 @@ public class DbSecciones extends SQLiteOpenHelper {
     }
 
 
-    public int getCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("SELECT count(*) FROM secciones", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-            s = cursor.getInt(0);
-        }
-            cursor.close();db.close();
-            return  s;
-    }
-
-    public void Vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM secciones");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
 }

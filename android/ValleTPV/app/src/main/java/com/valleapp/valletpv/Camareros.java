@@ -13,34 +13,28 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.Bundle;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
-
 import android.view.View;
-
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.valleapp.valletpv.Util.JSON;
 import com.valleapp.valletpv.Util.ServicioCom;
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.dlg.DlgSelCamareros;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class Camareros extends Activity {
@@ -244,7 +238,7 @@ public class Camareros extends Activity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -294,7 +288,7 @@ public class Camareros extends Activity {
 
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+
     @Override
     protected void onResume() {
         super.onResume();

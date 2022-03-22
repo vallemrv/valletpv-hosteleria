@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -14,8 +15,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -30,23 +29,18 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import com.valleapp.valletpv.Util.AdaptadorSettings;
+import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.db.DbCuenta;
+import com.valleapp.valletpv.db.DbMesas;
+import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.dlg.DlgSelCamareros;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.valleapp.valletpv.Util.AdaptadorSelCam;
-import com.valleapp.valletpv.Util.AdaptadorSettings;
-import com.valleapp.valletpv.Util.ServicioCom;
-import com.valleapp.valletpv.db.DbCamareros;
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbZonas;
-import com.valleapp.valletpv.dlg.DlgSelCamareros;
 
 
 public class Mesas extends Activity {
@@ -619,13 +613,13 @@ public class Mesas extends Activity {
                     if (motivo.getText().length() > 0) {
                         try {
                             String idm = m.getString("ID");
-                            List<NameValuePair> p = new ArrayList<NameValuePair>();
-                            p.add(new BasicNameValuePair("motivo", motivo.getText().toString()));
-                            p.add(new BasicNameValuePair("idm", idm));
-                            p.add(new BasicNameValuePair("idc", cam.getString("ID")));
+                            ContentValues p = new ContentValues();
+                            p.put("motivo", motivo.getText().toString());
+                            p.put("idm", idm);
+                            p.put("idc", cam.getString("ID"));
                             if (myServicio != null){
                                 dbMesas.cerrarMesa(idm); dbCuenta.eliminar(idm); RellenarMesas();
-                                myServicio.rmMesa(p,zn.getString("ID"));
+                                myServicio.rmMesa(p);
                             }
                             dlg.cancel();
                         } catch (JSONException e) {
@@ -640,13 +634,13 @@ public class Mesas extends Activity {
                 public void onClick(View view) {
                     try {
                         String idm = m.getString("ID");
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
-                        p.add(new BasicNameValuePair("motivo", error.getText().toString()));
-                        p.add(new BasicNameValuePair("idm",idm));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
+                        ContentValues p = new ContentValues();
+                        p.put("motivo", error.getText().toString());
+                        p.put("idm",idm);
+                        p.put("idc", cam.getString("ID"));
                         if (myServicio != null){
                              dbMesas.cerrarMesa(idm); dbCuenta.eliminar(idm); RellenarMesas();
-                             myServicio.rmMesa(p,zn.getString("ID"));
+                             myServicio.rmMesa(p);
                         }
                         dlg.cancel();
                     } catch (JSONException e) {
@@ -660,13 +654,13 @@ public class Mesas extends Activity {
                 public void onClick(View view) {
                     try {
                         String idm = m.getString("ID");
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
-                        p.add(new BasicNameValuePair("motivo", simpa.getText().toString()));
-                        p.add(new BasicNameValuePair("idm", idm));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
+                        ContentValues p = new ContentValues();
+                        p.put("motivo", simpa.getText().toString());
+                        p.put("idm", idm);
+                        p.put("idc", cam.getString("ID"));
                         if (myServicio != null){
                             dbMesas.cerrarMesa(idm); dbCuenta.eliminar(idm); RellenarMesas();
-                            myServicio.rmMesa(p,zn.getString("ID"));
+                            myServicio.rmMesa(p);
                         }
                         dlg.cancel();
                     } catch (JSONException e) {
@@ -680,13 +674,13 @@ public class Mesas extends Activity {
                 public void onClick(View view) {
                     try {
                         String idm = m.getString("ID");
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
-                        p.add(new BasicNameValuePair("motivo", inv.getText().toString()));
-                        p.add(new BasicNameValuePair("idm", idm));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
+                        ContentValues p = new ContentValues();
+                        p.put("motivo", inv.getText().toString());
+                        p.put("idm", idm);
+                        p.put ("idc", cam.getString("ID"));
                         if (myServicio != null){
                             dbMesas.cerrarMesa(idm); dbCuenta.eliminar(idm); RellenarMesas();
-                            myServicio.rmMesa(p,zn.getString("ID"));
+                            myServicio.rmMesa(p);
                         }
                         dlg.cancel();
                     } catch (JSONException e) {

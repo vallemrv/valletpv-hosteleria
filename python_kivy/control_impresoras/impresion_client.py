@@ -17,7 +17,7 @@ class receptor_manager():
         from tpv.impresora import DocPrint
         self.doc = DocPrint(usb=usb,url=url,ip_caja=ip_caja)
 
-    def on_message(ws, message):
+    def on_message(self, ws, message):
         message = json.loads(message)["message"]
         op = message["op"]
         if op == "open":
@@ -27,7 +27,7 @@ class receptor_manager():
         elif op == "ticket":
             if str(message["abrircajon"]).strip() == "True":
                 ws.doc.abrir_cajon()
-            if str(message["receptor_activo"]).strip() == "True"
+            if str(message["receptor_activo"]).strip() == "True":
                 cambio = float(message['efectivo']) - float(message['total'])
                 ws.doc.imprimirTicket(message['num'], message['camarero'], message['fecha'], message["mesa"],
                                    message['total'], message['efectivo'], cambio, message['lineas'])
@@ -40,34 +40,36 @@ class receptor_manager():
                                   message["mesa"], message['lineas'], message['total'])
 
 
-    def on_error(ws, error):
+    def on_error(self, ws, error):
         print(error)
 
-    def on_close(ws):
+    def on_close(self, ws):
         print("### closed ###")
 
-    def on_open(ws):
-        pass
+    def on_open(self, ws):
+        print("### open ###")
 
 
 def run_websoker(url, args):
 
     websocket.enableTrace(True)
+    
     manager = receptor_manager(**args)
-
+    
     ws = websocket.WebSocketApp(url,
                                 on_message = manager.on_message,
                                 on_error = manager.on_error,
                                 on_close = manager.on_close)
+    
     ws.doc = manager
     ws.on_open = manager.on_open
-
+    
     while True:
         ws.run_forever()
         time.sleep(2)
-
+    
 if __name__ == "__main__":
     print_caja = {'usb':(0x1504,0x002b,0,0x81,0x02)}
     print_cocina = {"usb":(0x20d1,0x7007,0,0x81,0x02)}
-    threading.Thread(target=run_websoker, args=("ws://tpvtr.valleapp.com/ws/impresion/caja/", print_caja)).start()
-    threading.Thread(target=run_websoker, args=("ws://tpvtr.valleapp.com/ws/impresion/cocina/", print_cocina)).start()
+    threading.Thread(target=run_websoker, args=("ws://localhost:8000/ws/impresion/caja/", print_caja)).start()
+    #threading.Thread(target=run_websoker, args=("ws://localhost:8000/ws/impresion/cocina/", print_cocina)).start()

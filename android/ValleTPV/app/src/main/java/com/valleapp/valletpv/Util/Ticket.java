@@ -8,13 +8,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.valleapp.valletpv.Interfaces.IControlador;
+import com.valleapp.valletpv.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import com.valleapp.valletpv.Interfaces.IControlador;
-import com.valleapp.valletpv.R;
 
 /**
  * Created by xbmc on 8/09/14.
@@ -22,7 +22,7 @@ import com.valleapp.valletpv.R;
 public class Ticket extends ArrayAdapter<JSONObject> implements View.OnClickListener {
 
     private final Context context;
-    private java.util.List<JSONObject> values = new ArrayList<JSONObject>();
+    private final java.util.List<JSONObject> values;
     IControlador controlador;
 
     public Ticket(Context context, ArrayList<JSONObject> values, IControlador controlador) {

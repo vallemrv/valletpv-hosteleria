@@ -5,6 +5,7 @@
 # @Last modified time: 2019-01-17T00:43:08+01:00
 # @License: Apache license vesion 2.0
 
+from dis import code_info
 from asgiref.sync import async_to_sync
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -15,8 +16,8 @@ class ImpresionConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.print_name = self.scope['url_route']['kwargs']['print_name']
-        self.print_group_name = settings.EMPRESA + "_" + self.print_name
-
+        
+        self.print_group_name = settings.EMPRESA + "_impresion_" + self.print_name
         # Join room group
         await self.channel_layer.group_add(
             self.print_group_name,
@@ -41,14 +42,18 @@ class ImpresionConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.print_group_name,
             {
-                'type': 'print_message',
+                'type': 'send_message',
                 'message': message
             }
         )
 
     # Receive message from room group
-    async def print_message(self, event):
-        message = event['message']
+    async def send_message(self, event):
+        message = ""
+        if 'message' in event:
+            message = event['message']
+        if 'content' in event:
+            message = event["content"]
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
@@ -60,8 +65,7 @@ class ComunicacionConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.roon = self.scope['url_route']['kwargs']["receptor"]
-        self.group_name = settings.EMPRESA + "_" + self.roon
-
+        self.group_name = settings.EMPRESA + "_comunicaciones_" + self.roon
         # Join room group
         await self.channel_layer.group_add(
             self.group_name,
@@ -95,6 +99,11 @@ class ComunicacionConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def send_message(self, event):
-        message = event['content']
+        message = ""
+        if 'message' in event:
+            message = event['message']
+        if 'content' in event:
+            message = event["content"]
+
         # Send message to WebSocket
-        await self.send(text_data=json.dumps(message))
+        await self.send(text_data=message)

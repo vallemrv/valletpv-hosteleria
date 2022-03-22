@@ -2,19 +2,15 @@ package com.valleapp.valletpv;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -23,20 +19,14 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.valleapp.valletpv.Util.HTTPRequest;
 import com.valleapp.valletpv.Util.ServicioCom;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbZonas;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class OpMesas extends Activity {
@@ -181,9 +171,9 @@ public class OpMesas extends Activity {
                             public void onClick(View view) {
                                 try {
                                     JSONObject m = (JSONObject)view.getTag();
-                                    List<NameValuePair> p = new ArrayList<NameValuePair>();
-                                    p.add(new BasicNameValuePair("idp", mesa.getString("ID")));
-                                    p.add(new BasicNameValuePair("ids", m.getString("ID")));
+                                    ContentValues p = new ContentValues();
+                                    p.put("idp", mesa.getString("ID"));
+                                    p.put("ids", m.getString("ID"));
                                     String url = server + (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
                                     if(servicioCom!=null){
                                         servicioCom.opMesas(p, url);

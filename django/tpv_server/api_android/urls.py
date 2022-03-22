@@ -11,7 +11,7 @@ from api_android import views as api_views
 TEST = [
    path("send_last_cierre", api_views.send_last_cierre, name="send_last_cierre"),
    path("reparar_subteclas", api_views.reparar_subteclas, name="sreparar_subteclas"),
-
+   path("test_ws", api_views.test_websocket, name="test_ws"),
 ]
 
 
@@ -122,4 +122,4 @@ ZONAS = []
 urlpatterns = [] + (ARQUEOS + ARITICULOS + COMANDAS + CAMAREROS + SYNC + CUENTA +
                    FAMILIAS + GASTOS + HISTORIAL + IMPRESION + INFMESAS + MESAS +
                    PEDIDOS + RECEPTORES + SECCIONES + SUGERENCIAS + TPV + VENTAS +
-                   ZONAS+ TEST)
+                   ZONAS + TEST)

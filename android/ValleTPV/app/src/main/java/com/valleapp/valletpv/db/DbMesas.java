@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -70,17 +71,17 @@ public class DbMesas extends SQLiteOpenHelper {
         }
         db.close();
     }
-
+    @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
         JSONArray lista = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "SELECT * FROM mesas WHERE IDZona="+id+" ORDER BY Orden DESC", null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject obj = new JSONObject();
-                int num = res.getInt(res.getColumnIndex("num"));
+                 int num = res.getInt(res.getColumnIndex("num"));
                 String RGB = res.getString(res.getColumnIndex("RGB"));
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
                 obj.put("IDZoma", res.getString(res.getColumnIndex("IDZona")));
@@ -99,28 +100,6 @@ public class DbMesas extends SQLiteOpenHelper {
         return lista;
     }
 
-
-    public int getCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("select count(*) from mesas", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-            s= cursor.getInt(0);
-          }
-        cursor.close();db.close();
-        return s;
-    }
-
-    public void Vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-           db.execSQL("DELETE FROM mesas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
 
     public void update(JSONArray datos) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -150,13 +129,13 @@ public class DbMesas extends SQLiteOpenHelper {
         db.execSQL("UPDATE mesas SET abierta='false', num=0 WHERE ID="+idm);
         db.close();
     }
-
+    @SuppressLint("Range")
     public JSONArray getAllMenosUna(String id, String idm) {
         JSONArray lista = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "SELECT * FROM mesas WHERE IDZona="+id+" ORDER BY Orden DESC", null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 String ID = res.getString(res.getColumnIndex("ID"));
                 if(!ID.equals(idm)) {

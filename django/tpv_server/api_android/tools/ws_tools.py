@@ -7,31 +7,47 @@
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.serializers.json import DjangoJSONEncoder
-import websocket
+from django.conf import settings
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 import json
 
 def send_pedidos_ws(request, datos):
     for k, v in datos.items():
-        url = ''.join(['ws://', get_current_site(request).domain, '/ws/impresion/', v["receptor"], "/"])
-        ws = websocket.create_connection(url)
-        ws.send(json.dumps({"message": v}))
-        ws.close()
+        try:
+            channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
+            layer = get_channel_layer()
+            async_to_sync(layer.group_send)(channel_name, {
+                'type': 'send_message',
+                'content': json.dumps(v, cls=DjangoJSONEncoder)
+            })
+        except Exception as e:
+            print(e)
 
 def send_ticket_ws(request, v):
     try:
-        url = ''.join(['ws://', get_current_site(request).domain, '/ws/impresion/', v["receptor"], "/"])
-        ws = websocket.create_connection(url)
-        ws.send(json.dumps({"message": v}, cls=DjangoJSONEncoder))
-        ws.close()
+        
+        channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
+        layer = get_channel_layer()
+        async_to_sync(layer.group_send)(channel_name, {
+            'type': 'send_message',
+            'content': json.dumps(v, cls=DjangoJSONEncoder)
+         })
     except Exception as e:
         print(e)
 
 
 def send_update_ws(request, v):
     try:
-        url = ''.join(['ws://', get_current_site(request).domain, '/ws/comunicacion/', v["receptor"]])
-        ws = websocket.create_connection(url)
-        ws.send(json.dumps({"content": v}))
-        ws.close()
+        channel_name = settings.EMPRESA + "_comunicaciones_" + v["receptor"]
+        layer = get_channel_layer()
+        async_to_sync(layer.group_send)(channel_name, {
+        'type': 'send_message',
+        'content': json.dumps(v)
+        })
     except Exception as e:
         print(e)
+
+
+    

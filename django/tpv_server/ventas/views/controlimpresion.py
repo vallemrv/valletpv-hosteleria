@@ -5,19 +5,20 @@
 # @Last modified time: 29-Jun-2018
 # @License: Apache license vesion 2.0
 
-import websocket
+
 import json
 from datetime import datetime
-from django.db.models import Q, Count, Sum, F
+from django.db.models import Count, Sum, F
 from django.db.models.fields import DecimalField
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms.models import model_to_dict
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from tokenapi.http import JsonResponse
-from gestion.models import (Pedidos, Lineaspedido, Ticket, Infmesa, Teclas,
-                            Arqueocaja, Efectivo, Ticketlineas, Receptores,
+from gestion.models import (Pedidos,  Ticket,  Teclas,
+                            Arqueocaja,  Receptores,
                             Mesasabiertas, Camareros)
+
+from api_android.tools import send_pedidos_ws, send_ticket_ws
 
 
 def imprimir_pedido(request, id):
@@ -202,16 +203,3 @@ def abrircajon(request):
     send_ticket_ws(request, obj)
     return JsonResponse({})
 
-
-def send_pedidos_ws(request, datos):
-    for k, v in datos.items():
-        url = ''.join(['ws://', get_current_site(request).domain, '/ws/impresion/', v["receptor"], "/"])
-        ws = websocket.create_connection(url)
-        ws.send(json.dumps({"message": v}))
-        ws.close()
-
-def send_ticket_ws(request, v):
-    url = ''.join(['ws://', get_current_site(request).domain, '/ws/impresion/', v["receptor"], "/"])
-    ws = websocket.create_connection(url)
-    ws.send(json.dumps({"message": v}, cls=DjangoJSONEncoder))
-    ws.close()

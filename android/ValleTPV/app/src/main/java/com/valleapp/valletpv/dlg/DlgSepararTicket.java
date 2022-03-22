@@ -2,7 +2,6 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -10,16 +9,15 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.valleapp.valletpv.Interfaces.IControlador;
+import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.Util.SepararTicket;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Locale;
-
-import com.valleapp.valletpv.Interfaces.IControlador;
-import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.Util.SepararTicket;
 
 /**
  * Created by valle on 19/10/14.

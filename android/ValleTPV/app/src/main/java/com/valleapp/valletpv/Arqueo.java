@@ -3,13 +3,12 @@ package com.valleapp.valletpv;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.AndroidException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,16 +16,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import com.valleapp.valletpv.Util.HTTPRequest;
+import com.valleapp.valletpv.Util.JSON;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.valleapp.valletpv.Util.HTTPRequest;
-import com.valleapp.valletpv.Util.JSON;
 
 
 public class Arqueo extends Activity {
@@ -146,7 +143,7 @@ public class Arqueo extends Activity {
     }
 
     public void clickAbrirCaja(View v){
-        new HTTPRequest(server+"/impresion/abrircajon",new ArrayList<NameValuePair>(),"open", controller_http);
+        new HTTPRequest(server+"/impresion/abrircajon",new ContentValues(),"open", controller_http);
     }
 
     @Override
@@ -269,12 +266,12 @@ public class Arqueo extends Activity {
       }
 
       public void ArquearCaja(View v){
-              List<NameValuePair> p = new ArrayList<NameValuePair>();
-              p.add(new BasicNameValuePair("cambio", Double.toString(cambio)));
-              p.add(new BasicNameValuePair("efectivo", Double.toString(efectivo )));
-              p.add(new BasicNameValuePair("gastos",Double.toString(gastos)));
-              p.add(new BasicNameValuePair("des_efectivo",objEfectivo.toString()));
-              p.add(new BasicNameValuePair("des_gastos",objGastos.toString()));
+              ContentValues p = new ContentValues();
+              p.put("cambio", Double.toString(cambio));
+              p.put("efectivo", Double.toString(efectivo ));
+              p.put("gastos",Double.toString(gastos));
+              p.put("des_efectivo",objEfectivo.toString());
+              p.put("des_gastos",objGastos.toString());
               new HTTPRequest(server+"/arqueos/arquear",p,"arqueo", controller_http);
 
       }
@@ -288,7 +285,7 @@ public class Arqueo extends Activity {
                   startActivity(intent);
               }else{
                   server = pref.getString("URL");
-                  new HTTPRequest(server+"/arqueos/getcambio",new ArrayList<NameValuePair>(),"cambio", controller_http);
+                  new HTTPRequest(server+"/arqueos/getcambio",new ContentValues(),"cambio", controller_http);
               }
 
           } catch (Exception e) {

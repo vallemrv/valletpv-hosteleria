@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -15,7 +16,6 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,29 +28,25 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import com.valleapp.valletpv.Interfaces.IControlador;
+import com.valleapp.valletpv.Util.JSON;
+import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.Util.Ticket;
+import com.valleapp.valletpv.db.DbCuenta;
+import com.valleapp.valletpv.db.DbMesas;
+import com.valleapp.valletpv.db.DbSecciones;
+import com.valleapp.valletpv.db.DbTeclas;
+import com.valleapp.valletpv.dlg.DlgCobrar;
+import com.valleapp.valletpv.dlg.DlgSepararTicket;
+import com.valleapp.valletpv.dlg.DlgVarios;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.valleapp.valletpv.Interfaces.IControlador;
-import com.valleapp.valletpv.Util.JSON;
-import com.valleapp.valletpv.Util.ServicioCom;
-import com.valleapp.valletpv.Util.Ticket;
-import com.valleapp.valletpv.db.DbTeclas;
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbSecciones;
-
-import com.valleapp.valletpv.dlg.DlgCobrar;
-import com.valleapp.valletpv.dlg.DlgSepararTicket;
-import com.valleapp.valletpv.dlg.DlgVarios;
 
 
 public class Cuenta extends Activity implements TextWatcher, IControlador {
@@ -328,10 +324,10 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     private void aparcar(String idm, JSONArray nuevos) throws JSONException {
         if(nuevos.length()>0) {
-            List<NameValuePair> p = new ArrayList<NameValuePair>();
-            p.add(new BasicNameValuePair("idm", idm));
-            p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-            p.add(new BasicNameValuePair("pedido", nuevos.toString()));
+            ContentValues p = new ContentValues();
+            p.put("idm", idm);
+            p.put("idc", cam.getString("ID"));
+            p.put("pedido", nuevos.toString());
             if (myServicio != null) {
                 myServicio.nuevoPedido(p);
                 dbCuenta.aparcar(idm);
@@ -389,8 +385,8 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
             lineas = dbCuenta.getAll(mesa.getString("ID"));
             stop = false;
             if(totalMesa>0) {
-                    List<NameValuePair> p = new ArrayList<NameValuePair>();
-                    p.add(new BasicNameValuePair("idm", mesa.getString("ID")));
+                    ContentValues p = new ContentValues();
+                    p.put("idm", mesa.getString("ID"));
                     if(myServicio!=null) myServicio.PreImprimir(p);
             }
         } catch (JSONException e) {
@@ -566,11 +562,11 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
         try {
             estoy=true; stop=false;
-            List<NameValuePair> p = new ArrayList<NameValuePair>();
-            p.add(new BasicNameValuePair("idm", mesa.getString("ID")));
-            p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-            p.add(new BasicNameValuePair("entrega", Double.toString(entrega)));
-            p.add(new BasicNameValuePair("art", lsart.toString()));
+            ContentValues p = new ContentValues();
+            p.put("idm", mesa.getString("ID"));
+            p.put("idc", cam.getString("ID"));
+            p.put("entrega", Double.toString(entrega));
+            p.put("art", lsart.toString());
             dbCuenta.eliminar(mesa.getString("ID"), lsart);
             if(myServicio!=null) {
                 JSONObject info = new JSONObject();
@@ -634,16 +630,16 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                     if (motivo.getText().length() > 0) {
                         try {
                             art.put("Can",1);
-                            List<NameValuePair> p = new ArrayList<NameValuePair>();
+                            ContentValues p = new ContentValues();
                             String idm = mesa.getString("ID");
-                            p.add(new BasicNameValuePair("idm", idm));
-                            p.add(new BasicNameValuePair("Precio", art.getString("Precio")));
-                            p.add(new BasicNameValuePair("idArt", art.getString("IDArt")));
-                            p.add(new BasicNameValuePair("can", "1"));
-                            p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-                            p.add(new BasicNameValuePair("motivo", motivo.getText().toString()));
-                            p.add(new BasicNameValuePair("Estado", art.getString("Estado")));
-                            p.add(new BasicNameValuePair("Nombre", art.getString("Nombre")));
+                            p.put("idm", idm);
+                            p.put("Precio", art.getString("Precio"));
+                            p.put("idArt", art.getString("IDArt"));
+                            p.put("can", "1");
+                            p.put("idc", cam.getString("ID"));
+                            p.put("motivo", motivo.getText().toString());
+                            p.put("Estado", art.getString("Estado"));
+                            p.put("Nombre", art.getString("Nombre"));
                             if (myServicio != null){
                                 myServicio.rmLinea(p);
                                 dbCuenta.eliminar(idm, new JSONArray().put(art));
@@ -662,16 +658,16 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                 public void onClick(View view) {
                     try {
                         art.put("Can",1);
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
+                        ContentValues p = new ContentValues();
                         String idm = mesa.getString("ID");
-                        p.add(new BasicNameValuePair("idm", idm));
-                        p.add(new BasicNameValuePair("Precio", art.getString("Precio")));
-                        p.add(new BasicNameValuePair("idArt", art.getString("IDArt")));
-                        p.add(new BasicNameValuePair("can", "1"));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-                        p.add(new BasicNameValuePair("motivo", error.getText().toString()));
-                        p.add(new BasicNameValuePair("Estado", art.getString("Estado")));
-                        p.add(new BasicNameValuePair("Nombre", art.getString("Nombre")));
+                        p.put("idm", idm);
+                        p.put("Precio", art.getString("Precio"));
+                        p.put("idArt", art.getString("IDArt"));
+                        p.put("can", "1");
+                        p.put("idc", cam.getString("ID"));
+                        p.put("motivo", motivo.getText().toString());
+                        p.put("Estado", art.getString("Estado"));
+                        p.put("Nombre", art.getString("Nombre"));
                         if (myServicio != null) {
                             myServicio.rmLinea(p);
                             dbCuenta.eliminar(idm, new JSONArray().put(art));
@@ -691,16 +687,16 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                 public void onClick(View view) {
                     try {
                         art.put("Can",1);
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
+                        ContentValues p = new ContentValues();
                         String idm = mesa.getString("ID");
-                        p.add(new BasicNameValuePair("idm", idm));
-                        p.add(new BasicNameValuePair("Precio", art.getString("Precio")));
-                        p.add(new BasicNameValuePair("idArt", art.getString("IDArt")));
-                        p.add(new BasicNameValuePair("can", "1"));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-                        p.add(new BasicNameValuePair("motivo", simpa.getText().toString()));
-                        p.add(new BasicNameValuePair("Estado", art.getString("Estado")));
-                        p.add(new BasicNameValuePair("Nombre", art.getString("Nombre")));
+                        p.put("idm", idm);
+                        p.put("Precio", art.getString("Precio"));
+                        p.put("idArt", art.getString("IDArt"));
+                        p.put("can", "1");
+                        p.put("idc", cam.getString("ID"));
+                        p.put("motivo", motivo.getText().toString());
+                        p.put("Estado", art.getString("Estado"));
+                        p.put("Nombre", art.getString("Nombre"));
                         if (myServicio != null){
                             myServicio.rmLinea(p);
                             dbCuenta.eliminar(idm, new JSONArray().put(art));
@@ -719,16 +715,16 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                 public void onClick(View view) {
                     try {
                         art.put("Can",1);
-                        List<NameValuePair> p = new ArrayList<NameValuePair>();
+                        ContentValues p = new ContentValues();
                         String idm = mesa.getString("ID");
-                        p.add(new BasicNameValuePair("idm", idm));
-                        p.add(new BasicNameValuePair("Precio", art.getString("Precio")));
-                        p.add(new BasicNameValuePair("idArt", art.getString("IDArt")));
-                        p.add(new BasicNameValuePair("can", "1"));
-                        p.add(new BasicNameValuePair("idc", cam.getString("ID")));
-                        p.add(new BasicNameValuePair("motivo", inv.getText().toString()));
-                        p.add(new BasicNameValuePair("Estado", art.getString("Estado")));
-                        p.add(new BasicNameValuePair("Nombre", art.getString("Nombre")));
+                        p.put("idm", idm);
+                        p.put("Precio", art.getString("Precio"));
+                        p.put("idArt", art.getString("IDArt"));
+                        p.put("can", "1");
+                        p.put("idc", cam.getString("ID"));
+                        p.put("motivo", motivo.getText().toString());
+                        p.put("Estado", art.getString("Estado"));
+                        p.put("Nombre", art.getString("Nombre"));
                         if (myServicio != null) {
                             myServicio.rmLinea(p);
                             dbCuenta.eliminar(idm, new JSONArray().put(art));
