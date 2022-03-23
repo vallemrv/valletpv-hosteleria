@@ -398,11 +398,11 @@ public class Mesas extends Activity {
                 msg = Toast.makeText(cx, String.format("Cambio: %01.2f € ",
                          cambio), Toast.LENGTH_LONG);
 
-                View toastView = msg.getView();
+                /*View toastView = msg.getView();
                 TextView toastMessage =  toastView.findViewById(android.R.id.message);
                 toastMessage.setTextSize(45);
                 toastMessage.setPadding(5,5,5,5);
-                toastMessage.setTextColor(Color.RED);
+                toastMessage.setTextColor(Color.RED);*/
                 msg.show();
             }
 

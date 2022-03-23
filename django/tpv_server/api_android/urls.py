@@ -52,7 +52,7 @@ SYNC = [
     path("know_connect", api_views.know_connect, name="know_connect"),
     path("lastsync", api_views.lastsync, name="lastsync"),
     path("firstsync", api_views.firstsync, name="firstsync"),
-    
+    path("get_update_tables", api_views.get_update_tables, name="get_update_tables")
 ]
 
 CUENTA = [

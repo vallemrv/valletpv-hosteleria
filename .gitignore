@@ -1,4 +1,4 @@
-# Directorios no necesarios
+# Directorios y ficheros no necesarios
 .vscode/
 manage*
 media*/
@@ -7,11 +7,12 @@ Test*/
 server_*
 *.sqlite3
 node*
-**/control_impresoras/logo.png
+**/control_impresoras/test*
 
 #excepciones
 !manage_template.py
 !test_ws/
+!management/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

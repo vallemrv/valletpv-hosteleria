@@ -6,14 +6,15 @@
 # @License: Apache License v2.0
 
 from api_android.tools import send_update_ws
-from tokenapi.http import JsonError, JsonResponse
+from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
             
 from gestion.models import *
-import json
+
 
 from datetime import datetime
+
 
 @csrf_exempt
 def getupdate(request):
@@ -41,6 +42,7 @@ def getupdate(request):
     except:
         print("error en sincronizacion")
     return JsonResponse(res)
+
 
 @csrf_exempt
 def get_eco(request):
@@ -125,3 +127,11 @@ def firstsync(request):
     return JsonResponse(respose)
 
 
+@csrf_exempt
+def get_update_tables(request):
+    sync = Sync.objects.all()
+    response = []
+    for s in sync:
+        response.append({"nombre":s.nombre, "last":s.last})
+
+    return JsonResponse(response)

@@ -16,30 +16,24 @@ import locale
 
 import sys
 
-ip_caja = '192.168.1.8'
+
 
 class DocPrint():
 
-    def __init__(self, ip_caja=None, usb=None, url=None):
-        print(ip_caja,usb, url)
-        if ip_caja!=None:
-            self.ip_caja = ip_caja
-            self.tipo = "Network"
-        if usb!=None:
-            self.usb = usb
-            self.tipo = "Usb"
-        if url!=None:
-            self.url = url
-            self.tipo = "File"
+    def __init__(self, datos_empresa, datos_impresora):
+        self._datos = datos_empresa
+        self.tipo = datos_impresora["tipo"]
+        self.params = datos_impresora["params"]
+       
 
     def abrir_cajon(self,  *args):
         try:
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
+                printer = File(self.params)
 
             printer.cashdraw(2)
         except Exception as e:
@@ -56,18 +50,17 @@ class DocPrint():
 
         try:
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
+                printer = File(self.params)
 
 
 
             with EscposIO(printer) as p:
                 p.printer.codepage = 'cp858'
-                p.printer._raw(escpos.CHARCODE_PC852)
-
+                
                 p.writelines("Cierre de caja", align='center', width=2, height=2)
 
                 p.writelines(fecha, align='center', width=2, height=2)
@@ -98,22 +91,24 @@ class DocPrint():
         try:
 
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
+                printer = File(self.params)
 
 
 
             with EscposIO(printer) as p:
                 p.printer.codepage = 'cp858'
-                p.printer._raw(escpos.CHARCODE_PC852)
-
-                p.printer.image("logo.png")
-                p.writelines('Calle Dr Mesa Moles, 2', font='a', align='center')
-                p.writelines('18012 Granada', font='a', align='center')
-                p.writelines('NIF: B18616201', font='b', align='center')
+                p.printer._raw(escpos.BEEP)
+                p.printer.image(self._datos["url_logo"])
+                p.writelines("")
+                p.writelines(self._datos["nombre_empresa"], font='A', align='center')
+                
+                p.writelines(self._datos["direccion"]["calle"], font='a', align='center')
+                p.writelines(self._datos["direccion"]["cp"]+ " "+ self._datos["direccion"]["provincia"], font='a', align='center')
+                p.writelines('NIF: '+ self._datos["nif"], font='A', align='center')
                 p.writelines('------------------------------------------', align='center')
                 p.writelines(fecha, height=2, width=1, font='b', align='center')
                 p.writelines("Num Ticket: %d" % num,font='a', align='center')
@@ -139,25 +134,24 @@ class DocPrint():
                 p.writelines("Factura simplificada",  text_type='bold',  font='a', align='center')
                 p.writelines("Iva incluido",  text_type='bold', font='a',  align='center')
                 p.writelines("Gracias por su visita",font='a',   align='center')
+                p.writelines("TLF: "+ self._datos["telefono"], text_type='bold', height=2, font='a',   align='center')
 
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
     def imprimirPedido(self, camarero, mesa, hora, lineas):
-
+        
         try:
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
-
-
+                printer = File(self.params)
+            
             with EscposIO(printer) as p:
                 p.printer.codepage = 'cp858'
-                p.printer._raw(escpos.CHARCODE_PC852)
-
+               
                 p.printer.set(align='center')
                 p.writelines("")
                 p.writelines('------------------------------------------', align='center')
@@ -180,17 +174,16 @@ class DocPrint():
     def imprimirUrgente(self, camarero, mesa, hora, lineas):
         try:
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
+                printer = File(self.params)
 
 
             with EscposIO(printer) as p:
                 p.printer.codepage = 'cp858'
-                p.printer._raw(escpos.CHARCODE_PC852)
-
+                
                 p.printer.set(align='center')
                 p.writelines("")
                 p.writelines('URGENTE!!', height=2, width=2, font='a', align='center')
@@ -212,7 +205,7 @@ class DocPrint():
             print("[ERROR  ] %s" % e)
 
     def imprimirPreTicket(self, camarero, numcopias, fecha, mesa, lineas, total):
-
+        
         if type(fecha) is datetime:
             fecha = fecha.strftime("El %a %d-%B a las (%H:%M)")
         else:
@@ -221,16 +214,15 @@ class DocPrint():
 
         try:
             if self.tipo == "Network":
-                printer = Network(self.ip_caja, timeout=1)
+                printer = Network(self.params, timeout=1)
             if self.tipo == "Usb":
-                printer = Usb(*self.usb)
+                printer = Usb(*self.params)
             if self.tipo == "File":
-                printer = File(self.url)
+                printer = File(self.params)
 
             with EscposIO(printer) as p:
                 p.printer.codepage = 'cp858'
-                p.printer._raw(escpos.CHARCODE_PC852)
-
+                
                 p.printer.set(align='center')
                 p.writelines('PRETICKET', font='a', height=2, align='center')
                 p.writelines('')
@@ -247,7 +239,7 @@ class DocPrint():
 
                 p.writelines("")
                 p.writelines("Total: {0:0.2f} €".format(float(total)),
-                              align='right', height=2)
+                              align='right', height=3)
                 p.writelines("")
                 p.writelines("No olvide pedir su ticket",  text_type='bold', height=2, align='center')
                 p.writelines(camarero, text_type='bold', font='a', align='center')
@@ -259,20 +251,3 @@ class DocPrint():
 
     def test_print(self):
         print("Test print console")
-
-if __name__ == '__main__':
-    import sys
-    import os
-    import locale
-
-    #locale.setlocale(locale.LC_TIME, "es_ES.UTF-8") # swedish
-
-    with EscposIO(Network("192.168.0.200")) as p:
-        p.printer.codepage = 'cp858'
-        p.printer._raw(escpos.CHARCODE_PC852)
-        p.writelines("ñññññ€", height=2, width=2)
-        p.writelines("illosss", height=2, width=2)
-        p.writelines("locooo", height=2, width=2)
-        p.writelines("cassaaa", height=2, width=2)
-        p.writelines("ppppepe", height=2, width=2)
-        p.printer.cashdraw(2)
