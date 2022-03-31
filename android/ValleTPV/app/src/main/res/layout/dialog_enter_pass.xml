@@ -6,6 +6,15 @@
     android:padding="5dip">
 
     <EditText
+        android:id="@+id/editTextTextPersonName4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Contraseña"
+        android:textSize="25sp" />
+
+    <EditText
         android:id="@+id/enter_pass_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

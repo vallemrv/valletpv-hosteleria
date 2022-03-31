@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by valle on 19/10/14.
@@ -40,7 +41,7 @@ public class DlgSepararTicket extends Dialog{
         setContentView(R.layout.separarticket);
 
         final TextView tot = (TextView) findViewById(R.id.lblTotalCobro);
-        Button ok = (Button)findViewById(R.id.btnAceptar);
+        Button ok = (Button)findViewById(R.id.btn_varios_aceptar);
         ImageButton s = (ImageButton)findViewById(R.id.btnSalir);
 
         final ListView lstCobros = (ListView)findViewById(R.id.lstCobros);
@@ -116,12 +117,8 @@ public class DlgSepararTicket extends Dialog{
 
     }
 
-    public void setLineasTicket(JSONArray lsart) throws JSONException {
-        for(int i= 0;i<lsart.length();i++){
-            JSONObject art = new JSONObject(lsart.get(i).toString());
-            art.put("CanCobro",0);
-            lineasTicket.add(art);
-        }
+    public void setLineasTicket(List<JSONObject> lsart) throws JSONException {
+        lineasTicket = (ArrayList<JSONObject>) lsart;
         lstArt.setAdapter(new SepararTicket(getContext(), lineasTicket, false));
      }
 
@@ -142,7 +139,12 @@ public class DlgSepararTicket extends Dialog{
     }
 
     public void clickSalirSeparados(View view){
-        cancel(); this.controlador.salir();
+        cancel();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        controlador.setEstadoAutoFinish(true, false);
+    }
 }

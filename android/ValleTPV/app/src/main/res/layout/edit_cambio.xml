@@ -34,7 +34,7 @@
             android:text="OK"
             android:id="@+id/aceptarCam"
             android:layout_toStartOf="@+id/salirCambio"
-            android:background="@drawable/blancoxml"
+            android:background="@drawable/fondo_btn_xml"
             android:layout_margin="5dp"
             android:layout_below="@+id/cambio" />
 

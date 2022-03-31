@@ -5,6 +5,9 @@
 # @Last modified time: 2019-08-02T15:16:09+02:00
 # @License: Apache License v2.0
 
+import json
+from multiprocessing.dummy import JoinableQueue
+from urllib import response
 from api_android.tools import send_update_ws
 from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -47,14 +50,16 @@ def getupdate(request):
 @csrf_exempt
 def get_eco(request):
     #enviar notficacion de update
-    code = request.POST["code"]
-    update = {
-       "OP": "ECO_ECO",
-       "receptor": "comandas",
-       "code": code
-    }
-    send_update_ws(request, update)
-    return JsonResponse("success")
+    if ("code" in request.POST):
+        code = request.POST["code"]
+        update = {
+        "OP": "ECO_ECO",
+        "receptor": "comandas",
+        "code": code
+        }
+        send_update_ws(request, update)
+        return JsonResponse("success")
+    return JsonResponse("non_success")
 
 
 @csrf_exempt
@@ -122,8 +127,7 @@ def firstsync(request):
             aux["Registros"].append(reg)
             respose["Tablas"].append(aux)
             
-    respose["lastsync"] =   "%s" % datetime.now.last.strftime("%Y/%m/%d, %H:%M:%S")      
-    print(respose)
+    respose["lastsync"] =   "%s" % datetime.now.last.strftime("%Y/%m/%d, %H:%M:%S")
     return JsonResponse(respose)
 
 
@@ -132,6 +136,123 @@ def get_update_tables(request):
     sync = Sync.objects.all()
     response = []
     for s in sync:
-        response.append({"nombre":s.nombre, "last":s.last})
+        response.append({"nombre": s.nombre, "last": s.last})
 
     return JsonResponse(response)
+
+@csrf_exempt
+def get_tb_up_last(request):
+    t = request.POST["tb"]
+    tb_sync = Sync.objects.filter(nombre=t).first()
+    
+    if not tb_sync:
+        tb_sync = Sync();
+        tb_sync.nombre = t
+        tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        tb_sync.save()
+
+   
+    return JsonResponse({"nombre": t, "last": tb_sync.last})
+
+@csrf_exempt
+def update_for_devices(request):
+    t = request.POST["tb"] 
+    
+    tbModel = None
+    objs = []
+    if t == 'camareros':
+        tbModel = Camareros
+    elif t == 'mesas':
+        tbModel = Mesas
+    elif t == "zonas":
+        tbModel = Zonas
+    elif t == "secciones":
+        tbModel = Secciones
+    elif t == "teclas":
+        tbModel = Teclas
+    elif t == "cuenta":
+        tbModel = Lineaspedido
+    elif t == "mesasabiertas":
+        tbModel = Mesasabiertas
+    
+    if tbModel:
+        objs = tbModel.update_for_devices()
+            
+    
+    tb_sync = Sync.objects.filter(nombre=t).first()
+    if not tb_sync:
+        tb_sync = Sync();
+        tb_sync.nombre = t
+        tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        tb_sync.save()
+
+    
+    print(objs)
+   
+    return JsonResponse(
+        {"nombre": t, 
+        "last": tb_sync.last, 
+        "objs": objs})
+
+
+@csrf_exempt
+def update_from_devices(request):
+    tb = request.POST["tb"]
+    rows = json.loads(request.POST["rows"])
+    tbs = []
+
+    if tb == "camareros":
+        tbs.append(tb)
+        for row in rows:
+            Camareros.update_from_device(row)
+
+    elif tb in "borrarmesa":
+        for r in rows:
+            motivo = r["motivo"]
+            idc = r["idc"]
+            idm = r["idm"]
+            Mesasabiertas.borrar_mesa_abierta(idm, idc, motivo)
+        tbs.append("mesasabiertas", "lineaspedido")
+        
+    elif tb in ["cambiarmesas", "juntarmesas"]:
+        for r in rows:
+            idp = r["idp"]
+            ids = r["ids"]
+            if tb == "cambiarmesas":
+                Mesasabiertas.cambiar_mesas_abiertas(idp, ids)
+                tbs.append("mesasabiertas")
+            else:
+                Mesasabiertas.juntar_mesas_abiertas(idp, ids)
+                tbs.append("mesasabiertas", "infmesa", "pedidos", "lineaspedido")
+
+    elif tb == "borrarlinea":
+        for r in rows:
+            idm = r["idm"]
+            p = r["Precio"]
+            idArt = r["idArt"]
+            can = int(r["can"])
+            idc = r["idc"]
+            motivo = r["motivo"]
+            s = r["Estado"]
+            n = r["Nombre"]
+            Lineaspedido.borrar_linea(idm, p, idArt, can, idc, motivo, s, n)
+        tbs.append("mesasabiertas", "lineaspedido", "infmesa", "pedidos")
+
+    elif tb == "nuevopedido":
+        tbs.append("mesasabiertas", "pedidos", "lineaspedido", "infmesa")
+        for r in rows:
+            idm = r["idm"]
+            idc = r["idc"]
+            lineas = json.loads(r["pedido"])
+            Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
+    elif tb == "cobrarcuenta":
+        tbs.append("mesasabiertas", "lineaspedido")
+        
+
+    
+   
+    
+    return JsonResponse(
+         {"tb": tb, 
+          "last":datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+          })

@@ -1,5 +1,6 @@
 package com.valleapp.valletpv;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -45,7 +46,7 @@ public class OpMesas extends Activity {
     JSONObject zn = null;
     Context cx;
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             servicioCom = ((ServicioCom.MyBinder)iBinder).getService();
@@ -58,7 +59,7 @@ public class OpMesas extends Activity {
     };
 
 
-    private void RellenarZonas() {
+    private void rellenarZonas() {
         try {
 
             lszonas = dbZonas.getAll();
@@ -83,7 +84,7 @@ public class OpMesas extends Activity {
 
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    View v = inflater.inflate(R.layout.btn_art, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
                     Button btn = (Button)v.findViewById(R.id.boton_art);
@@ -94,24 +95,21 @@ public class OpMesas extends Activity {
                     String[] rgb = z.getString("RGB").trim().split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            try {
-                                zn = lszonas.getJSONObject((Integer)view.getId());
-                                RellenarMesas();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
+                    btn.setOnClickListener(view -> {
+                        try {
+                            zn = lszonas.getJSONObject((Integer)view.getId());
+                            rellenarMesas();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
                     });
                     ll.addView(v, params);
 
 
                 }
 
-               RellenarMesas();
+               rellenarMesas();
 
             }
 
@@ -121,7 +119,7 @@ public class OpMesas extends Activity {
 
     }
 
-    private void RellenarMesas() {
+    private void rellenarMesas() {
         try {
 
             lsmesas = dbMesas.getAllMenosUna(zn.getString("ID"), mesa.getString("ID"));
@@ -153,7 +151,7 @@ public class OpMesas extends Activity {
                         LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                                 (Context.LAYOUT_INFLATER_SERVICE);
 
-                        View v = inflater.inflate(R.layout.btn_art, null);
+                        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
                         Button btn = (Button) v.findViewById(R.id.boton_art);
@@ -166,24 +164,21 @@ public class OpMesas extends Activity {
                         String[] rgb = m.getString("RGB").trim().split(",");
                         btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                        btn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                try {
-                                    JSONObject m = (JSONObject)view.getTag();
-                                    ContentValues p = new ContentValues();
-                                    p.put("idp", mesa.getString("ID"));
-                                    p.put("ids", m.getString("ID"));
-                                    String url = server + (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
-                                    if(servicioCom!=null){
-                                        servicioCom.opMesas(p, url);
-                                        finalizar(m);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                        btn.setOnClickListener(view -> {
+                            try {
+                                JSONObject m1 = (JSONObject)view.getTag();
+                                ContentValues p = new ContentValues();
+                                p.put("idp", mesa.getString("ID"));
+                                p.put("ids", m1.getString("ID"));
+                                String url = op.equals("cambiar") ? "cambiarmesas" :"juntarmesas";
+                                if(servicioCom!=null){
+                                    servicioCom.opMesas(p, url);
+                                    finalizar(m1);
                                 }
-
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+
                         });
                         row.addView(v, rowparams);
 
@@ -203,7 +198,7 @@ public class OpMesas extends Activity {
 
     private void finalizar(JSONObject m) throws JSONException {
         if(op.equals("cambiar")){
-            if(!m.getBoolean("abierta")){
+            if(m.getString("abierta").equals("0")){
                 dbMesas.abrirMesa(m.getString("ID"));
                 dbMesas.cerrarMesa(mesa.getString("ID"));
                 dbCuenta.cambiarCuenta(mesa.getString("ID"), m.getString("ID"));
@@ -213,7 +208,7 @@ public class OpMesas extends Activity {
                 dbCuenta.cambiarCuenta("-100", m.getString("ID"));
             }
         }else {
-            if(m.getBoolean("abierta")){
+            if(m.getString("abierta").equals("1")){
                 dbMesas.cerrarMesa(m.getString("ID"));
                 dbCuenta.cambiarCuenta(m.getString("ID"), mesa.getString("ID"));
             }else{
@@ -236,19 +231,18 @@ public class OpMesas extends Activity {
         try {
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
             TextView l = (TextView)findViewById(R.id.lblTitulo);
-            String titulo = op.equals("cambiar") ? "Cambiar mesa "+ mesa.getString("Nombre"):"Juntar mesa "+ mesa.getString("Nombre") ;
+            String titulo = op.equals("cambiar") ? "Cambiar mesa "+ mesa.getString("Nombre") : "Juntar mesa "+ mesa.getString("Nombre") ;
             l.setText(titulo);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        RellenarZonas();
+        rellenarZonas();
     }
 
     @Override
     protected void onResume() {
-        ServicioCom.pasa = false;
         Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
         intent.putExtra("url", server);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
@@ -257,8 +251,7 @@ public class OpMesas extends Activity {
 
     @Override
     protected void onDestroy() {
-        ServicioCom.pasa = true;
-        if(mConexion!=null && servicioCom!=null ) unbindService(mConexion);
+        unbindService(mConexion);
         super.onDestroy();
     }
 }

@@ -9,5 +9,26 @@
     <string name="title_activity_arqueo">Arqueo de caja</string>
     <string name="crear">Crear</string>
     <string name="entrar">Entrar</string>
+    <string name="title_activity_camareros">Camareros</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="simpa">Simpa</string>
+    <string name="error_pedido">Error\npedido</string>
+    <string name="borrar_editar">Editar modo</string>
+    <string name="borrar_salir">Salir de modo borrar</string>
+    <string name="editar_motivo">Editar motivo</string>
+    <string name="borrar_ok">Ok</string>
+    <string name="borrar_invitacion">Invitacion</string>
+    <string name="op_mesas_camarero">Camarero</string>
+    <string name="cuenta_reposo">0.00 €</string>
+    <string name="cuenta_label_total">Total:</string>
+    <string name="camareros_libre">Camareros libre</string>
+    <string name="carmareros_pase">Carmareros pase</string>
 
 </resources>

@@ -8,10 +8,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.Util.JSON;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.valleapp.valletpv.Util.JSON;
 
 
 public class PreferenciasTPV extends Activity {
@@ -22,7 +22,7 @@ public class PreferenciasTPV extends Activity {
         setContentView(R.layout.activity_preferencias_tpv);
         final Context cx = this;
         final EditText txt = (EditText)findViewById(R.id.txtUrl);
-        Button btn = (Button)findViewById(R.id.btnAceptar);
+        Button btn = (Button)findViewById(R.id.btn_varios_aceptar);
         JSONObject obj = cargarPreferencias();
 
         if(obj!=null) try {
@@ -42,6 +42,7 @@ public class PreferenciasTPV extends Activity {
                  JSON json = new JSON();
                  json.serializar("preferencias.dat",obj,cx);
                  Toast.makeText(getApplicationContext(),"Datos guardados correctamente",Toast.LENGTH_SHORT).show();
+                 finish();
 
              } catch (JSONException e) {
                 e.printStackTrace();

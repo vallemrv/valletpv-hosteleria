@@ -33,10 +33,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="Ok"
-                android:id="@+id/btnAceptar"
+                android:id="@+id/btn_varios_aceptar"
                 android:layout_toLeftOf="@+id/salir"
                 android:layout_weight="0.15"
-                android:background="@drawable/blancoxml"
+                android:background="@drawable/fondo_btn_xml"
                 android:layout_margin="5dp"/>
 
             <ImageButton

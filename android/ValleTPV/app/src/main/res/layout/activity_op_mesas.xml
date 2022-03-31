@@ -20,14 +20,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Camarero"
+            android:text="@string/op_mesas_camarero"
 
             android:id="@+id/lblTitulo"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:textSize="35dip"
-            android:layout_marginLeft="5dp" />
+            android:textSize="35sp"
+            android:layout_marginStart="5dp" />
 
 
 
@@ -47,14 +46,14 @@
             android:layout_weight="0.1"
 
             android:background="@android:color/white"
-            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="5dp">
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:id="@+id/pneZonas"></LinearLayout>
+                android:id="@+id/pneZonas" />
         </HorizontalScrollView>
 
         <ScrollView
@@ -68,9 +67,9 @@
 
             <TableLayout
                 android:layout_width="fill_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/pneMesas"
-                android:stretchColumns="*"></TableLayout>
+                android:stretchColumns="*" />
 
         </ScrollView>
 

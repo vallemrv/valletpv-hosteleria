@@ -164,7 +164,7 @@ public class Arqueo extends Activity {
        dlg.setContentView(R.layout.add_efectivo);
        dlg.setTitle("Agregar efectivo");
        Button s = (Button) dlg.findViewById(R.id.btnSalir);
-       Button ok = (Button) dlg.findViewById(R.id.btnAceptar);
+       Button ok = (Button) dlg.findViewById(R.id.btn_varios_aceptar);
        final TextView m = (TextView) dlg.findViewById(R.id.txtMoneda);
        final TextView c = (TextView) dlg.findViewById(R.id.txtCantidad);
           s.setOnClickListener(new View.OnClickListener() {

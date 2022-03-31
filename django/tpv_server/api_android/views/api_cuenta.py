@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from api_android.tools import (send_imprimir_ticket, send_update_ws,
                                get_descripcion_ticket)
-from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos,
+from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
                             Infmesa, Ticket, Ticketlineas, Historialnulos)
 from datetime import datetime
 from uuid import uuid4
@@ -48,19 +48,7 @@ def get_cuenta(request):
 
 @csrf_exempt
 def juntarmesas(request):
-    if request.POST["idp"] != request.POST["ids"]:
-        mesaP = Mesasabiertas.objects.filter(mesa__pk=request.POST["idp"]).first()
-        mesaS = Mesasabiertas.objects.filter(mesa__pk=request.POST["ids"]).first()
-        if mesaS:
-            infmesa = mesaS.infmesa
-            pedidos = Pedidos.objects.filter(infmesa__pk=infmesa.pk)
-            for pedido in pedidos:
-                pedido.infmesa_id = mesaP.infmesa.pk
-                pedido.save()
-                for l in pedido.lineaspedido_set.all():
-                    l.infmesa_id = mesaP.infmesa.pk
-                    l.save()
-            infmesa.delete()
+    Mesasabiertas.juntar_mesas_abiertas( request.POST["idp"], request.POST["ids"])
 
 
     #enviar notficacion de update
@@ -76,18 +64,7 @@ def juntarmesas(request):
 
 @csrf_exempt
 def cambiarmesas(request):
-    if request.POST["idp"] != request.POST["ids"]:
-        mesaP = Mesasabiertas.objects.filter(mesa__pk=request.POST["idp"]).first()
-        mesaS = Mesasabiertas.objects.filter(mesa__pk=request.POST["ids"]).first()
-        if mesaS:
-            infmesa = mesaS.infmesa
-            mesaS.infmesa = mesaP.infmesa
-            mesaS.save()
-            mesaP.infmesa = infmesa;
-            mesaP.save()
-        else:
-            mesaP.mesa_id = request.POST['ids']
-            mesaP.save()
+    Mesasabiertas.cambiar_mesas_abiertas(request.POST["idp"], request.POST["ids"])
 
     #enviar notficacion de update
     update = {
@@ -148,52 +125,17 @@ def mvlinea(request):
 
 @csrf_exempt
 def ls_aparcadas(request):
-    mesas = Mesasabiertas.objects.all()
-    lstArt = []
-    for m in mesas:
-        for l in Lineaspedido.objects.filter(infmesa__pk=m.infmesa.pk, estado='P'):
-            obj = {
-                'ID': l.pk,
-                'IDPedido': l.pedido_id,
-                'UID': m.infmesa.pk,
-                'IDArt': l.idart,
-                'Estado': l.estado,
-                'Precio': l.precio,
-                'Nombre': l.nombre,
-                'IDMesa': m.mesa.pk
-            }
-            lstArt.append(obj)
-    return JsonResponse(lstArt)
+    return JsonResponse(Mesasabiertas.update_for_devices())
 
-@csrf_exempt
-def cuenta_aparcar(request):
-    idm= request.POST["idm"]
-    mesa = MesasAbiertas.objects.filter(infmesa__mesa__pk=idm).first()
-    if mesa:
-        uid = mesa.infmesa.pk
-        Lineaspedido.objects.filter(uid=uid, estado='N').update(estado='P')
-        return HttpResponse('success')
 
 @csrf_exempt
 def cuenta_add(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     lineas = json.loads(request.POST["pedido"])
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    if not mesa:
-        infmesa = Infmesa()
-        infmesa.ref = ""
-        infmesa.camarero_id = idc
-        infmesa.hora = datetime.now().strftime("%H:%M")
-        infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
-        infmesa.uid = idm + '-' + str(uuid4())
-        infmesa.save()
-
-        mesa = Mesasabiertas()
-        mesa.mesa_id = idm
-        mesa.infmesa_id = infmesa.pk
-        mesa.save()
-
+    is_updatable = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
+    
+    if is_updatable:
         #enviar notficacion de update
         update = {
            "OP": "UPDATE",
@@ -202,23 +144,7 @@ def cuenta_add(request):
         }
         send_update_ws(request, update)
 
-    pedido = Pedidos()
-    pedido.infmesa_id = mesa.infmesa.pk
-    pedido.hora = datetime.now().strftime("%H:%M")
-    pedido.camarero_id = idc
-    pedido.save()
-
-    for pd in lineas:
-        can = int(pd["Can"])
-        for i in range(0, can):
-            linea = Lineaspedido()
-            linea.infmesa_id = mesa.infmesa.pk
-            linea.idart = pd["IDArt"]
-            linea.pedido_id = pedido.pk
-            linea.nombre = pd["Nombre"]
-            linea.precio = pd["Precio"]
-            linea.estado = 'R' if pd['Precio'] == 0 else 'P'
-            linea.save()
+    
 
     return HttpResponse('success')
 
@@ -228,48 +154,21 @@ def cuenta_cobrar(request):
     idc = request.POST["idc"]
     entrega = request.POST["entrega"]
     art = json.loads(request.POST["art"])
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    total = 0
 
-    if mesa:
-        uid = mesa.infmesa.pk
-        ticket = Ticket()
-        ticket.hora = datetime.now().strftime("%H:%M")
-        ticket.fecha = datetime.now().strftime("%Y/%m/%d")
-        ticket.camarero_id = idc
-        ticket.uid = uid
-        ticket.entrega = entrega
-        ticket.mesa = mesa.mesa.nombre
-        ticket.save()
-
-
-        for l in art:
-            can = int(l["Can"])
-            reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & Q(idart=l["IDArt"]) &
-                                              Q(precio=l["Precio"]) &
-                                              (Q(estado='P') | Q(estado='N')))[:can]
-
-            for r in reg:
-                total = total + r.precio
-                linea = Ticketlineas()
-                linea.ticket_id = ticket.pk
-                linea.linea_id = r.pk
-                linea.save()
-                r.estado = 'C'
-                r.save()
-
-        numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
-        if (numart <= 0):
-            #enviar notficacion de update
-            update = {
-               "OP": "UPDATE",
-               "Tabla": "mesasabiertas",
-               "receptor": "comandas",
-            }
-            send_update_ws(request, update)
-            Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
-
-    send_imprimir_ticket(request, ticket.id)
+    numart, total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
+    
+    if (numart <= 0):
+        #enviar notficacion de update
+        update = {
+            "OP": "UPDATE",
+            "Tabla": "mesasabiertas",
+            "receptor": "comandas",
+        }
+        send_update_ws(request, update)
+            
+    if (id > 0):
+        send_imprimir_ticket(request, id)
+        
     return JsonResponse({"totalcobro": str(total), "entrega": entrega})
 
 @csrf_exempt
@@ -277,23 +176,7 @@ def cuenta_rm(request):
     idm = request.POST["idm"]
     motivo = request.POST["motivo"]
     idc = request.POST["idc"]
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    if mesa:
-        uid = mesa.infmesa.pk
-        reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & (Q(estado='R') |
-                                          Q(estado='P') |
-                                          Q(estado='N')))
-        for r in reg:
-            historial = Historialnulos()
-            historial.lineapedido_id = r.pk
-            historial.camarero_id = idc
-            historial.motivo = motivo
-            historial.hora = datetime.now().strftime("%H:%M")
-            historial.save()
-            r.estado = 'A'
-            r.save()
-
-        mesa.delete()
+    Mesasabiertas.borrar_mesa_abierta(idm,idc,motivo)
 
     #enviar notficacion de update
     update = {
@@ -315,25 +198,10 @@ def cuenta_rm_linea(request):
     motivo = request.POST["motivo"]
     s = request.POST["Estado"]
     n = request.POST["Nombre"]
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    if mesa:
-        uid = mesa.infmesa.pk
-        reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=idArt, estado=s, precio=p, nombre=n)[:can]
+    
+    
+    numart = Lineaspedido.borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n)
 
-        for r in reg:
-            if motivo != 'null':
-                h = Historialnulos()
-                h.lineapedido_id = r.id
-                h.camarero_id = idc
-                h.motivo = motivo
-                h.hora = datetime.now().strftime("%H:%M")
-                h.save()
-                r.estado = 'A'
-                r.save()
-            else:
-                r.delete()
-
-    numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
     if (numart <= 0):
         #enviar notficacion de update
         update = {
@@ -342,7 +210,8 @@ def cuenta_rm_linea(request):
            "receptor": "comandas",
         }
         send_update_ws(request, update)
-        Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+        
+
     return HttpResponse('success')
 
 @csrf_exempt

@@ -10,8 +10,6 @@ from django.forms import ModelForm
 from gestion.models import Camareros
 
 class CamarerosForm(ModelForm):
-
-
     class Meta:
         model = Camareros
-        exclude = ["activo", "autorizado", "pass_field", "email"]
+        exclude = ["activo", "autorizado", "pass_field", "email", "permisos"]

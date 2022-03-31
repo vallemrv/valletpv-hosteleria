@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.valleapp.valletpv.Interfaces.IBaseDatos;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +18,7 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbZonas extends SQLiteOpenHelper {
+public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -42,34 +44,6 @@ public class DbZonas extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    public void RellenarTabla(JSONArray datos){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-           db.execSQL("DELETE FROM zonas");
-       }catch (SQLiteException e){
-           this.onCreate(db);
-       }
-
-       // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                 ContentValues values = new ContentValues();
-                 values.put("ID", datos.getJSONObject(i).getInt("ID"));
-                 values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
-                 values.put("RGB", datos.getJSONObject(i).getString("RGB"));
-                 values.put("Tarifa", datos.getJSONObject(i).getString("Tarifa"));
-                 db.insert("zonas", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-        db.close();
-    }
 
     @SuppressLint("Range")
     public JSONArray getAll()
@@ -98,4 +72,42 @@ public class DbZonas extends SQLiteOpenHelper {
     }
 
 
+    @Override
+    public void resetFlag(int id) {
+
+    }
+
+    @Override
+    public JSONArray filter(String cWhere) {
+        return null;
+    }
+
+    @Override
+    public void rellenarTabla(JSONArray objs) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            db.execSQL("DELETE FROM zonas");
+        }catch (SQLiteException e){
+            this.onCreate(db);
+        }
+
+        // Insert the new row, returning the primary key value of the new row
+        for (int i= 0 ; i<objs.length();i++){
+            // Create a new map of values, where column names are the keys
+            try {
+                ContentValues values = new ContentValues();
+                values.put("ID", objs.getJSONObject(i).getInt("id"));
+                values.put("Nombre", objs.getJSONObject(i).getString("nombre"));
+                values.put("RGB", objs.getJSONObject(i).getString("rgb"));
+                values.put("Tarifa", objs.getJSONObject(i).getString("tarifa"));
+                db.insert("zonas", null, values);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        db.close();
+    }
 }

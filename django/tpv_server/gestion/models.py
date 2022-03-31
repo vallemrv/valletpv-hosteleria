@@ -6,10 +6,15 @@
 # @License: Apache license vesion 2.0
 
 from __future__ import unicode_literals
+from datetime import datetime
+from turtle import update
+from uuid import uuid4
 
+from django.db.models import Q
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
+from django.forms.models import model_to_dict
 
 from app.utility import rgbToHex
 
@@ -17,7 +22,17 @@ from app.utility import rgbToHex
 
 class Sync(models.Model):
     nombre = models.CharField(max_length=50) 
-    last = models.DateTimeField(auto_now=True)
+    last = models.CharField(max_length=26)
+
+    @staticmethod
+    def actualizar(tb_name):
+        sync = Sync.objects.filter(nombre=tb_name).first()
+        if not sync:
+            sync = Sync()
+        sync.nombre = tb_name
+        sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        sync.save()
+        
 
 
 class Arqueocaja(models.Model):
@@ -113,22 +128,43 @@ class Camareros(models.Model):
     pass_field = models.CharField(db_column='Pass', max_length=100, null=True)  # Field name made lowercase. Field renamed because it was a Python reserved word.
     activo = models.IntegerField(db_column='Activo', default=1)  # Field name made lowercase.
     autorizado = models.IntegerField(db_column='Autorizado', default=1)  # Field name made lowercase.
+    permisos = models.CharField(db_column='Permisos', max_length=100, null=True, default="")  # Field name made lowercase. Field renamed because it was a Python reserved word.
+    
+    @staticmethod
+    def update_from_device(row):
+        c = Camareros.objects.filter(id=row["ID"]).first()
+        if not c:
+            c = Camareros()
+            
+        c.autorizado = int(row["autorizado"])
+        c.pass_field = row["Pass"]
+        c.permisos = row["permisos"]
+        c.save()
+        
 
+    @staticmethod
+    def update_for_devices():
+        rows = Camareros.objects.filter(activo=1)
+        tb = []
+        for r in rows:
+            tb.append({
+                "ID":r.id,
+                "Nombre": r.nombre,
+                "Apellidos": r.apellidos,
+                "Pass": r.pass_field,
+                "autorizado": r.autorizado,
+                "permisos": r.permisos
+            })
+        return tb
+    
+    
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -153,20 +189,12 @@ class Cierrecaja(models.Model):
 
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -223,7 +251,7 @@ class Cierrecaja(models.Model):
                    'Total': r[2],
                    })
         return lineas
-
+    
 
 class Efectivo(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -232,20 +260,12 @@ class Efectivo(models.Model):
     moneda = models.DecimalField(db_column='Moneda', max_digits=5, decimal_places=2)  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -262,20 +282,12 @@ class Familias(models.Model):
 
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
     def __unicode__(self):
@@ -296,20 +308,12 @@ class Gastos(models.Model):
     importe = models.DecimalField(db_column='Importe', max_digits=6, decimal_places=2)  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -325,20 +329,12 @@ class Historialnulos(models.Model):
     motivo = models.CharField(db_column='Motivo', max_length=200)  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -354,20 +350,12 @@ class HorarioUsr(models.Model):
     usurario = models.ForeignKey(User,  on_delete=models.CASCADE, db_column='IDUsr')  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -384,20 +372,12 @@ class Infmesa(models.Model):
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -415,22 +395,60 @@ class Lineaspedido(models.Model):
     precio = models.DecimalField(db_column='Precio', max_digits=6, decimal_places=2)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=400)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
+    
+    @staticmethod
+    def update_for_devices():
+        mesas = Mesasabiertas.objects.all()
+        lineas = []
+        for m in mesas:
+            for l in Lineaspedido.objects.filter(infmesa__pk=m.infmesa.pk, estado='P'):
+                obj = {
+                    'ID': l.pk,
+                    'IDPedido': l.pedido_id,
+                    'UID': m.infmesa.pk,
+                    'IDArt': l.idart,
+                    'Estado': l.estado,
+                    'Precio': l.precio,
+                    'Nombre': l.nombre,
+                    'IDMesa': m.mesa.pk
+                }
+                lineas.append(obj)
+        return lineas
+
+    def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
+        num = -1
+        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        if mesa:
+            uid = mesa.infmesa.pk
+            reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=idArt, estado=s, precio=p, nombre=n)[:can]
+    
+            for r in reg:
+                if motivo != 'null':
+                    h = Historialnulos()
+                    h.lineapedido_id = r.id
+                    h.camarero_id = idc
+                    h.motivo = motivo
+                    h.hora = datetime.now().strftime("%H:%M")
+                    h.save()
+                    r.estado = 'A'
+                    r.save()
+                else:
+                    r.delete()
+
+            num = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
+           
+            if num <= 0:
+                Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+
+        return num
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -442,6 +460,16 @@ class Mesas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', unique=True, max_length=50)  # Field name made lowercase.
     orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
+
+    @staticmethod
+    def update_from_device(row):
+        pass
+        
+
+    @staticmethod
+    def update_for_devices():
+        return Mesas.get_all_for_devices()
+    
     
     @staticmethod
     def get_all_for_devices():
@@ -480,20 +508,12 @@ class Mesas(models.Model):
 
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -514,21 +534,80 @@ class Mesasabiertas(models.Model):
     infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     mesa = models.ForeignKey(Mesas, on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
 
+
+    @staticmethod
+    def update_for_devices():
+        mesas = Mesasabiertas.objects.all()
+        objs = []
+        for m in mesas:
+            obj = {
+                "ID": m.mesa_id,
+                "num": m.infmesa.numcopias
+            }
+            objs.append(obj)
+        return objs
+
+
+    @staticmethod
+    def borrar_mesa_abierta(idm, idc, motivo):
+        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        if mesa:
+            uid = mesa.infmesa.pk
+            reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & (Q(estado='R') |
+                                              Q(estado='P') |
+                                              Q(estado='N')))
+            for r in reg:
+                historial = Historialnulos()
+                historial.lineapedido_id = r.pk
+                historial.camarero_id = idc
+                historial.motivo = motivo
+                historial.hora = datetime.now().strftime("%H:%M")
+                historial.save()
+                r.estado = 'A'
+                r.save()
+
+            mesa.delete()
+
+
+    @staticmethod
+    def cambiar_mesas_abiertas(idp, ids):
+        if idp != ids:
+            mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
+            mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
+            if mesaS:
+                infmesa = mesaS.infmesa
+                mesaS.infmesa = mesaP.infmesa
+                mesaS.save()
+                mesaP.infmesa = infmesa;
+                mesaP.save()
+            else:
+                mesaP.mesa_id = ids
+                mesaP.save()
+
+    @staticmethod
+    def juntar_mesas_abiertas(idp, ids):
+        if idp != ids:
+            mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
+            mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
+            if mesaS:
+                infmesa = mesaS.infmesa
+                pedidos = Pedidos.objects.filter(infmesa__pk=infmesa.pk)
+                for pedido in pedidos:
+                    pedido.infmesa_id = mesaP.infmesa.pk
+                    pedido.save()
+                    for l in pedido.lineaspedido_set.all():
+                        l.infmesa_id = mesaP.infmesa.pk
+                        l.save()
+                infmesa.delete()
+
+   
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -543,26 +622,17 @@ class Mesaszona(models.Model):
     mesa = models.ForeignKey(Mesas,  on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         super().delete(*args, **kwargs)
 
 
     class Meta:
         db_table = 'mesaszona'
-
 
 class Pedidos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -571,29 +641,58 @@ class Pedidos(models.Model):
     camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
     mensaje =  models.CharField(db_column='Mensaje', max_length=300, default="", null=True)  # Field name made lowercase.
 
+    @staticmethod
+    def agregar_nuevas_lineas(idm, idc, lineas):
+        is_mesa_nueva = False
+        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        if not mesa:
+            infmesa = Infmesa()
+            infmesa.ref = ""
+            infmesa.camarero_id = idc
+            infmesa.hora = datetime.now().strftime("%H:%M")
+            infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
+            infmesa.uid = idm + '-' + str(uuid4())
+            infmesa.save()
+
+            mesa = Mesasabiertas()
+            mesa.mesa_id = idm
+            mesa.infmesa_id = infmesa.pk
+            mesa.save()
+            is_mesa_nueva = True
+
+        pedido = Pedidos()
+        pedido.infmesa_id = mesa.infmesa.pk
+        pedido.hora = datetime.now().strftime("%H:%M")
+        pedido.camarero_id = idc
+        pedido.save()
+
+        for pd in lineas:
+            can = int(pd["Can"])
+            for i in range(0, can):
+                linea = Lineaspedido()
+                linea.infmesa_id = mesa.infmesa.pk
+                linea.idart = pd["IDArt"]
+                linea.pedido_id = pedido.pk
+                linea.nombre = pd["Nombre"]
+                linea.precio = pd["Precio"]
+                linea.estado = 'R' if pd['Precio'] == 0 else 'P'
+                linea.save()
+
+        return is_mesa_nueva
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
     class Meta:
         db_table = 'pedidos'
         ordering = ['-id']
-
 
 class Receptores(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -603,20 +702,12 @@ class Receptores(models.Model):
     descripcion = models.CharField(db_column='Descripcion', max_length=200, default="")  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -629,30 +720,28 @@ class Receptores(models.Model):
     class Meta:
         db_table = 'receptores'
 
-
 class Secciones(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
     color = models.CharField(db_column='Color', max_length=20, null=True)  # Field name made lowercase.
     rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
     orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
-
+    
+    @staticmethod
+    def update_for_devices():
+        rows = Secciones.objects.all()
+        objs = []
+        for r in rows:
+            objs.append(model_to_dict(r))
+        return objs
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -691,6 +780,8 @@ class SeccionesCom(models.Model):
     descuento = models.DecimalField(db_column='Descuento', blank=True, null=True, max_digits=4, decimal_places=2, default='0')
     icono = models.CharField(db_column='Icono', max_length=11, choices=ICON_CHOICES, default="bar")
 
+    
+
     @staticmethod
     def get_all_for_devices():
         sec = SeccionesCom.objects.all()
@@ -715,22 +806,13 @@ class SeccionesCom(models.Model):
         elif not self.descuento  or  self.descuento < 0:
             self.descuento = 0
 
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
-
+        Sync.actualizar(self._meta.db_table)
         super(SeccionesCom, self).save(*args, **kwargs)
 
       
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -743,33 +825,23 @@ class SeccionesCom(models.Model):
     class Meta:
         db_table = 'secciones_com'
 
-
 class Servidos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
     class Meta:
         db_table = 'servidos'
         ordering = ['-id']
-
 
 class Subteclas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -789,20 +861,12 @@ class Subteclas(models.Model):
 
         
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -810,27 +874,18 @@ class Subteclas(models.Model):
         db_table = 'subteclas'
         ordering = ['-orden']
 
-
 class Sugerencias(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas',  on_delete=models.CASCADE, db_column='IDTecla', default=-1)  # Field name made lowercase.
     sugerencia = models.CharField(db_column='Sugerencia', max_length=300)  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -855,6 +910,21 @@ class Teclas(models.Model):
     descripcion_r = models.CharField("Descripción recepción", db_column='Descripcion_r', max_length=300, null=True, blank=True)
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     tipo = models.CharField(max_length=2, choices=TIPO_TECLA_CHOICE, default="SP")
+
+    @staticmethod
+    def update_for_devices():
+        rows = Teclas.objects.all()
+        row = None
+        objs = []
+        for r in rows:
+            teclasseccion = r.teclaseccion_set.all()
+            row = model_to_dict(r)
+            row["Precio"] = r.p1 
+            row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "150,150,150"
+            row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
+            row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
+            objs.append(row)
+        return objs
    
     def get_color(self, hex=False):
         s = self.teclaseccion_set.all().first()
@@ -864,20 +934,12 @@ class Teclas(models.Model):
         return color if not hex else rgbToHex(color)
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
     def get_items_edit(self, orden=None, show_secciones=False):
@@ -948,20 +1010,12 @@ class Teclascom(models.Model):
     orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
    
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -976,20 +1030,12 @@ class Teclaseccion(models.Model):
     tecla = models.ForeignKey(Teclas,  on_delete=models.CASCADE, db_column='IDTecla')  # Field name made lowercase.
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 
@@ -1006,21 +1052,53 @@ class Ticket(models.Model):
     uid = models.CharField(db_column='UID', max_length=100)  # Field name made lowercase.
     mesa = models.CharField(db_column='Mesa', max_length=40)  # Field name made lowercase.
 
+    @staticmethod
+    def cerrar_cuenta(idm, idc, entrega, art):
+        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        total = 0
+        numart = -1
+        id = -1
+        if mesa:
+            uid = mesa.infmesa.pk
+            ticket = Ticket()
+            ticket.hora = datetime.now().strftime("%H:%M")
+            ticket.fecha = datetime.now().strftime("%Y/%m/%d")
+            ticket.camarero_id = idc
+            ticket.uid = uid
+            ticket.entrega = entrega
+            ticket.mesa = mesa.mesa.nombre
+            ticket.save()
+            id = ticket.id
+
+
+            for l in art:
+                can = int(l["Can"])
+                reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & Q(idart=l["IDArt"]) &
+                                                Q(precio=l["Precio"]) &
+                                                (Q(estado='P') | Q(estado='N')))[:can]
+
+                for r in reg:
+                    total = total + r.precio
+                    linea = Ticketlineas()
+                    linea.ticket_id = ticket.pk
+                    linea.linea_id = r.pk
+                    linea.save()
+                    r.estado = 'C'
+                    r.save()
+
+            numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
+            if numart <= 0:
+                Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+
+        return (numart, total, id)
+
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -1033,21 +1111,15 @@ class Ticketlineas(models.Model):
     ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE, db_column='IDTicket')  # Field name made lowercase.
     linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
 
+    
+
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
 
@@ -1061,6 +1133,15 @@ class Zonas(models.Model):
     tarifa = models.IntegerField(db_column='Tarifa')  # Field name made lowercase.
     rgb = models.CharField("Color", db_column='RGB', max_length=50)  # Field name made lowercase.
 
+    @staticmethod
+    def update_for_devices():
+        zonas = Zonas.objects.all()
+        objs = []
+        for z in zonas:
+            objs.append(model_to_dict(z))
+        return  objs
+        
+
     def __unicode__(self):
         return self.nombre
 
@@ -1070,20 +1151,12 @@ class Zonas(models.Model):
     
 
     def save(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
-        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
-        if not sync:
-            sync = Sync()
-        sync.nombre = self._meta.db_table
-        sync.save()
+        Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
 
 

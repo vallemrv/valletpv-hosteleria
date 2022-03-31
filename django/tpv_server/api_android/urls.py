@@ -43,6 +43,7 @@ CAMAREROS = [
     path("listado_activos", api_views.listado_activos, name="camareros_listado_activos"),
     path("sel_camareros", api_views.sel_camareros, name="camareros_sel_camareros"),
     path("listado_autorizados", api_views.listado_autorizados, name="camareros_listado_autorizados"),
+     path("camarero_add", api_views.camarero_add, name="camarero_add"),
 ]
 
 SYNC = [
@@ -52,7 +53,10 @@ SYNC = [
     path("know_connect", api_views.know_connect, name="know_connect"),
     path("lastsync", api_views.lastsync, name="lastsync"),
     path("firstsync", api_views.firstsync, name="firstsync"),
-    path("get_update_tables", api_views.get_update_tables, name="get_update_tables")
+    path("get_update_tables", api_views.get_update_tables, name="get_update_tables"),
+    path("update_for_devices", api_views.update_for_devices, name="update_for_devices"),
+    path("get_tb_up_last", api_views.get_tb_up_last, name="get_tb_up_last"),
+    path("update_from_devices", api_views.update_from_devices, name="update_from_devices")
 ]
 
 CUENTA = [
@@ -62,7 +66,6 @@ CUENTA = [
     path("cambiarmesas", api_views.cambiarmesas, name="cuenta_cambiarmesas"),
     path("mvlinea", api_views.mvlinea, name="cuenta_mvlinea"),
     path("lsaparcadas", api_views.ls_aparcadas, name="cuenta_ls_aparcadas"),
-    path("aparcar", api_views.cuenta_aparcar, name="cuenta_aparcar"),
     path("cobrar", api_views.cuenta_cobrar, name="cuenta_cobrar"),
     path("rm", api_views.cuenta_rm, name="cuenta_rm"),
     path("rmlinea", api_views.cuenta_rm_linea, name="cuenta_rm_linea"),

@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.valleapp.valletpv.Interfaces.IBaseDatos;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +17,7 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTbUpdates extends SQLiteOpenHelper {
+public class DbTbUpdates extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -26,6 +28,7 @@ public class DbTbUpdates extends SQLiteOpenHelper {
 
     public DbTbUpdates(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        onCreate(this.getWritableDatabase());
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -44,7 +47,17 @@ public class DbTbUpdates extends SQLiteOpenHelper {
     }
 
 
-    public void RellenarTabla(JSONArray tb){
+    @Override
+    public void resetFlag(int id) {
+
+    }
+
+    @Override
+    public JSONArray filter(String cWhere) {
+        return null;
+    }
+
+    public void rellenarTabla(JSONArray tb){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
@@ -88,12 +101,29 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             res.moveToNext();
 
         }
-        res.close();db.close();
+        res.close();
+        db.close();
         return ls;
     }
 
+    private boolean hayRegistros(String tb){
+        boolean hay = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? ", new String[]{tb});
+            res.moveToFirst();
+            int count = res.getInt(0);
+            hay = count > 0;
+            res.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        db.close();
+        return hay;
+    }
 
-    public void Vaciar(){
+
+    public void vaciar(){
         SQLiteDatabase db = this.getWritableDatabase();
         try{
           db.execSQL("DELETE FROM "+tb_name);
@@ -101,5 +131,64 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             this.onCreate(db);
         }
         db.close();
+    }
+
+    public boolean is_updatable(JSONObject obj) {
+        boolean isUp = true;
+        SQLiteDatabase db = null;
+        try {
+            String date = obj.getString("last");
+            if (date.equals("")) return true;
+            String tb = obj.getString("nombre");
+            isUp = !hayRegistros(tb);
+            db = this.getReadableDatabase();
+
+            if (!isUp) {
+                Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
+                res.moveToFirst();
+                int count = res.getInt(0);
+                isUp = count > 0;
+                res.close();
+            }
+
+        } catch (Exception e) {
+            if (db != null)  this.onCreate(db);
+            e.printStackTrace();
+        }
+        if (db != null) db.close();
+        return  isUp;
+    }
+
+    public void upTabla(String tb, String last) {
+        SQLiteDatabase db = null;
+        try {
+            boolean hay = hayRegistros(tb);
+            db =  this.getWritableDatabase();
+            ContentValues v = new ContentValues();
+            v.put("nombre", tb);
+            v.put("last", last);
+            if (!hay) {
+                 db.insert(tb_name, null, v);
+            }else{
+                db.update(tb_name, v, "nombre = ?",  new String[]{tb});
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if (db != null) db.close();
+    }
+
+    public void setLast(String tb, String last) {
+        SQLiteDatabase db = null;
+        try{
+            db = getWritableDatabase();
+            ContentValues v = new ContentValues();
+            v.put("last", last);
+            db.update(tb_name, v, "nombre = ? ", new String[]{tb});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

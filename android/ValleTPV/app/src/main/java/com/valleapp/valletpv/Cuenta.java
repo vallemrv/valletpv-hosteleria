@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -45,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -53,36 +55,53 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
 
     private String server = "";
-    DbSecciones dbSecciones = new DbSecciones(this);
-    DbTeclas dbTeclas = new DbTeclas(this);
-    DbCuenta dbCuenta = new DbCuenta(this);
-    DbMesas dbMesas = new DbMesas(this);
+    DbSecciones dbSecciones;
+    DbTeclas dbTeclas;
+    DbCuenta dbCuenta;
+    DbMesas dbMesas;
 
     JSONObject cam = null;
     JSONObject mesa = null;
 
-    JSONArray lineas = null;
+    List<JSONObject> lineas = null;
     JSONArray lsartresul = null;
 
-    ArrayList<JSONObject> lineasTicket = new ArrayList<JSONObject>();
     Double totalMesa = 0.00;
 
     String tipo = "";
     String sec = "";
     int cantidad = 1;
-    Boolean estoy = true;
+    Boolean reset = true;
     Boolean stop = false;
-    Timer timer = new Timer();
+    Timer timerAutoCancel = new Timer();
+
+    private long autoCancel = 10000;
 
     ServicioCom myServicio;
 
     final Context cx = this;
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            get_cuenta();
+            try {
+                myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+                myServicio.setExHandler("lineaspedido", handlerHttp);
+                dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
+                dbMesas = (DbMesas) myServicio.getDb("mesas");
+                dbSecciones = (DbSecciones) myServicio.getDb("secciones");
+                dbTeclas = (DbTeclas) myServicio.getDb("teclas");
+                rellenarSecciones();
+                rellenarTicket();
+
+
+                if (tipo.equals("c"))
+                    mostarCobrar(dbCuenta.filter("IDMesa=" + mesa.getInt("ID")), totalMesa);
+
+                get_cuenta();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -92,57 +111,41 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
     };
 
     @SuppressLint("HandlerLeak")
-    private Handler mostrarBusqueda= new Handler(){
+    private final Handler mostrarBusqueda= new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            RellenarArticulos(lsartresul);
+            rellenarArticulos(lsartresul);
         }
     };
 
     @SuppressLint("HandlerLeak")
-    private Handler controlador_cuenta = new Handler(){
+    private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            String res = msg.getData().getString("RESPONSE");
             try {
-                JSONArray datos = new JSONArray(res);
-                dbCuenta.ReplaceMesa(datos, mesa.getString("ID"));
+                setEstadoAutoFinish(true, false);
+                String res = msg.getData().getString("RESPONSE");
+                if (res != null) {
+                    JSONArray datos = new JSONArray(res);
+                    synchronized (dbCuenta) {
+                        dbCuenta.replaceMesa(datos, mesa.getString("ID"));
+                        rellenarTicket();
+                    }
+                }else{
+                    get_cuenta();
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            RellenarTicket();
         }
     };
 
-    private void RellenarTicket() {
-        try {
 
-                TextView l = findViewById(R.id.lblPrecio);
-                ListView lst =  findViewById(R.id.lstCamareros);
-                lineasTicket.clear();
-
-                lineas = dbCuenta.getAll(mesa.getString("ID"));
-
-                totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
-                l.setText(String.format("%01.2f €", totalMesa));
-
-
-                for(int i=0; i < lineas.length(); i++){
-                    lineasTicket.add(lineas.getJSONObject(i));
-                }
-
-                lst.setAdapter(new Ticket(cx, lineasTicket, this));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void RellenarSecciones() {
+    //Inicializacion de estados y vista onResume
+    private void rellenarSecciones() {
 
         try{
 
@@ -164,7 +167,7 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                 for (int i = 0; i < lssec.length(); i++) {
                     JSONObject  z =  lssec.getJSONObject(i);
 
-                    if(sec == "" && i==0) sec =  z.getString("ID");
+                    if(sec.equals("") && i==0) sec =  z.getString("ID");
 
                     Button btn = new Button(cx);
                     btn.setId(z.getInt("ID"));
@@ -175,32 +178,26 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                     String[] rgb = z.getString("RGB").trim().split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            estoy = true;
-                            sec =  view.getTag().toString();
-                            try {
-                                JSONArray  lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
-                                RellenarArticulos(lsart);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                    btn.setOnClickListener(view -> {
+                        setEstadoAutoFinish(true, false);
+                        sec =  view.getTag().toString();
+                        try {
+                            JSONArray  lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
+                            rellenarArticulos(lsart);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     });
 
-                    btn.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            AsociarBotonera(view);
-                            return false;
-                        }
+                    btn.setOnLongClickListener(view -> {
+                        asociarBotonera(view);
+                        return false;
                     });
                     ll.addView(btn, params);
                 }
 
                 JSONArray lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
-                RellenarArticulos(lsart);
+                rellenarArticulos(lsart);
 
             }
 
@@ -209,7 +206,33 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         }
     }
 
-    private void RellenarArticulos(JSONArray lsart) {
+    private void cargarPreferencias() {
+        JSON json = new JSON();
+        try {
+            JSONObject pref = json.deserializar("preferencias.dat", this);
+            if(!pref.isNull("sec")) {
+                sec = pref.getString("sec");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void get_cuenta(){
+        if(myServicio!=null & mesa != null) {
+            try {
+                myServicio.get_cuenta(handlerHttp, mesa.getString("ID"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //Mostrar datos de articulos y ticket
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
+    private void rellenarArticulos(JSONArray lsart) {
         try {
 
             if(lsart.length()>0){
@@ -243,7 +266,7 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    View v = inflater.inflate(R.layout.boton_art, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.boton_art, null);
                     Button btn = (Button)v.findViewById(R.id.btnArt);
 
                     btn.setId(i);
@@ -251,15 +274,12 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
                     btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",m.getDouble("Precio")));
 
-                   String[] rgb = m.getString("RGB").split(",");
-                   btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                    String[] rgb = m.getString("RGB").split(",");
+                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                           JSONObject art = (JSONObject)view.getTag();
-                           PedirArt(art);
-                        }
+                    btn.setOnClickListener(view -> {
+                        JSONObject art = (JSONObject)view.getTag();
+                        pedirArt(art);
                     });
                     row.addView(v, rowparams);
 
@@ -280,47 +300,96 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     }
 
-    private void PedirArt(JSONObject art) {
-
+    @SuppressLint("DefaultLocale")
+    private void rellenarTicket() {
         try {
-            estoy=true;
-            dbCuenta.addArt(cantidad,mesa.getInt("ID"),art);
-            cantidad = 1;
-            TextView lbl = (TextView)findViewById(R.id.lblCantida);
-            lbl.setText("Cantidad "+cantidad);
-            RellenarTicket();
+            synchronized (dbCuenta) {
+                TextView l = findViewById(R.id.lblPrecio);
+                ListView lst = findViewById(R.id.lstCamareros);
+
+                lineas = dbCuenta.getAll(mesa.getString("ID"));
+                totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
+
+                l.setText(String.format("%01.2f €", totalMesa));
+
+                lst.setAdapter(new Ticket(cx, (ArrayList<JSONObject>) lineas, this));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-
     }
 
-
-    private void cargarPreferencias() {
-        JSON json = new JSON();
-        try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
-            if(!pref.isNull("sec")) {
-               sec = pref.getString("sec");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    //Dialogos
+    public void mostrarVarios(View v) {
+        setEstadoAutoFinish(true, true);
+        DlgVarios dlg= new DlgVarios(this, this);
+        dlg.show();
     }
 
-    private void get_cuenta(){
-        if(myServicio!=null & mesa != null) {
+    public void mostrarSeparados(View v) {
+        // TODO Auto-generated method stub
+        if( totalMesa > 0) {
             try {
-                myServicio.get_cuenta(controlador_cuenta, mesa.getString("ID"));
+                setEstadoAutoFinish(true, true);
+                this.aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+                lineas = dbCuenta.getAll(mesa.getString("ID"));
+                DlgSepararTicket dlg = new DlgSepararTicket(this,this);
+                dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
+                dlg.setLineasTicket(lineas);
+                dlg.show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    private void pedirArt(JSONObject art) {
+        try {
+            setEstadoAutoFinish(true, false);
+            dbCuenta.addArt(cantidad,mesa.getInt("ID"),art);
+            cantidad = 1;
+            TextView lbl = (TextView) findViewById(R.id.lblCantida);
+            lbl.setText("Cantidad "+ cantidad);
+            rellenarTicket();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Acciones con el servidor
+    public void preImprimir(View v){
+        try{
+            setEstadoAutoFinish(false, false);
+            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+            lineas = dbCuenta.getAll(mesa.getString("ID"));
+            if(totalMesa>0) {
+                ContentValues p = new ContentValues();
+                p.put("idm", mesa.getString("ID"));
+                if(myServicio!=null) myServicio.preImprimir(p);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void abrirCajon(View v){
+        setEstadoAutoFinish(false, false);
+        if(myServicio!=null) myServicio.abrirCajon();
+    }
+
+    public void cobrarMesa(View v){
+        try {
+            setEstadoAutoFinish(true, true);
+            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+            JSONArray l = dbCuenta.filter("IDMesa="+mesa.getString("ID"));
+            mostarCobrar(l, totalMesa);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void aparcar(String idm, JSONArray nuevos) throws JSONException {
         if(nuevos.length()>0) {
@@ -336,87 +405,15 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         }
     }
 
-
-    public void AsociarBotonera(View view) {
-        JSON json = new JSON();
-        try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
-            pref.put("sec",Integer.toString(view.getId()));
-            json.serializar("preferencias.dat", pref, cx);
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    "Asocicion realizada", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public void MostrarVarios(View v) {
-        stop = true;
-        DlgVarios dlg= new DlgVarios(this, this);
-        dlg.show();
-    }
-
-
-
-    public void MostrarSeparados(View v) {
-        // TODO Auto-generated method stub
-        if( totalMesa > 0) {
-            try {
-                stop = true;
-                this.aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-                lineas = dbCuenta.getAll(mesa.getString("ID"));
-                DlgSepararTicket dlg = new DlgSepararTicket(this,this);
-                dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
-                dlg.setLineasTicket(lineas);
-                dlg.show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void PreImprimir(View v){
-        try{
-            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            lineas = dbCuenta.getAll(mesa.getString("ID"));
-            stop = false;
-            if(totalMesa>0) {
-                    ContentValues p = new ContentValues();
-                    p.put("idm", mesa.getString("ID"));
-                    if(myServicio!=null) myServicio.PreImprimir(p);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void AbrirCajon(View v){
-        if(myServicio!=null) myServicio.AbrirCajon();
-    }
-
-
-
-    public void CobrarMesa(View v){
-        try {
-            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            lineas = dbCuenta.getAll(mesa.getString("ID"));
-            mostarCobrar(lineas, totalMesa);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @SuppressLint("SetTextI18n")
     public void clickCantidad(View v){
-        estoy = true;
+        setEstadoAutoFinish(true, false);
         cantidad = Integer.parseInt(((Button) v).getText().toString());
         TextView lbl = findViewById(R.id.lblCantida);
         lbl.setText("Cantidad "+cantidad);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -439,30 +436,25 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         }
     }
 
-
-
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {  }
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        estoy = true;
+        reset = true;
         if(charSequence.length()>0) {
             try {
                 final String str = charSequence.toString();
                 final String t =  mesa.getString("Tarifa");
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        lsartresul = dbTeclas.getCoincidencia(str, t);
-                        mostrarBusqueda.sendEmptyMessage(1);
-                     }
-                }).start();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    lsartresul = dbTeclas.findLike(str, t);
+                    mostrarBusqueda.sendEmptyMessage(1);
+                 }).start();
              } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -474,21 +466,14 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     @Override
     protected void onPause() {
-        if(timer!=null){
-            timer.cancel();
-            timer = null;
+        if(timerAutoCancel!=null){
+            timerAutoCancel.cancel();
+            timerAutoCancel = null;
         }
         try{
             String idm = mesa.getString("ID");
-            JSONArray nuevos = dbCuenta.getNuevos(idm);
-            if(nuevos.length()>0) {
-               aparcar(idm, nuevos);
-            }
-
-            ServicioCom.pasa = false;
-            DbCuenta.IDMesa = -1;
-
-         }catch (Exception e){
+            aparcar(idm, dbCuenta.getNuevos(idm));
+        }catch (Exception e){
             e.printStackTrace();
         }
         super.onPause();
@@ -496,58 +481,53 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     @Override
     protected void onDestroy() {
-        if(timer!=null) {
-            timer.cancel();
-            timer=null;
+        if(timerAutoCancel!=null) {
+            timerAutoCancel.cancel();
+            timerAutoCancel=null;
         }
-        if(mConexion!=null&& myServicio!=null) unbindService(mConexion);
+        unbindService(mConexion);
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
         try {
-             ServicioCom.pasa = true;
-             if(timer==null) timer = new Timer();
-             timer.schedule(new TimerTask()
+
+             if(timerAutoCancel==null) timerAutoCancel = new Timer();
+             timerAutoCancel.schedule(new TimerTask()
             {
                 @Override
                 public void run() {
                     if(!stop) {
-                        if (!estoy) finish();
-                        else estoy = false;
+                        if (!reset) finish();
+                        else reset = false;
                     }
                 }
-            },10000,10000);
+            },5000,autoCancel);
 
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
 
-            DbCuenta.IDMesa = mesa.getInt("ID");
 
-            RellenarSecciones();
-            RellenarTicket();
 
-            if(tipo.equals("c"))
-                mostarCobrar(dbCuenta.getAll(Integer.toString(DbCuenta.IDMesa)), totalMesa);
-
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         super.onResume();
     }
 
     @Override
-    public void salir() {
-       estoy=true;stop=false;
+    public void setEstadoAutoFinish(boolean r, boolean s) {
+       reset = r;
+       stop = s;
     }
 
     @Override
     public void mostarCobrar(JSONArray lsart, Double totalCobro) {
         if(totalCobro>0) {
             try {
-                stop = true;
+                setEstadoAutoFinish(true, true);
                 DlgCobrar dlg = new DlgCobrar(this, this);
                 dlg.setTitle("Cobrar " + mesa.getString("Nombre"));
                 dlg.setDatos(lsart, totalCobro);
@@ -561,7 +541,7 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
     @Override
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
         try {
-            estoy=true; stop=false;
+            setEstadoAutoFinish(true, false);
             ContentValues p = new ContentValues();
             p.put("idm", mesa.getString("ID"));
             p.put("idc", cam.getString("ID"));
@@ -569,27 +549,27 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
             p.put("art", lsart.toString());
             dbCuenta.eliminar(mesa.getString("ID"), lsart);
             if(myServicio!=null) {
-                JSONObject info = new JSONObject();
-                info.put("totalcobro", totalCobro);
-                info.put("entrega", entrega);
-                myServicio.cobrarCuenta(p, info);
+                myServicio.cobrarCuenta(p);
                 if (totalCobro - totalMesa == 0) {
                     dbMesas.cerrarMesa(mesa.getString("ID"));
                     finish();
                 } else {
-                    RellenarTicket();
+                    rellenarTicket();
                 }
+                sendMessageMesaCobrada(entrega, entrega-totalCobro);
             }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
 
+
     @Override
     public void pedirArt(JSONObject art, String s) {
         cantidad = Integer.parseInt(s);
-        PedirArt(art);
+        pedirArt(art);
     }
 
     @Override
@@ -609,144 +589,103 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
             final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
             pneEdit.setVisibility(View.GONE);
 
-            exit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            exit.setOnClickListener(view -> dlg.cancel());
+
+            edit.setOnClickListener(view -> {
+                if(pneEdit.getVisibility() == View.VISIBLE)  pneEdit.setVisibility(View.GONE);
+                else pneEdit.setVisibility(View.VISIBLE);
+            });
+
+            ok.setOnClickListener(view -> {
+                if (motivo.getText().length() > 0) {
+                    borrarLinea(art, motivo.getText().toString());
                     dlg.cancel();
+                    setEstadoAutoFinish(true, false);
                 }
             });
 
-            edit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(pneEdit.getVisibility() == View.VISIBLE)  pneEdit.setVisibility(View.GONE);
-                    else pneEdit.setVisibility(View.VISIBLE);
-                }
+            error.setOnClickListener(view -> {
+                borrarLinea(art, motivo.getText().toString());
+                dlg.cancel();
+                setEstadoAutoFinish(true, false);
+
             });
 
-            ok.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (motivo.getText().length() > 0) {
-                        try {
-                            art.put("Can",1);
-                            ContentValues p = new ContentValues();
-                            String idm = mesa.getString("ID");
-                            p.put("idm", idm);
-                            p.put("Precio", art.getString("Precio"));
-                            p.put("idArt", art.getString("IDArt"));
-                            p.put("can", "1");
-                            p.put("idc", cam.getString("ID"));
-                            p.put("motivo", motivo.getText().toString());
-                            p.put("Estado", art.getString("Estado"));
-                            p.put("Nombre", art.getString("Nombre"));
-                            if (myServicio != null){
-                                myServicio.rmLinea(p);
-                                dbCuenta.eliminar(idm, new JSONArray().put(art));
-                                if(dbCuenta.getCount(idm)<=0)   dbMesas.cerrarMesa(idm);
-                            }
-                            dlg.cancel();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+            simpa.setOnClickListener(view -> {
+                borrarLinea(art, motivo.getText().toString());
+                dlg.cancel();
+                setEstadoAutoFinish(true, false);
+
             });
 
-            error.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        art.put("Can",1);
-                        ContentValues p = new ContentValues();
-                        String idm = mesa.getString("ID");
-                        p.put("idm", idm);
-                        p.put("Precio", art.getString("Precio"));
-                        p.put("idArt", art.getString("IDArt"));
-                        p.put("can", "1");
-                        p.put("idc", cam.getString("ID"));
-                        p.put("motivo", motivo.getText().toString());
-                        p.put("Estado", art.getString("Estado"));
-                        p.put("Nombre", art.getString("Nombre"));
-                        if (myServicio != null) {
-                            myServicio.rmLinea(p);
-                            dbCuenta.eliminar(idm, new JSONArray().put(art));
-                            if (dbCuenta.getCount(idm) <= 0) dbMesas.cerrarMesa(idm);
-                            RellenarTicket();
-                        }
-                        dlg.cancel();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            simpa.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        art.put("Can",1);
-                        ContentValues p = new ContentValues();
-                        String idm = mesa.getString("ID");
-                        p.put("idm", idm);
-                        p.put("Precio", art.getString("Precio"));
-                        p.put("idArt", art.getString("IDArt"));
-                        p.put("can", "1");
-                        p.put("idc", cam.getString("ID"));
-                        p.put("motivo", motivo.getText().toString());
-                        p.put("Estado", art.getString("Estado"));
-                        p.put("Nombre", art.getString("Nombre"));
-                        if (myServicio != null){
-                            myServicio.rmLinea(p);
-                            dbCuenta.eliminar(idm, new JSONArray().put(art));
-                            if(dbCuenta.getCount(idm)<=0)   dbMesas.cerrarMesa(idm);
-                            RellenarTicket();
-                        }
-                        dlg.cancel();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            inv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        art.put("Can",1);
-                        ContentValues p = new ContentValues();
-                        String idm = mesa.getString("ID");
-                        p.put("idm", idm);
-                        p.put("Precio", art.getString("Precio"));
-                        p.put("idArt", art.getString("IDArt"));
-                        p.put("can", "1");
-                        p.put("idc", cam.getString("ID"));
-                        p.put("motivo", motivo.getText().toString());
-                        p.put("Estado", art.getString("Estado"));
-                        p.put("Nombre", art.getString("Nombre"));
-                        if (myServicio != null) {
-                            myServicio.rmLinea(p);
-                            dbCuenta.eliminar(idm, new JSONArray().put(art));
-                            if (dbCuenta.getCount(idm) <= 0) dbMesas.cerrarMesa(idm);
-                            RellenarTicket();
-                        }
-                        dlg.cancel();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
+            inv.setOnClickListener(view -> {
+                borrarLinea(art, motivo.getText().toString());
+                dlg.cancel();
+                setEstadoAutoFinish(true, false);
             });
 
             dlg.show();
-
 
     }
 
     @Override
     public void borrarArticulo(JSONObject art) throws JSONException {
          art.put("Can",1);
-         dbCuenta.eliminar(mesa.getString("ID"),new JSONArray().put(art));
-         RellenarTicket();
+         dbCuenta.eliminar(mesa.getString("ID"), new JSONArray().put(art));
+         rellenarTicket();
     }
+
+    // Utilidades
+    private void asociarBotonera(View view) {
+        JSON json = new JSON();
+        try {
+            JSONObject pref = json.deserializar("preferencias.dat", this);
+            pref.put("sec",Integer.toString(view.getId()));
+            json.serializar("preferencias.dat", pref, cx);
+            Toast toast= Toast.makeText(getApplicationContext(),
+                    "Asocicion realizada", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
+            toast.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void borrarLinea(final JSONObject art, String motivo){
+        try{
+            art.put("Can",1);
+            ContentValues p = new ContentValues();
+            String idm = mesa.getString("ID");
+            p.put("idm", idm);
+            p.put("Precio", art.getString("Precio"));
+            p.put("idArt", art.getString("IDArt"));
+            p.put("can", "1");
+            p.put("idc", cam.getString("ID"));
+            p.put("motivo", motivo);
+            p.put("Estado", art.getString("Estado"));
+            p.put("Nombre", art.getString("Nombre"));
+            if (myServicio != null){
+                myServicio.rmLinea(p);
+                dbCuenta.eliminar(idm, new JSONArray().put(art));
+                if(dbCuenta.getCount(idm)<=0)   dbMesas.cerrarMesa(idm);
+                rellenarTicket();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMessageMesaCobrada(Double entrega, double cambio) {
+        Handler handlerMesas = myServicio.getExHandler("camareros");
+        Message msg = handlerMesas.obtainMessage();
+        Bundle bundle = msg.getData();
+        if (bundle == null) bundle = new Bundle();
+        bundle.putString("op", "show_info_cobro");
+        bundle.putDouble("entrega", entrega );
+        bundle.putDouble("cambio", cambio);
+        msg.setData(bundle);
+        handlerMesas.sendMessage(msg);
+    }
+
 }

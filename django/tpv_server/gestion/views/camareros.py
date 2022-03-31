@@ -8,9 +8,8 @@
 from api_android.tools import send_update_ws
 from tokenapi.http import JsonResponse, HttpResponse
 from django.db.models import Q
-from django.forms.models import model_to_dict
-from django.shortcuts import render, reverse
-from gestion.models import Camareros
+from django.shortcuts import render
+from gestion.models import Camareros, Sync
 from gestion.forms import CamarerosForm
 from django.contrib.auth.decorators import login_required
 
@@ -55,6 +54,8 @@ def add_camarero(request):
                               {'tipo':'pass', 'icon':'fa-unlock-alt'}],
                      'obj': {"id":obj.id, "nombre": obj.nombre, "apellidos": obj.apellidos }
                }
+    else:
+        print("no valido")
 
     return JsonResponse(obj_send)
 
@@ -79,7 +80,8 @@ def edit_camarero(request, id):
 
 @login_required(login_url='login_tk')
 def rm_camarero(request, id):
-    Camareros.objects.filter(pk=id).update(activo=False)
+    Camareros.objects.filter(pk=id).update(activo=0)
+    Sync.actualizar("camareros")
     return HttpResponse("success")
 
 @login_required(login_url='login_tk')

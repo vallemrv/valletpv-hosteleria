@@ -1,42 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.valleapp.valletpv" >
+    package="com.valleapp.valletpv">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="m">
         <activity
-            android:name=".Camareros"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape"
-            android:exported="true">
+            android:name=".ValleTPV"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".Arqueo"
+            android:exported="true"
             android:label="@string/title_activity_arqueo"
-            android:screenOrientation="landscape"
-            android:exported="true">
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".PreferenciasTPV"
+            android:exported="true"
             android:label="@string/title_activity_preferencias_tpv"
-            android:screenOrientation="landscape"
-            android:exported="true">
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,27 +48,28 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Camareros"
+            android:exported="false"
+            android:label="@string/title_activity_camareros"
+            android:screenOrientation="landscape" />
+        <activity
             android:name=".Mesas"
             android:label="@string/title_activity_mesas"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".Cuenta"
             android:label="@string/title_activity_cuenta"
-            android:screenOrientation="landscape"
-            >
-        </activity>
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".OpMesas"
             android:label="@string/title_activity_op_mesas"
-            android:screenOrientation="landscape">
-        </activity>
+            android:screenOrientation="landscape" />
 
         <service
             android:name=".Util.ServicioCom"
             android:enabled="true"
-            android:exported="false" >
-        </service>
+            android:exported="false" />
     </application>
 
 </manifest>

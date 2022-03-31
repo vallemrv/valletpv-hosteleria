@@ -6,6 +6,17 @@
     android:padding="5dip">
 
 
+    <EditText
+        android:id="@+id/editTextTextPersonName3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:capitalize="none"
+        android:ems="10"
+        android:fontFeatureSettings="bold"
+        android:inputType="textPersonName"
+        android:text="Crear contraseña"
+        android:textSize="22sp" />
+
     <TextView
         android:id="@+id/editText3"
         android:layout_width="match_parent"

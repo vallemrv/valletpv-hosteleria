@@ -61,7 +61,7 @@
         android:id="@+id/btnVerTicket"
         android:src="@android:drawable/ic_menu_search"
         android:onClick="clickVerTicket"
-        android:background="@drawable/blancoxml"
+        android:background="@drawable/fondo_btn_xml"
         android:textSize="30sp"/>
 
 

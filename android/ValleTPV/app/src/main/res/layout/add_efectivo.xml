@@ -46,11 +46,11 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:text="OK"
-            android:id="@+id/btnAceptar"
+            android:id="@+id/btn_varios_aceptar"
             android:layout_toStartOf="@+id/btnSalir"
             android:layout_below="@+id/txtMoneda"
             android:layout_toLeftOf="@+id/btnSalir"
-            android:background="@drawable/blancoxml"
+            android:background="@drawable/fondo_btn_xml"
             android:layout_margin="5dp"
             android:textSize="35sp"/>
     </RelativeLayout>

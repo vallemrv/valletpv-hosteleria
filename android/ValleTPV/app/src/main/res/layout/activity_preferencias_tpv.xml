@@ -20,7 +20,7 @@
             android:textSize="48dip" />
 
         <Button
-            android:id="@+id/btnAceptar"
+            android:id="@+id/btn_varios_aceptar"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.1

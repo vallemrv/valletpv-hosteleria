@@ -45,8 +45,8 @@ public class Ticket extends ArrayAdapter<JSONObject> implements View.OnClickList
             TextView t = (TextView) rowView.findViewById(R.id.lblTotal);
             can.setText(String.format("%s", values.get(position).getString("Can")));
             nombre.setText(String.format("%s",values.get(position).getString("Nombre")));
-            p.setText(String.format("%.2f €", values.get(position).getDouble("Precio")));
-            t.setText(String.format("%.2f €", values.get(position).getDouble("Total")));
+            p.setText(String.format("%01.2f €", values.get(position).getDouble("Precio")));
+            t.setText(String.format("%01.2f €", values.get(position).getDouble("Total")));
             ImageButton rm = (ImageButton)rowView.findViewById(R.id.btnBorrar);
             rm.setTag(values.get(position));
             rm.setOnClickListener(this);

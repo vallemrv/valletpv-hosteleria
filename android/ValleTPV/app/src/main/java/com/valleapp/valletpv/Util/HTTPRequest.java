@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -42,7 +41,6 @@ public class HTTPRequest {
     public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler success){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;
-        Log.d("cagada", String.format("strUrl: %s, params: %s ", strUrl, op));
 
         try {
 
@@ -53,8 +51,6 @@ public class HTTPRequest {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "UTF-8");
 
-
-            Log.d("test", strUrl);
             // Execute HTTP Post Request
             HttpURLConnection finalConn = conn;
              new Thread(){

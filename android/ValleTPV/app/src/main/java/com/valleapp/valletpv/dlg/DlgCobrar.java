@@ -2,6 +2,7 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -91,12 +92,15 @@ public class DlgCobrar extends Dialog{
     }
 
     public void clickTarjeta(View v){
-        controlador.cobrar(lineas,totalCobro,0.00);
-        this.cancel();
+        Log.i("DLGCobrar", String.valueOf(entrega));
+        if (entrega == totalCobro) {
+            controlador.cobrar(lineas, totalCobro, 0.00);
+            this.cancel();
+        }
     }
 
     public void clickSalir(View v){
-        controlador.salir();cancel();
+        cancel();
     }
 
     public void clickEntrega(View v){
@@ -120,4 +124,9 @@ public class DlgCobrar extends Dialog{
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        controlador.setEstadoAutoFinish(true, false);
+    }
 }

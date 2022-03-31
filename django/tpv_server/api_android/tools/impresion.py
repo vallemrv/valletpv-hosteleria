@@ -41,6 +41,13 @@ def imprimir_pedido(request, id):
     send_pedidos_ws(request, receptores)
 
 def send_imprimir_ticket(request, id):
+    receptor_activo = request.POST["receptor_activo"] if "receptor_activo" in request.POST else None
+    abrircajon = request.POST["abrircajon"] if "abrircajon" in request.POST else True
+    handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon)
+
+
+def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
+    
     ticket = Ticket.objects.get(pk=id)
     camarero = Camareros.objects.get(pk=ticket.camarero_id)
     lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__idart"),
@@ -64,8 +71,8 @@ def send_imprimir_ticket(request, id):
         "op": "ticket",
         "fecha": ticket.fecha + " " + ticket.hora,
         "receptor": receptor.nomimp,
-        "receptor_activo": request.POST["receptor_activo"] if "receptor_activo" in request.POST else receptor.activo,
-        "abrircajon": request.POST["abrircajon"] if "abrircajon" in request.POST else True,
+        "receptor_activo": receptor_activo if receptor_activo else receptor.activo,
+        "abrircajon": abrircajon,
         "camarero": camarero.nombre + " " + camarero.apellidos,
         "mesa": ticket.mesa,
         "lineas": lineas_ticket,
@@ -73,4 +80,4 @@ def send_imprimir_ticket(request, id):
         "efectivo": ticket.entrega,
         'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']
     }
-    send_ticket_ws(request, obj)
+    send_ticket_ws(None, obj)

@@ -47,7 +47,7 @@
             android:layout_below="@+id/txtImporte"
             android:layout_toLeftOf="@+id/Salir"
             android:layout_toStartOf="@+id/Salir"
-            android:background="@drawable/blancoxml"
+            android:background="@drawable/fondo_btn_xml"
             android:layout_margin="5dp" />
     </RelativeLayout>
 </LinearLayout>

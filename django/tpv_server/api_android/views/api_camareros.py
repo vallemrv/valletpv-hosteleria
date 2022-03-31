@@ -120,3 +120,15 @@ def es_autorizado(request):
             return JsonResponse({"autorizado": False})
     except:
         return JsonResponse({"autorizado": True, "cam": request.POST["id"]})
+
+
+@csrf_exempt
+def camarero_add(request):
+    nombre = request.POST["nombre"]
+    apellido = request.POST["apellido"]
+    camarero = Camareros()
+    camarero.nombre = nombre
+    camarero.apellidos = apellido
+    camarero.autorizado = 1
+    camarero.save()
+    return JsonResponse("success")
