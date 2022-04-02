@@ -37,8 +37,11 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="270dp"
-            android:background="@drawable/add_camareros"
-            android:onClick="clickAddCamareros" />
+            android:background="@drawable/fondo_btn_xml"
+            android:onClick="clickAddCamareros"
+            android:scaleType="fitXY"
+            android:padding="10dp"
+            android:src="@drawable/add_camareros" />
 
         <ImageButton
             android:id="@+id/btnSettings"
@@ -48,21 +51,31 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="180dp"
-            android:background="@drawable/settings"
+            android:background="@drawable/fondo_btn_xml"
+            android:scaleType="fitXY"
             android:onClick="clickSettings"
-            android:text="Abrir\nCajon" />
+            android:padding="10dp"
+            android:src="@drawable/settings"
+            android:text="settings" />
 
         <ImageButton
+            android:id="@+id/btnOpenCaja"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:text="Abrir\nCajon"
-            android:id="@+id/btnOpenCaja"
-            android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/fondo_btn_xml"
             android:onClick="clickAbrirCaja"
-            android:background="@drawable/abrircajonxml"
-            android:layout_margin="5dp" />
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/abrircajon"
+            android:text="Abrir\nCajon" />
 
         <ImageButton
             android:id="@+id/btnListadoTicket"
@@ -75,8 +88,11 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/btnOpenCaja"
-            android:background="@drawable/listaticketxml"
+            android:background="@drawable/fondo_btn_xml"
             android:onClick="clickListaTicket"
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/listaticket"
             android:text="Lista\nTicket" />
 
 

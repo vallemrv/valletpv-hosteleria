@@ -18,23 +18,29 @@
             android:hint="Cambio"
             android:textSize="35sp"/>
 
-        <Button
+        <ImageButton
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:id="@+id/salirCambio"
             android:layout_gravity="end"
             android:layout_below="@+id/cambio"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/salirxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/salir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:layout_margin="5dp" />
 
-        <Button
+        <ImageButton
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:text="OK"
             android:id="@+id/aceptarCam"
             android:layout_toStartOf="@+id/salirCambio"
             android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/check"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:layout_margin="5dp"
             android:layout_below="@+id/cambio" />
 

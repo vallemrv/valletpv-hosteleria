@@ -29,7 +29,10 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:layout_marginEnd="15dp"
-            android:background="@drawable/abrircajonxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/abrircajon"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:onClick="abrirCajon" />
 
 
@@ -41,8 +44,11 @@
             android:layout_margin="5dp"
             android:layout_toStartOf="@+id/AbrirCajon"
             android:layout_toLeftOf="@+id/AbrirCajon"
-            android:background="@drawable/cobrarxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/cobrar"
             android:onClick="cobrarMesa"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:text="Cobrar" />
 
         <EditText
@@ -64,8 +70,11 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:layout_toStartOf="@+id/separar"
-            android:background="@drawable/variosxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/varios"
             android:onClick="mostrarVarios"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:text="Varios" />
 
         <ImageButton
@@ -75,8 +84,11 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:layout_toStartOf="@+id/Cobrar"
-            android:background="@drawable/imprimirxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/imprimirticket"
             android:onClick="preImprimir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:text="New Button" />
 
         <ImageButton
@@ -86,7 +98,10 @@
             android:layout_centerVertical="true"
             android:layout_margin="5dp"
             android:layout_toStartOf="@+id/preimprimir"
-            android:background="@drawable/separarticketxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/separarticket"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:onClick="mostrarSeparados" />
 
         <TextView
@@ -117,8 +132,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="0.4">
+            android:layout_weight="0.4"
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/pneDisplay"

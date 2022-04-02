@@ -3,12 +3,11 @@ package com.valleapp.valletpv.dlg;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.Interfaces.IControlador;
 import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,9 +17,9 @@ import org.json.JSONObject;
  */
 public class DlgVarios extends Dialog {
 
-    IControlador controlador;
+    IControladorCuenta controlador;
 
-    public DlgVarios(Context context, final IControlador controlador) {
+    public DlgVarios(Context context, final IControladorCuenta controlador) {
         super(context);
         this.controlador = controlador;
     }
@@ -30,11 +29,11 @@ public class DlgVarios extends Dialog {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.varios);
         this.setTitle("Varios ");
-        final TextView can = (TextView) this.findViewById(R.id.txt_varios_can);
-        final TextView p = (TextView) this.findViewById(R.id.txt_varios_precio);
-        final TextView nom = (TextView) this.findViewById(R.id.txt_varios_nombre);
-        Button ok = (Button) this.findViewById(R.id.btn_varios_aceptar);
-        ImageButton s = (ImageButton) this.findViewById(R.id.btn_varios_salir);
+        final TextView can = this.findViewById(R.id.txt_varios_can);
+        final TextView p =  this.findViewById(R.id.txt_varios_precio);
+        final TextView nom =  this.findViewById(R.id.txt_varios_nombre);
+        ImageButton ok = this.findViewById(R.id.btn_varios_aceptar);
+        ImageButton s = this.findViewById(R.id.btn_varios_salir);
 
         can.setText("");
         p.setText("");
@@ -54,7 +53,7 @@ public class DlgVarios extends Dialog {
                     art.put("Precio", p.getText().toString().replace(",", "."));
                     art.put("Can", strCan);
                     art.put("Nombre", nombre);
-                    controlador.pedirArt(art, strCan);
+                    controlador.pedirArt(art);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

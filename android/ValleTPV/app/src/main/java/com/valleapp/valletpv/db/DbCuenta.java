@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.valleapp.valletpv.Interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,22 +124,23 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
         return s;
     }
 
-    public void addArt(int can, int IDMesa,  JSONObject art){
+    public void addArt(int IDMesa,  JSONObject art){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
          // Insert the new row, returning the primary key value of the new row
-        for(int i=0;i<can;i++) {
-            try {
-                ContentValues values = new ContentValues();
-                values.put("IDArt", art.getInt("ID"));
-                values.put("Nombre", art.getString("Nombre"));
-                values.put("Precio", art.getDouble("Precio"));
-                values.put("IDMesa", IDMesa);
-                values.put("Estado", "N");
-                db.insert("cuenta", null, values);
-            }catch (JSONException e){
-                e.printStackTrace();
+        try {
+            int can = art.getInt("Can");
+            for(int i=0;i<can;i++) {
+                    ContentValues values = new ContentValues();
+                    values.put("IDArt", art.getInt("ID"));
+                    values.put("Nombre", art.getString("Nombre"));
+                    values.put("Precio", art.getDouble("Precio"));
+                    values.put("IDMesa", IDMesa);
+                    values.put("Estado", "N");
+                    db.insert("cuenta", null, values);
             }
+        }catch (JSONException e){
+            e.printStackTrace();
         }
         db.close();
     }

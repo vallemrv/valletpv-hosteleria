@@ -4,14 +4,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.Interfaces.IControlador;
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.Util.SepararTicket;
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSepararTicket;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +24,7 @@ import java.util.List;
  */
 public class DlgSepararTicket extends Dialog{
 
-    IControlador controlador;
+    IControladorCuenta controlador;
     Double totalCobro = 0.00;
     ListView lstArt;
 
@@ -35,38 +34,26 @@ public class DlgSepararTicket extends Dialog{
 
 
 
-    public DlgSepararTicket(Context context, IControlador controlador ) {
+    public DlgSepararTicket(Context context, IControladorCuenta controlador ) {
         super(context);
         this.controlador = controlador;
         setContentView(R.layout.separarticket);
 
         final TextView tot = (TextView) findViewById(R.id.lblTotalCobro);
-        Button ok = (Button)findViewById(R.id.btn_varios_aceptar);
-        ImageButton s = (ImageButton)findViewById(R.id.btnSalir);
+        ImageButton ok = findViewById(R.id.btn_varios_aceptar);
+        ImageButton s = findViewById(R.id.btnSalir);
 
         final ListView lstCobros = (ListView)findViewById(R.id.lstCobros);
 
         lstArt = (ListView)findViewById(R.id.lstArticulos);
 
-         ok.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View view) {
-                 clickCobrarSeparados(view);
-             }
-         });
+         ok.setOnClickListener(view -> clickCobrarSeparados(view));
 
-         s.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View view) {
-                 clickSalirSeparados(view);
-             }
-         });
+         s.setOnClickListener(view -> clickSalirSeparados(view));
 
         tot.setText(String.format("Total cobro %01.2f €", totalCobro));
 
-        lstArt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        lstArt.setOnItemClickListener((adapterView, view, i, l) -> {
             try {
                 JSONObject art = (JSONObject)view.getTag();
                 int can = art.getInt("Can");
@@ -77,15 +64,14 @@ public class DlgSepararTicket extends Dialog{
                     art.put("CanCobro", canCobro);
                     if (can==canCobro) lineasTicket.remove(art);
                     if (canCobro == 1) separados.add(art);
-                    lstCobros.setAdapter(new SepararTicket(getContext(), separados, true));
-                    lstArt.setAdapter(new SepararTicket(getContext(), lineasTicket, false));
+                    lstCobros.setAdapter(new AdaptadorSepararTicket(getContext(), separados, true));
+                    lstArt.setAdapter(new AdaptadorSepararTicket(getContext(), lineasTicket, false));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-                }
-            });
+        });
 
 
 
@@ -104,8 +90,8 @@ public class DlgSepararTicket extends Dialog{
                         lineasTicket.add(art);
                 }
                 if (canCobro == 0) separados.remove(art);
-                lstCobros.setAdapter(new SepararTicket(getContext(), separados, true));
-                lstArt.setAdapter(new SepararTicket(getContext(), lineasTicket, false));
+                lstCobros.setAdapter(new AdaptadorSepararTicket(getContext(), separados, true));
+                lstArt.setAdapter(new AdaptadorSepararTicket(getContext(), lineasTicket, false));
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -119,7 +105,7 @@ public class DlgSepararTicket extends Dialog{
 
     public void setLineasTicket(List<JSONObject> lsart) throws JSONException {
         lineasTicket = (ArrayList<JSONObject>) lsart;
-        lstArt.setAdapter(new SepararTicket(getContext(), lineasTicket, false));
+        lstArt.setAdapter(new AdaptadorSepararTicket(getContext(), lineasTicket, false));
      }
 
 

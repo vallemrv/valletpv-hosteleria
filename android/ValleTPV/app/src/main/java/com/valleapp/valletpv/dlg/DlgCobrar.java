@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.Interfaces.IControlador;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
 import com.valleapp.valletpv.R;
 
 import org.json.JSONArray;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class DlgCobrar extends Dialog{
 
     JSONArray lineas;
-    IControlador controlador;
+    IControladorCuenta controlador;
     String strEntrega = "";
     Double totalCobro = 0.00;
     Double entrega = 0.00;
@@ -30,14 +30,14 @@ public class DlgCobrar extends Dialog{
     TextView lblCambio;
     TextView lbltotal;
 
-    public DlgCobrar(Context context, IControlador controlador) {
+    public DlgCobrar(Context context, IControladorCuenta controlador) {
         super(context);
         this.controlador = controlador;
         setContentView(R.layout.cobros);
         lbltotal = (TextView) findViewById(R.id.lblPrecio);
         lblEntrega = (TextView) findViewById(R.id.lblEntrega);
         lblCambio = (TextView) findViewById(R.id.lblCambio);
-        Button tj = (Button)findViewById(R.id.btnTarjeta);
+        ImageButton tj = findViewById(R.id.btnTarjeta);
         ImageButton ef = (ImageButton)findViewById(R.id.btnEfectivo);
         ImageButton s = (ImageButton)findViewById(R.id.btnSalir);
         s.setOnClickListener(new View.OnClickListener() {

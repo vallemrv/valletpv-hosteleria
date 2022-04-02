@@ -9,7 +9,10 @@
 from django.urls import path
 from . import views
 
+
 app_name = "gestion"
+
+
 CAMAREROS = [
     path("lista_camareros", views.lista_camareros, name="lista_camareros"),
     path("add_camarero", views.add_camarero, name="add_camarero"),

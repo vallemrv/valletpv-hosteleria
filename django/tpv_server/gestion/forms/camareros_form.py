@@ -12,4 +12,4 @@ from gestion.models import Camareros
 class CamarerosForm(ModelForm):
     class Meta:
         model = Camareros
-        exclude = ["activo", "autorizado", "pass_field", "email", "permisos"]
+        exclude = ["activo", "autorizado", "pass_field", "email"]

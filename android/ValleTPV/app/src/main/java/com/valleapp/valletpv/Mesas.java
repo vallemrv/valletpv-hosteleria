@@ -29,13 +29,15 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.Interfaces.IAutoFinish;
-import com.valleapp.valletpv.Util.AdaptadorSettings;
-import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.interfaces.IAutoFinish;
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
+import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
+import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSelCamareros;
 
 import org.json.JSONArray;
@@ -47,7 +49,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Mesas extends Activity implements IAutoFinish {
+public class Mesas extends Activity implements IAutoFinish, IControladorAutorizaciones {
 
     final Context cx = this;
     final long periodFinish = 5000;
@@ -74,6 +76,24 @@ public class Mesas extends Activity implements IAutoFinish {
     ListView lista_setting;
     ServicioCom myServicio;
 
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
+            if(myServicio!=null){
+                myServicio.setExHandler("mesas", handleHttp);
+                dbMesas = (DbMesas) myServicio.getDb("mesas");
+                dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
+                dbZonas = (DbZonas) myServicio.getDb("zonas");
+                rellenarZonas();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myServicio = null;
+        }
+    };
 
 
     @SuppressLint("HandlerLeak")
@@ -107,6 +127,8 @@ public class Mesas extends Activity implements IAutoFinish {
                                 lista_setting.setAdapter(adaptadorSettings);
 
                             }
+                            break;
+                        case "procesar_autorizacion":
                             break;
                     }
 
@@ -275,20 +297,24 @@ public class Mesas extends Activity implements IAutoFinish {
     }
 
     public  void clickSettings(View v){
-        stop = true;
+        setEstadoAutoFinish(true,true);
         final Dialog settings = new Dialog(cx);
+
+        settings.setOnCancelListener(dialogInterface -> {
+            setEstadoAutoFinish(true,false);
+        });
         settings.setTitle("Opciones impresión...");
         settings.setContentView(R.layout.dialog_settings);
         lista_setting = settings.findViewById(R.id.lista_settings);
-        Button salir = settings.findViewById(R.id.boton_salir);
+        ImageButton salir = settings.findViewById(R.id.boton_salir);
         salir.setOnClickListener(v1 -> {
             if (adaptadorSettings != null){
                 JSONArray lista = adaptadorSettings.lista;
                 if(myServicio!=null) myServicio.setSettings(lista.toString());
 
             }
-            settings.dismiss();
-            stop = false;reset=true;
+            settings.cancel();
+
         });
         if(myServicio!=null) myServicio.getSettings(handleHttp);
         settings.show();
@@ -298,19 +324,21 @@ public class Mesas extends Activity implements IAutoFinish {
     public void clickListaTicket(View v){
         stop = true;
         dlgListadoTicket = new Dialog(this);
+        dlgListadoTicket.setOnCancelListener(dialogInterface -> {
+            stop = false;reset=true;
+        });
         dlgListadoTicket.setContentView(R.layout.listado_ticket);
         dlgListadoTicket.setTitle("Lista de ticket");
         Window window = dlgListadoTicket.getWindow();
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-        final Button imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
-        final Button salir = dlgListadoTicket.findViewById(R.id.btnSalir);
-        final Button ls =  dlgListadoTicket.findViewById(R.id.btnListado);
+        final ImageButton imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
+        final ImageButton salir = dlgListadoTicket.findViewById(R.id.btnSalir);
+        final ImageButton ls =  dlgListadoTicket.findViewById(R.id.btnListado);
         imp.setVisibility(View.GONE);
         ls.setVisibility(View.GONE);
 
         salir.setOnClickListener(view -> {
             dlgListadoTicket.cancel();
-            stop = false;reset=true;
         });
 
         ls.setOnClickListener(view -> {
@@ -321,7 +349,6 @@ public class Mesas extends Activity implements IAutoFinish {
         imp.setOnClickListener(view -> {
             if(myServicio!=null) myServicio.imprimirTicket(IDTicket);
             dlgListadoTicket.cancel();
-            stop = false;reset = true;
         });
         if(myServicio!=null) myServicio.getListaTickets(handleHttp);
         dlgListadoTicket.show();
@@ -330,8 +357,8 @@ public class Mesas extends Activity implements IAutoFinish {
     public  void clickVerTicket(View v){
 
         IDTicket =  v.getTag().toString();
-        ((Button) dlgListadoTicket.findViewById(R.id.btnImprimir)).setVisibility(View.VISIBLE);
-        ((Button) dlgListadoTicket.findViewById(R.id.btnListado)).setVisibility(View.VISIBLE);
+        ((ImageButton) dlgListadoTicket.findViewById(R.id.btnImprimir)).setVisibility(View.VISIBLE);
+        ((ImageButton) dlgListadoTicket.findViewById(R.id.btnListado)).setVisibility(View.VISIBLE);
         if(myServicio!=null){
             myServicio.getLineasTicket(handleHttp, IDTicket);
         }
@@ -359,7 +386,7 @@ public class Mesas extends Activity implements IAutoFinish {
 
                 LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.linea_cabecera_ticket, null);
+                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_cabecera_ticket, null);
 
                 TextView  n = v.findViewById(R.id.lblNumTicket);
                 TextView  f = v.findViewById(R.id.lblHoraFecha);
@@ -411,7 +438,7 @@ public class Mesas extends Activity implements IAutoFinish {
 
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.linea_ticket, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_linea_ticket, null);
 
                     TextView  c = v.findViewById(R.id.lblCan);
                     TextView  p = v.findViewById(R.id.lblPrecio);
@@ -429,7 +456,7 @@ public class Mesas extends Activity implements IAutoFinish {
 
                 LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
-                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.linea_total, null);
+                @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_linea_total, null);
                 TextView  t = (TextView)v.findViewById(R.id.lblTotalTicket);
                 t.setText(String.format("%01.2f €",Total));
 
@@ -471,21 +498,29 @@ public class Mesas extends Activity implements IAutoFinish {
     }
 
     public void clickBorrarMesa(View v){
-        stop = true;
+        setEstadoAutoFinish(true,true);
 
         final JSONObject m = (JSONObject)v.getTag();
         final Dialog dlg = new Dialog(cx);
+
+        dlg.setOnCancelListener(dialogInterface -> {
+            setEstadoAutoFinish(true,false);
+        });
+
         dlg.setContentView(R.layout.borrar_art);
         dlg.setTitle("Borrar Mesa ");
         final EditText motivo = dlg.findViewById(R.id.txtMotivo);
         final Button error = dlg.findViewById(R.id.btnError);
         final Button simpa =  dlg.findViewById(R.id.btnSimpa);
         final Button inv = dlg.findViewById(R.id.btnInv);
-        final Button ok =  dlg.findViewById(R.id.btnOk);
+        final ImageButton ok =  dlg.findViewById(R.id.btnOk);
         final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
         final ImageButton exit = dlg.findViewById(R.id.btnSalir);
         final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
+        final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
+        txtInfo.setText("Borrado de mesa completa");
         pneEdit.setVisibility(View.GONE);
+
 
             exit.setOnClickListener(view -> dlg.cancel());
 
@@ -497,10 +532,9 @@ public class Mesas extends Activity implements IAutoFinish {
             ok.setOnClickListener(view -> {
                 if (motivo.getText().length() > 0) {
                     try {
+                        dlg.cancel();
                         final String idm = m.getString("ID");
                         borrarMesa(idm, motivo.getText().toString());
-                        dlg.cancel();
-                        stop=false;reset=true;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -509,9 +543,8 @@ public class Mesas extends Activity implements IAutoFinish {
 
             error.setOnClickListener(view -> {
                 try{
-                    borrarMesa(m.getString("ID"), error.getText().toString());
                     dlg.cancel();
-                    stop=false;reset=true;
+                    borrarMesa(m.getString("ID"), error.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -519,9 +552,8 @@ public class Mesas extends Activity implements IAutoFinish {
 
             simpa.setOnClickListener(view -> {
                 try {
-                    borrarMesa(m.getString("ID"), simpa.getText().toString());
                     dlg.cancel();
-                    stop=false;reset=true;
+                    borrarMesa(m.getString("ID"), simpa.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -530,9 +562,8 @@ public class Mesas extends Activity implements IAutoFinish {
             inv.setOnClickListener(view -> {
 
                 try {
-                    borrarMesa(m.getString("ID"), inv.getText().toString());
                     dlg.cancel();
-                    stop=false;reset=true;
+                    borrarMesa(m.getString("ID"), inv.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -595,49 +626,47 @@ public class Mesas extends Activity implements IAutoFinish {
         super.onResume();
     }
 
-    private final ServiceConnection mConexion = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null){
-                myServicio.setExHandler("mesas", handleHttp);
-                dbMesas = (DbMesas) myServicio.getDb("mesas");
-                dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
-                dbZonas = (DbZonas) myServicio.getDb("zonas");
-                rellenarZonas();
-            }
-        }
+    @Override
+    public void setEstadoAutoFinish(boolean reset, boolean stop) {
+        this.reset = reset;
+        this.stop = stop;
+    }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            myServicio = null;
-        }
-    };
+    @Override
+    public void pedirAutorizacion(ContentValues p) {
+        myServicio.pedirAutorizacion(p, handleHttp, "procesar_autorizacion");
+    }
+
+    @Override
+    public void pedirAutorizacion(String id) {
+
+    }
+
 
     //Utilidades
     private void borrarMesa(String idm, String motivo){
         try {
 
-            ContentValues p = new ContentValues();
-            p.put("motivo", motivo);
-            p.put("idm",idm);
-            p.put("idc", cam.getString("ID"));
             if (myServicio != null){
-                dbMesas.cerrarMesa(idm);
-                dbCuenta.eliminar(idm);
-                myServicio.rmMesa(p);
-                rellenarMesas();
+                JSONObject p = new JSONObject();
+                p.put("motivo", motivo);
+                p.put("idm",idm);
+                p.put("idc", cam.getString("ID"));
+
+
+                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                                               myServicio.getDb("camareros"), this,
+                                               p, "borrar_mesa");
+                dlg.show();
             }
+
+           ;
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void setEstadoAutoFinish(boolean reset, boolean stop) {
-        this.reset = reset;
-        this.stop = stop;
-    }
+
 }
 

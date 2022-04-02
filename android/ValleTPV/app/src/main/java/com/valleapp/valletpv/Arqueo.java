@@ -8,16 +8,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.Util.HTTPRequest;
-import com.valleapp.valletpv.Util.JSON;
+import com.valleapp.valletpv.tools.HTTPRequest;
+import com.valleapp.valletpv.tools.JSON;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +43,7 @@ public class Arqueo extends Activity {
 
 
     @SuppressLint("HandlerLeak")
-    private final Handler controller_http = new Handler() {
+    private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE").toString();
@@ -84,10 +86,10 @@ public class Arqueo extends Activity {
 
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.linea_gastos, null);
-            TextView can = (TextView) v.findViewById(R.id.cantidad);
-            TextView des = (TextView) v.findViewById(R.id.Descripcion);
-            Button rm = (Button)v.findViewById(R.id.btnBorrar);
+            View v = inflater.inflate(R.layout.item_gastos, null);
+            TextView can = v.findViewById(R.id.cantidad);
+            TextView des = v.findViewById(R.id.Descripcion);
+            ImageButton rm = v.findViewById(R.id.btnBorrar);
             rm.setTag(gasto);
 
             try {
@@ -120,11 +122,11 @@ public class Arqueo extends Activity {
 
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.linea_efectivo, null);
-            TextView mon = (TextView) v.findViewById(R.id.Moneda);
-            TextView can = (TextView) v.findViewById(R.id.Cantidad);
-            TextView tot = (TextView) v.findViewById(R.id.Total);
-            Button rm = (Button)v.findViewById(R.id.btnBorrar);
+            View v = inflater.inflate(R.layout.item_efectivo, null);
+            TextView mon =  v.findViewById(R.id.Moneda);
+            TextView can = v.findViewById(R.id.Cantidad);
+            TextView tot = v.findViewById(R.id.Total);
+            ImageButton rm = v.findViewById(R.id.btnBorrar);
             rm.setTag(e);
 
             try {
@@ -163,7 +165,7 @@ public class Arqueo extends Activity {
        final Dialog dlg = new Dialog(this);
        dlg.setContentView(R.layout.add_efectivo);
        dlg.setTitle("Agregar efectivo");
-       Button s = (Button) dlg.findViewById(R.id.btnSalir);
+       ImageButton s = dlg.findViewById(R.id.btnSalir);
        Button ok = (Button) dlg.findViewById(R.id.btn_varios_aceptar);
        final TextView m = (TextView) dlg.findViewById(R.id.txtMoneda);
        final TextView c = (TextView) dlg.findViewById(R.id.txtCantidad);
@@ -203,8 +205,8 @@ public class Arqueo extends Activity {
           final Dialog dlg = new Dialog(this);
           dlg.setContentView(R.layout.add_gastos);
           dlg.setTitle("Agregar gasto");
-          Button s = (Button) dlg.findViewById(R.id.Salir);
-          Button ok = (Button) dlg.findViewById(R.id.Aceptar);
+          ImageButton s = dlg.findViewById(R.id.Salir);
+          ImageButton ok = dlg.findViewById(R.id.Aceptar);
           final TextView txtDes = (TextView) dlg.findViewById(R.id.txtDescripcion);
           final TextView imp = (TextView) dlg.findViewById(R.id.txtImporte);
           s.setOnClickListener(new View.OnClickListener() {
@@ -240,8 +242,8 @@ public class Arqueo extends Activity {
           final Dialog dlg = new Dialog(this);
           dlg.setContentView(R.layout.edit_cambio);
           dlg.setTitle("Editar Cambio");
-          Button s = (Button) dlg.findViewById(R.id.salirCambio);
-          Button ok = (Button) dlg.findViewById(R.id.aceptarCam);
+          ImageButton s = dlg.findViewById(R.id.salirCambio);
+          ImageButton ok =  dlg.findViewById(R.id.aceptarCam);
           final TextView txtDes = (TextView) dlg.findViewById(R.id.cambio);
           s.setOnClickListener(new View.OnClickListener() {
               @Override

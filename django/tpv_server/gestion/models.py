@@ -20,6 +20,11 @@ from app.utility import rgbToHex
 
 
 
+class PeticionesAutoria(models.Model):
+    idautorizado = models.ForeignKey("Camareros", on_delete=models.CASCADE)
+    accion = models.CharField(max_length=150)
+    instrucciones = models.CharField(max_length=300)
+
 class Sync(models.Model):
     nombre = models.CharField(max_length=50) 
     last = models.CharField(max_length=26)

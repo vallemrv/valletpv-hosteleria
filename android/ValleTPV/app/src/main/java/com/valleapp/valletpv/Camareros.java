@@ -27,8 +27,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.Util.ServicioCom;
-import com.valleapp.valletpv.Util.ToastShowInfoCuenta;
+import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpv.tools.ToastShowInfoCuenta;
 import com.valleapp.valletpv.db.DbCamareros;
 
 import org.json.JSONArray;

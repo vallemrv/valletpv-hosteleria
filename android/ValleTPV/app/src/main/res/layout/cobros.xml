@@ -111,16 +111,23 @@
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/cobrarxml"
+                    android:background="@drawable/fondo_btn_xml"
+                    android:src="@drawable/cobrar"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
                     android:text="New Button" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/btnTarjeta"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/tarjetaxml" />
+                    android:background="@drawable/fondo_btn_xml"
+                    android:src="@drawable/tarjeta"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
+                    />
 
                 <ImageButton
                     android:id="@+id/btnSalir"
@@ -128,7 +135,10 @@
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/salirxml"
+                    android:background="@drawable/fondo_btn_xml"
+                    android:src="@drawable/salir"
+                    android:padding="10dp"
+                    android:scaleType="fitCenter"
                     android:text="New Button" />
 
             </LinearLayout>

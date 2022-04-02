@@ -7,8 +7,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import com.valleapp.valletpv.Interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -112,6 +113,8 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
         return lscam;
     }
 
+
+
     public void setAutorizado(int id, Boolean a){
         String autorizado = a ? "1" : "0";
         SQLiteDatabase db = this.getReadableDatabase();
@@ -130,14 +133,21 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
-    @SuppressLint("Range")
+
     public ArrayList<JSONObject> getAutorizados(Boolean a)
     {
         String autorizado = a ? "1" : "0";
-
-        ArrayList<JSONObject> lscam = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from camareros WHERE autorizado = '"+ autorizado + "'", null );
+        ArrayList<JSONObject>  lscam = cargarRegistros(res);
+        db.close();
+        return lscam;
+    }
+
+    @SuppressLint("Range")
+    private ArrayList<JSONObject> cargarRegistros(Cursor res) {
+
+        ArrayList<JSONObject>  lscam = new ArrayList<>();
         res.moveToFirst();
 
         while(!res.isAfterLast()){
@@ -149,6 +159,7 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
                 cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
                 cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
                 lscam.add(cam);
+                Log.i("DBCamareros", cam.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -157,19 +168,10 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
 
         }
         res.close();
-        db.close();
         return lscam;
     }
 
-    public void vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM camareros");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
+
 
     public void addCamNuevo(String n, String a) {
         try {
@@ -185,4 +187,14 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
             e.printStackTrace();
         }
     }
+
+    public ArrayList<JSONObject> getConPermiso(String permiso) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from camareros where permisos  LIKE '%"+permiso+"%' AND autorizado = '1'", null );
+        ArrayList<JSONObject>  lscam = cargarRegistros(res);
+        db.close();
+        return lscam;
+    }
+
+
 }

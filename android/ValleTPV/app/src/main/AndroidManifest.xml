@@ -67,7 +67,7 @@
             android:screenOrientation="landscape" />
 
         <service
-            android:name=".Util.ServicioCom"
+            android:name=".tools.ServicioCom"
             android:enabled="true"
             android:exported="false" />
     </application>

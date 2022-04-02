@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:padding="10dp">
 
+    <TextView
+        android:id="@+id/txt_info_borrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="25sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -46,7 +53,10 @@
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/editarxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/editar"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:contentDescription="@string/borrar_editar" />
 
         <ImageButton
@@ -55,7 +65,10 @@
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/salirxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/salir"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
             android:contentDescription="@string/borrar_salir" />
 
 
@@ -79,7 +92,7 @@
             android:inputType="text"
             android:textSize="35sp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnOk"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -87,6 +100,9 @@
             android:layout_margin="5dp"
             android:layout_weight="4"
             android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/check"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
             android:text="@string/borrar_ok" />
 
     </LinearLayout>

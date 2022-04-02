@@ -20,7 +20,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbZonas;

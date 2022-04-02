@@ -2,17 +2,15 @@
 .vscode/
 manage*
 media*/
-test*/
-Test*/
 server_*
 *.sqlite3
 node*
-**/control_impresoras/test*
+ignore*
 
 #excepciones
 !manage_template.py
-!test_ws/
 !management/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

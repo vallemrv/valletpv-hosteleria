@@ -29,7 +29,7 @@
                 android:layout_weight="0.7"
                 />
 
-            <Button
+            <ImageButton
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="Ok"
@@ -37,6 +37,9 @@
                 android:layout_toLeftOf="@+id/salir"
                 android:layout_weight="0.15"
                 android:background="@drawable/fondo_btn_xml"
+                android:src="@drawable/check"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:layout_margin="5dp"/>
 
             <ImageButton
@@ -44,7 +47,10 @@
                 android:layout_height="match_parent"
                 android:id="@+id/btnSalir"
                 android:layout_weight="0.15"
-                android:background="@drawable/salirxml"
+                android:background="@drawable/fondo_btn_xml"
+                android:src="@drawable/salir"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:layout_margin="5dp" />
 
         </LinearLayout>

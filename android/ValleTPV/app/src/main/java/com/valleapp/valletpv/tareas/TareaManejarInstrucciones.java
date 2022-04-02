@@ -6,8 +6,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
-import com.valleapp.valletpv.Util.HTTPRequest;
-import com.valleapp.valletpv.Util.Instrucciones;
+import com.valleapp.valletpv.tools.HTTPRequest;
+import com.valleapp.valletpv.tools.Instrucciones;
 
 import java.util.Queue;
 import java.util.Timer;

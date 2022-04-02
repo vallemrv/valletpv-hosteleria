@@ -58,15 +58,16 @@
                 android:id="@+id/relativeLayout" >
 
                 <ImageButton
+                    android:id="@+id/btnOpenCaja"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:text="Abrir\nCajon"
-                    android:id="@+id/btnOpenCaja"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:onClick="clickAbrirCaja"
                     android:src="@android:drawable/ic_secure"
-                    android:onClick="clickAbrirCaja"/>
-                </RelativeLayout>
+                    android:text="Abrir\nCajon" />
+
+            </RelativeLayout>
 
             <Button
                 android:layout_width="fill_parent"

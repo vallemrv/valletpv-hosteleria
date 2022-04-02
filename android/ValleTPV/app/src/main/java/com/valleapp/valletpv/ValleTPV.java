@@ -11,16 +11,15 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.valleapp.valletpv.Util.AdaptadorSelCam;
-import com.valleapp.valletpv.Util.JSON;
-import com.valleapp.valletpv.Util.RowsUpdatables;
-import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
+import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpv.tools.RowsUpdatables;
+import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +60,7 @@ public class ValleTPV extends Activity {
             }
         });
 
-        Button btnok = findViewById(R.id.aceptar);
+        ImageButton btnok = findViewById(R.id.aceptar);
         btnok.setOnClickListener(view -> {
             Intent i = new Intent(getApplicationContext(), Camareros.class);
             startActivity(i);

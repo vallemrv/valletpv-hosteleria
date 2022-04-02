@@ -11,10 +11,14 @@
         android:layout_weight="1"
         />
 
-    <Button
+    <ImageButton
         android:id="@+id/boton_salir"
         android:layout_width="match_parent"
         android:layout_height="100dip"
+        android:background="@drawable/fondo_btn_xml"
+        android:src="@drawable/guardar"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
         android:text="Guardar"
         android:textSize="35sp"/>
 

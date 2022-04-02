@@ -28,7 +28,10 @@
             android:layout_height="50dp"
             android:id="@+id/btnBorrarMesa"
             android:onClick="clickBorrarMesa"
-            android:background="@drawable/borrarxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/papelera"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:layout_margin="5dp"
             />
 
@@ -37,7 +40,10 @@
             android:layout_height="50dp"
             android:id="@+id/btnCambiarMesa"
             android:onClick="clickCambiarMesa"
-            android:background="@drawable/cambiarmesaxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/cambiarmesa"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:layout_margin="5dp" />
 
 
@@ -47,7 +53,10 @@
             android:layout_height="50dp"
             android:id="@+id/btnCobrar"
             android:onClick="clickCobrarMesa"
-            android:background="@drawable/cobrarxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:src="@drawable/cobrar"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:layout_margin="5dp" />
 
 

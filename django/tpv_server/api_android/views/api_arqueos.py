@@ -38,15 +38,7 @@ def get_cambio(request):
     else:
         return JsonResponse({"cambio":"0.00", "hay_arqueos": "True"})
 
-@csrf_exempt
-def send_last_cierre(request):
-    arqueo = Arqueocaja.objects.all().order_by('-id').first()
 
-    users = getUsuariosMail()
-    for us in users:
-        send_cierre(us, arqueo.get_desglose_cierre())
-
-    return HttpResponse("success")
 
 @csrf_exempt
 def arquear(request):

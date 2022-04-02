@@ -5,7 +5,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.valleapp.valletpv.Interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

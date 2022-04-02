@@ -84,9 +84,11 @@
             android:layout_marginTop="-3dp"
             android:layout_marginBottom="5dp"
             android:background="@drawable/fondo_btn"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/salir" />
 
-        <Button
+        <ImageButton
             android:id="@+id/aceptar"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="match_parent"
@@ -94,6 +96,9 @@
             android:layout_below="@id/salir"
             android:layout_marginTop="0dp"
             android:background="@drawable/fondo_btn"
+            android:src="@drawable/check"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
             android:text="Ok"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="34sp"

@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.Util.JSON;
+import com.valleapp.valletpv.tools.JSON;
 
 import org.json.JSONException;
 import org.json.JSONObject;

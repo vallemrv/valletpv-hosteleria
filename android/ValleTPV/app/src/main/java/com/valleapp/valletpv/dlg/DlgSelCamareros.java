@@ -2,16 +2,15 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.valleapp.valletpv.Interfaces.IAutoFinish;
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.Util.AdaptadorSelCam;
-import com.valleapp.valletpv.Util.RowsUpdatables;
-import com.valleapp.valletpv.Util.ServicioCom;
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpv.db.DbCamareros;
+import com.valleapp.valletpv.interfaces.IAutoFinish;
+import com.valleapp.valletpv.tools.RowsUpdatables;
+import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,7 +89,7 @@ public class DlgSelCamareros extends Dialog{
 
     }
 
-    public Button get_btn_ok(){
+    public ImageButton get_btn_ok(){
         return findViewById(R.id.aceptar);
     }
 

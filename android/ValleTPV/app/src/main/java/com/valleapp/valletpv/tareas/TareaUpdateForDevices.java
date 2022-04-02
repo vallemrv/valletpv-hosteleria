@@ -3,7 +3,7 @@ package com.valleapp.valletpv.tareas;
 import android.content.ContentValues;
 import android.os.Handler;
 
-import com.valleapp.valletpv.Util.HTTPRequest;
+import com.valleapp.valletpv.tools.HTTPRequest;
 
 import java.util.Timer;
 import java.util.TimerTask;

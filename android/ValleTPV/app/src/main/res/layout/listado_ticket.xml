@@ -15,17 +15,20 @@
     android:layout_height="match_parent"
     >
 
-    <Button
+    <ImageButton
         android:layout_width="80sp"
         android:layout_height="80sp"
         android:id="@+id/btnSalir"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/salirxml"
+        android:background="@drawable/fondo_btn_xml"
+        android:src="@drawable/salir"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
         android:layout_margin="5dp" />
 
-    <Button
+    <ImageButton
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:id="@+id/btnImprimir"
@@ -33,9 +36,13 @@
         android:layout_toLeftOf="@+id/btnSalir"
         android:layout_toStartOf="@+id/btnSalir"
         android:layout_margin="5dp"
-        android:background="@drawable/imprimirxml" />
+        android:background="@drawable/fondo_btn_xml"
+        android:src="@drawable/imprimirticket"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        />
 
-    <Button
+    <ImageButton
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:id="@+id/btnListado"
@@ -43,7 +50,10 @@
         android:layout_toLeftOf="@+id/btnImprimir"
         android:layout_toStartOf="@+id/btnImprimir"
         android:layout_margin="5dp"
-        android:background="@drawable/listaticketxml" />
+        android:background="@drawable/fondo_btn_xml"
+        android:src="@drawable/listaticket"
+        android:padding="10dp"
+        android:scaleType="fitCenter"/>
 
     <ScrollView
         android:id="@+id/scrollView"

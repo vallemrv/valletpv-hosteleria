@@ -29,10 +29,13 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.Interfaces.IControlador;
-import com.valleapp.valletpv.Util.JSON;
-import com.valleapp.valletpv.Util.ServicioCom;
-import com.valleapp.valletpv.Util.Ticket;
+import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
+import com.valleapp.valletpv.interfaces.IAutoFinish;
+import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
+import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbSecciones;
@@ -51,8 +54,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Cuenta extends Activity implements TextWatcher, IControlador {
-
+public class Cuenta extends Activity implements TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
 
     private String server = "";
     DbSecciones dbSecciones;
@@ -278,8 +280,13 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
                     btn.setOnClickListener(view -> {
-                        JSONObject art = (JSONObject)view.getTag();
-                        pedirArt(art);
+                        try {
+                            JSONObject art = (JSONObject) view.getTag();
+                            art.put("Can", cantidad);
+                            pedirArt(art);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     });
                     row.addView(v, rowparams);
 
@@ -296,14 +303,14 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
 
     @SuppressLint("DefaultLocale")
     private void rellenarTicket() {
         try {
             synchronized (dbCuenta) {
+                resetCantidad();
+
                 TextView l = findViewById(R.id.lblPrecio);
                 ListView lst = findViewById(R.id.lstCamareros);
 
@@ -312,7 +319,7 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
                 l.setText(String.format("%01.2f €", totalMesa));
 
-                lst.setAdapter(new Ticket(cx, (ArrayList<JSONObject>) lineas, this));
+                lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineas, this));
             }
 
         } catch (JSONException e) {
@@ -342,20 +349,6 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void pedirArt(JSONObject art) {
-        try {
-            setEstadoAutoFinish(true, false);
-            dbCuenta.addArt(cantidad,mesa.getInt("ID"),art);
-            cantidad = 1;
-            TextView lbl = (TextView) findViewById(R.id.lblCantida);
-            lbl.setText("Cantidad "+ cantidad);
-            rellenarTicket();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
 
@@ -411,6 +404,18 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         cantidad = Integer.parseInt(((Button) v).getText().toString());
         TextView lbl = findViewById(R.id.lblCantida);
         lbl.setText("Cantidad "+cantidad);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void pedirArt(JSONObject art) {
+        try {
+            setEstadoAutoFinish(true, false);
+            dbCuenta.addArt(mesa.getInt("ID"), art);
+            rellenarTicket();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -566,17 +571,20 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
     }
 
 
-    @Override
-    public void pedirArt(JSONObject art, String s) {
-        cantidad = Integer.parseInt(s);
-        pedirArt(art);
-    }
+
 
     @Override
     public void clickMostrarBorrar(final JSONObject art) {
 
+            setEstadoAutoFinish(true,true);
+
             final Dialog dlg = new Dialog(cx);
             dlg.setContentView(R.layout.borrar_art);
+
+            dlg.setOnCancelListener(dialogInterface -> {
+                setEstadoAutoFinish(true,false);
+            });
+
             dlg.setTitle("Borrar articulos");
             final EditText motivo = dlg.findViewById(R.id.txtMotivo);
             final Button error =  dlg.findViewById(R.id.btnError);
@@ -587,6 +595,17 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
             final ImageButton exit =  dlg.findViewById(R.id.btnSalir);
 
             final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
+            final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
+            try {
+                Integer canArt = art.getInt("Can");
+                if (cantidad > canArt) cantidad = canArt;
+                art.put("Can", cantidad);
+                txtInfo.setText("Borrar " + cantidad + " "+art.getString("Nombre"));
+                resetCantidad();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
             pneEdit.setVisibility(View.GONE);
 
             exit.setOnClickListener(view -> dlg.cancel());
@@ -600,29 +619,26 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
                 if (motivo.getText().length() > 0) {
                     borrarLinea(art, motivo.getText().toString());
                     dlg.cancel();
-                    setEstadoAutoFinish(true, false);
+
                 }
             });
 
             error.setOnClickListener(view -> {
-                borrarLinea(art, motivo.getText().toString());
+                borrarLinea(art, error.getText().toString());
                 dlg.cancel();
-                setEstadoAutoFinish(true, false);
+
 
             });
 
             simpa.setOnClickListener(view -> {
-                borrarLinea(art, motivo.getText().toString());
+                borrarLinea(art, simpa.getText().toString());
                 dlg.cancel();
-                setEstadoAutoFinish(true, false);
-
             });
 
             inv.setOnClickListener(view -> {
-                borrarLinea(art, motivo.getText().toString());
+                borrarLinea(art, inv.getText().toString());
                 dlg.cancel();
-                setEstadoAutoFinish(true, false);
-            });
+           });
 
             dlg.show();
 
@@ -630,13 +646,31 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     @Override
     public void borrarArticulo(JSONObject art) throws JSONException {
+         reset = true;
          art.put("Can",1);
          dbCuenta.eliminar(mesa.getString("ID"), new JSONArray().put(art));
          rellenarTicket();
     }
 
+    @Override
+    public void pedirAutorizacion(ContentValues params) {
+        myServicio.pedirAutorizacion(params, handlerHttp, "procesar_autorizacion");
+    }
+
+    @Override
+    public void pedirAutorizacion(String id) {
+
+    }
+
     // Utilidades
+    public void resetCantidad(){
+        cantidad = 1;
+        TextView lbl = (TextView) findViewById(R.id.lblCantida);
+        lbl.setText("Cantidad "+ cantidad);
+    }
+
     private void asociarBotonera(View view) {
+        reset = true;
         JSON json = new JSON();
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
@@ -654,22 +688,21 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
 
     private void borrarLinea(final JSONObject art, String motivo){
         try{
-            art.put("Can",1);
-            ContentValues p = new ContentValues();
-            String idm = mesa.getString("ID");
-            p.put("idm", idm);
-            p.put("Precio", art.getString("Precio"));
-            p.put("idArt", art.getString("IDArt"));
-            p.put("can", "1");
-            p.put("idc", cam.getString("ID"));
-            p.put("motivo", motivo);
-            p.put("Estado", art.getString("Estado"));
-            p.put("Nombre", art.getString("Nombre"));
+
             if (myServicio != null){
-                myServicio.rmLinea(p);
-                dbCuenta.eliminar(idm, new JSONArray().put(art));
-                if(dbCuenta.getCount(idm)<=0)   dbMesas.cerrarMesa(idm);
-                rellenarTicket();
+                JSONObject p = new JSONObject();
+                p.put("idm",  mesa.getString("ID"));
+                p.put("Precio", art.getString("Precio"));
+                p.put("idArt", art.getString("IDArt"));
+                p.put("can", art.getString("Can"));
+                p.put("idc", cam.getString("ID"));
+                p.put("motivo", motivo);
+                p.put("Estado", art.getString("Estado"));
+                p.put("Nombre", art.getString("Nombre"));
+                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                        myServicio.getDb("camareros"), this,
+                        p, "borrar_linea");
+                dlg.show();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -687,5 +720,7 @@ public class Cuenta extends Activity implements TextWatcher, IControlador {
         msg.setData(bundle);
         handlerMesas.sendMessage(msg);
     }
+
+
 
 }

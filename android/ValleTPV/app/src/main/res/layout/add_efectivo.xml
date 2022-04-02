@@ -32,17 +32,20 @@
             android:layout_alignEnd="@+id/btnSalir"
             android:textSize="35sp"/>
 
-        <Button
+        <ImageButton
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:id="@+id/btnSalir"
             android:layout_below="@+id/txtMoneda"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/salirxml"
+            android:background="@drawable/fondo_btn_xml"
+            android:scaleType="fitXY"
+            android:padding="10dp"
+            android:src="@drawable/salir"
             android:layout_margin="5dp"
             android:textSize="35sp"/>
 
-        <Button
+        <ImageButton
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:text="OK"
@@ -51,7 +54,10 @@
             android:layout_below="@+id/txtMoneda"
             android:layout_toLeftOf="@+id/btnSalir"
             android:background="@drawable/fondo_btn_xml"
+            android:scaleType="fitXY"
             android:layout_margin="5dp"
+            android:src="@drawable/check"
+            android:padding="10dp"
             android:textSize="35sp"/>
     </RelativeLayout>
 </LinearLayout>

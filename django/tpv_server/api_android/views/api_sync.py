@@ -187,7 +187,6 @@ def update_for_devices(request):
         tb_sync.save()
 
     
-    print(objs)
    
     return JsonResponse(
         {"nombre": t, 

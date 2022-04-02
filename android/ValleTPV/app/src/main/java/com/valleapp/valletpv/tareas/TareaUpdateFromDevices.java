@@ -6,9 +6,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
-import com.valleapp.valletpv.Interfaces.IBaseDatos;
-import com.valleapp.valletpv.Util.HTTPRequest;
-import com.valleapp.valletpv.Util.RowsUpdatables;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
+import com.valleapp.valletpv.tools.HTTPRequest;
+import com.valleapp.valletpv.tools.RowsUpdatables;
 import com.valleapp.valletpv.db.DbTbUpdates;
 
 import org.json.JSONObject;
