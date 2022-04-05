@@ -335,7 +335,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
           if(myServicio!=null){
               myServicio.addColaInstrucciones(new Instruccion(p, "/comanda/pedir"));
               nota.EliminarComanda();
-              dbMesas.abrirMesa(mesa.getString("ID"));
+              dbMesas.abrirMesa(mesa.getString("ID"), "0");
               finish();
           }
         }catch (Exception e){

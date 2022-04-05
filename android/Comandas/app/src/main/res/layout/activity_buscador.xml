@@ -6,7 +6,7 @@
     android:layout_marginLeft="10dp"
     android:layout_marginTop="10dp"
     android:layout_marginRight="10dp"
-    tools:context="com.valleapp.comandas.Buscador">
+    tools:context="com.valleapp.comandas.BuscadorTeclas">
 
     <ScrollView
         android:layout_width="fill_parent"

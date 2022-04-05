@@ -112,9 +112,9 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="22dp"
-            fab:fab_colorNormal="@color/pink_pressed"
-            fab:fab_colorPressed="@color/pink"
-            fab:fab_icon="@drawable/add_nuevo_camarero" />
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/mas" />
 
 
 

@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.comandas.utilidades;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -19,19 +19,21 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbSecciones extends SQLiteOpenHelper implements IBaseDatos {
+public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbSecciones(Context context) {
+    public DBSecciones(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS secciones (ID INTEGER PRIMARY KEY, Nombre TEXT,Orden INTEGER, RGB TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS secciones (ID INTEGER PRIMARY KEY, " +
+                "nombre TEXT, " +
+                "icono TEXT, es_promocion TEXT, descuento TEXT)");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -52,14 +54,16 @@ public class DbSecciones extends SQLiteOpenHelper implements IBaseDatos {
     {
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM secciones ORDER BY Orden DESC" , null );
+        Cursor res =  db.rawQuery( "SELECT * FROM secciones ORDER BY orden DESC" , null );
         res.moveToFirst();
         while(!res.isAfterLast()){
             try{
                 JSONObject obj = new JSONObject();
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+                obj.put("nombre", res.getString(res.getColumnIndex("nombre")));
                 obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
+                obj.put("icono", res.getString(res.getColumnIndex("icono")));
+                obj.put("es_promocion", res.getString(res.getColumnIndex("es_promocion")));
+                obj.put("descuento", res.getString(res.getColumnIndex("descuento")));
                 ls.put(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -98,9 +102,10 @@ public class DbSecciones extends SQLiteOpenHelper implements IBaseDatos {
             try {
                 ContentValues values = new ContentValues();
                 values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
-                values.put("RGB", datos.getJSONObject(i).getString("rgb"));
-                values.put("Orden", datos.getJSONObject(i).getString("orden"));
+                values.put("nombre", datos.getJSONObject(i).getString("nombre"));
+                values.put("icono", datos.getJSONObject(i).getString("icono"));
+                values.put("es_promocion", datos.getJSONObject(i).getString("es_promocion"));
+                values.put("descuento", datos.getJSONObject(i).getString("descuento"));
                 db.insert("secciones", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();

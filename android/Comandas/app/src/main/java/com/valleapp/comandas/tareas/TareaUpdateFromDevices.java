@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.tareas;
+package com.valleapp.comandas.tareas;
 
 import android.content.ContentValues;
 import android.os.Handler;
@@ -6,10 +6,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 
-import com.valleapp.valletpv.interfaces.IBaseDatos;
-import com.valleapp.valletpv.tools.HTTPRequest;
-import com.valleapp.valletpv.tools.RowsUpdatables;
-import com.valleapp.valletpv.db.DbTbUpdates;
+
+import com.valleapp.comandas.db.DbTbUpdates;
+import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+import com.valleapp.comandas.utilidades.RowsUpdatables;
 
 import org.json.JSONObject;
 

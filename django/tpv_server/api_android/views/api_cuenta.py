@@ -31,6 +31,7 @@ def get_cuenta(request):
     lstArt = []
     if m_abierta:
         for l in Lineaspedido.objects.filter(infmesa__pk=m_abierta.infmesa.pk, estado='P'):
+            mesa = m_abierta.mesa
             obj = {
                 'ID': l.pk,
                 'IDPedido': l.pedido_id,
@@ -39,7 +40,9 @@ def get_cuenta(request):
                 'Estado': l.estado,
                 'Precio': l.precio,
                 'Nombre': l.nombre,
-                'IDMesa': m_abierta.mesa.pk
+                'IDMesa': mesa.pk,
+                'nomMesa': mesa.nombre,
+                'IDZona': mesa.zonas_set.all().first().pk
             }
             lstArt.append(obj)
 

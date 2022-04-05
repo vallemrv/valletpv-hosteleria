@@ -32,7 +32,7 @@
             android:layout_height="40dp"
             android:id="@+id/btnBorrar"
             android:src="@android:drawable/ic_menu_delete"
-            android:onClick="OnBorrarLinea"
+            android:onClick="onBorrarLinea"
             android:layout_weight="0.1" />
 
 

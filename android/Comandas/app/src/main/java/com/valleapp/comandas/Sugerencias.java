@@ -2,10 +2,12 @@ package com.valleapp.comandas;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,8 +24,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.comandas.Util.HTTPRequest;
-import com.valleapp.comandas.Util.AdaptadorSugerencias;
+import com.valleapp.comandas.adaptadores.AdaptadorSugerencias;
+import com.valleapp.comandas.db.DBSugerencias;
+import com.valleapp.comandas.utilidades.HTTPRequest;
 
 
 public class Sugerencias extends Activity implements TextWatcher {
@@ -32,46 +35,27 @@ public class Sugerencias extends Activity implements TextWatcher {
     JSONObject art;
     Context cx;
     TextView txtSug;
+    DBSugerencias dbSugerencias;
+    JSONArray lsBusqueda = new JSONArray();
 
     @SuppressLint("HandlerLeak")
-    private final Handler controller_http = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-            String op = msg.getData().getString("op");
-            String res = msg.getData().getString("RESPONSE");
-            if(op.equals("add")){
-                if(res.trim().equals("success")){
-                   Intent it = getIntent();
-                   it.putExtra("art", art.toString());
-                   it.putExtra("sug", txtSug.getText().toString().replace("\n",""));
-                   setResult(RESULT_OK, it);
-                   finish();
-               }
-            }else if(op.equals("sug")){
-                RellenarSug(res);
-            }
+                rellenarSug(lsBusqueda);
         }
     };
 
-    private void RellenarSug(String res) {
+    private void rellenarSug(JSONArray p) {
         try {
 
-            List<JSONObject> lPedidos = new ArrayList<JSONObject>();
+            List<JSONObject> lsug = new ArrayList<>();
 
-
-            if(!res.equals("")) {
-
-                JSONArray p = new JSONArray(res);
-
-
-                for(int i=0; i < p.length(); i++){
-                    lPedidos.add(p.getJSONObject(i));
-                }
-
-
+            for(int i=0; i < p.length(); i++){
+                lsug.add(p.getJSONObject(i));
             }
 
             ListView lst = findViewById(R.id.lstSugerencias);
-            lst.setAdapter(new AdaptadorSugerencias(cx, lPedidos));
+            lst.setAdapter(new AdaptadorSugerencias(cx, lsug));
 
 
         } catch (JSONException e) {
@@ -96,9 +80,7 @@ public class Sugerencias extends Activity implements TextWatcher {
             TextView l = findViewById(R.id.lblTitulo);
             String titulo = "Sugerencia para " + art.getString("Nombre") ;
             l.setText(titulo);
-            List<NameValuePair> p = new ArrayList<NameValuePair>();
-            p.add(new BasicNameValuePair("id", art.getString("ID")));
-            new HTTPRequest(server+"/sugerencias/ls",p,"sug", controller_http);
+            rellenarSug(dbSugerencias.filter("IDTecla ="+ art.getString("ID")));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -109,9 +91,13 @@ public class Sugerencias extends Activity implements TextWatcher {
     }
 
     public void clickSugerencia(View v){
+        aceptarSug(v.getTag().toString());
+    }
+
+    private void aceptarSug(String sug){
         Intent it = getIntent();
         it.putExtra("art", art.toString());
-        it.putExtra("sug", v.getTag().toString());
+        it.putExtra("sug", sug);
         setResult(RESULT_OK, it);
         finish();
     }
@@ -130,16 +116,25 @@ public class Sugerencias extends Activity implements TextWatcher {
           try {
 
               if (charSequence.toString().contains("\n")) {
-                   List<NameValuePair> p = new ArrayList<>();
-                  p.add(new BasicNameValuePair("sug", charSequence.toString().replace("\n", "")));
-                  p.add(new BasicNameValuePair("idArt", art.getString("ID")));
-                  new HTTPRequest(server + "/sugerencias/add", p, "add", controller_http);
+                  ContentValues p = new ContentValues();
+                  String sug = charSequence.toString().replace("\n", "");
+                  p.put("sug", sug);
+                  p.put("idArt", art.getString("ID"));
+                  new HTTPRequest(server + "/sugerencias/add", p, "", null);
                   txtSug.setVisibility(View.GONE);
+                  aceptarSug(sug);
               } else if (!charSequence.toString().contains("\n")) {
-                  List<NameValuePair> p = new ArrayList<NameValuePair>();
-                  p.add(new BasicNameValuePair("id", art.getString("ID")));
-                  p.add(new BasicNameValuePair("str", charSequence.toString()));
-                  new HTTPRequest(server + "/sugerencias/ls", p, "sug", controller_http);
+                  String cWhere = "IDTecla = "+art.getString("ID")+" AND sugerencia LIKE '%"+ charSequence.toString() +"%'";
+                  new Thread(() -> {
+                      try {
+                          Thread.sleep(1000);
+                      } catch (InterruptedException e) {
+                          e.printStackTrace();
+                      }
+                      lsBusqueda = dbSugerencias.filter(cWhere);
+                      handler.sendEmptyMessage(0);
+                  }).start();
+
               }
 
           } catch (JSONException e) {
@@ -147,9 +142,6 @@ public class Sugerencias extends Activity implements TextWatcher {
           }
 
       }
-
-
-
     }
 
     @Override

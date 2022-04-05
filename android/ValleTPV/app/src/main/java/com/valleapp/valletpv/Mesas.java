@@ -236,7 +236,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
                     m.put("Tarifa",zn.getString("Tarifa"));
 
-                    Button btn = (Button)v.findViewById(R.id.btnMesa);
+                    Button btn = v.findViewById(R.id.btnMesa);
 
                     btn.setId(i);
                     btn.setText(m.getString("Nombre"));

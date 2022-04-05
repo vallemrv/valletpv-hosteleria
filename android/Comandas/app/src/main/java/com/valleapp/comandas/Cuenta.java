@@ -2,9 +2,15 @@ package com.valleapp.comandas;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.widget.ListView;
@@ -19,8 +25,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.comandas.Util.HTTPRequest;
-import com.valleapp.comandas.Util.Ticket;
+import com.valleapp.comandas.adaptadores.Ticket;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.ServicioCom;
 
 
 public class Cuenta extends Activity {
@@ -28,44 +38,70 @@ public class Cuenta extends Activity {
     String totalMesa;
     String server = "";
     JSONObject mesa;
-    ArrayList<JSONObject> lineasTicket = new ArrayList<JSONObject>();
     Context cx;
+    DBCuenta dbCuenta;
+    DBMesas dbmesa;
+    ServicioCom myServicio;
+
+
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            try {
+                myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+                myServicio.setExHandler("lineaspedido", handlerHttp);
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                dbmesa = (DBMesas) myServicio.getDb("mesas");
+
+                //Atualizar cuenta.
+                ContentValues p = new ContentValues();
+                p.put("mesa_id",mesa.getString("ID"));
+                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);
+                rellenarTicket();
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myServicio = null;
+        }
+    };
 
 
     @SuppressLint("HandlerLeak")
-    private final Handler controller_cuenta = new Handler() {
+    private final Handler handlerHttp = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            if(op.equals("ticket")){
-                RellenarTicket(res);
-            }else if(op.equals("salir")){
-                finish();
+            if(op.equals("actualizar")){
+                try {
+                    dbCuenta.rellenarTabla(new JSONArray(res));
+                    rellenarTicket();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
          }
     };
 
-    private void RellenarTicket(String res) {
+    private void rellenarTicket() {
         try {
 
-            if(!res.equals("")) {
 
                 TextView l =  findViewById(R.id.txtTotal);
                 ListView lst =  findViewById(R.id.lstCuenta);
-                lineasTicket.clear();
 
-                JSONObject ticket = new JSONObject(res);
-                JSONArray lineas = ticket.getJSONArray("lineas");
 
-                totalMesa = String.format("%.2f", ticket.getDouble("total"));
+                List<JSONObject> lineasTicket = dbCuenta.getAll(mesa.getString("ID"));
+                totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")));
                 l.setText(String.format("%s €", totalMesa));
 
+                lst.setAdapter(new Ticket(cx, (ArrayList<JSONObject>) lineasTicket));
 
-                for(int i=0; i < lineas.length(); i++){
-                    lineasTicket.add(lineas.getJSONObject(i));
-                }
-                lst.setAdapter(new Ticket(cx, lineasTicket));
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -79,23 +115,37 @@ public class Cuenta extends Activity {
         TextView lbl = findViewById(R.id.lblMesa);
         this.cx = this;
         try {
-            List<NameValuePair> p = new ArrayList<>();
+
             server = getIntent().getExtras().getString("url");
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
             lbl.setText("Mesa "+mesa.getString("Nombre"));
-            p.add(new BasicNameValuePair("idm",mesa.getString("ID")));
-            new HTTPRequest(server+"/cuenta/ticket",p,"ticket", controller_cuenta);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        intent.putExtra("url", server);
+        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService(mConexion);
+        super.onDestroy();
+    }
+
     public void clickImprimir(View v){
         if(Double.parseDouble(totalMesa.replace(",","."))>0) {
             try {
-                List<NameValuePair> p = new ArrayList<>();
-                p.add(new BasicNameValuePair("idm", mesa.getString("ID")));
-                new HTTPRequest(server + "/impresion/preimprimir", p, "salir", controller_cuenta);
+                ContentValues p = new ContentValues();
+                p.put("idm", mesa.getString("ID"));
+                myServicio.addColaInstrucciones(new Instruccion(p,"/impresion/preimprimir"));
+                finish();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -105,9 +155,11 @@ public class Cuenta extends Activity {
     public void clickMarcarRojo(View v){
         if(Double.parseDouble(totalMesa.replace(",","."))>0) {
             try {
-                List<NameValuePair> p = new ArrayList<>();
-                p.add(new BasicNameValuePair("idm", mesa.getString("ID")));
-                new HTTPRequest(server + "/comandas/marcar_rojo", p, "salir", controller_cuenta);
+                ContentValues p = new ContentValues();
+                p.put("idm", mesa.getString("ID"));
+                myServicio.addColaInstrucciones(new Instruccion(p,"/comandas/marcar_rojo"));
+                dbmesa.marcarRojo(mesa.getString("ID"));
+                finish();
             } catch (JSONException e) {
                 e.printStackTrace();
             }

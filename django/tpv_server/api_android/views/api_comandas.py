@@ -5,6 +5,7 @@
 # @Last modified time: 2019-10-10T17:44:16+02:00
 # @License: Apache License v2.0
 
+from os import sync
 from api_android.tools import (send_update_ws, imprimir_pedido,
                                get_descripcion_pedido)
 from tokenapi.http import JsonResponse
@@ -12,7 +13,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.models import  Count
-from gestion.models import (Mesasabiertas, SeccionesCom, Subteclas,
+from gestion.models import (Mesasabiertas, SeccionesCom, Subteclas, Sync,
                             Teclas, Infmesa, Pedidos, Lineaspedido, Camareros)
 
 from datetime import datetime
@@ -27,6 +28,7 @@ def marcar_rojo(request):
     infmesa = mesa_abierta.infmesa
     infmesa.numcopias = infmesa.numcopias + 1
     infmesa.save()
+    Sync.actualizar("mesasabiertas")
     if infmesa.numcopias <= 1:
         update = {
            "OP": "UPDATE",

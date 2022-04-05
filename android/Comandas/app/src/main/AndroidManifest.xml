@@ -19,7 +19,8 @@
             android:name="com.valleapp.comandas.Camareros"
             android:label="@string/app_name"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+               android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,7 +31,8 @@
             android:name="com.valleapp.comandas.Preferencias"
             android:label="PreferenciasTpv"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,13 +46,13 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.comandas.Comanda"
+            android:name="com.valleapp.comandas.HacerComandas"
             android:label="@string/title_activity_comanda"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.comandas.Buscador"
+            android:name="com.valleapp.comandas.BuscadorTeclas"
             android:label="@string/title_activity_buscador"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
@@ -85,13 +87,11 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
+       <service
+           android:name=".utilidades.ServicioCom"
+           android:enabled="true"
+           android:exported="false" />
 
-        <service
-            android:name="com.valleapp.comandas.Util.ServicioCom"
-            android:enabled="true"
-            android:exported="false"
-            >
-        </service>
-    </application>
+       </application>
 
 </manifest>

@@ -327,7 +327,9 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
             try {
                 int idMesa = datos.getJSONObject(i).getInt("IDMesa");
                 ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("ID"));
+                String id = datos.getJSONObject(i).getString("ID");
+                db.delete("cuenta","ID = ?", new String[]{id});
+                values.put("ID", id);
                 values.put("IDArt", datos.getJSONObject(i).getInt("IDArt"));
                 values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
                 values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));

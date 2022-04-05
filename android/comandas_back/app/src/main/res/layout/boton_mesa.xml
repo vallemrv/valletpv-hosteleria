@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="#ff64696e">
+
+
+    <Button
+        android:id="@+id/btnMesa"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/pneBotones"
+        android:background="@android:color/transparent"
+        android:text="Mesa" />
+
+
+        <ImageButton
+            android:id="@+id/btnCambiarMesa"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitStart"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/btnLsPedidos"
+            android:background="@android:color/transparent"
+            android:onClick="clickCambiarMesa"
+            android:src="@drawable/cambio" />
+
+
+        <ImageButton
+            android:id="@+id/btnLsPedidos"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitStart"
+            android:layout_alignParentBottom="true"
+
+            android:layout_toLeftOf="@+id/btnCobrar"
+            android:background="@android:color/transparent"
+            android:onClick="clickMostrarPedidos"
+            android:src="@drawable/pedido" />
+
+        <ImageButton
+            android:id="@+id/btnCobrar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="fitStart"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:onClick="MostrarListaTicket"
+            android:src="@drawable/cuenta" />
+
+
+
+</RelativeLayout>

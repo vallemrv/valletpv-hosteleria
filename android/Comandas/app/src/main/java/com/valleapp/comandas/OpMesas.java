@@ -1,13 +1,21 @@
 package com.valleapp.comandas;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -26,43 +34,54 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.comandas.Util.HTTPRequest;
-import com.valleapp.comandas.Util.JSON;
-import com.valleapp.comandas.db.DbMesas;
-import com.valleapp.comandas.db.DbZonas;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.db.DBZonas;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.JSON;
+import com.valleapp.comandas.utilidades.ServicioCom;
 
 
 public class OpMesas extends Activity {
 
-    DbZonas dbZonas = new DbZonas(this);
-    DbMesas dbMesas = new DbMesas(this);
-    String server="";
-    String url = "";
+    DBZonas dbZonas;
+    DBMesas dbMesas;
+    DBCuenta dbCuenta;
     JSONObject mesa ;
     String op ;
     JSONArray lsmesas = null;
     JSONArray lszonas = null;
     JSONObject zn = null;
     JSONObject art = null;
+    private String url;
     Context cx;
+    private String server;
+    private ServicioCom servicioCom;
 
-
-    private final Handler handle = new Handler() {
-        public void handleMessage(Message msg) {
-            String op = msg.getData().getString("op");
-            if(op.equals("salir")){
-                finish();
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            servicioCom = ((ServicioCom.MyBinder)iBinder).getService();
+            if (servicioCom != null){
+                dbZonas = (DBZonas) servicioCom.getDb("zonas");
+                dbMesas = (DBMesas) servicioCom.getDb("mesas");
+                dbCuenta = (DBCuenta) servicioCom.getDb("lineaspedido");
+                rellenarZonas();
             }
-
         }
 
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            servicioCom = null;
+        }
     };
 
-    private void RellenarZonas() {
+
+
+    private void rellenarZonas() {
         try {
 
             lszonas = dbZonas.getAll();
-
 
             if(lszonas.length()>0){
 
@@ -90,24 +109,21 @@ public class OpMesas extends Activity {
                     String[] rgb = z.getString("RGB").trim().split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
 
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            try {
-                                zn = lszonas.getJSONObject((Integer)view.getId());
-                                RellenarMesas();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
+                    btn.setOnClickListener(view -> {
+                        try {
+                            zn = lszonas.getJSONObject(view.getId());
+                            rellenarMesas();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
                     });
                     ll.addView(v, params);
 
 
                 }
 
-                RellenarMesas();
+                rellenarMesas();
             }
 
         }catch (Exception e){
@@ -116,7 +132,7 @@ public class OpMesas extends Activity {
 
     }
 
-    private void RellenarMesas() {
+    private void rellenarMesas() {
         try {
 
 
@@ -145,7 +161,7 @@ public class OpMesas extends Activity {
                     LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
 
-                    View v = inflater.inflate(R.layout.btn_art, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
                     Button btn = v.findViewById(R.id.boton_art);
@@ -157,34 +173,38 @@ public class OpMesas extends Activity {
                     btn.setTextSize(15);
                     String[] rgb = m_show.getString("RGB").trim().split(",");
                     if (m_show.getInt("ID") != mesa.getInt("ID")) {
-                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
+                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()),
+                                Integer.parseInt(rgb[1].trim()),
+                                Integer.parseInt(rgb[2].trim())));
+                        btn.setOnClickListener(view -> {
+                            try {
+                                JSONObject m = (JSONObject) view.getTag();
+                                ContentValues p = new ContentValues();
 
-                        btn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                try {
-                                    JSONObject m = (JSONObject) view.getTag();
-                                    List<NameValuePair> p = new ArrayList<NameValuePair>();
-
-                                    if (art == null) {
-                                        p.add(new BasicNameValuePair("idp", mesa.getString("ID")));
-                                        p.add(new BasicNameValuePair("ids", m.getString("ID")));
-                                        finalizar(m);
-                                    } else {
-                                        p.add(new BasicNameValuePair("idm", m.getString("ID")));
-                                        p.add(new BasicNameValuePair("idLinea", art.getString("ID")));
-                                    }
-                                    new HTTPRequest(url, p, "salir", handle);
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                if (art == null) {
+                                    p.put("idp", mesa.getString("ID"));
+                                    p.put("ids", m.getString("ID"));
+                                    finalizar(m);
+                                } else {
+                                    p.put("idm", m.getString("ID"));
+                                    p.put("idLinea", art.getString("ID"));
                                 }
-
+                                if (servicioCom != null) {
+                                    servicioCom.addColaInstrucciones(new Instruccion(p, url));
+                                    finish();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+
                         });
                     }else{
-                        btn.setBackgroundColor(Color.RED);
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                        btn.setOnClickListener(view ->{
+                            Toast.makeText(cx,"Esta es la misma mesa..", Toast.LENGTH_SHORT).show();
+                        });
                     }
+
                     row.addView(v, rowparams);
 
                     if (((i + 1) % 3) == 0) {
@@ -204,15 +224,21 @@ public class OpMesas extends Activity {
 
     private void finalizar(JSONObject m) throws JSONException {
         if(op.equals("cambiar")){
-            if(!m.getBoolean("abierta")){
-                dbMesas.abrirMesa(m.getString("ID"));
+            if(m.getString("abierta").equals("0")){
+                dbMesas.abrirMesa(m.getString("ID"), mesa.getString("num"));
                 dbMesas.cerrarMesa(mesa.getString("ID"));
+                dbCuenta.cambiarCuenta(mesa.getString("ID"), m.getString("ID"));
+            }else{
+                dbCuenta.cambiarCuenta(mesa.getString("ID"), "-100");
+                dbCuenta.cambiarCuenta(m.getString("ID"), mesa.getString("ID"));
+                dbCuenta.cambiarCuenta("-100", m.getString("ID"));
             }
         }else {
-            if(m.getBoolean("abierta")){
+            if(m.getString("abierta").equals("1")){
                 dbMesas.cerrarMesa(m.getString("ID"));
+                dbCuenta.cambiarCuenta(m.getString("ID"), mesa.getString("ID"));
             }else{
-                dbMesas.abrirMesa(m.getString("ID"));
+                dbMesas.abrirMesa(m.getString("ID"), mesa.getString("num"));
             }
         }
 
@@ -224,24 +250,23 @@ public class OpMesas extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_op_mesas);
-        cargarPreferencias();
-        cx = this;
         server = getIntent().getExtras().getString("url");
+        cx = this;
         op = getIntent().getExtras().getString("op");
         try {
-           TextView l = findViewById(R.id.lblTitulo);
+            TextView l = findViewById(R.id.lblTitulo);
             String titulo = "";
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
-            url = server + (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
-           if(op.equals("art")){
+            if(op.equals("art")){
                titulo = "Cambiar articulo "+mesa.getString("Nombre");
                art = new JSONObject(getIntent().getExtras().getString("art"));
-               url = server+"/cuenta/mvlinea";
-           }else{
-                titulo =  op.equals("cambiar") ? "Cambiar mesa " + mesa.getString("Nombre") : "Juntar mesa " + mesa.getString("Nombre");
-           }
+               url = server + "/cuenta/mvlinea";
+            }else{
+               url = server + (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
+               titulo =  (op.equals("cambiar") ? "Cambiar mesa " : "Juntar mesa ") + mesa.getString("Nombre");
+            }
            l.setText(titulo);
-           RellenarZonas();
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -249,19 +274,17 @@ public class OpMesas extends Activity {
 
     }
 
-    private void cargarPreferencias() {
-        JSON json = new JSON();
-        try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
-            if(!pref.isNull("zn")) {
-                zn = new JSONObject(pref.getString("zn"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        intent.putExtra("url", server);
+        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        super.onResume();
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        unbindService(mConexion);
+        super.onDestroy();
+    }
 }

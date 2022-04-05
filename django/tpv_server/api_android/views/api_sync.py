@@ -174,6 +174,11 @@ def update_for_devices(request):
         tbModel = Lineaspedido
     elif t == "mesasabiertas":
         tbModel = Mesasabiertas
+    elif t == "seccionescom":
+        tbModel = SeccionesCom
+    elif t == "sugerencias":
+        tbModel = Sugerencias
+    
     
     if tbModel:
         objs = tbModel.update_for_devices()
@@ -205,48 +210,7 @@ def update_from_devices(request):
         for row in rows:
             Camareros.update_from_device(row)
 
-    elif tb in "borrarmesa":
-        for r in rows:
-            motivo = r["motivo"]
-            idc = r["idc"]
-            idm = r["idm"]
-            Mesasabiertas.borrar_mesa_abierta(idm, idc, motivo)
-        tbs.append("mesasabiertas", "lineaspedido")
-        
-    elif tb in ["cambiarmesas", "juntarmesas"]:
-        for r in rows:
-            idp = r["idp"]
-            ids = r["ids"]
-            if tb == "cambiarmesas":
-                Mesasabiertas.cambiar_mesas_abiertas(idp, ids)
-                tbs.append("mesasabiertas")
-            else:
-                Mesasabiertas.juntar_mesas_abiertas(idp, ids)
-                tbs.append("mesasabiertas", "infmesa", "pedidos", "lineaspedido")
-
-    elif tb == "borrarlinea":
-        for r in rows:
-            idm = r["idm"]
-            p = r["Precio"]
-            idArt = r["idArt"]
-            can = int(r["can"])
-            idc = r["idc"]
-            motivo = r["motivo"]
-            s = r["Estado"]
-            n = r["Nombre"]
-            Lineaspedido.borrar_linea(idm, p, idArt, can, idc, motivo, s, n)
-        tbs.append("mesasabiertas", "lineaspedido", "infmesa", "pedidos")
-
-    elif tb == "nuevopedido":
-        tbs.append("mesasabiertas", "pedidos", "lineaspedido", "infmesa")
-        for r in rows:
-            idm = r["idm"]
-            idc = r["idc"]
-            lineas = json.loads(r["pedido"])
-            Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
-    elif tb == "cobrarcuenta":
-        tbs.append("mesasabiertas", "lineaspedido")
-        
+  
 
     
    

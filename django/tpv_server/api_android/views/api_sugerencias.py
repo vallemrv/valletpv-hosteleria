@@ -32,7 +32,8 @@ def sugerencia_ls(request):
 def sugerencia_add(request):
     idart = request.POST["idArt"]
     sug = request.POST["sug"]
-    if sug != "":
+    r = Sugerencias.objects.filter(sugerecia=sug, tecla__id=idart).first()
+    if sug != "" and not r:
         sugerecia = Sugerencias()
         sugerecia.tecla_id = idart
         sugerecia.sugerencia = sug

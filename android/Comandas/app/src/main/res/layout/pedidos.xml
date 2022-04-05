@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -21,23 +20,22 @@
     </ScrollView>
 
 
-    <ImageButton
-        android:id="@+id/buscar"
-        android:layout_width="70dip"
-        android:layout_height="70dip"
-        android:layout_alignParentRight="true"
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_add_nuevo_camarero"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="7dip"
-        android:layout_marginLeft="7dip"
-        android:layout_marginTop="7dip"
-        android:layout_marginEnd="7dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginBottom="7dip"
-        android:background="@android:color/transparent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="22dp"
+        fab:fab_colorNormal="@color/pink"
+        fab:fab_colorPressed="@color/pink_pressed"
+        fab:fab_icon="@drawable/lupa"
+        android:layout_alignParentRight="true"
         android:onClick="buscarPedidos"
-        android:padding="5dp"
-        android:scaleType="fitStart"
-        android:src="@drawable/buscar_float" />
+        android:layout_marginRight="16dp" />
+
+
 
 
 </RelativeLayout>

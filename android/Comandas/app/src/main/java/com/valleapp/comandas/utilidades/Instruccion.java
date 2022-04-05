@@ -3,7 +3,7 @@ package com.valleapp.comandas.utilidades;
 import android.content.ContentValues;
 import android.os.Handler;
 
-public class Instrucciones {
+public class Instruccion {
 
     public ContentValues getParams() {
         return params;
@@ -26,10 +26,10 @@ public class Instrucciones {
     ContentValues params;
     String op = "";
 
-    public Instrucciones(ContentValues params, String url, Handler handler, String op){
+    public Instruccion(ContentValues params, String url, Handler handler, String op){
         this.params = params; this.url = url; this.handler = handler; this.op = op;
     }
-    public Instrucciones(ContentValues params, String url){
+    public Instruccion(ContentValues params, String url){
         this.params = params; this.url = url; this.handler = null;
     }
 }

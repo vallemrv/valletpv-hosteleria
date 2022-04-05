@@ -155,7 +155,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
             if(lssec.length()>0){
 
-                LinearLayout ll = (LinearLayout)findViewById(R.id.pneSecciones);
+                LinearLayout ll = findViewById(R.id.pneSecciones);
                 ll.removeAllViews();
 
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -239,7 +239,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
             if(lsart.length()>0){
 
-                TableLayout ll = (TableLayout)findViewById(R.id.pneArt);
+                TableLayout ll = findViewById(R.id.pneArt);
                 ll.removeAllViews();
 
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -269,7 +269,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
                     @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.boton_art, null);
-                    Button btn = (Button)v.findViewById(R.id.btnArt);
+                    Button btn = v.findViewById(R.id.btnArt);
 
                     btn.setId(i);
                     btn.setTag(m);
@@ -665,7 +665,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     // Utilidades
     public void resetCantidad(){
         cantidad = 1;
-        TextView lbl = (TextView) findViewById(R.id.lblCantida);
+        TextView lbl = findViewById(R.id.lblCantida);
         lbl.setText("Cantidad "+ cantidad);
     }
 

@@ -19,9 +19,9 @@ def  get_pendientes(request):
     idz = request.POST["idz"]
     lstObj = []
     mz = "(SELECT mesaszona.IDZona, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesaszona ON mesaszona.IDMesa=mesasabiertas.IDMesa) as mz";
-    m = "(SELECT mesas.Nombre AS nomMesa, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesas ON mesas.ID=mesasabiertas.IDMesa) as m";
+    m = "(SELECT mesas.Nombre AS nomMesa, IDMesa, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesas ON mesas.ID=mesasabiertas.IDMesa) as m";
     s = "(SELECT IDLinea FROM servidos)";
-    lpedidos = ''.join(['SELECT m.nomMesa, mz.IDZona, l.ID, l.Precio, count(l.IDArt) as Can, l.Nombre, l.IDArt, IDPedido ',
+    lpedidos = ''.join(['SELECT m.nomMesa, mz.IDZona, l.ID, l.Precio, count(l.IDArt) as Can, l.Nombre, l.IDArt, IDPedido, m.IDMesa, Estado ',
                'FROM lineaspedido as l LEFT JOIN {0} ON mz.UID=l.UID LEFT JOIN {1} ON m.UID=l.UID ',
                'WHERE (Estado="P" OR Estado="R") AND mz.IDZona={2} AND l.ID NOT IN {3} ',
                'GROUP BY l.IDArt, l.Nombre, l.Precio, l.IDPedido, l.UID, m.nomMesa ',
@@ -39,7 +39,9 @@ def  get_pendientes(request):
                'Can': r[4],
                'Nombre': r[5],
                'IDArt': r[6],
-               'IDPedido': r[7]
+               'IDPedido': r[7],
+               "IDMesa": r[8],
+               "Estado": r[9]
             })
 
     return JsonResponse(lstObj)

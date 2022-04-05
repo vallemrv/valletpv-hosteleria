@@ -1,4 +1,4 @@
-package com.valleapp.comandas.db;
+package com.valleapp.valletpv.db;
 
 import android.content.ContentValues;
 import android.content.Context;

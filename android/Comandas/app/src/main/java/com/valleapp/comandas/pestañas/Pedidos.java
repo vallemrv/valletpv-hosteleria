@@ -1,7 +1,9 @@
-package com.valleapp.comandas.Util;
+package com.valleapp.comandas.pestañas;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,7 +17,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.valleapp.comandas.IUtil.IPedidos;
+import com.valleapp.comandas.interfaces.IPedidos;
 import com.valleapp.comandas.R;
 
 /**
@@ -25,8 +27,6 @@ public class Pedidos extends Fragment {
     // Store instance variables
     private LinearLayout contenedor;
 
-    public  Pedidos(){}
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class Pedidos extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
      }
 
@@ -55,7 +55,7 @@ public class Pedidos extends Fragment {
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
 
-            View v = inflater.inflate(R.layout.linea_pedido_externo, null);
+            @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.linea_pedido_externo, null);
             TextView t =  v.findViewById(R.id.lblCantidad);
             TextView s =  v.findViewById(R.id.lblNombre);
             t.setText(String.format("%s", art.getString("Can")));
@@ -65,12 +65,9 @@ public class Pedidos extends Fragment {
             btnCamb.setTag(art);
             btn.setTag(art);
             btn.setLongClickable(true);
-            btn.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    pedidos.pedir(view);
-                    return false;
-                }
+            btn.setOnLongClickListener(view -> {
+                pedidos.pedir(view);
+                return false;
             });
 
             contenedor.addView(v, params);

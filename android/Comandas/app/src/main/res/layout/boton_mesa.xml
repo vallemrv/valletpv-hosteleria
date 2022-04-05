@@ -1,56 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:orientation="vertical"
+    android:layout_width="0sp"
     android:layout_height="match_parent"
-    android:background="#ff64696e">
+    android:layout_weight="1">
 
 
     <Button
         android:id="@+id/btnMesa"
-        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/pneBotones"
-        android:background="@android:color/transparent"
         android:text="Mesa" />
 
+
+    <LinearLayout
+        android:id="@+id/pneBtnMesa"
+        android:layout_width="wrap_content"
+        android:layout_height="40sp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btnCambiarMesa"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:scaleType="fitStart"
-            android:layout_alignParentBottom="true"
+            android:layout_margin="2dp"
             android:layout_toLeftOf="@+id/btnLsPedidos"
-            android:background="@android:color/transparent"
+            android:background="@drawable/fondo_btn_xml"
             android:onClick="clickCambiarMesa"
-            android:src="@drawable/cambio" />
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cambiarmesa" />
 
 
         <ImageButton
             android:id="@+id/btnLsPedidos"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:scaleType="fitStart"
-            android:layout_alignParentBottom="true"
-
+            android:layout_margin="2dp"
             android:layout_toLeftOf="@+id/btnCobrar"
-            android:background="@android:color/transparent"
+            android:background="@drawable/fondo_btn_xml"
             android:onClick="clickMostrarPedidos"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/pedido" />
 
         <ImageButton
             android:id="@+id/btnCobrar"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:scaleType="fitStart"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:onClick="MostrarListaTicket"
-            android:src="@drawable/cuenta" />
+            android:layout_margin="2dp"
+            android:background="@drawable/fondo_btn_xml"
+            android:onClick="mostrarListaTicket"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cobrar" />
 
 
+    </LinearLayout>
 
 </RelativeLayout>

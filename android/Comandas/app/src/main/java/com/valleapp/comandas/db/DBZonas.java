@@ -19,14 +19,14 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbZonas(Context context) {
+    public DBZonas(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

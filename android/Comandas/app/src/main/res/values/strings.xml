@@ -11,5 +11,7 @@
     <string name="entrar">Entrar</string>
     <string name="crear">Crear</string>
     <string name="agregar_empresas">Agregar empresa</string>
+    <string name="pass">Entra contraseña</string>
+    <string name="repitePass">Repetir contraseña</string>
 
 </resources>

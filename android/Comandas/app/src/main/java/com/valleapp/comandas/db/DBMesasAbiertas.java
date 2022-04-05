@@ -11,11 +11,11 @@ import com.valleapp.comandas.interfaces.IBaseDatos;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class DbMesasAbiertas implements IBaseDatos {
+public class DBMesasAbiertas implements IBaseDatos {
 
-    DbMesas db;
+    DBMesas db;
 
-    public DbMesasAbiertas(DbMesas db){
+    public DBMesasAbiertas(DBMesas db){
         this.db = db;
     }
 

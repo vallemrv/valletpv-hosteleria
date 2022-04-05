@@ -20,14 +20,14 @@ import java.util.Locale;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBMesas extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbMesas(Context context) {
+    public DBMesas(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -88,9 +88,9 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
     }
 
 
-    public void abrirMesa(String idm) {
+    public void abrirMesa(String idm, String num) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("UPDATE mesas SET abierta='1', num=0 WHERE ID="+idm);
+        db.execSQL("UPDATE mesas SET abierta='1', num="+num+" WHERE ID="+idm);
         db.close();
     }
 
@@ -148,4 +148,11 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
     }
 
 
+    public void marcarRojo(String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("num", "1");
+        db.update("mesas", v, "ID = ?", new String[]{id});
+        db.close();
+    }
 }

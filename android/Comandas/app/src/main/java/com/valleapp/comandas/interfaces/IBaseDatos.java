@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.interfaces;
+package com.valleapp.comandas.interfaces;
 
 import org.json.JSONArray;
 

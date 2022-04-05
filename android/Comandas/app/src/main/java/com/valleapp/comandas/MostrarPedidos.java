@@ -2,10 +2,12 @@ package com.valleapp.comandas;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,16 +18,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.valleapp.comandas.Util.HTTPRequest;
 
 
 public class MostrarPedidos extends Activity {
@@ -33,19 +31,22 @@ public class MostrarPedidos extends Activity {
     String server;
     JSONObject mesa;
     JSONObject zn;
-
+    DBCuenta dbCuenta;
     Context cx;
 
 
     @SuppressLint("HandlerLeak")
-    private final Handler controller_pedidos = new Handler() {
+    private final Handler handlerHttp = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            if(op.equals("salir")){
-                finish();
-            }else if(op.equals("pedido")){
-                RellenarPedido(res);
+            if(op.equals("actualizar")){
+                try {
+                    dbCuenta.actualizarMesa(new JSONArray(res), mesa.getString("ID"));
+                    rellenarPedido();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }else{
                 Toast toast= Toast.makeText(getApplicationContext(),
                         "Peticion enviadaaaa", Toast.LENGTH_SHORT);
@@ -55,13 +56,12 @@ public class MostrarPedidos extends Activity {
         }
     };
 
-    private void RellenarPedido(String res) {
+    private void rellenarPedido() {
 
           try{
-
-            JSONArray lineas = new JSONArray(res);
-            LinearLayout ll = findViewById(R.id.pneListado);
-            ll.removeAllViews();
+              JSONArray lineas = dbCuenta.filter("IDMesa = "+mesa.getString("ID"));
+              LinearLayout ll = findViewById(R.id.pneListado);
+              ll.removeAllViews();
 
               if(lineas.length()>0){
 
@@ -77,7 +77,7 @@ public class MostrarPedidos extends Activity {
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
 
-                    View v = inflater.inflate(R.layout.linea_pedido_interno, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.linea_pedido_interno, null);
                     TextView t = v.findViewById(R.id.lblCantidad);
                     TextView s = v.findViewById(R.id.lblNombre);
                     t.setText(String.format("%s", art.getString("Can")));
@@ -88,12 +88,9 @@ public class MostrarPedidos extends Activity {
                     btn.setTag(art);
                     btn.setLongClickable(true);
 
-                    btn.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            ((MostrarPedidos) cx).clickPedir(view);
-                            return false;
-                        }
+                    btn.setOnLongClickListener(view -> {
+                        clickPedir(view);
+                        return false;
                     });
 
                     ll.addView(v, params);
@@ -113,6 +110,7 @@ public class MostrarPedidos extends Activity {
         setContentView(R.layout.activity_mostrar_pedidos);
         TextView lbl = findViewById(R.id.lblMesa);
         this.cx = this;
+        dbCuenta = new DBCuenta(this);
         try {
             server = getIntent().getExtras().getString("url");
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
@@ -125,10 +123,11 @@ public class MostrarPedidos extends Activity {
     @Override
     protected void onResume() {
         try{
-            List<NameValuePair> p = new ArrayList<NameValuePair>();
-            p.add(new BasicNameValuePair("idm",mesa.getString("ID")));
-            new HTTPRequest(server+"/comandas/lspedidos",p,"pedido", controller_pedidos);
-        } catch (JSONException e) {
+            ContentValues p = new ContentValues();
+            p.put("mesa_id", mesa.getString("ID"));
+            new HTTPRequest(server +"/cuenta/get_cuenta", p, "actualizar", handlerHttp);
+            rellenarPedido();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.onResume();
@@ -137,29 +136,28 @@ public class MostrarPedidos extends Activity {
     public void clickPedir(View v){
         try{
             JSONObject obj = (JSONObject)v.getTag();
-            List<NameValuePair> p = new ArrayList<>();
-            p.add(new BasicNameValuePair("idp",obj.getString("IDPedido")));
-            p.add(new BasicNameValuePair("id",obj.getString("IDArt")));
-            p.add(new BasicNameValuePair("Nombre",obj.getString("Nombre")));
-            new HTTPRequest(server+"/impresion/reenviarlinea",p,"", controller_pedidos);
+            ContentValues p = new ContentValues();
+            p.put("idp",obj.getString("IDPedido"));
+            p.put("id",obj.getString("IDArt"));
+            p.put("Nombre",obj.getString("Nombre"));
+            new HTTPRequest(server+"/impresion/reenviarlinea",p,"", handlerHttp);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
 
-
-    public void clickSalir(View v){
-        finish();
-    }
-
     public void clickCambiar(View v){
-       JSONObject m = (JSONObject)v.getTag();
+        JSONObject m = (JSONObject)v.getTag();
         Intent intent = new Intent(cx,OpMesas.class);
         intent.putExtra("op","art");
         intent.putExtra("mesa", mesa.toString());
         intent.putExtra("art",m.toString());
         intent.putExtra("url",server);
         startActivity(intent);
+    }
+
+    public  void clickSalir(View v){
+        finish();
     }
 }

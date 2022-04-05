@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/send_notificacion"
+            android:src="@drawable/enviar"
             android:scaleType="fitCenter"
             android:padding="10sp"
             />

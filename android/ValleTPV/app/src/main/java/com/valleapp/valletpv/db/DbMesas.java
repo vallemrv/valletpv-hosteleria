@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 
@@ -64,7 +63,6 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
             // Create a new map of values, where column names are the keys
             try {
                 String abierta = datos.getJSONObject(i).getString("abierta").toLowerCase(Locale.ROOT);
-                Log.i("DBMESAS", abierta);
                 if (abierta.equals("true")) abierta = "1";
                 else if (abierta.equals("false")) abierta = "0";
                 ContentValues values = new ContentValues();

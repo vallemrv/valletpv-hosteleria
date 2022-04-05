@@ -1,9 +1,10 @@
-package com.valleapp.valletpv.tareas;
+package com.valleapp.comandas.tareas;
 
 import android.content.ContentValues;
 import android.os.Handler;
 
-import com.valleapp.valletpv.tools.HTTPRequest;
+
+import com.valleapp.comandas.utilidades.HTTPRequest;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,9 +18,9 @@ public class TareaUpdateForDevices extends TimerTask {
     String[] tablasUpdatables;
 
     public TareaUpdateForDevices(String[] tablasUpdatables, String server,
-                          Handler handler,
-                          Timer parent,
-                          long timeout){
+                                 Handler handler,
+                                 Timer parent,
+                                 long timeout){
         this.tablasUpdatables = tablasUpdatables;
         this.server = server;
         this.handler = handler;

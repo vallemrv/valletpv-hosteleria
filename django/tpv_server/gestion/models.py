@@ -39,7 +39,6 @@ class Sync(models.Model):
         sync.save()
         
 
-
 class Arqueocaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre')  # Field name made lowercase.
@@ -415,7 +414,9 @@ class Lineaspedido(models.Model):
                     'Estado': l.estado,
                     'Precio': l.precio,
                     'Nombre': l.nombre,
-                    'IDMesa': m.mesa.pk
+                    'IDMesa': m.mesa.pk,
+                    'nomMesa': m.mesa.nombre,
+                    'IDZona': m.mesa.zonas_set.all().first().pk
                 }
                 lineas.append(obj)
         return lineas
@@ -585,9 +586,11 @@ class Mesasabiertas(models.Model):
                 mesaS.save()
                 mesaP.infmesa = infmesa;
                 mesaP.save()
-            else:
+            elif mesaP:
                 mesaP.mesa_id = ids
                 mesaP.save()
+            else:
+                Sync.actualizar("mesasabiertas")
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):
@@ -785,7 +788,12 @@ class SeccionesCom(models.Model):
     descuento = models.DecimalField(db_column='Descuento', blank=True, null=True, max_digits=4, decimal_places=2, default='0')
     icono = models.CharField(db_column='Icono', max_length=11, choices=ICON_CHOICES, default="bar")
 
-    
+    @staticmethod
+    def update_for_devices():
+        a = []
+        for obj in SeccionesCom.objects.all():
+            a.append(model_to_dict(obj))
+        return a
 
     @staticmethod
     def get_all_for_devices():
@@ -858,6 +866,15 @@ class Subteclas(models.Model):
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     orden = models.IntegerField(db_column='Orden', default=0, blank=True)  # Field name made lowercase.
     
+
+    @staticmethod
+    def update_for_devices():
+        a = []
+        for sub in Subteclas.objects.all():
+            a.append(model_to_dict(sub))
+        return a
+
+
     def get_color(self, hex=False):
         if self.tecla_child:
             return self.tecla_child.get_color(hex)
@@ -883,6 +900,13 @@ class Sugerencias(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas',  on_delete=models.CASCADE, db_column='IDTecla', default=-1)  # Field name made lowercase.
     sugerencia = models.CharField(db_column='Sugerencia', max_length=300)  # Field name made lowercase.
+
+    @staticmethod
+    def update_for_devices():
+        a = []
+        for obj in Sugerencias.objects.all():
+            a.append(model_to_dict(obj))
+        return a
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -916,6 +940,7 @@ class Teclas(models.Model):
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     tipo = models.CharField(max_length=2, choices=TIPO_TECLA_CHOICE, default="SP")
 
+
     @staticmethod
     def update_for_devices():
         rows = Teclas.objects.all()
@@ -925,9 +950,12 @@ class Teclas(models.Model):
             teclasseccion = r.teclaseccion_set.all()
             row = model_to_dict(r)
             row["Precio"] = r.p1 
-            row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "150,150,150"
+            row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
             row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
             row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
+            seccioncom = r.teclascom_set.all().first()
+            row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
+            row["OrdenCom"] = seccioncom.orden if seccioncom else -1;
             objs.append(row)
         return objs
    

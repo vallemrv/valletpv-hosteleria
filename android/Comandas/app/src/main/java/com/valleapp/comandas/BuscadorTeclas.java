@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.valleapp.comandas.db.DBTeclas;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -27,18 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Buscador extends Activity implements TextWatcher{
+public class BuscadorTeclas extends Activity implements TextWatcher{
 
     Context cx;
     String server = "";
-    private final Handler Http = new Handler() {
-        public void handleMessage(Message msg) {
-            String op = msg.getData().getString("op");
-            String res = msg.getData().getString("RESPONSE");
-            if (op.equals("art")) {
-                RellenaBotonera(res);
-            }
+    JSONArray lsart = new JSONArray();
+    DBTeclas dbTeclas = new DBTeclas(this);
 
+    private final Handler handlerBusqueda = new Handler(Looper.getMainLooper()) {
+        public void handleMessage(Message msg) {
+            rellenaBotonera();
         }
     };
 
@@ -48,18 +49,15 @@ public class Buscador extends Activity implements TextWatcher{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buscador);
         server = getIntent().getExtras().getString("url");
-
         this.cx = this;
         TextView t = findViewById(R.id.txtBuscador);
         t.addTextChangedListener(this);
     }
 
 
-    private void RellenaBotonera(String res) {
+    private void rellenaBotonera() {
 
         try {
-
-            JSONArray lsart = new JSONArray(res);
 
             if (lsart.length() > 0) {
 
@@ -88,7 +86,7 @@ public class Buscador extends Activity implements TextWatcher{
                     View v = inflater.inflate(R.layout.btn_art, null);
 
 
-                    Button btn = (Button)v.findViewById(R.id.boton_art);
+                    Button btn = v.findViewById(R.id.boton_art);
 
                     btn.setId(i);
                     btn.setTag(m);
@@ -133,9 +131,26 @@ public class Buscador extends Activity implements TextWatcher{
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-           List<NameValuePair> p = new ArrayList<>();
-            p.add(new BasicNameValuePair("str", charSequence.toString()));
-           // new HTTPRequest(server+"/articulos/listado",p,"art",Http);
+
+        if(charSequence.length()>0) {
+            try {
+                new Thread(() ->{
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    String str = charSequence.toString();
+                    lsart = dbTeclas.filter("Nombre LIKE '%"+ str +"%'");
+                    handlerBusqueda.sendEmptyMessage(0);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     @Override

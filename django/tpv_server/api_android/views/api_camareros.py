@@ -69,14 +69,14 @@ def listado_autorizados(request):
 def listado(request):
     camareros =  Camareros.objects.filter(activo=True, autorizado=True)
     lstObj = []
-    for c in camareros:
+    for r in camareros:
         obj = {
-            "ID": c.id,
-            "Nombre": c.nombre,
-            "Apellidos": c.apellidos,
-            "Email": c.email,
-            "Pass": c.pass_field,
-            "Activo": c.activo
+            "ID":r.id,
+            "Nombre": r.nombre,
+            "Apellidos": r.apellidos,
+            "Pass": r.pass_field,
+            "autorizado": r.autorizado,
+            "permisos": r.permisos
         }
         lstObj.append(obj)
 

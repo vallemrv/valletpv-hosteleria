@@ -2,10 +2,16 @@ package com.valleapp.comandas;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,8 +19,11 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.valleapp.comandas.Util.AdaptadorBuscarPedidos;
-import com.valleapp.comandas.Util.HTTPRequest;
+import com.valleapp.comandas.adaptadores.AdaptadorBuscarPedidos;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.ServicioCom;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -33,35 +42,35 @@ public class BuscarPedidos extends Activity implements TextWatcher {
     TextView txtBuscar;
     JSONObject objSel;
     List<JSONObject> lPedidos = new ArrayList<>();
+    ServicioCom myServicio;
+    DBCuenta dbCuenta;
 
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            try {
+                myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
 
-    @SuppressLint("HandlerLeak")
-    private final Handler controller_http = new Handler() {
-        public void handleMessage(Message msg) {
-            String op = msg.getData().getString("op");
-            String res = msg.getData().getString("RESPONSE");
-            if(op.equals("servido")){
-                lPedidos.remove(objSel);
-                RellenarSug();
-            }else if(op.equals("buscar")){
-                lPedidos = new ArrayList<>();
-                try {
-                    if(!res.equals("")) {
-                        JSONArray p = new JSONArray(res);
-                        for (int i = 0; i < p.length(); i++) {
-                            lPedidos.add(p.getJSONObject(i));
-                        }
-
-                    }
-                RellenarSug();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myServicio = null;
         }
     };
 
-    private void RellenarSug() {
+    @SuppressLint("HandlerLeak")
+    private final Handler handelerBusqueda = new Handler(Looper.getMainLooper()) {
+        public void handleMessage(Message msg) {
+            rellenarLista();
+        }
+    };
+
+    private void rellenarLista() {
         ListView lst = findViewById(R.id.lstPedidosPendientes);
         lst.setAdapter(new AdaptadorBuscarPedidos(cx, lPedidos));
     }
@@ -80,12 +89,27 @@ public class BuscarPedidos extends Activity implements TextWatcher {
 
     public void clickServido(View v) throws JSONException {
         objSel = (JSONObject) v.getTag();
-        List<NameValuePair> p = new ArrayList<>();
-        p.add(new BasicNameValuePair("art", objSel.toString()));
-        p.add(new BasicNameValuePair("idz", objSel.getString("IDZona")));
-        new HTTPRequest(server + "/pedidos/servido", p, "servido", controller_http);
+        ContentValues p = new ContentValues();
+        p.put("art", objSel.toString());
+        p.put("idz", objSel.getString("IDZona"));
+        myServicio.addColaInstrucciones(new Instruccion(p, server + "/pedidos/servido"));
+        lPedidos.remove(objSel);
+        rellenarLista();
     }
 
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        intent.putExtra("url", server);
+        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService(mConexion);
+        super.onDestroy();
+    }
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) { }
@@ -96,10 +120,16 @@ public class BuscarPedidos extends Activity implements TextWatcher {
 
       if(charSequence.length()>0) {
           try {
-
-              List<NameValuePair> p = new ArrayList<>();
-              p.add(new BasicNameValuePair("str", charSequence.toString()));
-              new HTTPRequest(server + "/pedidos/buscar", p, "buscar", controller_http);
+              new Thread(() ->{
+                  try {
+                      Thread.sleep(1000);
+                  } catch (InterruptedException e) {
+                      e.printStackTrace();
+                  }
+                  String str = charSequence.toString();
+                  lPedidos = dbCuenta.filterList("Nombre LIKE '%"+ str +"%'");
+                  handelerBusqueda.sendEmptyMessage(0);
+              });
 
           } catch (Exception e) {
               e.printStackTrace();

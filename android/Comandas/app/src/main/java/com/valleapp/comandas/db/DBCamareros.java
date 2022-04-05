@@ -21,14 +21,14 @@ import java.util.ArrayList;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbCamareros extends SQLiteOpenHelper implements IBaseDatos {
+public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbCamareros(Context context) {
+    public DBCamareros(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -160,7 +160,6 @@ public class DbCamareros extends SQLiteOpenHelper implements IBaseDatos {
                 cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
                 cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
                 lscam.add(cam);
-                Log.i("DBCamareros", cam.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

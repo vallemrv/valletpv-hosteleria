@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.comandas.utilidades;
 
 import android.content.ContentValues;
 import android.os.Bundle;
@@ -38,7 +38,7 @@ public class HTTPRequest {
     }
 
 
-    public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler success){
+    public HTTPRequest(String strUrl, final ContentValues params, final String op, final Handler handler){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;
 
@@ -52,7 +52,7 @@ public class HTTPRequest {
             conn.setRequestProperty("Accept-Charset", "UTF-8");
 
             // Execute HTTP Post Request
-            HttpURLConnection finalConn = conn;
+            final HttpURLConnection finalConn = conn;
              new Thread(){
                 public void run(){
 
@@ -70,29 +70,31 @@ public class HTTPRequest {
                         String line;
 
                         while ((line = reader.readLine()) != null) {
-
                             result.append(line);
                         }
 
-                        Message msg = success.obtainMessage();
-                        Bundle bundle = msg.getData();
-                        if (bundle == null) bundle = new Bundle();
-                        bundle.putString("RESPONSE", result.toString());
-                        bundle.putString("op", op);
-                        msg.setData(bundle);
-                        success.sendMessage(msg);
+                        if (handler != null) {
+                            Message msg = handler.obtainMessage();
+                            Bundle bundle = msg.getData();
+                            if (bundle == null) bundle = new Bundle();
+                            bundle.putString("RESPONSE", result.toString());
+                            bundle.putString("op", op);
+                            msg.setData(bundle);
+                            handler.sendMessage(msg);
+                        }
 
 
                      } catch (Exception e) {
                         // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        Message msg = success.obtainMessage();
-                        Bundle bundle = msg.getData();
-                        if(bundle==null) bundle = new Bundle();
-                        bundle.putString("RESPONSE", op);
-                        bundle.putString("op","error");
-                        msg.setData(bundle);
-                        success.sendMessage(msg);
+                        if( handler != null) {
+                            Message msg = handler.obtainMessage();
+                            Bundle bundle = msg.getData();
+                            if (bundle == null) bundle = new Bundle();
+                            bundle.putString("RESPONSE", op);
+                            bundle.putString("op", "error");
+                            msg.setData(bundle);
+                            handler.sendMessage(msg);
+                        }
                     }
                 }
             }.start();

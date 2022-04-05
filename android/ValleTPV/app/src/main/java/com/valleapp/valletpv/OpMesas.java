@@ -67,7 +67,7 @@ public class OpMesas extends Activity {
 
             if(lszonas.length()>0){
 
-                LinearLayout ll = (LinearLayout)findViewById(R.id.pneZonas);
+                LinearLayout ll = findViewById(R.id.pneZonas);
                 ll.removeAllViews();
 
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -87,7 +87,7 @@ public class OpMesas extends Activity {
                     @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
-                    Button btn = (Button)v.findViewById(R.id.boton_art);
+                    Button btn = v.findViewById(R.id.boton_art);
                     btn.setId(i);
                     btn.setSingleLine(false);
                     btn.setTextSize(11);
@@ -126,7 +126,7 @@ public class OpMesas extends Activity {
 
             if(lsmesas.length()>0){
 
-                TableLayout ll = (TableLayout)findViewById(R.id.pneMesas);
+                TableLayout ll = findViewById(R.id.pneMesas);
                 ll.removeAllViews();
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -154,7 +154,7 @@ public class OpMesas extends Activity {
                         @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
-                        Button btn = (Button) v.findViewById(R.id.boton_art);
+                        Button btn = v.findViewById(R.id.boton_art);
 
                         btn.setId(i);
                         btn.setSingleLine(false);
@@ -230,7 +230,7 @@ public class OpMesas extends Activity {
         op = getIntent().getExtras().getString("op");
         try {
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
-            TextView l = (TextView)findViewById(R.id.lblTitulo);
+            TextView l = findViewById(R.id.lblTitulo);
             String titulo = op.equals("cambiar") ? "Cambiar mesa "+ mesa.getString("Nombre") : "Juntar mesa "+ mesa.getString("Nombre") ;
             l.setText(titulo);
 

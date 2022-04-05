@@ -15,10 +15,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTbSugerencias extends SQLiteOpenHelper implements IBaseDatos {
+public class DBSugerencias extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -27,7 +30,7 @@ public class DbTbSugerencias extends SQLiteOpenHelper implements IBaseDatos {
     public String tb_name = "sugerencias";
 
 
-    public DbTbSugerencias(Context context) {
+    public DBSugerencias(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         onCreate(this.getWritableDatabase());
     }
@@ -53,10 +56,34 @@ public class DbTbSugerencias extends SQLiteOpenHelper implements IBaseDatos {
 
     }
 
+    @SuppressLint("Range")
     @Override
-    public JSONArray filter(String cWhere) {
-        return null;
+    public JSONArray filter(String cWhere){
+        JSONArray ls = new JSONArray();
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (cWhere != null) cWhere = " WHERE "+ cWhere;
+        else cWhere = "";
+        Cursor res =  db.rawQuery( "select * from "+ tb_name + cWhere, null );
+        res.moveToFirst();
+        while(!res.isAfterLast()){
+            try{
+                JSONObject obj = new JSONObject();
+                obj.put("ID", res.getString(res.getColumnIndex("ID")));
+                obj.put("sugerencia", res.getString(res.getColumnIndex("sugerencia")));
+                obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
+                ls.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            res.moveToNext();
+
+        }
+        res.close();
+        db.close();
+        return ls;
     }
+
+
 
     public void rellenarTabla(JSONArray tb){
         // Gets the data repository in write mode
@@ -72,7 +99,7 @@ public class DbTbSugerencias extends SQLiteOpenHelper implements IBaseDatos {
             try {
                 ContentValues values = new ContentValues();
                 values.put("ID", tb.getJSONObject(i).getInt("id"));
-                values.put("IDTecla", tb.getJSONObject(i).getString("idtecla"));
+                values.put("IDTecla", tb.getJSONObject(i).getString("tecla"));
                 values.put("sugerencia", tb.getJSONObject(i).getString("sugerencia"));
                  db.insert(tb_name, null, values);
             } catch (JSONException e) {
@@ -83,115 +110,12 @@ public class DbTbSugerencias extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
-    @SuppressLint("Range")
+
     public JSONArray getAll()
     {
-        JSONArray ls = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from "+ tb_name, null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("sugerencia", res.getString(res.getColumnIndex("sugerencia")));
-                obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-        res.close();
-        db.close();
-        return ls;
-    }
-
-    private boolean hayRegistros(String tb){
-        boolean hay = false;
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? ", new String[]{tb});
-            res.moveToFirst();
-            int count = res.getInt(0);
-            hay = count > 0;
-            res.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        db.close();
-        return hay;
+        return filter(null);
     }
 
 
-    public void vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM "+tb_name);
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
 
-    public boolean is_updatable(JSONObject obj) {
-        boolean isUp = true;
-        SQLiteDatabase db = null;
-        try {
-            String date = obj.getString("last");
-            if (date.equals("")) return true;
-            String tb = obj.getString("nombre");
-            isUp = !hayRegistros(tb);
-            db = this.getReadableDatabase();
-
-            if (!isUp) {
-                Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
-                res.moveToFirst();
-                int count = res.getInt(0);
-                isUp = count > 0;
-                res.close();
-            }
-
-        } catch (Exception e) {
-            if (db != null)  this.onCreate(db);
-            e.printStackTrace();
-        }
-        if (db != null) db.close();
-        return  isUp;
-    }
-
-    public void upTabla(String tb, String last) {
-        SQLiteDatabase db = null;
-        try {
-            boolean hay = hayRegistros(tb);
-            db =  this.getWritableDatabase();
-            ContentValues v = new ContentValues();
-            v.put("nombre", tb);
-            v.put("last", last);
-            if (!hay) {
-                 db.insert(tb_name, null, v);
-            }else{
-                db.update(tb_name, v, "nombre = ?",  new String[]{tb});
-            }
-
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        if (db != null) db.close();
-    }
-
-    public void setLast(String tb, String last) {
-        SQLiteDatabase db = null;
-        try{
-            db = getWritableDatabase();
-            ContentValues v = new ContentValues();
-            v.put("last", last);
-            db.update(tb_name, v, "nombre = ? ", new String[]{tb});
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 }
