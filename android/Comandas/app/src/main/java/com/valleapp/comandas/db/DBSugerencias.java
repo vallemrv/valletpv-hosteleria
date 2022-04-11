@@ -6,33 +6,22 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
-
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by valle on 13/10/14.
  */
-public class DBSugerencias extends SQLiteOpenHelper implements IBaseDatos {
+public class DBSugerencias extends DBBase {
 
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
 
     public String tb_name = "sugerencias";
 
 
     public DBSugerencias(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        onCreate(this.getWritableDatabase());
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -50,11 +39,6 @@ public class DBSugerencias extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    @Override
-    public void resetFlag(int id) {
-
-    }
 
     @SuppressLint("Range")
     @Override
@@ -83,8 +67,7 @@ public class DBSugerencias extends SQLiteOpenHelper implements IBaseDatos {
         return ls;
     }
 
-
-
+    @Override
     public void rellenarTabla(JSONArray tb){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
@@ -110,12 +93,10 @@ public class DBSugerencias extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
-
     public JSONArray getAll()
     {
         return filter(null);
     }
-
 
 
 }

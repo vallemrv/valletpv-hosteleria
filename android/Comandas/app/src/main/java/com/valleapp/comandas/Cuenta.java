@@ -76,7 +76,7 @@ public class Cuenta extends Activity {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            if(op.equals("actualizar")){
+            if(op != null && op.equals("actualizar")){
                 try {
                     dbCuenta.rellenarTabla(new JSONArray(res));
                     rellenarTicket();
@@ -135,6 +135,7 @@ public class Cuenta extends Activity {
 
     @Override
     protected void onDestroy() {
+        myServicio.rmExHandler("lineaspedido");
         unbindService(mConexion);
         super.onDestroy();
     }

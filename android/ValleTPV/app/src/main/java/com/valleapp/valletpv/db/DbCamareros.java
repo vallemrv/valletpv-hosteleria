@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 
@@ -159,7 +158,6 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
                 cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
                 cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
                 lscam.add(cam);
-                Log.i("DBCamareros", cam.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

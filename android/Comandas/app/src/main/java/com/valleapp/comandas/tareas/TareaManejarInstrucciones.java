@@ -44,9 +44,9 @@ public class TareaManejarInstrucciones extends TimerTask {
                                 handlerInst.sendMessage(msgInst);
                             }
                         }
-                        procesado = true;
                     }
                 }
+                procesado = true;
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -65,24 +65,21 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
+            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
 
             if (procesado) {
 
                 synchronized (cola) {
                     Instruccion inst = cola.peek();
-
                     if (inst != null) {
                         procesado = false;
-                        Log.i("Jose_luis", inst.getUrl());
                         new HTTPRequest(inst.getUrl(), inst.getParams(), "", handleHttp);
                     }
                 }
             }
 
-
             synchronized (parent) {
-                parent.wait(3000);
+                parent.wait(1000);
             }
 
         }catch (Exception e){

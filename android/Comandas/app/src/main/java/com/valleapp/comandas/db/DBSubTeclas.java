@@ -6,9 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,15 +15,11 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+public class DBSubTeclas extends DBBase  {
 
 
     public DBSubTeclas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -44,17 +37,7 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
     @Override
-    public void resetFlag(int id) {
-
-    }
-
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
-    }
-
     public void rellenarTabla(JSONArray datos){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
@@ -71,7 +54,7 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
                  values.put("ID", datos.getJSONObject(i).getInt("id"));
                  values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
                  values.put("Incremento", datos.getJSONObject(i).getString("incremento"));
-                 values.put("IDTecla", datos.getJSONObject(i).getString("idtecla"));
+                 values.put("IDTecla", datos.getJSONObject(i).getString("tecla"));
                  db.insert("subteclas", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -88,7 +71,7 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "SELECT * FROM subteclas WHERE IDTecla="+id , null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject obj = new JSONObject();
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));

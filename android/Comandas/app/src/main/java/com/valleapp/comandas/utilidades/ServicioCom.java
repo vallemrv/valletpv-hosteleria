@@ -11,6 +11,7 @@ import android.os.Message;
 import android.util.Log;
 
 
+import com.valleapp.comandas.db.DBBase;
 import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
@@ -22,6 +23,7 @@ import com.valleapp.comandas.db.DbTbUpdates;
 import com.valleapp.comandas.db.DBTeclas;
 import com.valleapp.comandas.db.DBZonas;
 import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.tareas.TareaManejarAutorias;
 import com.valleapp.comandas.tareas.TareaManejarInstrucciones;
 import com.valleapp.comandas.tareas.TareaUpdateForDevices;
 
@@ -45,15 +47,14 @@ public class ServicioCom extends Service {
 
     Timer timerUpdateFast = new Timer();
     Timer timerUpdateLow = new Timer();
-    Timer timerUpdateFromDevices = new Timer();
     Timer timerManejarInstrucciones = new Timer();
+    Timer timerAurotias = new Timer();
 
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
 
     DbTbUpdates dbTbUpdates;
 
-    Queue<RowsUpdatables> colaUpdate = new LinkedList<>();
     Queue<Instruccion> colaInstrucciones = new LinkedList<>();
 
     String[] tbNameUpdateFast;
@@ -121,7 +122,6 @@ public class ServicioCom extends Service {
         if (url != null){
             server = url;
             IniciarDB();
-            //timerUpdateFromDevices.schedule(new TareaUpdateFromDevices(dbs, timerUpdateFromDevices, colaUpdate, server, dbTbUpdates), 2000, 1);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones), 2000, 1);
             timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 5000), 2000, 1);
             timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 20000), 2000, 1);
@@ -140,7 +140,7 @@ public class ServicioCom extends Service {
     public void onDestroy() {
         timerUpdateFast.cancel();
         timerUpdateLow.cancel();
-        timerUpdateFromDevices.cancel();
+        timerAurotias.cancel();
         super.onDestroy();
     }
 
@@ -153,19 +153,16 @@ public class ServicioCom extends Service {
     public void setExHandler(String nombre, Handler handler) {
         exHandler.put(nombre, handler);
     }
-    public Handler getExHandler(String nombre){
-        try {
-            return exHandler.get(nombre);
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
 
-        return  null;
+
+    public void rmExHandler(String handlerName) {
+        if (exHandler.containsKey(handlerName))   exHandler.remove(exHandler.get(handlerName));
     }
 
-    public void addTbCola(RowsUpdatables r){
-        colaUpdate.add(r);
+    public void initTimerAutorias(Handler mainHandler, String idautoria, String url){
+        timerAurotias.schedule(new TareaManejarAutorias(mainHandler, idautoria, 2000, url), 2000, 1);
     }
+
     public void addColaInstrucciones(Instruccion inst) {
         synchronized (colaInstrucciones) {
             colaInstrucciones.add(inst);
@@ -184,7 +181,7 @@ public class ServicioCom extends Service {
                     "mesas",
                     "teclas",
                     "subteclas",
-                    "seccionescom",
+                    "secciones_com",
                     "sugerencias"
             };
 
@@ -195,7 +192,7 @@ public class ServicioCom extends Service {
             dbs.put("mesas", dbMesas);
             dbs.put("camareros", new DBCamareros(getApplicationContext()));
             dbs.put("zonas", new DBZonas(getApplicationContext()));
-            dbs.put("seccionescom", new DBSecciones(getApplicationContext()));
+            dbs.put("secciones_com", new DBSecciones(getApplicationContext()));
             dbs.put("teclas", new DBTeclas(getApplicationContext()));
             dbs.put("lineaspedido", new DBCuenta(getApplicationContext()));
             dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
@@ -204,14 +201,19 @@ public class ServicioCom extends Service {
         }
 
 
-        if(dbTbUpdates==null)  dbTbUpdates = new DbTbUpdates(getApplicationContext());
+        if(dbTbUpdates==null){
+            dbTbUpdates = new DbTbUpdates(getApplicationContext());
+            dbTbUpdates.inicializar();
+        }
+
+        for(IBaseDatos db: dbs.values()){
+            db.inicializar();
+        }
     }
 
     public IBaseDatos getDb(String nombre){
         return dbs.get(nombre);
     }
-
-
 
     public class MyBinder extends Binder{
        public ServicioCom getService() {

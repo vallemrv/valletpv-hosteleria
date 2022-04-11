@@ -1,6 +1,8 @@
 package com.valleapp.comandas;
 
-import static com.valleapp.comandas.R.*;
+import static com.valleapp.comandas.R.drawable;
+import static com.valleapp.comandas.R.id;
+import static com.valleapp.comandas.R.layout;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,8 +17,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -26,31 +28,28 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.valleapp.comandas.db.DBCamareros;
+import com.valleapp.comandas.utilidades.ActivityBase;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.JSON;
+import com.valleapp.comandas.utilidades.ServicioCom;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import com.valleapp.comandas.db.DBCamareros;
-import com.valleapp.comandas.utilidades.HTTPRequest;
-import com.valleapp.comandas.utilidades.Instruccion;
-import com.valleapp.comandas.utilidades.JSON;
-import com.valleapp.comandas.utilidades.ServicioCom;
+
+public class Camareros extends ActivityBase {
 
 
 
-public class Camareros extends Activity {
-
-
-    private String server = "";
     ArrayList<JSONObject> lscam = null;
-    final Context cx = this;
-
-    private ServicioCom myServicio;
     private DBCamareros dbCamareros;
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
@@ -68,11 +67,11 @@ public class Camareros extends Activity {
         }
     };
 
-    @SuppressLint("HandlerLeak")
+
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
-            if (op == "listado") {
+            if (op.equals("listado")) {
                 try {
                     String res = msg.getData().getString("RESPONSE");
                     dbCamareros.rellenarTabla(new JSONArray(res));
@@ -83,6 +82,8 @@ public class Camareros extends Activity {
             }
         }
     };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +122,7 @@ public class Camareros extends Activity {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT );
 
-                DisplayMetrics metrics = getResources().getDisplayMetrics();
+
 
 
                 TableRow row = new TableRow(cx);
@@ -139,6 +140,7 @@ public class Camareros extends Activity {
                             .trim().replace(" ", "\n"));
 
                     btnCamarero.setOnClickListener(view -> {
+
                         try {
                             final JSONObject camSeleccionado = (JSONObject) view.getTag();
                             final String cam_pass = camSeleccionado.getString("Pass");
@@ -152,7 +154,7 @@ public class Camareros extends Activity {
                                         .setOnClickListener(v -> {
                                             try {
                                                 if (!pass_rep.getText().toString().equals(pass.getText().toString())){
-                                                    Toast.makeText(getApplicationContext(),"Las contraseñas no coincidén...", Toast.LENGTH_SHORT).show();
+                                                    mostrarToast("Las contraseña no coinciden..", Gravity.BOTTOM, 0, 80);
                                                 }else {
                                                     ContentValues p = new ContentValues();
                                                     p.put("cam", camSeleccionado.toString());
@@ -179,9 +181,7 @@ public class Camareros extends Activity {
                                                 if(pass.getText().toString().equals(cam_pass)){
                                                     entrarEnMesas(camSeleccionado.toString());
                                                 }else{
-                                                    Toast.makeText(getApplicationContext(),
-                                                            "Usuario no autorizado...",
-                                                            Toast.LENGTH_SHORT).show();
+                                                    mostrarToast("Usuario no autorizado...", Gravity.BOTTOM, 0, 80);
                                                 }
                                             } catch (Exception e){
                                                 e.printStackTrace();
@@ -197,6 +197,7 @@ public class Camareros extends Activity {
                         }
                     });
 
+                    DisplayMetrics metrics = getResources().getDisplayMetrics();
                     TableRow.LayoutParams rowparams = new TableRow.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             Math.round(metrics.density * 100));
@@ -218,10 +219,7 @@ public class Camareros extends Activity {
     }
 
     public void reloadCamareros(View v){
-        Toast toast= Toast.makeText(getApplicationContext(),
-                "Refrescando camareros", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 200);
-        toast.show();
+        mostrarToast("Refrescando camareros", Gravity.BOTTOM, 0, 80);
         descargarCamarerosActivos();
 
     }

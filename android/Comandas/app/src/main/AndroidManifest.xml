@@ -87,6 +87,12 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
+           <activity
+               android:name="com.valleapp.comandas.Autorias"
+               android:label="@string/title_activity_autorias"
+               android:configChanges="orientation"
+               android:screenOrientation="portrait">
+           </activity>
        <service
            android:name=".utilidades.ServicioCom"
            android:enabled="true"

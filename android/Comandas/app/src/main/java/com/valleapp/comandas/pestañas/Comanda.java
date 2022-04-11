@@ -2,6 +2,7 @@ package com.valleapp.comandas.pestañas;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class Comanda extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         controlador.cargarNota();
     }
@@ -50,10 +51,11 @@ public class Comanda extends Fragment {
         View view = inflater.inflate(R.layout.comanda, container, false);
         listaPedidos = view.findViewById(R.id.linear_layout);
         Can_art = view.findViewById(R.id.numArt);
-        mensaje = view.findViewById(R.id.mensaje);
+        mensaje = view.findViewById(R.id.txt_mensaje_autoria);
         return view;
     }
 
+    @SuppressLint("SetTextI18n")
     public void setCantidad(String can){
         Can_art.setText("Hay "+ can +" articulos");
     }

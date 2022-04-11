@@ -6,10 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,15 +15,10 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
-
+public class DBZonas extends DBBase{
 
     public DBZonas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -70,17 +61,6 @@ public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
         }
         res.close();db.close();
         return lista;
-    }
-
-
-    @Override
-    public void resetFlag(int id) {
-
-    }
-
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
     }
 
     @Override

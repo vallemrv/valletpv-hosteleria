@@ -6,9 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,15 +17,11 @@ import java.util.Locale;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBMesas extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+public class DBMesas extends DBBase {
 
 
     public DBMesas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -47,6 +40,41 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos {
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    @SuppressLint("Range")
+    @Override
+    public JSONArray filter(String cWhere) {
+        JSONArray lista = new JSONArray();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String strWhere = "";
+        if (cWhere != null){
+            strWhere = " WHERE "+cWhere;
+        }
+
+        Cursor res =  db.rawQuery( "SELECT * FROM mesas "+strWhere+" ORDER BY Orden DESC", null );
+        res.moveToFirst();
+        while(!res.isAfterLast()){
+            try{
+                JSONObject obj = new JSONObject();
+                int num = res.getInt(res.getColumnIndex("num"));
+                String RGB = res.getString(res.getColumnIndex("RGB"));
+                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+                obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
+                obj.put("RGB", num<=0 ? RGB : "255,0,0");
+                obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
+                obj.put("ID", res.getString(res.getColumnIndex("ID")));
+                obj.put("num", num);
+                lista.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            res.moveToNext();
+
+        }
+        res.close();db.close();
+        return lista;
     }
 
     @Override
@@ -81,6 +109,7 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos {
         }
         db.close();
     }
+
     @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
@@ -98,53 +127,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE mesas SET abierta='0', num=0 WHERE ID="+idm);
         db.close();
-    }
-
-    public JSONArray getAllMenosUna(String id, String idm) {
-        return filter("IDZona = "+id+" AND ID !=  "+idm);
-    }
-
-    @Override
-    public void resetFlag(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("flag", "");
-        db.update("mesas", v, "ID=?", new String[]{String.valueOf(id)});
-    }
-
-    @SuppressLint("Range")
-    @Override
-    public JSONArray filter(String cWhere) {
-        JSONArray lista = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+cWhere;
-        }
-
-        Cursor res =  db.rawQuery( "SELECT * FROM mesas "+strWhere+" ORDER BY Orden DESC", null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                int num = res.getInt(res.getColumnIndex("num"));
-                String RGB = res.getString(res.getColumnIndex("RGB"));
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("IDZoma", res.getString(res.getColumnIndex("IDZona")));
-                obj.put("RGB", num<=0 ? RGB : "255,0,0");
-                obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("num", num);
-                lista.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-        res.close();db.close();
-        return lista;
     }
 
 

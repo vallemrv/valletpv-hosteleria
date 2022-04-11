@@ -1,5 +1,6 @@
 package com.valleapp.comandas;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,19 +22,14 @@ import android.widget.TextView;
 
 import com.valleapp.comandas.db.DBTeclas;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class BuscadorTeclas extends Activity implements TextWatcher{
 
     Context cx;
-    String server = "";
+    String tarifa = "1";
     JSONArray lsart = new JSONArray();
     DBTeclas dbTeclas = new DBTeclas(this);
 
@@ -48,7 +44,7 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buscador);
-        server = getIntent().getExtras().getString("url");
+        tarifa = getIntent().getExtras().getString("Tarifa");
         this.cx = this;
         TextView t = findViewById(R.id.txtBuscador);
         t.addTextChangedListener(this);
@@ -83,7 +79,7 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
 
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    View v = inflater.inflate(R.layout.btn_art, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
                     Button btn = v.findViewById(R.id.boton_art);
@@ -95,15 +91,12 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                     String[] rgb = m.getString("RGB").split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            JSONObject art = (JSONObject) view.getTag();
-                            Intent it = getIntent();
-                            it.putExtra("art", art.toString());
-                            setResult(RESULT_OK, it);
-                            finish();
-                        }
+                    btn.setOnClickListener(view -> {
+                        JSONObject art = (JSONObject) view.getTag();
+                        Intent it = getIntent();
+                        it.putExtra("art", art.toString());
+                        setResult(RESULT_OK, it);
+                        finish();
                     });
                     row.addView(v, rowparams);
 
@@ -118,7 +111,7 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
             }
 
         } catch (Exception e) {
-            Log.e("cagada", e.getMessage());
+             e.printStackTrace();
         }
 
 
@@ -141,9 +134,10 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                         e.printStackTrace();
                     }
                     String str = charSequence.toString();
-                    lsart = dbTeclas.filter("Nombre LIKE '%"+ str +"%'");
+                    Log.i("tarifa", tarifa);
+                    lsart = dbTeclas.findLike(str, tarifa);
                     handlerBusqueda.sendEmptyMessage(0);
-                });
+                }).start();
 
             } catch (Exception e) {
                 e.printStackTrace();

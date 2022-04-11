@@ -1,7 +1,6 @@
 package com.valleapp.comandas;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,30 +8,34 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.view.Gravity;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.utilidades.ActivityBase;
 import com.valleapp.comandas.utilidades.HTTPRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MostrarPedidos extends Activity {
+
+public class MostrarPedidos extends ActivityBase {
 
     String server;
     JSONObject mesa;
-    JSONObject zn;
     DBCuenta dbCuenta;
     Context cx;
+    boolean pause = false;
 
 
     @SuppressLint("HandlerLeak")
@@ -48,27 +51,29 @@ public class MostrarPedidos extends Activity {
                     e.printStackTrace();
                 }
             }else{
-                Toast toast= Toast.makeText(getApplicationContext(),
-                        "Peticion enviadaaaa", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-                toast.show();
+                mostrarToast("Peticion envidada....");
             }
         }
     };
 
     private void rellenarPedido() {
 
-          try{
-              JSONArray lineas = dbCuenta.filter("IDMesa = "+mesa.getString("ID"));
-              LinearLayout ll = findViewById(R.id.pneListado);
-              ll.removeAllViews();
+        try{
+            JSONArray lineas = dbCuenta.filterByPedidos("IDMesa = "+mesa.getString("ID"));
 
-              if(lineas.length()>0){
+            LinearLayout ll = findViewById(R.id.pneListado);
+            ll.removeAllViews();
+
+            if(lineas.length()>0){
+
+                DisplayMetrics metrics = getResources().getDisplayMetrics();
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    (int) (metrics.density * 50f));
 
                 params.setMargins(5,0,5,0);
+
 
                 for (int i = 0; i < lineas.length(); i++) {
 
@@ -95,7 +100,9 @@ public class MostrarPedidos extends Activity {
 
                     ll.addView(v, params);
                 }
-           }
+            }else {
+                finish();
+            }
 
         }catch (Exception e){
            e.printStackTrace();
@@ -103,7 +110,7 @@ public class MostrarPedidos extends Activity {
 
     }
 
-
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,14 +130,30 @@ public class MostrarPedidos extends Activity {
     @Override
     protected void onResume() {
         try{
-            ContentValues p = new ContentValues();
-            p.put("mesa_id", mesa.getString("ID"));
-            new HTTPRequest(server +"/cuenta/get_cuenta", p, "actualizar", handlerHttp);
             rellenarPedido();
+            String idm = mesa.getString("ID");
+            if(!pause) {
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ContentValues p = new ContentValues();
+                        p.put("mesa_id", idm);
+                        new HTTPRequest(server + "/cuenta/get_cuenta", p, "actualizar", handlerHttp);
+                    }
+                }, 1000);
+            }
+            pause = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
         super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        pause = true;
+        super.onPause();
     }
 
     public void clickPedir(View v){
@@ -145,7 +168,6 @@ public class MostrarPedidos extends Activity {
             e.printStackTrace();
         }
     }
-
 
     public void clickCambiar(View v){
         JSONObject m = (JSONObject)v.getTag();

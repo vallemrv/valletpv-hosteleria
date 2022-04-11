@@ -25,6 +25,26 @@ class PeticionesAutoria(models.Model):
     accion = models.CharField(max_length=150)
     instrucciones = models.CharField(max_length=300)
 
+    class Meta:
+        ordering = ['-id']
+
+    def save(self, *args, **kwargs):
+        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
+        if not sync:
+            sync = Sync()
+        sync.nombre = self._meta.db_table
+        sync.save()
+        return super().save(*args, **kwargs)
+        
+
+    def delete(self, *args, **kwargs):
+        sync = Sync.objects.filter(nombre=self._meta.db_table).first()
+        if not sync:
+            sync = Sync()
+        sync.nombre = self._meta.db_table
+        sync.save()
+        return super().delete( *args, **kwargs)
+
 class Sync(models.Model):
     nombre = models.CharField(max_length=50) 
     last = models.CharField(max_length=26)
@@ -34,11 +54,10 @@ class Sync(models.Model):
         sync = Sync.objects.filter(nombre=tb_name).first()
         if not sync:
             sync = Sync()
-        sync.nombre = tb_name
+        sync.nombre = tb_name.lower()
         sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         sync.save()
         
-
 class Arqueocaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre')  # Field name made lowercase.
@@ -123,7 +142,6 @@ class Arqueocaja(models.Model):
 
         return ex
 
-
 class Camareros(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=100)  # Field name made lowercase.
@@ -176,7 +194,6 @@ class Camareros(models.Model):
     class Meta:
         db_table = 'camareros'
         ordering = ["apellidos"]
-
 
 class Cierrecaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -255,8 +272,7 @@ class Cierrecaja(models.Model):
                    'Total': r[2],
                    })
         return lineas
-    
-
+ 
 class Efectivo(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo')  # Field name made lowercase.
@@ -416,9 +432,11 @@ class Lineaspedido(models.Model):
                     'Nombre': l.nombre,
                     'IDMesa': m.mesa.pk,
                     'nomMesa': m.mesa.nombre,
-                    'IDZona': m.mesa.zonas_set.all().first().pk
+                    'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
+                    'servido': Servidos.objects.filter(linea__pk=l.pk).count()
                 }
                 lineas.append(obj)
+                
         return lineas
 
     def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
@@ -445,6 +463,7 @@ class Lineaspedido(models.Model):
            
             if num <= 0:
                 Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+                Sync.actualizar(Mesasabiertas._meta.db_table)
 
         return num
 
@@ -766,18 +785,26 @@ class Secciones(models.Model):
 
 ICON_CHOICES = (
     ("bar", "Bar"),
-    ("bebida", "Bebida"),
-    ("bocadillos", "Bocadillos"),
+    ("bocadillo", "Bocadillo"),
     ("carne", "Carne"),
-    ("comida", "Comidas"),
-    ("desayunos", "Desayunos"),
-    ("meriendas", "Meriendas"),
-    ("pasteles", "Pasteles"),
-    ("pescado", "Pescados"),
-    ("tapas", "Tapas"),
-    ("pizzas", "Pizzas"),
-    ("tartas", "Tartas"),
-    ("copas", "Copas"),
+    ("cocktel", "Cocktel"),
+    ("copa_con_limon", "Copa con rodaja de limon"),
+    ("copa_vino", "Copa de vino"),
+    ("cubalibre", "Cubalibre"),
+    ("donut", "Donut"),
+    ("jarra_cerveza", "Jarra de cerveza"),
+    ("llevar", "Icono para llevar"),
+    ("magdalena", "Magdalena"),
+    ("menu", "Menu"),
+    ("pescado", "Pescado"),
+    ("pincho", "Pincho"),
+    ("pizza", "Pizza"),
+    ("plato", "Plato humeante"),
+    ("plato_combinado", "Plato combinado"),
+    ("sopa", "Plato sopa"),
+    ("sopa_cuchara", "Plato sopa con cuchara"),
+    ("tarta", "Tarta"),
+    ("taza_cafe", "Taza cafe"),
 )
 
 
@@ -786,7 +813,7 @@ class SeccionesCom(models.Model):
     nombre = models.CharField(db_column='Nombre', max_length=11)  # Field name made lowercase.
     es_promocion = models.BooleanField(db_column='Es_promocion', blank=True, null=True, default="False")
     descuento = models.DecimalField(db_column='Descuento', blank=True, null=True, max_digits=4, decimal_places=2, default='0')
-    icono = models.CharField(db_column='Icono', max_length=11, choices=ICON_CHOICES, default="bar")
+    icono = models.CharField(db_column='Icono', max_length=15, choices=ICON_CHOICES, default="bar")
 
     @staticmethod
     def update_for_devices():
@@ -1122,6 +1149,7 @@ class Ticket(models.Model):
             numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
             if numart <= 0:
                 Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+                Sync.actualizar(Mesasabiertas._meta.db_table)
 
         return (numart, total, id)
 

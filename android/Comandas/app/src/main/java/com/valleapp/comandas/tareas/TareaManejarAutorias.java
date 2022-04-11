@@ -32,10 +32,12 @@ public class TareaManejarAutorias extends TimerTask {
         public void handleMessage(@NonNull Message msg) {
             try {
                 String res = msg.getData().getString("RESPONSE");
-                JSONArray l = new JSONArray(res);
-                if(l.length() != autorizacionesSize){
-                    autorizacionesSize = l.length();
-                    if(mainHandler != null) mainHandler.handleMessage(msg);
+                if(res != null && res != "") {
+                    JSONArray l = new JSONArray(res);
+                    if (l.length() != autorizacionesSize) {
+                        autorizacionesSize = l.length();
+                        if (mainHandler != null) mainHandler.handleMessage(msg);
+                    }
                 }
             }catch (Exception e){
                 e.printStackTrace();

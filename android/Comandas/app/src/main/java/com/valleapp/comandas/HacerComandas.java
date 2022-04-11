@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +31,7 @@ import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBSecciones;
 import com.valleapp.comandas.db.DBSubTeclas;
 import com.valleapp.comandas.db.DBTeclas;
+import com.valleapp.comandas.utilidades.ActivityBase;
 import com.valleapp.comandas.utilidades.Instruccion;
 import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.interfaces.IComanda;
@@ -42,7 +45,7 @@ import com.valleapp.comandas.pestañas.SeccionesCom;
 import com.valleapp.comandas.utilidades.ServicioCom;
 
 
-public class HacerComandas extends FragmentActivity implements  INota, IComanda, ITeclados {
+public class HacerComandas extends ActivityBase implements  INota, IComanda, ITeclados {
 
     private AdaptadorComanda aComanda;
     private Comanda comanda = null;
@@ -58,7 +61,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
     JSONObject cam = null;
     JSONObject mesa = null;
 
-    int can =1;
+    int can = 1;
     int tarifa = 1;
 
     JSONObject sec = null;
@@ -78,9 +81,25 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if (myServicio != null){
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
-                dbSecciones = (DBSecciones) myServicio.getDb("seccionescom");
+                dbSecciones = (DBSecciones) myServicio.getDb("secciones_com");
                 dbTeclas = (DBTeclas) myServicio.getDb("teclas");
                 dbSubTeclas = (DBSubTeclas) myServicio.getDb("subteclas");
+                comanda = new Comanda((IComanda) cx);
+                seccionesCom = new SeccionesCom((ITeclados) cx, dbSecciones.getAll());
+                aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
+
+                ViewPager vpPager = findViewById(R.id.pager);
+                TextView title = findViewById(R.id.lblTitulo);
+
+                vpPager.setAdapter(aComanda);
+                try {
+                    title.setText(cam.getString("Nombre") + " -- " + mesa.getString("Nombre"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                cargarPreferencias();
             }
         }
 
@@ -89,7 +108,6 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
             myServicio = null;
         }
     };
-
 
 
     public  void cargarNota(){
@@ -102,7 +120,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
             if(!pref.isNull("sec")) {
-                sec = dbSecciones.filter("nombre = "+pref.getString("sec")).getJSONObject(0);
+                sec = dbSecciones.filter("Nombre = '"+pref.getString("sec")+"'").getJSONObject(0);
             }else{
                 sec = dbSecciones.getAll().optJSONObject(0);
             }
@@ -112,7 +130,6 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
         }
 
     }
-
 
     public void rellenarComanda() {
         List<JSONObject> lPedidos = new ArrayList<>();
@@ -134,83 +151,83 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
 
     public void rellenarBotonera() {
         try {
+            if (dbTeclas != null) {
+                JSONArray lsart = dbTeclas.getAll(sec.getString("ID"), tarifa);
 
-            JSONArray lsart = dbTeclas.getAll(sec.getString("Nombre"), tarifa);
+                if (lsart.length() > 0) {
 
-            if (lsart.length() > 0) {
+                    LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
+                    ll.removeAllViews();
 
-                LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
-                ll.removeAllViews();
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-                params.weight = 1;
-
-
-                LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-                rowparams.weight= 1;
-                rowparams.setMargins(5,5,5,5);
+                    params.weight = 1;
 
 
-                LinearLayout row = new LinearLayout(cx);
-                row.setOrientation(LinearLayout.HORIZONTAL);
+                    LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-                ll.addView(row, params);
-
-
-                for (int i = 0; i < lsart.length(); i++) {
-
-                    final JSONObject a = lsart.getJSONObject(i);
-
-                    LayoutInflater inflater = (LayoutInflater) cx.getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-                    View v = inflater.inflate(R.layout.btn_art, null);
-
-                    Button btn = v.findViewById(R.id.boton_art);
-                    String[] rgb = a.getString("RGB").split(",");
-
-                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
-                    btn.setId(i);
-                    btn.setSingleLine(false);
-
-                    String nombre = "";
-
-                    if(sec.getBoolean("es_promocion")){
-                         if(!es_aplicable) btn.setBackgroundResource(R.drawable.bg_red);
-                         else{
-                             Double precio = a.getDouble("Precio");
-                             Double descuento = sec.getDouble("descuento");
-                             a.put("Precio",precio*descuento);
-                         }
-                    }
-
-                    nombre = a.getString("Nombre");
-                    btn.setText(nombre.trim());
-                    btn.setTag(new JSONObject(a.toString()));
+                    rowparams.weight = 1;
+                    rowparams.setMargins(5, 5, 5, 5);
 
 
-                    btn.setOnClickListener(view -> {
-                        JSONObject art = (JSONObject) view.getTag();
-                        pedirArt(art);
-                    });
+                    LinearLayout row = new LinearLayout(cx);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
 
-                    row.addView(v, rowparams);
+                    ll.addView(row, params);
 
-                    if ((i<lsart.length()-1) && ((i + 1) % 3) == 0) {
-                        row = new LinearLayout(cx);
-                        row.setOrientation(LinearLayout.HORIZONTAL);
-                        ll.addView(row, params);
+
+                    for (int i = 0; i < lsart.length(); i++) {
+
+                        final JSONObject a = lsart.getJSONObject(i);
+
+                        LayoutInflater inflater = (LayoutInflater) cx.getSystemService
+                                (Context.LAYOUT_INFLATER_SERVICE);
+                        View v = inflater.inflate(R.layout.btn_art, null);
+
+                        Button btn = v.findViewById(R.id.boton_art);
+                        String[] rgb = a.getString("RGB").split(",");
+
+                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                        btn.setId(i);
+                        btn.setSingleLine(false);
+
+                        String nombre = "";
+
+                        if (sec.getBoolean("es_promocion")) {
+                            if (!es_aplicable) btn.setBackgroundResource(R.drawable.bg_red);
+                            else {
+                                Double precio = a.getDouble("Precio");
+                                Double descuento = sec.getDouble("descuento");
+                                a.put("Precio", precio * descuento);
+                            }
+                        }
+
+                        nombre = a.getString("Nombre");
+                        btn.setText(nombre.trim());
+                        btn.setTag(new JSONObject(a.toString()));
+
+
+                        btn.setOnClickListener(view -> {
+                            JSONObject art = (JSONObject) view.getTag();
+                            pedirArt(art);
+                        });
+
+                        row.addView(v, rowparams);
+
+                        if ((i < lsart.length() - 1) && ((i + 1) % 3) == 0) {
+                            row = new LinearLayout(cx);
+                            row.setOrientation(LinearLayout.HORIZONTAL);
+                            ll.addView(row, params);
+                        }
                     }
                 }
+
             }
-
-
-        } catch (Exception e) {
-           e.printStackTrace();
-        }
+            } catch(Exception e){
+                e.printStackTrace();
+            }
 
 
     }
@@ -228,11 +245,12 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
                 ll.removeAllViews();
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-
+                DisplayMetrics metrics = getResources().getDisplayMetrics();
                 LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 0.33f);
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        (int) (metrics.density * 100));
 
                 rowparams.weight = 1;
                 rowparams.setMargins(5,5,5,5);
@@ -257,7 +275,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
                     btn.setSingleLine(false);
                     btn.setText(m.getString("Nombre"));
                     btn.setOnClickListener(view -> addSug((JSONObject)view.getTag()));
-
+                    btn.setBackgroundResource(R.drawable.bg_pink);
                     row.addView(v, rowparams);
 
                     if ((i<lsart.length()-1) && ((i + 1) % 3) == 0) {
@@ -278,11 +296,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
     private void addSug(JSONObject sub){
 
         try {
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    sub.getString("Nombre"), Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
-
+            mostrarToast(sub.getString("Nombre"));
             String nom = this.artSel.getString("Nombre");
             String sug = sub.getString("Nombre");
             Double precio = this.artSel.getDouble("Precio")+ sub.getDouble("Incremento");
@@ -298,11 +312,8 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
 
     private void pedirArt(JSONObject art) {
         try {
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    art.getString("Nombre"), Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
 
+            mostrarToast(art.getString("Nombre"));
             if(art.getString("tipo").equals("SP")){
                 nota.addArt(art,can);
             }else{
@@ -316,7 +327,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
     }
 
     public void clickMenu(View v) throws JSONException {
-        sec = dbSecciones.filter("nombre = "+v.getTag().toString()).getJSONObject(0);
+        sec = dbSecciones.filter("Nombre = '"+v.getTag().toString()+"'").getJSONObject(0);
         rellenarBotonera();
     }
 
@@ -333,7 +344,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
           p.put("idc",cam.getString("ID"));
           p.put("mensaje", comanda.getMensaje());
           if(myServicio!=null){
-              myServicio.addColaInstrucciones(new Instruccion(p, "/comanda/pedir"));
+              myServicio.addColaInstrucciones(new Instruccion(p, server+"/comandas/pedir"));
               nota.EliminarComanda();
               dbMesas.abrirMesa(mesa.getString("ID"), "0");
               finish();
@@ -357,7 +368,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
 
     public void clickBuscarArticulo(View v){
         Intent intent = new Intent(cx, BuscadorTeclas.class);
-        intent.putExtra("url", server);
+        intent.putExtra("Tarifa", String.valueOf(tarifa));
         startActivityForResult(intent, 100);
     }
 
@@ -367,10 +378,7 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
             JSONObject pref = json.deserializar("preferencias.dat", this);
             pref.put("sec",view.getTag().toString());
             json.serializar("preferencias.dat", pref, cx);
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    "Asocicion realizada", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
+            mostrarToast("Asociacion realizada");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -385,35 +393,19 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
         cantidad = findViewById(R.id.linear_layout);
         infPedio = findViewById(R.id.lblPedido);
 
-        comanda = new Comanda(this);
-        seccionesCom = new SeccionesCom(this, dbSecciones.getAll());
-        aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
-
         cx = this;
-
-
-        ViewPager vpPager = findViewById(R.id.pager);
-        TextView title = findViewById(R.id.lblTitulo);
-
-        vpPager.setAdapter(aComanda);
-
-        cargarPreferencias();
-
 
         try {
 
             server = getIntent().getExtras().getString("url");
             cam = new JSONObject(getIntent().getExtras().getString("cam"));
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
-            title.setText(cam.getString("Nombre") + " " + cam.getString("Apellidos") + " -- " + mesa.getString("Nombre"));
             tarifa = mesa.getInt("Tarifa");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 
     @Override
     protected void onResume() {
@@ -436,7 +428,6 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
             if(resultCode == RESULT_OK){
                try{
                    JSONObject art = new JSONObject(data.getStringExtra("art"));
-                   art.put("Precio", tarifa==1 ? art.getString("P1") : art.getString("P2"));
                    nota.addArt(art, can);
                    } catch (JSONException e) {
                      e.printStackTrace();
@@ -463,4 +454,6 @@ public class HacerComandas extends FragmentActivity implements  INota, IComanda,
         es_aplicable = !es_aplicable;
         rellenarBotonera();
     }
+
+
 }

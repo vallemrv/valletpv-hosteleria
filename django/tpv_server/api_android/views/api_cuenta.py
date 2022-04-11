@@ -14,7 +14,7 @@ from django.db import connection
 from api_android.tools import (send_imprimir_ticket, send_update_ws,
                                get_descripcion_ticket)
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
-                            Infmesa, Ticket, Ticketlineas, Historialnulos)
+                            Infmesa, Servidos, Sync, Ticket, Ticketlineas, Historialnulos)
 from datetime import datetime
 from uuid import uuid4
 import json
@@ -42,7 +42,8 @@ def get_cuenta(request):
                 'Nombre': l.nombre,
                 'IDMesa': mesa.pk,
                 'nomMesa': mesa.nombre,
-                'IDZona': mesa.zonas_set.all().first().pk
+                'IDZona': mesa.mesaszona_set.all().first().zona.pk,
+                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
             }
             lstArt.append(obj)
 
@@ -114,7 +115,9 @@ def mvlinea(request):
 
          numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__uid=uid)).count()
          if numart<=0:
-             Mesasabiertas.objects.filter(infmesa__uid=uid).delete()
+            Mesasabiertas.objects.filter(infmesa__uid=uid).delete()
+            Sync.actualizar(Mesasabiertas._meta.db_table)
+            
 
         #enviar notficacion de update
          update = {

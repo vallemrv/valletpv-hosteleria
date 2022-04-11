@@ -9,7 +9,7 @@ from tokenapi.http import JsonResponse, JsonError, HttpResponse
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.shortcuts import render, reverse
-from gestion.models import SeccionesCom, Teclascom, Teclas
+from gestion.models import SeccionesCom, Sync, Teclascom, Teclas
 from gestion.forms import SeccionesComForm,  TeclascomForm, TeclasForm
 from app.utility import rgbToHex
 from django.contrib.auth.decorators import login_required

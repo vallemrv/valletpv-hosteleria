@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +32,7 @@ import org.json.JSONObject;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBZonas;
+import com.valleapp.comandas.utilidades.ActivityBase;
 import com.valleapp.comandas.utilidades.Instruccion;
 import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.interfaces.IPedidos;
@@ -42,14 +41,17 @@ import com.valleapp.comandas.pestañas.ListaMesas;
 import com.valleapp.comandas.pestañas.Pedidos;
 import com.valleapp.comandas.utilidades.ServicioCom;
 
+import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class Mesas extends FragmentActivity implements View.OnLongClickListener, IPedidos {
 
-    private AdaptadorMesas adaptadorMesas;
+public class Mesas extends ActivityBase implements View.OnLongClickListener, IPedidos {
+
     private ListaMesas listaMesas = null;
     private Pedidos pedidos = null;
 
-    private String server = "";
+
     int presBack = 0;
 
     DBMesas dbMesas;
@@ -59,9 +61,8 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
     JSONObject cam = null;
     JSONObject zn = null;
 
-    final Context cx = this;
+    JSONArray peticiones = new JSONArray();
 
-    ServicioCom myServicio;
 
 
     private final Handler handlerMesas = new Handler(Looper.getMainLooper()) {
@@ -70,36 +71,58 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
         }
     };
 
-
     private final Handler handlerOperaciones = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            if (op.equals("exit")){
-                 finish();
-            } else if(op.equals("pedidos")) {
-                try {
-                    dbCuenta.atualizarDatos(new JSONArray(res));
-                    rellenarPedido();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }else if (op.equals("servido")){
-                Toast toast= Toast.makeText(getApplicationContext(),
-                        "Pedido servdio...", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-                toast.show();
-            }else if (op.equals("reenviar")){
-                Toast toast= Toast.makeText(getApplicationContext(),
-                        "Peticion enviadaaaa", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-                toast.show();
+            switch (op) {
+                case "exit":
+                    finish();
+                    break;
+                case "pedidos":
+                    try {
+                        dbCuenta.atualizarDatos(new JSONArray(res));
+                        rellenarPedido();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "servido":
+                    mostrarToast("Articulos servidos");
+                    break;
+                case "reenviar":
+                    mostrarToast("Peticion enviadaaa");
+                    break;
+                case "mostrarmesas":
+                    rellenarZonas();
+                    findViewById(R.id.loading).setVisibility(View.GONE);
+                    break;
+                case "autorias":
+                    try {
+                        peticiones = new JSONArray(res);
+                        manejarAurotias();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
     };
 
+    private void manejarAurotias() {
+           View v = findViewById(R.id.show_autorias);
+           int numPeticiones = peticiones.length();
+            if(numPeticiones>0) {
+                v.setVisibility(View.VISIBLE);
+                TextView t = findViewById(R.id.txt_num_autorias);
+                t.setText(String.valueOf(numPeticiones));
+            }else{
+                v.setVisibility(View.GONE);
+            }
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    }
+
+    private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
@@ -108,7 +131,24 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
-                rellenarZonas();
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Message msg = handlerOperaciones.obtainMessage();
+                        Bundle b = msg.getData();
+                        if (b == null) b = new Bundle();
+                        b.putString("op", "mostrarmesas");
+                        msg.setData(b);
+                        handlerOperaciones.sendMessage(msg);
+                    }
+                },1000);
+                try {
+                    myServicio.initTimerAutorias(handlerOperaciones, cam.getString("ID"),
+                            server+"/autorizaciones/get_lista_autorizaciones");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
@@ -119,17 +159,15 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
         }
     };
 
-
     private void rellenarPedido() {
-
         try{
 
-            JSONArray lineas = dbCuenta.filter("IDZona = "+ zn.getString("ID"));
+            JSONArray lineas = dbCuenta.filterByPedidos("IDZona = "+ zn.getString("ID") +
+                     "  AND servido = 0");
 
             pedidos.vaciarPanel();
 
             if(lineas.length()>0){
-
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -138,16 +176,15 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
 
                  for (int i = 0; i < lineas.length(); i++) {
                    JSONObject  art =  lineas.getJSONObject(i);
-                   pedidos.addLinea(art,params,this,this);
+                   pedidos.addLinea(art, params,this,this);
                  }
             }
+
 
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
-
 
     private void rellenarZonas() {
         try {
@@ -185,13 +222,10 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
                     btn.setOnClickListener(view -> {
                             zn = (JSONObject)view.getTag();
                             rellenarMesas();
-                            getPendientes();
                     });
                     ll.addView(btn, params);
                 }
-
                 rellenarMesas();
-                getPendientes();
             }
 
         }catch (Exception e){
@@ -203,8 +237,10 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
     private void rellenarMesas() {
         try {
 
-            JSONArray lsmesas = dbMesas.getAll(zn.getString("ID")) ;
+            String idz = zn.getString("ID");
+            JSONArray lsmesas = dbMesas.getAll(idz) ;
             listaMesas.clearTable();
+
             if(lsmesas.length()>0){
 
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
@@ -241,7 +277,6 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
                         inicializarBtnAux(btnC, btnCm, btnLs, m);
                     }
 
-                    //m.put("Tarifa", m.getString("Tarifa"));
 
                     Button btn = v.findViewById(R.id.btnMesa);
                     btn.setId(i);
@@ -250,17 +285,22 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
                     btn.setTextSize(15);
                     btn.setTag(m);
 
-
                     String[] rgb = m.getString("RGB").trim().split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
 
                     btn.setOnClickListener(view -> {
-                            JSONObject m1 = (JSONObject)view.getTag();
+                        try {
+                            JSONObject m1 = (JSONObject) view.getTag();
+                            m1.put("Tarifa", zn.getString("Tarifa"));
                             Intent intent = new Intent(cx, HacerComandas.class);
                             intent.putExtra("op", "m");
                             intent.putExtra("cam", cam.toString());
                             intent.putExtra("mesa", m1.toString());
+                            intent.putExtra("url", server);
                             startActivity(intent);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     });
 
                     row.addView(v, rowparams);
@@ -270,7 +310,11 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
                         row = new TableRow(cx);
                         listaMesas.addView(row, params);
                     }
+
                 }
+
+                rellenarPedido();
+                getPendientes();
             }
 
         }catch (Exception e){
@@ -289,19 +333,27 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
     }
 
     public void getPendientes(){
-        try {
-            if (zn != null) {
-                ContentValues p = new ContentValues();
-                p.put("idz", zn.getString("ID"));
-                myServicio.addColaInstrucciones(new Instruccion(p,
-                        server+"/pedidos/getpendientes",
-                        handlerOperaciones, "pedidos"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
 
+                    if (zn != null) {
+                        ContentValues p = new ContentValues();
+                        p.put("idz", zn.getString("ID"));
+                        myServicio.addColaInstrucciones(new Instruccion(p,
+                                server + "/pedidos/getpendientes",
+                                handlerOperaciones, "pedidos"));
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 5000);
+
+    }
 
     public void clickServido(View v){
         try {
@@ -309,9 +361,10 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
             ContentValues p = new ContentValues();
             p.put("art", obj.toString());
             p.put("idz", zn.getString("ID"));
-            myServicio.addColaInstrucciones(new Instruccion(p,
-                    server+"/pedidos/servido",
-                    handlerMesas, "servido"));
+            myServicio.addColaInstrucciones(new Instruccion(p, server+"/pedidos/servido"));
+            dbCuenta.artServido(obj);
+            rellenarPedido();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -323,7 +376,6 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
         intent.putExtra("mesa", v.getTag().toString());
         startActivity(intent);
      }
-
 
     public void clickCambiarMesa(View v){
         Intent intent = new Intent(cx, OpMesas.class);
@@ -367,6 +419,13 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
         startActivity(intent);
     }
 
+    public void mostrarAutorias(View v){
+        Intent i = new Intent(cx, Autorias.class);
+        i.putExtra("url", server);
+        i.putExtra("peticiones", peticiones.toString());
+        startActivity(i);
+
+    }
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -376,7 +435,7 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
 
         pedidos = new Pedidos();
         listaMesas = new ListaMesas();
-        adaptadorMesas = new AdaptadorMesas(getSupportFragmentManager(), listaMesas, pedidos);
+        AdaptadorMesas adaptadorMesas = new AdaptadorMesas(getSupportFragmentManager(), listaMesas, pedidos);
 
 
         ViewPager vpPager = findViewById(R.id.pager);
@@ -388,12 +447,12 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
             cam = new JSONObject(getIntent().getExtras().getString("cam"));
             TextView title = findViewById(R.id.lblTitulo);
             title.setText(cam.getString("Nombre"));
+            findViewById(R.id.show_autorias).setVisibility(View.GONE);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
 
     @Override
     protected void onDestroy() {
@@ -411,11 +470,10 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
         if(presBack>=1) {
             super.onBackPressed();
         }else{
-            Toast.makeText(getApplicationContext(),"Pulsa otra vez para salir", Toast.LENGTH_SHORT).show();
+            mostrarToast("Pulsa otra vez para salir", Gravity.BOTTOM, 0, 80);
             presBack++;
         }
     }
-
 
     @Override
     public boolean onLongClick(View view) {
@@ -428,21 +486,15 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
               if(pref.getString("zn").equals(view.getTag().toString())){
                   pref.remove("zn");
               }else pref.put("zn", view.getTag().toString());
-
             }
             json.serializar("preferencias.dat", pref, cx);
-
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    "Asocicion realizada", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
+            mostrarToast("Asocioacion realizada");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-
 
     @Override
     protected void onResume() {
@@ -469,6 +521,5 @@ public class Mesas extends FragmentActivity implements View.OnLongClickListener,
             e.printStackTrace();
         }
     }
-
 
 }

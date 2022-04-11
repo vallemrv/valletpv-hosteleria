@@ -19,7 +19,6 @@ public class DBMesasAbiertas implements IBaseDatos {
         this.db = db;
     }
 
-
     @Override
     public void resetFlag(int id) {
         db.resetFlag(id);
@@ -53,5 +52,10 @@ public class DBMesasAbiertas implements IBaseDatos {
             e.printStackTrace();
         }
         db.close();
+    }
+
+    @Override
+    public void inicializar() {
+        db.inicializar();
     }
 }

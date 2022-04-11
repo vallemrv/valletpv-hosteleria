@@ -26,9 +26,9 @@ def get_lista_autorizaciones(request):
             camarero = Camareros.objects.get(id=inst["idc"])
             mesa = Mesas.objects.get(id=inst["idm"])
             motivo = inst["motivo"]
-            mensajes.append(camarero.nombre+ " "
+            mensajes.append({"tipo": "peticion", "idpeticion": p.pk, "mensaje":camarero.nombre+ " "
             + camarero.apellidos+" solicita permiso para borrar la mesa completa "
-            + mesa.nombre +" por el motivo:  "+ motivo)
+            + mesa.nombre +" por el motivo:  "+ motivo})
         elif p.accion == "borrar_linea":
             inst = json.loads(p.instrucciones)
             camarero = Camareros.objects.get(id=inst["idc"])
@@ -36,9 +36,11 @@ def get_lista_autorizaciones(request):
             nombre = inst["Nombre"]
             can = inst["can"]
             motivo = inst["motivo"]
-            mensajes.append(camarero.nombre+ " "
+            mensajes.append({"tipo": "peticion", "idpeticion": p.pk, "mensaje":camarero.nombre+ " "
             + camarero.apellidos+" solicita permiso para borrar " + can +" "+nombre + " de la mesa "
-            + mesa.nombre +" por el motivo:  "+ motivo)
+            + mesa.nombre +" por el motivo:  "+ motivo})
+        elif p.accion == "informacion":
+            mensajes.append({"tipo": "informacion", "idpedticion": p.pk, "mensaje": inst["mensaje"]})
 
     return JsonResponse(mensajes)
 
@@ -51,11 +53,10 @@ def gestionar_peticion(request):
     if aceptada == "1":
         inst = json.loads(p.instrucciones)
         if p.accion == "borrar_mesa":
-            Mesasabiertas.borrar_mesa_abierta(inst["idm"], inst["idc"], inst["motivo"])
+            Mesasabiertas.borrar_mesa_abierta(int(inst["idm"]), int(inst["idc"]), inst["motivo"])
         elif p.accion == "borrar_linea":
-            Lineaspedido.borrar_linea_pedido(inst["idm", 
-                inst["Precio"], inst["idArt"], inst["can"], 
-                inst["idc"], inst["motivo"], inst["Estado"], inst["Nombre"]])
+            Lineaspedido.borrar_linea_pedido(int(inst["idm"]), inst["Precio"], int(inst["idArt"]), int(inst["can"]), 
+                int(inst["idc"]), inst["motivo"], inst["Estado"], inst["Nombre"])
 
     p.delete()
         

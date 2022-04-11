@@ -6,10 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,15 +15,11 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+public class DBSecciones extends DBBase {
 
 
     public DBSecciones(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -47,14 +39,21 @@ public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    public JSONArray getAll()
+    {
+       return  filter(null);
+    }
 
 
     @SuppressLint("Range")
-    public JSONArray getAll()
-    {
+    @Override
+    public JSONArray filter(String cWhere) {
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM secciones ORDER BY orden DESC" , null );
+        if (cWhere != null){
+            cWhere = " WHERE "+ cWhere;
+        }else cWhere = "";
+        Cursor res =  db.rawQuery( "SELECT * FROM secciones " + cWhere , null );
         res.moveToFirst();
         while(!res.isAfterLast()){
             try{
@@ -74,17 +73,6 @@ public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
         }
         res.close();db.close();
         return ls;
-    }
-
-
-    @Override
-    public void resetFlag(int id) {
-
-    }
-
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
     }
 
     @Override

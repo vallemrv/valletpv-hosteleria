@@ -35,7 +35,7 @@ public class Sugerencias extends Activity implements TextWatcher {
     JSONObject art;
     Context cx;
     TextView txtSug;
-    DBSugerencias dbSugerencias;
+    DBSugerencias dbSugerencias = new DBSugerencias(this);
     JSONArray lsBusqueda = new JSONArray();
 
     @SuppressLint("HandlerLeak")

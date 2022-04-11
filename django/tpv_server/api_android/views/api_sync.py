@@ -170,14 +170,16 @@ def update_for_devices(request):
         tbModel = Secciones
     elif t == "teclas":
         tbModel = Teclas
-    elif t == "cuenta":
+    elif t in ["cuenta", "lineaspedido"]:
         tbModel = Lineaspedido
     elif t == "mesasabiertas":
         tbModel = Mesasabiertas
-    elif t == "seccionescom":
+    elif t in  ["seccionescom", "secciones_com"]:
         tbModel = SeccionesCom
     elif t == "sugerencias":
         tbModel = Sugerencias
+    elif t == "subteclas":
+        tbModel = Subteclas
     
     
     if tbModel:
@@ -191,8 +193,7 @@ def update_for_devices(request):
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()
 
-    
-   
+
     return JsonResponse(
         {"nombre": t, 
         "last": tb_sync.last, 
@@ -209,11 +210,6 @@ def update_from_devices(request):
         tbs.append(tb)
         for row in rows:
             Camareros.update_from_device(row)
-
-  
-
-    
-   
     
     return JsonResponse(
          {"tb": tb, 

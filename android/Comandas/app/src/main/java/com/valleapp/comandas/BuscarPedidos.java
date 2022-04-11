@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
                 myServicio = ((ServicioCom.MyBinder) iBinder).getService();
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
 
+
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -66,6 +68,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
     @SuppressLint("HandlerLeak")
     private final Handler handelerBusqueda = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
+
             rellenarLista();
         }
     };
@@ -93,6 +96,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
         p.put("art", objSel.toString());
         p.put("idz", objSel.getString("IDZona"));
         myServicio.addColaInstrucciones(new Instruccion(p, server + "/pedidos/servido"));
+        dbCuenta.artServido(objSel);
         lPedidos.remove(objSel);
         rellenarLista();
     }
@@ -127,9 +131,9 @@ public class BuscarPedidos extends Activity implements TextWatcher {
                       e.printStackTrace();
                   }
                   String str = charSequence.toString();
-                  lPedidos = dbCuenta.filterList("Nombre LIKE '%"+ str +"%'");
+                  lPedidos = dbCuenta.filterList("Nombre LIKE '%"+ str +"%' AND servido = 0");
                   handelerBusqueda.sendEmptyMessage(0);
-              });
+              }).start();
 
           } catch (Exception e) {
               e.printStackTrace();

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="pink">#cfb6d4</color>
+    <color name="pink_transparent">#aacfb6d4</color>
     <color name="pink_pressed">#b097be</color>
     <color name="black_semi_transparent">#B2000000</color>
     <color name="red">#FB6664</color>
     <color name="red_press">#FC1310</color>
+    <color name="white">#FFFFF5</color>
 </resources>

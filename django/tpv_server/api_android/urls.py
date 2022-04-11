@@ -21,6 +21,6 @@ urlpatterns = [
     path('sugerencias/', include("api_android.set_urls.sugerencias"), name="api_android_sugerencias"),
     path('receptores/', include("api_android.set_urls.receptores"), name="api_android_receptores"),
     path("autorizaciones/", include("api_android.set_urls.autorizaciones"), name="api_android_autorizaciones"),
-    path("tests/", include("api_android.set_urls.tests"), name="api_android_autorizaciones")
+    path("tests/", include("api_android.tests.tests_urls"), name="tests")
     
 ] 

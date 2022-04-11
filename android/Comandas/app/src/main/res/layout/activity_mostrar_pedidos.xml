@@ -12,40 +12,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Mesa Z1"
+        android:text="@string/mesa_z1"
         android:id="@+id/lblMesa"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="10dp"
-        android:textSize="19dp" />
+        android:textSize="19sp" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Salir"
         android:id="@+id/btnSalir"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_width="74dp"
+        android:layout_height="32dp"
         android:layout_alignParentEnd="true"
-        android:onClick="clickSalir"/>
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginBottom="19dp"
+        android:background="@drawable/bg_pink"
+        android:minWidth="48dp"
+        android:onClick="clickSalir"
+        android:text="@string/salir" />
 
     <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnSalir"
+        android:layout_below="@+id/lblMesa"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/btnSalir"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/lblMesa">
+        android:contentDescription="@string/lista_pedidos">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/pneListado"></LinearLayout>
+            android:id="@+id/pneListado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </ScrollView>
 
 </RelativeLayout>

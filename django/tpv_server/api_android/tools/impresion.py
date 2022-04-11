@@ -33,6 +33,7 @@ def imprimir_pedido(request, id):
                 "receptor_activo": receptor.activo,
                 "camarero": camareo.nombre + " " + camareo.apellidos,
                 "mesa": mesa.nombre,
+                "mensaje": pedido.mensaje,
                 "lineas": []
             }
         l["precio"] = float(l["precio"])

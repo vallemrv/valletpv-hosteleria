@@ -6,11 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,15 +16,10 @@ import java.util.ArrayList;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
-
+public class DBCamareros extends DBBase {
 
     public DBCamareros(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -50,26 +40,31 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    public JSONArray getAll()
+    {
+        return filter(null);
+    }
 
+    @Override
     public void rellenarTabla(JSONArray camareros){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-          db.execSQL("DELETE FROM camareros");
+            db.execSQL("DELETE FROM camareros");
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-       // Insert the new row, returning the primary key value of the new row
+        // Insert the new row, returning the primary key value of the new row
         for (int i= 0 ; i < camareros.length(); i++){
             // Create a new map of values, where column names are the keys
             try {
-                 ContentValues values = new ContentValues();
-                 values.put("ID", camareros.getJSONObject(i).getInt("ID"));
-                 values.put("pass_field", camareros.getJSONObject(i).getString("Pass"));
-                 values.put("autorizado", camareros.getJSONObject(i).getString("autorizado"));
-                 values.put("nombre", camareros.getJSONObject(i).getString("Nombre") + " " + camareros.getJSONObject(i).getString("Apellidos"));
-                 values.put("permisos", camareros.getJSONObject(i).getString("permisos"));
-                 db.insert("camareros", null, values);
+                ContentValues values = new ContentValues();
+                values.put("ID", camareros.getJSONObject(i).getInt("ID"));
+                values.put("pass_field", camareros.getJSONObject(i).getString("Pass"));
+                values.put("autorizado", camareros.getJSONObject(i).getString("autorizado"));
+                values.put("nombre", camareros.getJSONObject(i).getString("Nombre") + " " + camareros.getJSONObject(i).getString("Apellidos"));
+                values.put("permisos", camareros.getJSONObject(i).getString("permisos"));
+                db.insert("camareros", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -78,11 +73,8 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
-    public JSONArray getAll()
-    {
-        return filter(null);
-    }
 
+    @Override
     @SuppressLint("Range")
     public JSONArray filter(String cWhere){
         JSONArray lscam = new JSONArray();
@@ -113,27 +105,6 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
         return lscam;
     }
-
-
-
-    public void setAutorizado(int id, Boolean a){
-        String autorizado = a ? "1" : "0";
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("autorizado", autorizado);
-        cv.put("flag", "modificado");
-        db.update("camareros",  cv, "ID="+id, null);
-        db.close();
-    }
-
-    public void resetFlag(int id){
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("flag", "");
-        db.update("camareros",  cv, "ID="+id, null);
-        db.close();
-    }
-
 
     public ArrayList<JSONObject> getAutorizados(Boolean a)
     {
@@ -168,31 +139,6 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos {
 
         }
         res.close();
-        return lscam;
-    }
-
-
-
-    public void addCamNuevo(String n, String a) {
-        try {
-            SQLiteDatabase db = getWritableDatabase();
-            ContentValues v = new ContentValues();
-            v.put("nombre", n + " " + a);
-            v.put("pass_field", "");
-            v.put("permisos", "");
-            v.put("autorizado", "1");
-            db.insert("camareros", null, v);
-            db.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public ArrayList<JSONObject> getConPermiso(String permiso) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros where permisos  LIKE '%"+permiso+"%' AND autorizado = '1'", null );
-        ArrayList<JSONObject>  lscam = cargarRegistros(res);
-        db.close();
         return lscam;
     }
 

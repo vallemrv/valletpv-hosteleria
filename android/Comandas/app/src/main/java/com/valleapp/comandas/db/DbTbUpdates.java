@@ -6,9 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 
-import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,17 +15,14 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTbUpdates extends SQLiteOpenHelper implements IBaseDatos {
+public class DbTbUpdates extends DBBase{
 
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
 
     public String tb_name = "sync";
 
 
     public DbTbUpdates(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context);
         onCreate(this.getWritableDatabase());
     }
 
@@ -46,11 +41,6 @@ public class DbTbUpdates extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    @Override
-    public void resetFlag(int id) {
-
-    }
 
     @Override
     public JSONArray filter(String cWhere) {
@@ -123,16 +113,6 @@ public class DbTbUpdates extends SQLiteOpenHelper implements IBaseDatos {
     }
 
 
-    public void vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM "+tb_name);
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
-
     public boolean is_updatable(JSONObject obj) {
         boolean isUp = true;
         SQLiteDatabase db = null;
@@ -181,7 +161,7 @@ public class DbTbUpdates extends SQLiteOpenHelper implements IBaseDatos {
     }
 
     public void setLast(String tb, String last) {
-        SQLiteDatabase db = null;
+        SQLiteDatabase db;
         try{
             db = getWritableDatabase();
             ContentValues v = new ContentValues();

@@ -590,7 +590,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             final Button error =  dlg.findViewById(R.id.btnError);
             final Button simpa =  dlg.findViewById(R.id.btnSimpa);
             final Button inv = dlg.findViewById(R.id.btnInv);
-            final Button ok =  dlg.findViewById(R.id.btnOk);
+            final ImageButton ok =  dlg.findViewById(R.id.btnOk);
             final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
             final ImageButton exit =  dlg.findViewById(R.id.btnSalir);
 

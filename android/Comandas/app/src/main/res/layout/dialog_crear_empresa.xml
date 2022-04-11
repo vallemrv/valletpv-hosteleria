@@ -17,11 +17,11 @@
         android:id="@+id/txt_nombre_empresa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:layout_marginBottom="5dip"
-        android:textSize="25dip"
+        android:inputType="textPersonName"
+        android:textSize="25sp"
 
-        />
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
         android:id="@+id/text_nombre"
@@ -36,15 +36,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dip"
-        android:textSize="25dip"
-        />
-
+        android:textSize="25sp"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 
     <Button
         android:id="@+id/add_empresa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Agregar"
-        android:background="@drawable/bg_pink"/>
+        android:background="@drawable/bg_pink"
+        android:minHeight="48dp"
+        android:text="Agregar" />
 </LinearLayout>

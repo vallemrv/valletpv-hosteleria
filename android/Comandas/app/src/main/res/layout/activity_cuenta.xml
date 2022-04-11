@@ -12,12 +12,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Mesa Z1"
+        android:text="@string/mesa_z1"
         android:id="@+id/lblMesa"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:textSize="17dp"
+        android:textSize="17sp"
         android:layout_marginBottom="10dp" />
 
     <RelativeLayout
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Total:"
+            android:text="@string/total"
             android:id="@+id/textView"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="0.00 €"
+            android:text="@string/test_precio"
             android:id="@+id/txtTotal"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
@@ -58,34 +58,55 @@
     </RelativeLayout>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Salir"
         android:id="@+id/btnSalir"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/relativeLayout"
+        android:layout_width="80dp"
+        android:layout_height="48dp"
         android:layout_alignEnd="@+id/relativeLayout"
-        android:onClick="clickSalir"/>
+        android:layout_alignRight="@+id/relativeLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/bg_pink"
+        android:onClick="clickSalir"
+        android:text="@string/salir" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Imprimir"
         android:id="@+id/btnImprimir"
+        android:layout_width="80dp"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btnSalir"
+        android:layout_marginStart="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="2dp"
         android:layout_toStartOf="@+id/btnSalir"
-        android:onClick="clickImprimir"/>
+        android:layout_toLeftOf="@+id/btnSalir"
+        android:background="@drawable/bg_pink"
+        android:onClick="clickImprimir"
+        android:text="@string/imprimir" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Marcar"
         android:id="@+id/btnMarcarRojo"
+        android:layout_width="80dp"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btnImprimir"
+        android:layout_marginStart="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginBottom="2dp"
         android:layout_toStartOf="@+id/btnImprimir"
-        android:onClick="clickMarcarRojo"/>
+        android:layout_toLeftOf="@+id/btnImprimir"
+        android:background="@drawable/bg_pink"
+        android:onClick="clickMarcarRojo"
+        android:text="@string/marcar" />
 
     <ListView
         android:layout_width="wrap_content"

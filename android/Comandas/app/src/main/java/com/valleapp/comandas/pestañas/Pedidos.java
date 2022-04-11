@@ -51,6 +51,7 @@ public class Pedidos extends Fragment {
     }
 
     public void addLinea(JSONObject art, ViewGroup.LayoutParams params, Context cx, final IPedidos pedidos){
+
         try {
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
@@ -60,7 +61,7 @@ public class Pedidos extends Fragment {
             TextView s =  v.findViewById(R.id.lblNombre);
             t.setText(String.format("%s", art.getString("Can")));
             s.setText(String.format("%s - %s", art.getString("Nombre"), art.getString("nomMesa")));
-            RelativeLayout btn =  v.findViewById(R.id.btnPedir);
+            LinearLayout btn =  v.findViewById(R.id.btnPedir);
             ImageButton btnCamb =  v.findViewById(R.id.btnBorrarPedido);
             btnCamb.setTag(art);
             btn.setTag(art);

@@ -26,7 +26,7 @@ public class AdaptadorEmpresas extends ArrayAdapter<JSONObject> {
     List<JSONObject> values;
 
     public AdaptadorEmpresas(Context context, List<JSONObject> obj) {
-        super(context, R.layout.item_pedido, obj);
+        super(context, R.layout.item_empresa, obj);
         this.cx = context;this.values= obj;
       }
 

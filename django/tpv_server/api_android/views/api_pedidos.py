@@ -10,43 +10,33 @@ from tokenapi.http import JsonError, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.db import connection
-from gestion.models import Camareros, Lineaspedido, Servidos
+from gestion.models import Camareros, Lineaspedido, Mesasabiertas, Servidos
 import json
-
 
 @csrf_exempt
 def  get_pendientes(request):
     idz = request.POST["idz"]
-    lstObj = []
-    mz = "(SELECT mesaszona.IDZona, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesaszona ON mesaszona.IDMesa=mesasabiertas.IDMesa) as mz";
-    m = "(SELECT mesas.Nombre AS nomMesa, IDMesa, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesas ON mesas.ID=mesasabiertas.IDMesa) as m";
-    s = "(SELECT IDLinea FROM servidos)";
-    lpedidos = ''.join(['SELECT m.nomMesa, mz.IDZona, l.ID, l.Precio, count(l.IDArt) as Can, l.Nombre, l.IDArt, IDPedido, m.IDMesa, Estado ',
-               'FROM lineaspedido as l LEFT JOIN {0} ON mz.UID=l.UID LEFT JOIN {1} ON m.UID=l.UID ',
-               'WHERE (Estado="P" OR Estado="R") AND mz.IDZona={2} AND l.ID NOT IN {3} ',
-               'GROUP BY l.IDArt, l.Nombre, l.Precio, l.IDPedido, l.UID, m.nomMesa ',
-               'ORDER BY l.ID DESC']).format(mz, m, idz, s)
+    mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz)
+    lineas = []
+    for m in mesas:
+        for l in Lineaspedido.objects.filter(infmesa__pk=m.infmesa.pk, estado='P'):
+            obj = {
+                'ID': l.pk,
+                'IDPedido': l.pedido_id,
+                'UID': m.infmesa.pk,
+                'IDArt': l.idart,
+                'Estado': l.estado,
+                'Precio': l.precio,
+                'Nombre': l.nombre,
+                'IDMesa': m.mesa.pk,
+                'nomMesa': m.mesa.nombre,
+                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
+                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
+            }
+            lineas.append(obj)
+          
 
-    with connection.cursor() as cursor:
-        cursor.execute(lpedidos)
-        rows = cursor.fetchall()
-        for r in rows:
-            lstObj.append({
-               'nomMesa': r[0],
-               'IDZona': r[1],
-               'ID': r[2],
-               'Precio': r[3],
-               'Can': r[4],
-               'Nombre': r[5],
-               'IDArt': r[6],
-               'IDPedido': r[7],
-               "IDMesa": r[8],
-               "Estado": r[9]
-            })
-
-    return JsonResponse(lstObj)
-
-
+    return JsonResponse(lineas)
 
 @csrf_exempt
 def  buscar(request):

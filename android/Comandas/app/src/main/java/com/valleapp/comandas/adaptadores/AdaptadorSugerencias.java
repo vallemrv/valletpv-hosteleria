@@ -41,7 +41,7 @@ public class AdaptadorSugerencias extends ArrayAdapter<JSONObject> {
             // Set the text size 25 dip for ListView each item
             can.setTextSize(TypedValue.COMPLEX_UNIT_DIP,25);
 
-            String sug = values.get(position).getString("Sugerencia");
+            String sug = values.get(position).getString("sugerencia");
             can.setText(String.format("%s", sug));
             RelativeLayout btnInfo = (RelativeLayout)rowView.findViewById(R.id.btnArt);
             btnInfo.setTag(sug);

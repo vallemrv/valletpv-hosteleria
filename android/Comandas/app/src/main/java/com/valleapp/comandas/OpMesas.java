@@ -9,13 +9,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.util.DisplayMetrics;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,21 +20,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBZonas;
 import com.valleapp.comandas.utilidades.Instruccion;
-import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.utilidades.ServicioCom;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class OpMesas extends Activity {
@@ -186,14 +175,17 @@ public class OpMesas extends Activity {
                                     p.put("ids", m.getString("ID"));
                                     finalizar(m);
                                 } else {
-                                    p.put("idm", m.getString("ID"));
-                                    p.put("idLinea", art.getString("ID"));
+                                    String idm = m.getString("ID");
+                                    String idLinea = art.getString("ID");
+                                    p.put("idm", idm);
+                                    p.put("idLinea", idLinea);
+                                    dbCuenta.moverLinea(m, art);
                                 }
                                 if (servicioCom != null) {
                                     servicioCom.addColaInstrucciones(new Instruccion(p, url));
                                     finish();
                                 }
-                            } catch (JSONException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
