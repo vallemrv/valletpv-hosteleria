@@ -18,7 +18,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,20 +28,20 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
-import com.valleapp.valletpv.interfaces.IAutoFinish;
-import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
-import com.valleapp.valletpv.interfaces.IControladorCuenta;
-import com.valleapp.valletpv.tools.JSON;
-import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbSecciones;
 import com.valleapp.valletpv.db.DbTeclas;
 import com.valleapp.valletpv.dlg.DlgCobrar;
+import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSepararTicket;
 import com.valleapp.valletpv.dlg.DlgVarios;
+import com.valleapp.valletpv.interfaces.IAutoFinish;
+import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
+import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -77,7 +76,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     Boolean stop = false;
     Timer timerAutoCancel = new Timer();
 
-    private long autoCancel = 10000;
+    final long autoCancel = 10000;
 
     ServicioCom myServicio;
 
@@ -146,7 +145,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     };
 
 
-    //Inicializacion de estados y vista onResume
+    //Inicializacion de estados y vista
     private void rellenarSecciones() {
 
         try{
@@ -265,11 +264,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
                     final JSONObject  m =  lsart.getJSONObject(i);
 
-
-                    LayoutInflater inflater = (LayoutInflater)cx.getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.boton_art, null);
-                    Button btn = v.findViewById(R.id.btnArt);
+                    Button btn = new Button(cx);
 
                     btn.setId(i);
                     btn.setTag(m);
@@ -288,7 +283,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                             e.printStackTrace();
                         }
                     });
-                    row.addView(v, rowparams);
+                    row.addView(btn, rowparams);
 
                     if (((i+1) % 5) == 0) {
                         row = new LinearLayout(cx);
@@ -433,7 +428,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
            cam = new JSONObject(getIntent().getExtras().getString("cam"));
            mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
            tipo = getIntent().getExtras().getString("op");
-           TextView title = (TextView)findViewById(R.id.txtTitulo);
+           TextView title = findViewById(R.id.txtTitulo);
            title.setText(cam.getString("Nombre") +  " -- "+mesa.getString("Nombre"));
 
         } catch (JSONException e) {
@@ -573,6 +568,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void clickMostrarBorrar(final JSONObject art) {
 
@@ -581,23 +577,21 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             final Dialog dlg = new Dialog(cx);
             dlg.setContentView(R.layout.borrar_art);
 
-            dlg.setOnCancelListener(dialogInterface -> {
-                setEstadoAutoFinish(true,false);
-            });
+            dlg.setOnCancelListener(dialogInterface -> setEstadoAutoFinish(true,false));
 
             dlg.setTitle("Borrar articulos");
             final EditText motivo = dlg.findViewById(R.id.txtMotivo);
             final Button error =  dlg.findViewById(R.id.btnError);
             final Button simpa =  dlg.findViewById(R.id.btnSimpa);
             final Button inv = dlg.findViewById(R.id.btnInv);
-            final ImageButton ok =  dlg.findViewById(R.id.btnOk);
+            final ImageButton ok =  dlg.findViewById(R.id.btn_ok);
             final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
-            final ImageButton exit =  dlg.findViewById(R.id.btnSalir);
+            final ImageButton exit =  dlg.findViewById(R.id.btn_salir);
 
             final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
             final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
             try {
-                Integer canArt = art.getInt("Can");
+                int canArt = art.getInt("Can");
                 if (cantidad > canArt) cantidad = canArt;
                 art.put("Can", cantidad);
                 txtInfo.setText("Borrar " + cantidad + " "+art.getString("Nombre"));
@@ -654,7 +648,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     @Override
     public void pedirAutorizacion(ContentValues params) {
-        myServicio.pedirAutorizacion(params, handlerHttp, "procesar_autorizacion");
+        myServicio.pedirAutorizacion(params);
     }
 
     @Override
@@ -663,6 +657,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     }
 
     // Utilidades
+    @SuppressLint("SetTextI18n")
     public void resetCantidad(){
         cantidad = 1;
         TextView lbl = findViewById(R.id.lblCantida);

@@ -17,12 +17,12 @@ import com.valleapp.comandas.R;
 /**
  * Created by valle on 15/09/14.
  */
-public class Ticket extends ArrayAdapter<JSONObject> {
+public class AdaptadorTicket extends ArrayAdapter<JSONObject> {
 
     private final Context context;
-    private java.util.List<JSONObject> values = new ArrayList<JSONObject>();
+    private java.util.List<JSONObject> values;
 
-    public Ticket(Context context, ArrayList<JSONObject> values) {
+    public AdaptadorTicket(Context context, ArrayList<JSONObject> values) {
         super(context, R.layout.linea_art, (java.util.List<JSONObject>) values);
         this.context = context; this.values = values;
     }

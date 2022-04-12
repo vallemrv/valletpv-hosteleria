@@ -39,7 +39,7 @@ public class DlgCobrar extends Dialog{
         lblCambio = (TextView) findViewById(R.id.lblCambio);
         ImageButton tj = findViewById(R.id.btnTarjeta);
         ImageButton ef = (ImageButton)findViewById(R.id.btnEfectivo);
-        ImageButton s = (ImageButton)findViewById(R.id.btnSalir);
+        ImageButton s = (ImageButton)findViewById(R.id.btn_salir);
         s.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

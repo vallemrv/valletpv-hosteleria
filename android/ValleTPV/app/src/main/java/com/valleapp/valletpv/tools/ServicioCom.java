@@ -132,13 +132,11 @@ public class ServicioCom extends Service {
 
     @Override
     public void onCreate() {
-        Log.d("TEST", "Servicio creado");
-        super.onCreate();
+       super.onCreate();
     }
 
     @Override
     public void onDestroy() {
-        Log.d("TEST", "Servicio destruido");
         timerUpdateFast.cancel();
         timerUpdateLow.cancel();
         timerUpdateFromDevices.cancel();
@@ -292,8 +290,12 @@ public class ServicioCom extends Service {
         }
     }
 
-    public void pedirAutorizacion(ContentValues p, Handler controller, String op) {
-        new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, op, controller);
+    public void pedirAutorizacion(ContentValues p) {
+        new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, "", null);
+    }
+
+    public void sendMensaje(ContentValues p) {
+        new HTTPRequest(server + "/autorizaciones/send_informacion", p, "", null);
     }
 
     public class MyBinder extends Binder{

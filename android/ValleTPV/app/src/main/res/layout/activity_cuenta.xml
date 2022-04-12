@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pnePrincipal"
     android:layout_width="match_parent"
@@ -7,18 +8,18 @@
 
     <RelativeLayout
         android:id="@+id/contentControles"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true">
 
         <TextView
             android:id="@+id/txtTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="655dp"
+            android:layout_height="44dp"
             android:layout_alignParentStart="true"
             android:layout_marginTop="15dp"
-            android:text="Large Text"
+            android:text="@string/camarero"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <ImageButton
@@ -27,13 +28,16 @@
             android:layout_height="100dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/abrircajon"
+            android:contentDescription="@string/abrir_ncajon"
+            android:onClick="abrirCajon"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:onClick="abrirCajon" />
+            android:src="@drawable/abrircajon" />
 
 
         <ImageButton
@@ -41,15 +45,18 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/AbrirCajon"
-            android:layout_toLeftOf="@+id/AbrirCajon"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/cobrar"
+            android:contentDescription="@string/cobrar"
             android:onClick="cobrarMesa"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:text="Cobrar" />
+            android:src="@drawable/cobrar"
+            android:text="@string/cobrar" />
 
         <EditText
             android:id="@+id/txtBuscar"
@@ -59,8 +66,10 @@
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/btnVarios"
             android:enabled="true"
-            android:hint="Buscar articulos"
+            android:hint="@string/buscar_articulos"
+            android:importantForAutofill="no"
             android:inputType="textFilter"
+            android:textColorHint="#000000"
             android:textSize="25sp" />
 
         <ImageButton
@@ -68,56 +77,67 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/separar"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/varios"
+            android:contentDescription="@string/varios"
             android:onClick="mostrarVarios"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:text="Varios" />
+            android:src="@drawable/varios"
+            android:text="@string/varios" />
 
         <ImageButton
             android:id="@+id/preimprimir"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/Cobrar"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/imprimirticket"
+            android:contentDescription="@string/importe"
             android:onClick="preImprimir"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:text="New Button" />
+            android:src="@drawable/imprimirticket"
+            android:text="@string/imprimir" />
 
         <ImageButton
             android:id="@+id/separar"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerVertical="true"
-            android:layout_margin="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/preimprimir"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/separarticket"
+            android:contentDescription="@string/send_mensaje"
+            android:onClick="mostrarSeparados"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:onClick="mostrarSeparados" />
+            android:src="@drawable/separarticket" />
 
         <TextView
             android:id="@+id/lblCantida"
-            android:layout_width="wrap_content"
+            android:layout_width="655dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="5dp"
             android:padding="10dp"
             android:shadowColor="@android:color/black"
             android:singleLine="false"
-            android:text="Cantidad 1"
+            android:text="@string/cantidad_1"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/holo_red_dark" />
+            android:textColor="#FF5252" />
 
 
     </RelativeLayout>
@@ -127,7 +147,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/contentControles"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -143,14 +164,14 @@
 
                 <TextView
                     android:id="@+id/lblTotal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="500dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="35dp"
                     android:text="@string/cuenta_label_total"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="#ffff0011"
+                    android:textColor="#B71C1C"
                     android:textSize="25sp" />
 
                 <TextView
@@ -162,8 +183,9 @@
                     android:layout_marginEnd="35dp"
                     android:text="@string/cuenta_reposo"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="#ffff0001"
-                    android:textSize="25sp" />
+                    android:textColor="#B71C1C"
+                    android:textSize="25sp"
+                    tools:ignore="RelativeOverlap" />
 
             </RelativeLayout>
 
@@ -172,7 +194,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.6"
-                android:background="#ffffeac3" />
+                android:background="#ffffeac3"
+                tools:ignore="NestedWeights" />
 
             <LinearLayout
                 android:id="@+id/pneBotonera"
@@ -192,33 +215,40 @@
 
                     <Button
                         android:id="@+id/button4"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="1" />
+                        android:text="@string/numero_1"
+                        android:textColor="#000000"
+                        tools:ignore="NestedWeights" />
 
                     <Button
                         android:id="@+id/button5"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="2" />
+                        android:text="@string/numero_2"
+                        android:textColor="#000000" />
 
                     <Button
                         android:id="@+id/button6"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="3" />
+                        android:text="@string/nuemro_3"
+                        android:textColor="#000000" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -229,33 +259,40 @@
 
                     <Button
                         android:id="@+id/button"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="4" />
+                        android:text="@string/numero_4"
+                        android:textColor="#000000"
+                        tools:ignore="NestedWeights" />
 
                     <Button
                         android:id="@+id/button2"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="5" />
+                        android:text="@string/numero_5"
+                        android:textColor="#000000" />
 
                     <Button
                         android:id="@+id/button3"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="6" />
+                        android:text="@string/numero_6"
+                        android:textColor="#000000" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -267,33 +304,40 @@
 
                     <Button
                         android:id="@+id/button7"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="7" />
+                        android:text="@string/numero_7"
+                        android:textColor="#000000"
+                        tools:ignore="NestedWeights" />
 
                     <Button
                         android:id="@+id/button8"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="8" />
+                        android:text="@string/numero_8"
+                        android:textColor="#000000" />
 
                     <Button
                         android:id="@+id/button9"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="0dp"
-                        android:layout_height="fill_parent"
+                        android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/fondo_btn_xml"
                         android:onClick="clickCantidad"
-                        android:text="9" />
+                        android:text="@string/numero_9"
+                        android:textColor="#000000" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -310,7 +354,7 @@
             <TableLayout
                 android:id="@+id/pneArt"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:stretchColumns="*" />
         </ScrollView>
 
@@ -323,7 +367,7 @@
             <LinearLayout
                 android:id="@+id/pneSecciones"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" />
         </ScrollView>
     </LinearLayout>

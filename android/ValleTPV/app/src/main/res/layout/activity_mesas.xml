@@ -19,15 +19,15 @@
         android:background="@android:color/white">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Camarero"
             android:id="@+id/lblTitulo"
-            android:layout_centerVertical="true"
+            android:layout_width="376dp"
+            android:layout_height="62dp"
             android:layout_alignParentStart="true"
-            android:textSize="30sp"
-            android:layout_marginStart="5dp" />
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:text="@string/camarero"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="30sp" />
 
         <ImageButton
             android:id="@+id/add_camareros"
@@ -38,10 +38,26 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="270dp"
             android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/add_camareros"
             android:onClick="clickAddCamareros"
-            android:scaleType="fitXY"
             android:padding="10dp"
+            android:scaleType="fitXY"
             android:src="@drawable/add_camareros" />
+
+        <ImageButton
+            android:id="@+id/btn_mensajes"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="361dp"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/boton_mensajes"
+            android:onClick="clickSendMensajes"
+            android:padding="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/sobre" />
 
         <ImageButton
             android:id="@+id/btnSettings"
@@ -52,11 +68,12 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="180dp"
             android:background="@drawable/fondo_btn_xml"
-            android:scaleType="fitXY"
+            android:contentDescription="@string/settings"
             android:onClick="clickSettings"
             android:padding="10dp"
+            android:scaleType="fitXY"
             android:src="@drawable/settings"
-            android:text="settings" />
+            android:text="@string/settings" />
 
         <ImageButton
             android:id="@+id/btnOpenCaja"
@@ -71,11 +88,12 @@
             android:layout_marginBottom="5dp"
             android:adjustViewBounds="true"
             android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/boton_abrir_caja"
             android:onClick="clickAbrirCaja"
             android:padding="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/abrircajon"
-            android:text="Abrir\nCajon" />
+            android:text="@string/abrir_ncajon" />
 
         <ImageButton
             android:id="@+id/btnListadoTicket"
@@ -89,11 +107,12 @@
             android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/btnOpenCaja"
             android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/boton_listado_ticket"
             android:onClick="clickListaTicket"
             android:padding="10dp"
             android:scaleType="fitXY"
             android:src="@drawable/listaticket"
-            android:text="Lista\nTicket" />
+            android:text="@string/lista_nticket" />
 
 
     </RelativeLayout>
@@ -103,40 +122,43 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/relativeLayout"
-        android:background="#fffff1ea">
+        android:background="#fffff1ea"
+        android:baselineAligned="false">
 
         <ScrollView
+            android:id="@+id/scrollView3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:id="@+id/scrollView3"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="0.9"
             android:background="@android:color/white"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="2dp">
+            android:contentDescription="@string/teclado_mesas">
 
             <TableLayout
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/pneMesas"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:stretchColumns="*"></TableLayout>
 
         </ScrollView>
 
         <ScrollView
+            android:id="@+id/scrollView4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:id="@+id/scrollView4"
-            android:layout_weight="0.1"
+            android:layout_marginStart="2dp"
 
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.1"
             android:background="@android:color/white"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="5dp">
+            android:contentDescription="@string/teclado_mesas">
 
             <LinearLayout
-                android:orientation="vertical"
+                android:id="@+id/pneZonas"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:id="@+id/pneZonas"></LinearLayout>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"></LinearLayout>
         </ScrollView>
     </LinearLayout>
 

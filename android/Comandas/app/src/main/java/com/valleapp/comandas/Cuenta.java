@@ -16,8 +16,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.comandas.adaptadores.Ticket;
+import com.valleapp.comandas.adaptadores.AdaptadorTicket;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.utilidades.HTTPRequest;
@@ -100,7 +98,7 @@ public class Cuenta extends Activity {
                 totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")));
                 l.setText(String.format("%s €", totalMesa));
 
-                lst.setAdapter(new Ticket(cx, (ArrayList<JSONObject>) lineasTicket));
+                lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineasTicket));
 
         } catch (JSONException e) {
             e.printStackTrace();

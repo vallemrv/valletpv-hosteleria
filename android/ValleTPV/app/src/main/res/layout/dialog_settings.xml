@@ -12,14 +12,15 @@
         />
 
     <ImageButton
-        android:id="@+id/boton_salir"
+        android:id="@+id/btn_guardar"
         android:layout_width="match_parent"
         android:layout_height="100dip"
         android:background="@drawable/fondo_btn_xml"
-        android:src="@drawable/guardar"
+        android:contentDescription="@string/guardar"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:text="Guardar"
-        android:textSize="35sp"/>
+        android:src="@drawable/guardar"
+        android:text="@string/guardar"
+        android:textSize="35sp" />
 
 </LinearLayout>

@@ -35,12 +35,15 @@ public class AdaptadorAutorias extends ArrayAdapter<JSONObject> {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = inflater.inflate(R.layout.linea_autoria, parent, false);
         try {
-
+            JSONObject o = values.get(position);
             TextView t = v.findViewById(R.id.txt_mensaje_autoria);
             ImageButton b = v.findViewById(R.id.btn_autorizar);
+            if(!o.getString("tipo").equals("informacion")) {
+                b.setTag(o);
+            }else{
+                b.setVisibility(View.GONE);
+            }
             ImageButton bc = v.findViewById(R.id.btn_denegar);
-            JSONObject o = values.get(position);
-            b.setTag(o);
             bc.setTag(o);
             t.setText(o.getString("mensaje"));
 

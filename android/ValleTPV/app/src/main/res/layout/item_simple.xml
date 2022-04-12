@@ -9,6 +9,6 @@
         android:id="@+id/texto_linea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="TextView"
-        android:textSize="35dip" />
+        android:text="@string/texto_prueba"
+        android:textSize="35sp" />
 </LinearLayout>

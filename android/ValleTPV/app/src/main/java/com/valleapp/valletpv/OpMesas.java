@@ -1,6 +1,5 @@
 package com.valleapp.valletpv;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -11,8 +10,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -20,10 +17,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,13 +78,7 @@ public class OpMesas extends Activity {
                     JSONObject  z =  lszonas.getJSONObject(i);
 
                     if(zn==null && i==0) zn=z;
-
-                    LayoutInflater inflater = (LayoutInflater)cx.getSystemService
-                            (Context.LAYOUT_INFLATER_SERVICE);
-                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
-
-
-                    Button btn = v.findViewById(R.id.boton_art);
+                    Button btn = new Button(cx);
                     btn.setId(i);
                     btn.setSingleLine(false);
                     btn.setTextSize(11);
@@ -97,14 +88,14 @@ public class OpMesas extends Activity {
 
                     btn.setOnClickListener(view -> {
                         try {
-                            zn = lszonas.getJSONObject((Integer)view.getId());
+                            zn = lszonas.getJSONObject(view.getId());
                             rellenarMesas();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
                     });
-                    ll.addView(v, params);
+                    ll.addView(btn, params);
 
 
                 }
@@ -148,14 +139,7 @@ public class OpMesas extends Activity {
                 for (int i = 0; i < lsmesas.length(); i++) {
                     JSONObject  m =  lsmesas.getJSONObject(i);
 
-                        LayoutInflater inflater = (LayoutInflater) cx.getSystemService
-                                (Context.LAYOUT_INFLATER_SERVICE);
-
-                        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
-
-
-                        Button btn = v.findViewById(R.id.boton_art);
-
+                        Button btn = new Button(cx);
                         btn.setId(i);
                         btn.setSingleLine(false);
                         btn.setText(m.getString("Nombre"));
@@ -180,7 +164,7 @@ public class OpMesas extends Activity {
                             }
 
                         });
-                        row.addView(v, rowparams);
+                        row.addView(btn, rowparams);
 
                         if (((i + 1) % 5) == 0) {
                             row = new TableRow(cx);

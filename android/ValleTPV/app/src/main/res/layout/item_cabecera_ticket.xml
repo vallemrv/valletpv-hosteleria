@@ -5,66 +5,75 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="1"
         android:id="@+id/lblNumTicket"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="15dp"
-        android:textSize="30sp"
-        android:layout_weight="0.2"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_can"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="30sp" />
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="12/12/12 - 00:22"
         android:id="@+id/lblHoraFecha"
-        android:layout_marginStart="120dp"
-       android:layout_centerVertical="true"
-        android:layout_weight="0.35"
-        android:textSize="30sp"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:text="@string/fecha_hora"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/lblNombre"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="55dp"
-        android:text="Mesa 1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:text="@string/texto_prueba_mesa"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="35sp"
-        android:layout_weight="0.1"/>
+        android:textSize="35sp" />
 
     <TextView
         android:id="@+id/lblTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0.00€"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_euros"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="30sp" />
 
     <TextView
         android:id="@+id/lblEntrega"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="0.00€"
-        android:layout_weight="0.25"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_euros"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textSize="30sp" />
 
-    <ImageButton
-        android:layout_width="70dip"
-        android:layout_height="70dip"
-        android:id="@+id/btnVerTicket"
-        android:src="@drawable/lupa"
-        android:padding="10dp"
-        android:scaleType="fitCenter"
-        android:onClick="clickVerTicket"
-        android:background="@drawable/fondo_btn_xml"
-        android:textSize="30sp"/>
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1">
+
+        <ImageButton
+            android:id="@+id/btnVerTicket"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/ver"
+            android:onClick="clickVerTicket"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/lupa"
+            android:textSize="30sp" />
+    </FrameLayout>
 
 
 </LinearLayout>

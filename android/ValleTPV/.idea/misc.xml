@@ -22,34 +22,37 @@
         <entry key="app/src/main/res/layout-land/varios.xml" value="0.2682291666666667" />
         <entry key="app/src/main/res/layout-v14/activity_cuenta.xml" value="0.35625" />
         <entry key="app/src/main/res/layout-v3/activity_op_mesas.xml" value="0.35625" />
-        <entry key="app/src/main/res/layout/activity_arqueo.xml" value="0.15" />
+        <entry key="app/src/main/res/layout/activity_arqueo.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_camareros.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_cuenta.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/activity_mesas.xml" value="0.17291666666666666" />
-        <entry key="app/src/main/res/layout/activity_op_mesas.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_mesas.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/activity_op_mesas.xml" value="0.12" />
         <entry key="app/src/main/res/layout/activity_preferencias_tpv.xml" value="0.3029891304347826" />
         <entry key="app/src/main/res/layout/activity_start_app.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/activity_valle_tpv.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/add_efectivo.xml" value="0.3029891304347826" />
-        <entry key="app/src/main/res/layout/add_gastos.xml" value="0.3029891304347826" />
+        <entry key="app/src/main/res/layout/add_gastos.xml" value="0.18" />
         <entry key="app/src/main/res/layout/add_nuevo_camarero.xml" value="0.22" />
         <entry key="app/src/main/res/layout/borrar_art.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/boton_art.xml" value="0.3029891304347826" />
+        <entry key="app/src/main/res/layout/boton_art.xml" value="0.1" />
         <entry key="app/src/main/res/layout/boton_mesa.xml" value="0.15833333333333333" />
-        <entry key="app/src/main/res/layout/btn_art.xml" value="0.3029891304347826" />
+        <entry key="app/src/main/res/layout/btn_art.xml" value="0.20717131474103587" />
         <entry key="app/src/main/res/layout/cobros.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_create_pass.xml" value="0.3029891304347826" />
         <entry key="app/src/main/res/layout/dialog_enter_pass.xml" value="0.3029891304347826" />
-        <entry key="app/src/main/res/layout/dialog_mensaje.xml" value="0.3029891304347826" />
+        <entry key="app/src/main/res/layout/dialog_mensaje.xml" value="0.18" />
         <entry key="app/src/main/res/layout/dialog_settings.xml" value="0.22" />
         <entry key="app/src/main/res/layout/edit_cambio.xml" value="0.17291666666666666" />
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/item_art.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/item_cabecera_ticket.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/item_camarero_notificable.xml" value="0.34737711689384554" />
-        <entry key="app/src/main/res/layout/item_efectivo.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/item_gastos.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_cabecera_ticket.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/item_camarero_notificable.xml" value="0.16" />
+        <entry key="app/src/main/res/layout/item_efectivo.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/item_gastos.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_linea_ticket.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_linea_total.xml" value="0.1551155115511551" />
+        <entry key="app/src/main/res/layout/item_separado.xml" value="0.1551155115511551" />
+        <entry key="app/src/main/res/layout/item_settings.xml" value="0.1551155115511551" />
         <entry key="app/src/main/res/layout/item_simple.xml" value="0.1" />
         <entry key="app/src/main/res/layout/linea_cabecera_ticket.xml" value="0.17347359735973597" />
         <entry key="app/src/main/res/layout/linea_camarero_notificable.xml" value="0.17347359735973597" />
@@ -59,11 +62,11 @@
         <entry key="app/src/main/res/layout/linea_simple.xml" value="0.23324275362318841" />
         <entry key="app/src/main/res/layout/linea_ticket.xml" value="0.23324275362318841" />
         <entry key="app/src/main/res/layout/linea_total.xml" value="0.23324275362318841" />
-        <entry key="app/src/main/res/layout/lista_camareos_para_notificaciones.xml" value="0.67" />
+        <entry key="app/src/main/res/layout/lista_camareos_para_notificaciones.xml" value="0.12" />
         <entry key="app/src/main/res/layout/listado_ticket.xml" value="0.23324275362318841" />
         <entry key="app/src/main/res/layout/seleccionar_camareros.xml" value="0.17" />
-        <entry key="app/src/main/res/layout/separarticket.xml" value="0.5" />
-        <entry key="app/src/main/res/layout/toast_info_cambio.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/separarticket.xml" value="0.14" />
+        <entry key="app/src/main/res/layout/toast_info_cambio.xml" value="0.33" />
         <entry key="app/src/main/res/layout/varios.xml" value="0.18" />
       </map>
     </option>

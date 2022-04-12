@@ -19,7 +19,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -27,9 +26,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.tools.ToastShowInfoCuenta;
-import com.valleapp.valletpv.db.DbCamareros;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -160,7 +159,6 @@ public class Camareros extends Activity {
 
     @Override
     protected void onResume() {
-        Log.d("TEST", "Camareros resume");
         presBack = 0;
         Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
@@ -172,7 +170,6 @@ public class Camareros extends Activity {
 
     @Override
     protected void onDestroy() {
-        Log.d("TEST", "Camareros destruido");
         unbindService(mConexion);
         super.onDestroy();
     }

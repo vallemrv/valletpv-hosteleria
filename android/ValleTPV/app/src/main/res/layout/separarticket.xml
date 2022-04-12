@@ -1,59 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-   >
-
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="570dp"
         android:layout_height="500dp">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="0.2">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="0.2">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Cantida a cobrar"
-                android:id="@+id/lblTotalCobro"
-                android:textSize="20dp"
-                android:layout_weight="0.7"
-                />
+        <TextView
+            android:id="@+id/lblTotalCobro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:text="@string/cantida_a_cobrar"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="20sp" />
 
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="Ok"
-                android:id="@+id/btn_varios_aceptar"
-                android:layout_toLeftOf="@+id/salir"
-                android:layout_weight="0.15"
-                android:background="@drawable/fondo_btn_xml"
-                android:src="@drawable/check"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:layout_margin="5dp"/>
+        <ImageButton
+            android:id="@+id/btn_aceptar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="0.15"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/ok"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/check"
+            android:text="@string/ok" />
 
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/btnSalir"
-                android:layout_weight="0.15"
-                android:background="@drawable/fondo_btn_xml"
-                android:src="@drawable/salir"
-                android:padding="10dp"
-                android:scaleType="fitCenter"
-                android:layout_margin="5dp" />
+        <ImageButton
+            android:id="@+id/btn_salir"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="0.15"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/salir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/salir" />
 
-        </LinearLayout>
+    </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -61,51 +57,52 @@
             android:layout_weight="0.8"
             android:orientation="horizontal"
             android:padding="10dp"
-            android:background="#ffffbbee">
+            android:background="#ffffbbee"
+            android:baselineAligned="false">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:background="@android:color/white">
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:background="@android:color/white"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Articulos pendientes"
-                    android:id="@+id/textView"
-                    android:gravity="center_horizontal" />
+                    android:gravity="center_horizontal"
+                    android:text="@string/articulos_pendientes"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <ListView
+                    android:id="@+id/lstArticulos"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:id="@+id/lstArticulos"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="1" />
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="0.5" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:background="@android:color/white">
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:background="@android:color/white"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/textView2"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Articulos separados"
-                    android:id="@+id/textView2"
-                    android:gravity="center|center_horizontal" />
+                    android:gravity="center|center_horizontal"
+                    android:text="@string/articulos_separados"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <ListView
+                    android:id="@+id/lstCobros"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:id="@+id/lstCobros"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.5" />
             </LinearLayout>
 
 
@@ -115,4 +112,3 @@
     </LinearLayout>
 
 
-</RelativeLayout>

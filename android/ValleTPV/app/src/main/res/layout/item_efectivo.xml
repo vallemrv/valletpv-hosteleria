@@ -7,64 +7,67 @@
     android:padding="10dp"
     >
 
-       <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/Cantidad"
-        android:layout_weight="0.3"
+    <TextView
+        android:id="@+id/txt_cantidad"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_can"
         android:textAlignment="textEnd"
-        android:gravity="end"
-        android:textSize="20sp"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="20sp" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="X"
         android:id="@+id/lblpor"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.1"
-        android:gravity="end"
-        android:textSize="20sp"/>
+        android:gravity="center_vertical|end"
+        android:text="@string/x"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="20sp" />
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="4.00€"
-            android:id="@+id/Moneda"
-            android:layout_weight="0.3"
-            android:gravity="end"
-            android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/txt_moneda"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.25"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_euros"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="20sp" />
 
 
+    <TextView
+        android:id="@+id/Total"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.25"
+        android:gravity="center_vertical|end"
+        android:text="@string/texto_prueba_euros"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/Total"
-            android:layout_weight="0.3"
-            android:gravity="end"
-            android:textSize="20sp"
-            android:layout_marginRight="5dp" />
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.15">
 
-    <ImageButton
-        android:layout_width="65dip"
-        android:layout_height="65dip"
-        android:id="@+id/btnBorrar"
-        android:layout_weight="0.05"
-        android:layout_margin="5dp"
-        android:textSize="20sp"
-        android:background="@drawable/fondo_btn_xml"
-        android:src="@drawable/papelera"
-        android:padding="10dp"
-        android:scaleType="fitCenter"
-        android:onClick="clickBorrarEfc"
-        />
+        <ImageButton
+            android:id="@+id/btn_borrar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/borrar"
+            android:onClick="clickBorrarEfc"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/papelera"
+            android:textSize="20sp" />
+    </FrameLayout>
 
 
 </LinearLayout>

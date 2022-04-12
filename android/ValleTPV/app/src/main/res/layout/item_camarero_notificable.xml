@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="560sp"
-    android:layout_height="70sp">
-
-    <LinearLayout
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -22,16 +19,21 @@
             android:padding="10sp"
             android:textSize="25sp" />
 
+    <FrameLayout
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.2">
+
         <ImageButton
             android:id="@+id/btn_send_cam_autorizado"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical|end"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/enviar"
-            android:scaleType="fitCenter"
+            android:contentDescription="@string/mensaje"
             android:padding="10sp"
-            />
+            android:scaleType="fitCenter"
+            android:src="@drawable/enviar" />
+    </FrameLayout>
 
-    </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

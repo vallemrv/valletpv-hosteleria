@@ -25,7 +25,7 @@
         <entry key="app/src/main/res/layout/item_empresa.xml" value="0.1671195652173913" />
         <entry key="app/src/main/res/layout/item_pedido.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/linea_art.xml" value="0.18177083333333333" />
-        <entry key="app/src/main/res/layout/linea_autoria.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/linea_autoria.xml" value="0.33" />
         <entry key="app/src/main/res/layout/linea_pedido_externo.xml" value="0.25" />
         <entry key="app/src/main/res/layout/linea_pedido_interno.xml" value="0.33" />
         <entry key="app/src/main/res/layout/linea_simple.xml" value="0.17481884057971014" />

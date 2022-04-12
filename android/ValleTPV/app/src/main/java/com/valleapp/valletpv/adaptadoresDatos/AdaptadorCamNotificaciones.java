@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ public class AdaptadorCamNotificaciones extends ArrayAdapter<JSONObject> {
         try {
             TextView n = (TextView) v.findViewById(R.id.txt_nombre_camarero_notificaciones);
             JSONObject o = objects.get(position);
-            Log.i("ADAPTADOR", o.toString());
             n.setText(o.getString("Nombre"));
             ImageView btn = (ImageView) v.findViewById(R.id.btn_send_cam_autorizado);
             btn.setTag(o.getString("ID"));

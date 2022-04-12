@@ -84,6 +84,7 @@
             android:layout_marginTop="-3dp"
             android:layout_marginBottom="5dp"
             android:background="@drawable/fondo_btn"
+            android:contentDescription="@string/salir"
             android:padding="10dp"
             android:scaleType="fitCenter"
             android:src="@drawable/salir" />
@@ -96,13 +97,14 @@
             android:layout_below="@id/salir"
             android:layout_marginTop="0dp"
             android:background="@drawable/fondo_btn"
-            android:src="@drawable/check"
+            android:contentDescription="@string/ok"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:text="Ok"
+            android:src="@drawable/check"
+            android:text="@string/ok"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="34sp"
-            tools:text="@string/borrar_ok" />
+            tools:text="@string/ok" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_add_nuevo_camarero"
@@ -112,6 +114,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="22dp"
+            android:contentDescription="@string/agregar_camarero"
             fab:fab_colorNormal="@color/pink"
             fab:fab_colorPressed="@color/pink_pressed"
             fab:fab_icon="@drawable/mas" />

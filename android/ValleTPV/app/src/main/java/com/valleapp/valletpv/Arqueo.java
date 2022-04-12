@@ -89,7 +89,7 @@ public class Arqueo extends Activity {
             View v = inflater.inflate(R.layout.item_gastos, null);
             TextView can = v.findViewById(R.id.cantidad);
             TextView des = v.findViewById(R.id.Descripcion);
-            ImageButton rm = v.findViewById(R.id.btnBorrar);
+            ImageButton rm = v.findViewById(R.id.btn_borrar);
             rm.setTag(gasto);
 
             try {
@@ -123,10 +123,10 @@ public class Arqueo extends Activity {
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
             View v = inflater.inflate(R.layout.item_efectivo, null);
-            TextView mon =  v.findViewById(R.id.Moneda);
-            TextView can = v.findViewById(R.id.Cantidad);
+            TextView mon =  v.findViewById(R.id.txt_moneda);
+            TextView can = v.findViewById(R.id.txt_cantidad);
             TextView tot = v.findViewById(R.id.Total);
-            ImageButton rm = v.findViewById(R.id.btnBorrar);
+            ImageButton rm = v.findViewById(R.id.btn_borrar);
             rm.setTag(e);
 
             try {
@@ -165,8 +165,8 @@ public class Arqueo extends Activity {
        final Dialog dlg = new Dialog(this);
        dlg.setContentView(R.layout.add_efectivo);
        dlg.setTitle("Agregar efectivo");
-       ImageButton s = dlg.findViewById(R.id.btnSalir);
-       Button ok = (Button) dlg.findViewById(R.id.btn_varios_aceptar);
+       ImageButton s = dlg.findViewById(R.id.btn_salir);
+       Button ok = (Button) dlg.findViewById(R.id.btn_aceptar);
        final TextView m = (TextView) dlg.findViewById(R.id.txtMoneda);
        final TextView c = (TextView) dlg.findViewById(R.id.txtCantidad);
           s.setOnClickListener(new View.OnClickListener() {

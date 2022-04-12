@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <EditText
         android:id="@+id/txt_add_cam_nombre"
@@ -12,7 +12,10 @@
         android:layout_marginStart="36dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="36dp"
-        android:hint="Nombre"
+        android:autofillHints=""
+        android:hint="@string/nombre"
+        android:inputType="textPersonName"
+        android:textColorHint="#4E4340"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +29,10 @@
         android:layout_marginTop="124dp"
         android:layout_marginEnd="36dp"
         android:layout_marginBottom="212dp"
-        android:hint="1º Apellido"
+        android:autofillHints=""
+        android:hint="@string/primer_apellido"
+        android:inputType="textPersonName"
+        android:textColorHint="#3A3838"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -40,7 +46,7 @@
         android:layout_marginEnd="172dp"
         android:layout_marginBottom="48dp"
         android:background="@drawable/fondo_btn_xml"
-        android:text="Aceptar"
+        android:text="@string/ok"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -51,7 +57,7 @@
         android:layout_marginEnd="36dp"
         android:layout_marginBottom="48dp"
         android:background="@drawable/fondo_btn_xml"
-        android:text="Cancelar"
+        android:text="@android:string/cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

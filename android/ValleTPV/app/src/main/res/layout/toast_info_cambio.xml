@@ -1,88 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/toast_info_cobro_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/info_cobro_bg">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/info_cobro_bg"
+    android:orientation="vertical"
+    android:padding="10sp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="5sp">
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:id="@+id/Entrega"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/editTextTextPersonName6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:padding="5sp">
+            android:minHeight="48dp"
+            android:text="@string/entrega"
+            android:textSize="32sp"
+            android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editTextTextPersonName6"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:editable="false"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:minHeight="48dp"
-                android:text="Entrga"
-                android:textSize="32sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/txt_info_entrega"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:editable="false"
-                android:ems="10"
-                android:gravity="center_vertical|end"
-                android:inputType="textPersonName"
-                android:minHeight="48dp"
-                android:text="2,00€"
-                android:textSize="32sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/Cambio"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/txt_info_entrega"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:padding="5sp">
-
-            <EditText
-                android:id="@+id/editTextTextPersonName7"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:editable="false"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="Cambio"
-                android:textColor="#000000"
-                android:textSize="32sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/txt_info_cambio"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:editable="false"
-                android:ems="10"
-                android:gravity="center_vertical|end"
-                android:inputType="textPersonName"
-                android:text="2,00€"
-                android:textColor="#000000"
-                android:textSize="32sp" />
-        </LinearLayout>
+            android:gravity="center_vertical|end"
+            android:minWidth="150dp"
+            android:text="@string/texto_prueba_euros"
+            android:textSize="32sp" />
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/editTextTextPersonName7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/cambio"
+            android:textColor="#000000"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_info_cambio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical|end"
+            android:minWidth="150dp"
+            android:text="@string/texto_prueba_euros"
+            android:textColor="#000000"
+            android:textSize="32sp" />
+    </LinearLayout>
+
+</LinearLayout>

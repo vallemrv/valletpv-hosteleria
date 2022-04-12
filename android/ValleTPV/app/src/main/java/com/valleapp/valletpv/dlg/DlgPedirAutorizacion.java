@@ -18,7 +18,6 @@ import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,8 +53,6 @@ public class DlgPedirAutorizacion extends Dialog implements IControladorAutoriza
                 R.layout.item_camarero_notificable,
                 dbCamareros.getConPermiso(accion), this);
 
-        ArrayList<String> p = new ArrayList<>();
-        p.add("Manolo Rodriguea");
         l.setAdapter(ad);
         ImageButton btn = findViewById(R.id.btn_salir_notificaciones_camareros);
         btn.setOnClickListener(view -> {

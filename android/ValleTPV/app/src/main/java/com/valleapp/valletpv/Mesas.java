@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -29,32 +28,35 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
-import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
-import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.dlg.DlgMensajes;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSelCamareros;
+import com.valleapp.valletpv.interfaces.IAutoFinish;
+import com.valleapp.valletpv.interfaces.IControlMensajes;
+import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
+import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Mesas extends Activity implements IAutoFinish, IControladorAutorizaciones {
+public class Mesas extends Activity implements IAutoFinish, IControladorAutorizaciones, IControlMensajes {
 
     final Context cx = this;
     final long periodFinish = 5000;
 
- // Variables para salir con temporizador
+    // Variables para salir con temporizador
     Timer autoSalir = new Timer();
     boolean stop = false;
     boolean reset = false;
@@ -128,8 +130,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
                             }
                             break;
-                        case "procesar_autorizacion":
-                            break;
                     }
 
                 }
@@ -140,8 +140,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
         }
     };
-
-
 
     private void rellenarZonas() {
         try {
@@ -197,7 +195,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             JSONArray lsmesas = dbMesas.getAll(znID);
             if(lsmesas.length()>0){
 
-                TableLayout ll = (TableLayout)findViewById(R.id.pneMesas);
+                TableLayout ll = findViewById(R.id.pneMesas);
                 ll.removeAllViews();
 
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
@@ -288,7 +286,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             sel_cam.show();
             sel_cam.get_btn_ok().setOnClickListener(v1 -> {
                 sel_cam.cancel();
-                stop = false;reset=true;
+               setEstadoAutoFinish(true, false);
             });
         }catch (Exception e){
             e.printStackTrace();
@@ -300,13 +298,11 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         setEstadoAutoFinish(true,true);
         final Dialog settings = new Dialog(cx);
 
-        settings.setOnCancelListener(dialogInterface -> {
-            setEstadoAutoFinish(true,false);
-        });
+        settings.setOnCancelListener(dialogInterface -> setEstadoAutoFinish(true,false));
         settings.setTitle("Opciones impresión...");
         settings.setContentView(R.layout.dialog_settings);
         lista_setting = settings.findViewById(R.id.lista_settings);
-        ImageButton salir = settings.findViewById(R.id.boton_salir);
+        ImageButton salir = settings.findViewById(R.id.btn_guardar);
         salir.setOnClickListener(v1 -> {
             if (adaptadorSettings != null){
                 JSONArray lista = adaptadorSettings.lista;
@@ -332,14 +328,12 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         Window window = dlgListadoTicket.getWindow();
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         final ImageButton imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
-        final ImageButton salir = dlgListadoTicket.findViewById(R.id.btnSalir);
+        final ImageButton salir = dlgListadoTicket.findViewById(R.id.btn_salir);
         final ImageButton ls =  dlgListadoTicket.findViewById(R.id.btnListado);
         imp.setVisibility(View.GONE);
         ls.setVisibility(View.GONE);
 
-        salir.setOnClickListener(view -> {
-            dlgListadoTicket.cancel();
-        });
+        salir.setOnClickListener(view -> dlgListadoTicket.cancel());
 
         ls.setOnClickListener(view -> {
             imp.setVisibility(View.GONE);
@@ -357,24 +351,41 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     public  void clickVerTicket(View v){
 
         IDTicket =  v.getTag().toString();
-        ((ImageButton) dlgListadoTicket.findViewById(R.id.btnImprimir)).setVisibility(View.VISIBLE);
-        ((ImageButton) dlgListadoTicket.findViewById(R.id.btnListado)).setVisibility(View.VISIBLE);
+        dlgListadoTicket.findViewById(R.id.btnImprimir).setVisibility(View.VISIBLE);
+        dlgListadoTicket.findViewById(R.id.btnListado).setVisibility(View.VISIBLE);
         if(myServicio!=null){
             myServicio.getLineasTicket(handleHttp, IDTicket);
         }
     }
 
+    public void clickSendMensajes(View v){
+        try {
+            setEstadoAutoFinish(true, true);
+            DlgMensajes dlg = new DlgMensajes(cx, this);
+            dlg.setOnCancelListener(param -> {
+                setEstadoAutoFinish(true, false);
+            });
+            dlg.show();
+            DbCamareros db = new DbCamareros(cx);
+            List<JSONObject> lista = db.getAutorizados(true);
+            JSONObject o = new JSONObject();
+            o.put("ID", -1);
+            o.put("Nombre", "PARA TODOS");
+            lista.add(o);
+            dlg.mostrarReceptores(lista);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
     @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void mostrarListadoTicket(JSONArray ls) {
       try{
-
-
           if(ls.length()>0){
-
             LinearLayout ll =  dlgListadoTicket.findViewById(R.id.pneListados);
-
             ll.removeAllViews();
-
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -400,13 +411,11 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 t.setText(String.format("%01.2f €", z.getDouble( "Total")));
                 n.setText(z.getString("ID"));
 
-                ((ImageButton)v.findViewById(R.id.btnVerTicket)).setTag(z.getString("ID"));
-
+                v.findViewById(R.id.btnVerTicket).setTag(z.getString("ID"));
                 ll.addView(v, params);
 
             }
         }
-
       }catch (Exception e){
         e.printStackTrace();
       }
@@ -422,17 +431,13 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
 
             if(ls.length()>0){
-
                 LinearLayout ll = dlgListadoTicket.findViewById(R.id.pneListados);
-
                 ll.removeAllViews();
-
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
 
                 params.setMargins(5,5,5,5);
-
                 for (int i = 0; i < ls.length(); i++) {
                     JSONObject  z =  ls.getJSONObject(i);
 
@@ -457,7 +462,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                         (Context.LAYOUT_INFLATER_SERVICE);
                 @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_linea_total, null);
-                TextView  t = (TextView)v.findViewById(R.id.lblTotalTicket);
+                TextView  t = v.findViewById(R.id.lblTotalTicket);
                 t.setText(String.format("%01.2f €",Total));
 
                 ll.addView(v, params);
@@ -485,27 +490,26 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
     public void clickCambiarMesa(View v){
         Intent intent = new Intent(cx, OpMesas.class);
-        intent.putExtra("mesa", ((JSONObject)v.getTag()).toString());
+        intent.putExtra("mesa", v.getTag().toString());
         intent.putExtra("op", "cambiar");
         startActivity(intent);
     }
 
     public void clickJuntarMesa(View v){
         Intent intent = new Intent(cx, OpMesas.class);
-        intent.putExtra("mesa", ((JSONObject)v.getTag()).toString());
+        intent.putExtra("mesa", v.getTag().toString());
         intent.putExtra("op", "juntar");
         startActivity(intent);
     }
 
+    @SuppressLint("SetTextI18n")
     public void clickBorrarMesa(View v){
         setEstadoAutoFinish(true,true);
 
         final JSONObject m = (JSONObject)v.getTag();
         final Dialog dlg = new Dialog(cx);
 
-        dlg.setOnCancelListener(dialogInterface -> {
-            setEstadoAutoFinish(true,false);
-        });
+        dlg.setOnCancelListener(dialogInterface -> setEstadoAutoFinish(true,false));
 
         dlg.setContentView(R.layout.borrar_art);
         dlg.setTitle("Borrar Mesa ");
@@ -513,9 +517,9 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         final Button error = dlg.findViewById(R.id.btnError);
         final Button simpa =  dlg.findViewById(R.id.btnSimpa);
         final Button inv = dlg.findViewById(R.id.btnInv);
-        final ImageButton ok =  dlg.findViewById(R.id.btnOk);
+        final ImageButton ok =  dlg.findViewById(R.id.btn_ok);
         final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
-        final ImageButton exit = dlg.findViewById(R.id.btnSalir);
+        final ImageButton exit = dlg.findViewById(R.id.btn_salir);
         final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
         final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
         txtInfo.setText("Borrado de mesa completa");
@@ -620,7 +624,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         if (dbZonas != null) {
             rellenarZonas();
-            Log.d("ValleTVP.mesas", "resumiendo");
         }
 
         super.onResume();
@@ -634,7 +637,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
     @Override
     public void pedirAutorizacion(ContentValues p) {
-        myServicio.pedirAutorizacion(p, handleHttp, "procesar_autorizacion");
+        myServicio.pedirAutorizacion(p);
     }
 
     @Override
@@ -642,6 +645,20 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
     }
 
+    @Override
+    public void sendMensaje(String IDReceptor, String men){
+        setEstadoAutoFinish(true, false);
+        try {
+            ContentValues p = new ContentValues();
+            p.put("idreceptor", IDReceptor);
+            p.put("accion", "informacion");
+            p.put("mensaje", men);
+            p.put("autor", cam.getString("Nombre"));
+            myServicio.sendMensaje(p);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     //Utilidades
     private void borrarMesa(String idm, String motivo){
@@ -659,8 +676,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                                                p, "borrar_mesa");
                 dlg.show();
             }
-
-           ;
 
         } catch (JSONException e) {
             e.printStackTrace();

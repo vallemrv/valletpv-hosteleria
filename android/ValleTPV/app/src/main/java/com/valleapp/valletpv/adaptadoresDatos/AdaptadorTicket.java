@@ -50,7 +50,7 @@ public class AdaptadorTicket extends ArrayAdapter<JSONObject> implements View.On
             nombre.setText(String.format("%s",values.get(position).getString("Nombre")));
             p.setText(String.format("%01.2f €", values.get(position).getDouble("Precio")));
             t.setText(String.format("%01.2f €", values.get(position).getDouble("Total")));
-            ImageButton rm = (ImageButton)rowView.findViewById(R.id.btnBorrar);
+            ImageButton rm = (ImageButton)rowView.findViewById(R.id.btn_borrar);
             rm.setTag(values.get(position));
             rm.setOnClickListener(this);
         } catch (JSONException e) {
