@@ -1,11 +1,11 @@
-package com.valleapp.valletpv.db;
+package com.valleapp.comandas.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,15 +15,11 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbSubTeclas extends SQLiteOpenHelper {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+public class DBSubTeclas extends DBBase  {
 
 
-    public DbSubTeclas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    public DBSubTeclas(Context context) {
+        super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -41,8 +37,8 @@ public class DbSubTeclas extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    public void RellenarTabla(JSONArray datos){
+    @Override
+    public void rellenarTabla(JSONArray datos){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -55,10 +51,10 @@ public class DbSubTeclas extends SQLiteOpenHelper {
             // Create a new map of values, where column names are the keys
             try {
                  ContentValues values = new ContentValues();
-                 values.put("ID", datos.getJSONObject(i).getInt("ID"));
-                 values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
-                 values.put("Incremento", datos.getJSONObject(i).getString("Incremento"));
-                 values.put("IDTecla", datos.getJSONObject(i).getString("IDTecla"));
+                 values.put("ID", datos.getJSONObject(i).getInt("id"));
+                 values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
+                 values.put("Incremento", datos.getJSONObject(i).getString("incremento"));
+                 values.put("IDTecla", datos.getJSONObject(i).getString("tecla"));
                  db.insert("subteclas", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -68,13 +64,14 @@ public class DbSubTeclas extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "SELECT * FROM subteclas WHERE IDTecla="+id , null );
         res.moveToFirst();
-        while(res.isAfterLast() == false){
+        while(!res.isAfterLast()){
             try{
                 JSONObject obj = new JSONObject();
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
@@ -92,25 +89,7 @@ public class DbSubTeclas extends SQLiteOpenHelper {
     }
 
 
-    public int getCount(String id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("SELECT count(*) FROM subteclas WHERE IDTecla="+id, null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-            s = cursor.getInt(0);
-        }
-            cursor.close();db.close();
-            return  s;
-    }
 
-    public void Vaciar(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM subteclas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        db.close();
-    }
+
+
 }
