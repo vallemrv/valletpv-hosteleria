@@ -34,6 +34,7 @@ public class DlgMensajes extends Dialog implements IControlMensajes {
         setContentView(R.layout.dialog_mensaje);
         ImageButton btn = findViewById(R.id.btn_salir_mensajes);
         btn.setOnClickListener(v -> cancel());
+        setTitle("Enviar mensajes");
     }
 
     @Override

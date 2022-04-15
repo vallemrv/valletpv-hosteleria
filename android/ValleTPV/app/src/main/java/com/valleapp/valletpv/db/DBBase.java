@@ -1,11 +1,11 @@
-package com.valleapp.comandas.db;
+package com.valleapp.valletpv.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
-import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 

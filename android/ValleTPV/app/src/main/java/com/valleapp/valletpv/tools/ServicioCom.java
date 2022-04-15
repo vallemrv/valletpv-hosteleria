@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.valleapp.valletpv.db.DBSubTeclas;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.db.DbCuenta;
@@ -177,7 +178,8 @@ public class ServicioCom extends Service {
                     "zonas",
                     "mesas",
                     "teclas",
-                    "secciones"
+                    "secciones",
+                    "subteclas"
             };
 
         }
@@ -191,6 +193,7 @@ public class ServicioCom extends Service {
             dbs.put("teclas", new DbTeclas(getApplicationContext()));
             dbs.put("lineaspedido", new DbCuenta(getApplicationContext()));
             dbs.put("mesasabiertas", new DbMesasAbiertas(dbMesas));
+            dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
         }
 
 

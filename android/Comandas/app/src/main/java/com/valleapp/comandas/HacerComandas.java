@@ -455,5 +455,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         rellenarBotonera();
     }
 
-
+    @Override
+    protected void onPause() {
+        finish();
+        super.onPause();
+    }
 }

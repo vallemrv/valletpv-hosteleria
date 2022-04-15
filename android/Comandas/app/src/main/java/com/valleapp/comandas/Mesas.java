@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,7 +15,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,23 +25,22 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.valleapp.comandas.adaptadores.AdaptadorMesas;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.db.DBZonas;
+import com.valleapp.comandas.interfaces.IPedidos;
+import com.valleapp.comandas.pestañas.ListaMesas;
+import com.valleapp.comandas.pestañas.Pedidos;
+import com.valleapp.comandas.utilidades.ActivityBase;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.JSON;
+import com.valleapp.comandas.utilidades.ServicioCom;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.valleapp.comandas.db.DBCuenta;
-import com.valleapp.comandas.db.DBMesas;
-import com.valleapp.comandas.db.DBZonas;
-import com.valleapp.comandas.utilidades.ActivityBase;
-import com.valleapp.comandas.utilidades.Instruccion;
-import com.valleapp.comandas.utilidades.JSON;
-import com.valleapp.comandas.interfaces.IPedidos;
-import com.valleapp.comandas.adaptadores.AdaptadorMesas;
-import com.valleapp.comandas.pestañas.ListaMesas;
-import com.valleapp.comandas.pestañas.Pedidos;
-import com.valleapp.comandas.utilidades.ServicioCom;
-
-import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -62,6 +61,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     JSONObject zn = null;
 
     JSONArray peticiones = new JSONArray();
+    boolean viendo_mensajes = false;
 
 
 
@@ -99,6 +99,10 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     break;
                 case "autorias":
                     try {
+                        if(!viendo_mensajes) {
+                            MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
+                            m.start();
+                        }
                         peticiones = new JSONArray(res);
                         manejarAurotias();
                     }catch (Exception e){
@@ -420,6 +424,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     }
 
     public void mostrarAutorias(View v){
+        viendo_mensajes = true;
         Intent i = new Intent(cx, Autorias.class);
         i.putExtra("url", server);
         i.putExtra("peticiones", peticiones.toString());
@@ -498,6 +503,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     @Override
     protected void onResume() {
+        viendo_mensajes = false;
         presBack = 0;
         Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);

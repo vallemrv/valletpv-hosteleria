@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -136,6 +137,11 @@ public class Cuenta extends Activity {
         myServicio.rmExHandler("lineaspedido");
         unbindService(mConexion);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     public void clickImprimir(View v){
