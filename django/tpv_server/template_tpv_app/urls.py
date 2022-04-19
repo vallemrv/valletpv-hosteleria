@@ -29,16 +29,12 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('api/', include('api_android.urls'), name="api"),
-    path('almacen/', include("almacen.urls"), name="almacen"),
-    path('contabilidad/', include("contabilidad.urls"), name="conta"),
-    path('gestion/', include("gestion.urls"), name="gestion"),
-    path('ventas/', include("ventas.urls"), name="ventas"),
     path('favicon.ico$',
             RedirectView.as_view( # the redirecting function
                 url=staticfiles_storage.url('favicon.ico'), 
             ),
             name="favicon" # name of our view
         ),
-    path('', include("inicio.urls")),
+    path('', include("app.urls")),
 
 ]
