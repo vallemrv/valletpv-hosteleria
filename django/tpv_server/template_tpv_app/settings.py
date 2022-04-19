@@ -78,14 +78,14 @@ ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static', 'resources'),
-    os.path.join(BASE_DIR, "../../javascript/gestion_ui/dist"),
+    os.path.join(BASE_UI_DIR, "gestion_ui", "dist"),
     )
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+             os.path.join(BASE_UI_DIR, "gestion_ui", "dist"),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -191,18 +191,3 @@ STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT  =  os.path.join(STATIC_ROOT, 'media_{{name_tpv}}')
 
 
-# Directorio de Vue
-UI_DIR = os.path.join(BASE_UI_DIR, 'gestion_ui')
-
-# Opciones de webpack-loader
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'webpack_bundles/',
-        'STATS_FILE': os.path.join(UI_DIR, 'webpack-stats.json'),
-        'POLL_INTERVAL': 0.1,
-        'TIMEOUT': None,
-        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
-        'LOADER_CLASS': 'webpack_loader.loader.WebpackLoader',
-    }
-}
