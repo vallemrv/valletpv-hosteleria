@@ -4,9 +4,9 @@ manage*
 media*/
 server_*
 *.sqlite3
-node_modules
+node_*/
 ignore*
-**/dist/
+
 
 
 #excepciones
