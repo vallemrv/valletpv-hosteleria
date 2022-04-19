@@ -6,13 +6,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.pa
 
 
 class Command(BaseCommand):
-    help = 'Inserta datos iniciales en la base de datos.'
+    help = 'Borra todos los datos de ventas.'
 
     def add_arguments(self, parser):
         pass
 
     def handle(self, *args, **options):
-        path = os.path.join(BASE_DIR, "template_tpv_app", "delete_db.sql")
+        path = os.path.join(BASE_DIR,  "delete_db_ventas.sql")
         f = open(path, "r")
         command_sql = f.read().split(";")
         with connection.cursor() as cursor:

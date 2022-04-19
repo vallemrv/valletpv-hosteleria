@@ -25,6 +25,8 @@ BRAND_TITLE = "{{nombre_empresa}}"
 BRAND = "{{nombre_empresa}}"
 EMPRESA = "{{name_tpv}}"
 MAIL = "{{email}}"
+BASE_UI_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)),"javascript")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -50,10 +52,10 @@ INSTALLED_APPS = [
     'almacen',
     'contabilidad',
     'gestion',
-    'inicio',
     'app',
     'ventas',
     'api_android',
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -74,7 +76,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static', 'resources'),)
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static', 'resources'),
+    os.path.join(BASE_DIR, "../../javascript/gestion_ui/dist"),
+    )
 
 TEMPLATES = [
     {
@@ -184,3 +189,20 @@ MEDIA_URL   = '/media/'
 STATIC_URL  = '/static/'
 STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT  =  os.path.join(STATIC_ROOT, 'media_{{name_tpv}}')
+
+
+# Directorio de Vue
+UI_DIR = os.path.join(BASE_UI_DIR, 'gestion_ui')
+
+# Opciones de webpack-loader
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'webpack_bundles/',
+        'STATS_FILE': os.path.join(UI_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+        'LOADER_CLASS': 'webpack_loader.loader.WebpackLoader',
+    }
+}
