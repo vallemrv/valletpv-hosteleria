@@ -13,6 +13,7 @@ ignore*
 #excepciones
 !manage_template.py
 !management/
+!gestion_ui/
 
 
 # Byte-compiled / optimized / DLL files
