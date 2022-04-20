@@ -9,6 +9,7 @@ ignore*
 
 
 
+
 #excepciones
 !manage_template.py
 !management/
