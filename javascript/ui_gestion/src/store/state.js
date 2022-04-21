@@ -1,5 +1,6 @@
 export default {
     ocupado: false,
-    error: null,
-    datos: { }
+    error: "",
+    user: null,
+    token: null
 }

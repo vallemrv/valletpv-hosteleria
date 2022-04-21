@@ -11,14 +11,14 @@ def inicio(request):
 
 @csrf_exempt
 def getlistado(request):
-    print(request.POST)
+    app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"]
     filter = json.loads(request.POST["filter"]) if "filter" in request.POST else {}
-    model = apps.get_model('gestion', tb_name)
+    model = apps.get_model(app_name, tb_name)
     objs = model.objects.filter(**filter)
     regs = []
     for obj in objs:
         regs.append(model_to_dict(obj))
 
-    return JsonResponse({'tb':tb_name, "reg": regs})
+    return JsonResponse({'tb':tb_name, "regs": regs})
 

@@ -10,10 +10,16 @@
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </template>
-
       <v-list>
         <v-list-item v-for="(item, index) in items" :key="index" @click="showData(item)">
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
+          <v-list-item-title>
+            {{ item.title }}
+            <v-icon  v-if="item.icon">{{item.icon}}</v-icon>
+          </v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="salir()"  v-if="user">
+          {{user[0].username}}
+          <v-icon class="ml-3">mdi-location-exit</v-icon>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -22,19 +28,53 @@
 
 <script>
 import router from "@/router";
+import { mapState, mapActions } from 'vuex'
 export default {
   data: () => ({
     items: [
       { title: "Gestion", link: "gestion" },
-      { title: "Ventas", link: "ventas" },
+      { title: "Ventas", link: "ventas" }
     ],
     menu: false,
   }),
+  computed: {
+     ...mapState(['user',"token"])
+  },
   methods: {
     showData: function (item) {
       router.push(item.link);
       this.menu = false;
     },
+    mostrarUser(){
+      if(this.token!=null && this.token != undefined){
+        if (localStorage.user){
+          this.$store.state.user = JSON.parse(localStorage.user) 
+        }else{
+          let params = new FormData()
+          params.append("app", "auth")
+          params.append("tb", "user")
+          params.append("filter", JSON.stringify({id:this.token.id}))
+          this.getListado({params:params})
+        } 
+      }
+    },
+    salir(){
+      localStorage.removeItem("token")
+      localStorage.removeItem("user")
+      this.$store.state.user = null
+      this.$store.state.token = null
+    },
+    ...mapActions(['getListado'])
+  },
+  watch:{
+     user(v){
+       if(v){
+          localStorage.user = JSON.stringify(v)
+       }
+     }
+  },
+  created() {
+    this.mostrarUser()
   },
 };
 </script>

@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'app',
     'ventas',
     'api_android',
-    'webpack_loader',
 ]
 
 MIDDLEWARE = [

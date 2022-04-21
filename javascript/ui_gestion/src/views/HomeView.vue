@@ -9,9 +9,9 @@ export default {
   data: () => ({
     items: [
       { title: "Camareros", link: "/camareros" },
-      { title: "Click Me", link: "/camareros" },
-      { title: "Click Me", link: "/camareros" },
-      { title: "Click Me 2", link: "/camareros" },
+      { title: "Teclados", link: "/teclados" },
+      { title: "Precios", link: "/precios" },
+      { title: "Cajas", link: "/cierres_caja" },
     ],
   }),
 };

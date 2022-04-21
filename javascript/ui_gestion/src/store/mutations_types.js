@@ -1,1 +1,5 @@
+export const GET_REQUEST = 'GET_REQUEST'
+export const ERROR_REQUEST = 'ERROR_REQUEST'
+export const GET_TOKEN = 'GET_TOKEN'
 export const GET_LISTADOS_SUCCES = 'GET_LISTADOS_SUCCES'
+

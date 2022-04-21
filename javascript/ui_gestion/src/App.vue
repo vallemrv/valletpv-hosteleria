@@ -1,15 +1,13 @@
 <template>
   <v-app>
     <valle-login v-if="token == null"></valle-login>
-    <v-container fluid v-else>
+    <div  v-else>
       <valle-header></valle-header>
-      <v-main>
+      <v-main app>
         <v-container><router-view></router-view></v-container>
       </v-main>
-      <v-footer app>
-        <valle-footer></valle-footer>
-      </v-footer>
-    </v-container>
+      <valle-footer></valle-footer>
+    </div>
   </v-app>
 </template>
 
@@ -23,14 +21,28 @@ export default {
   components: { ValleFooter, ValleHeader, ValleLogin },
   name: "App",
 
-  data: () => ({
-    //
-  }),
+  data(){
+     return {
+        miToken:null
+     }
+  },
   computed: {
     ...mapState(["ocupado", "token"]),
   },
   methods: {
     ...mapActions(["getListado"]),
   },
+  created() {
+      if(localStorage.token){
+        this.$store.state.token = localStorage.token;
+      }
+  }
 };
 </script>
+
+
+<style scoped>
+  .v-container{
+    padding-bottom: 80px;
+  }
+</style>

@@ -1,17 +1,21 @@
 <template>
-    <v-col
-      class="text-center"
-      cols="12"
+    <v-footer
+      app 
+      bottom
+      fixed 
     >
-      {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
-    </v-col>
+        <v-col
+          class="text-center"
+          cols="12"
+        >
+          {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+        </v-col>
+    </v-footer>
+    
 </template>
 
-
-<script>
-
-export default {
-   
-}
-</script>
-
+<style scoped>
+    .v-footer{
+      width: 100%;
+    }
+</style>
