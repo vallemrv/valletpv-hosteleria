@@ -29,7 +29,8 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('api/', include('api_android.urls'), name="api"),
-    path('favicon.ico$',
+    path('token/', include('tokenapi.urls')),
+    path('favicon.ico',
             RedirectView.as_view( # the redirecting function
                 url=staticfiles_storage.url('favicon.ico'), 
             ),

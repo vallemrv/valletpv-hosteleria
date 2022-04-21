@@ -4,5 +4,6 @@ from . import views
 
 app_name = "app"
 urlpatterns = [
-    path('', views.inicio, name="inicio")
+    path('', views.inicio, name="inicio"),
+    path('getlistado', views.getlistado, name="getlistado")
 ]
