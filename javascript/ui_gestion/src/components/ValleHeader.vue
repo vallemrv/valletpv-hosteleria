@@ -38,7 +38,7 @@ export default {
     menu: false,
   }),
   computed: {
-     ...mapState(['user',"token"])
+     ...mapState(['user',"token", "error"])
   },
   methods: {
     showData: function (item) {
@@ -59,10 +59,7 @@ export default {
       }
     },
     salir(){
-      localStorage.removeItem("token")
-      localStorage.removeItem("user")
-      this.$store.state.user = null
-      this.$store.state.token = null
+      this.$tools.salir(this.$store)
     },
     ...mapActions(['getListado'])
   },
@@ -70,6 +67,13 @@ export default {
      user(v){
        if(v){
           localStorage.user = JSON.stringify(v)
+       }
+     },
+     error(v){
+       if(v){
+         if(v.request.status == 401){
+           this.salir()
+         }
        }
      }
   },

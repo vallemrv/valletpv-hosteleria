@@ -16,11 +16,9 @@ import { mapState, mapActions } from "vuex";
 import ValleFooter from "./components/ValleFooter";
 import ValleHeader from "./components/ValleHeader";
 import ValleLogin from "./components/ValleLogin";
-
 export default {
   components: { ValleFooter, ValleHeader, ValleLogin },
   name: "App",
-
   data(){
      return {
         miToken:null
@@ -34,7 +32,7 @@ export default {
   },
   created() {
       if(localStorage.token){
-        this.$store.state.token = localStorage.token;
+        this.$store.state.token = JSON.parse(localStorage.token);
       }
   }
 };

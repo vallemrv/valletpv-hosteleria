@@ -20,6 +20,7 @@
         label="Contraseña"
         :error-messages="passError"
         required
+        autocomplete
         @click:append="show_pass = !show_pass"
       ></v-text-field>
     </form>

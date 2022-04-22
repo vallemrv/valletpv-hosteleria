@@ -1,9 +1,33 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
-    getListado({ commit }, { params }){
+    getTeclados({ commit, state }){
         commit(types.GET_REQUEST)
-        API.getListado(params).then( r => commit(types.GET_LISTADOS_SUCCES, {result: r}))
+        let params = new FormData()
+        params.append("user", state.token.user)
+        params.append("token", state.token.token)
+        API.getTeclados(params)
+        .then( r => commit(types.GET_TECLADOS, {result: r}))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getListadoCompuesto({ commit, state }, { params }){
+        commit(types.GET_REQUEST)
+        params.append("user", state.token.user)
+        params.append("token", state.token.token)
+        API.getListado(params)
+        .then( r => commit(types.GET_LISTADOS_COMPUESTOS, {result: r}))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getListado({ commit, state }, { params }){
+        commit(types.GET_REQUEST)
+        params.append("user", state.token.user)
+        params.append("token", state.token.token)
+        API.getListado(params)
+        .then( r => commit(types.GET_LISTADOS, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
         })

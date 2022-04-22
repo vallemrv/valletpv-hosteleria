@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'app',
     'ventas',
     'api_android',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -73,18 +75,20 @@ AUTHENTICATION_BACKENDS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static', 'resources'),
-    os.path.join(BASE_UI_DIR, "gestion_ui", "dist"),
+        os.path.join(BASE_DIR, 'static', 'resources'),
+        os.path.join(BASE_DIR, 'static', 'dist'),
     )
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-             os.path.join(BASE_UI_DIR, "gestion_ui", "dist"),
+            os.path.join(BASE_DIR, 'static', 'dist'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

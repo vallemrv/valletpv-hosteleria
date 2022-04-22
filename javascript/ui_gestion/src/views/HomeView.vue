@@ -3,7 +3,6 @@
 </template>
 <script>
 import ValleMenuBtn from "@/components/ValleMenuBtn";
-
 export default {
   components: { ValleMenuBtn },
   data: () => ({
