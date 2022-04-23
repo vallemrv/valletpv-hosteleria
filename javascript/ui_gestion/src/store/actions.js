@@ -1,6 +1,9 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
+    addInstruccion( {commit, state }, {inst}) {
+        commit(types.ADD_INSTRUCTIONS, {inst:inst})
+    },
     getTeclados({ commit, state }){
         commit(types.GET_REQUEST)
         let params = new FormData()

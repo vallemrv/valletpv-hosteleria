@@ -4,6 +4,16 @@
       <v-toolbar-title> ValleTPV </v-toolbar-title>
     </router-link>
     <v-spacer></v-spacer>
+    <v-btn stacked v-if="num_inst > 0">
+      <v-badge
+        color="error"
+        :content="num_inst"
+      >
+        <v-icon icon="mdi-inbox-arrow-down"></v-icon>
+      </v-badge>
+
+      MOD
+    </v-btn>
     <v-menu v-model="menu" anchor="start" bottom>
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
@@ -38,7 +48,10 @@ export default {
     menu: false,
   }),
   computed: {
-     ...mapState(['user',"token", "error"])
+     ...mapState(['user',"token", "error", "instrucciones"]),
+     num_inst(){
+        return this.instrucciones.length
+     }
   },
   methods: {
     showData: function (item) {
@@ -79,7 +92,7 @@ export default {
   },
   created() {
     this.mostrarUser()
-  },
+  }
 };
 </script>
 

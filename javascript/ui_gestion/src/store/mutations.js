@@ -34,4 +34,21 @@ export default {
             state[e.tb] = e.regs
         });
     },
+    [types.ADD_INSTRUCTIONS] (state, {inst}){
+        state.ocupado = false;
+        state.error = null
+        let modificado = false
+        state.instrucciones.forEach( (obj, i) => {
+            var col_obj = Object.keys(obj.reg)[0]
+            var col_inst = Object.keys(inst.reg)[0]
+            if (obj.id == inst.id && 
+                col_obj == col_inst) {
+                obj.reg = inst.reg
+                modificado = true
+            }
+        })
+        if( !modificado ){
+            state.instrucciones.push(inst)
+        }      
+    },
 }

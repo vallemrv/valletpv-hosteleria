@@ -45,10 +45,26 @@ def get_listado_compuesto(request):
 
 @token_required
 def get_teclados(request):
-
-    
     return JsonResponse([
     {"tb":"teclas", 'regs': Teclas.update_for_devices()},
     {"tb": "secciones","regs": Secciones.update_for_devices()},
     {"tb": "subteclas", "regs": Subteclas.update_for_devices()}
     ])
+
+@token_required
+def mod_regs(request):
+    insts = json.loads(request.POST["isnts"])
+    for inst in insts:
+        app_name = inst["app"] if "app" in inst else "gestion"
+        tb_name = inst["tb"]
+        reg = inst["reg"]
+        id = inst["id"]
+        model = apps.get_model(app_name, tb_name)
+
+        obj = model.objects.filter(id=id).first()
+        if (obj):
+            obj.save(**reg)
+
+    return JsonResponse()
+
+
