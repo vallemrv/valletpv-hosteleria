@@ -4,24 +4,23 @@
       <v-toolbar-title> ValleTPV </v-toolbar-title>
     </router-link>
     <v-spacer></v-spacer>
-    <v-btn stacked v-if="num_inst > 0">
-      <v-badge
-        color="error"
-        :content="num_inst"
-      >
-        <v-icon icon="mdi-inbox-arrow-down"></v-icon>
-      </v-badge>
 
-      MOD
-    </v-btn>
-    <v-menu v-model="menu" anchor="start" bottom>
+    <valle-inbox
+      :num_inst="num_inst" 
+      v-if="num_inst > 0"></valle-inbox>
+    
+    <v-menu v-model="menu" 
+        anchor="bottom end" origin="auto" >
       <template v-slot:activator="{ props }">
         <v-btn icon v-bind="props">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </template>
+
       <v-list>
-        <v-list-item v-for="(item, index) in items" :key="index" @click="showData(item)">
+        <v-list-item v-for="(item, index) in items" 
+        :key="index" 
+        @click="showData(item)">
           <v-list-item-title>
             {{ item.title }}
             <v-icon  v-if="item.icon">{{item.icon}}</v-icon>
@@ -39,7 +38,9 @@
 <script>
 import router from "@/router";
 import { mapState, mapActions } from 'vuex'
+import ValleInbox from './ValleInbox.vue'
 export default {
+  components: { ValleInbox },
   data: () => ({
     items: [
       { title: "Gestion", link: "gestion" },
