@@ -4,6 +4,6 @@ export default {
     user: null,
     token: null,
     secFilter: [],
-    teclas: [],
-    instrucciones: []
+    teclas: null,
+    instrucciones: null
 }

@@ -3,8 +3,11 @@ import axios from 'axios'
 const url = "http://localhost:8000/"
 
 export default {
-    getTeclados(params){
-        return axios.post(url+"app/getTeclados",  params, {}).then(r => r.data);
+    addItem(params){
+        return axios.post(url+"app/add_reg", params, {}).then(r => r.data)
+    },
+    actualizar(params){
+        return axios.post(url+"app/mod_regs", params, {}).then(r => r.data)
     },
     getListadoCompuesto(params){
         return axios.post(url+"app/getListadoCompuesto",  params, {}).then(r => r.data);

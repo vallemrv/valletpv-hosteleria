@@ -1,5 +1,7 @@
 import * as types from "./mutations_types"
-export default {
+import * as tools from "./tools"
+
+export default {  
     [types.GET_REQUEST] (state){
         state.ocupado= true;
         state.error = null;
@@ -16,8 +18,7 @@ export default {
     [types.GET_LISTADOS_COMPUESTOS] (state, {result}){
         state.ocupado = false;
         state.error = null
-        tablas = result.tablas
-        tablas.forEach(e => {
+        result.forEach(e => {
             state[e.tb] = e.regs
         });
     },
@@ -27,28 +28,35 @@ export default {
         state.token = token;
         localStorage.token = JSON.stringify(state.token)
     },
-    [types.GET_TECLADOS] (state, {result}){
-        state.ocupado = false;
-        state.error = null
-        result.forEach(e => {
-            state[e.tb] = e.regs
-        });
-    },
     [types.ADD_INSTRUCTIONS] (state, {inst}){
+        if (!state.instrucciones) state.instrucciones = []
         state.ocupado = false;
         state.error = null
-        let modificado = false
-        state.instrucciones.forEach( (obj, i) => {
-            var col_obj = Object.keys(obj.reg)[0]
-            var col_inst = Object.keys(inst.reg)[0]
-            if (obj.id == inst.id && 
-                col_obj == col_inst) {
-                obj.reg = inst.reg
-                modificado = true
-            }
-        })
-        if( !modificado ){
+        let contains = false;
+        if (inst.tipo == "md"){
+            contains = tools.contains(state.instrucciones, inst, true);
+        }else if ( inst.tipo == "rm"){
+            contains = tools.contains(state.instrucciones, inst, false);
+        }
+       
+        if( !contains ){
             state.instrucciones.push(inst)
         }      
     },
+    [types.ACTUALIZAR] (state){
+        state.ocupado = false
+        state.error = null
+        state.instrucciones.forEach( (inst) => {
+            state[inst.tb] = null
+        })
+        state.instrucciones = null
+    },
+    [types.ADD_ITEM] (state, {item, tb_name}){
+        state.ocupado = false
+        state.error = null
+        let result = Object.values(state[tb_name])
+        result.push(JSON.parse(item))
+        state[tb_name] = result
+    }
+        
 }

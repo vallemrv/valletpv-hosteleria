@@ -4,10 +4,11 @@ import mutations from "./mutations"
 import getters from "./getters"
 import state from "./state"
 
+
 export default createStore({
   state,
   getters,
   mutations,
   actions,
-  modules: {}
+  modules: { },
 })

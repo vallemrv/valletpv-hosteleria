@@ -1,27 +1,31 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
-    addInstruccion( {commit, state }, {inst}) {
-        commit(types.ADD_INSTRUCTIONS, {inst:inst})
-    },
-    getTeclados({ commit, state }){
+    actualizar( {commit, state}){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("user", state.token.user)
-        params.append("token", state.token.token)
-        API.getTeclados(params)
-        .then( r => commit(types.GET_TECLADOS, {result: r}))
+        params.append("token", state.token.token) 
+        params.append("isnts", JSON.stringify(state.instrucciones))
+        API.actualizar(params)
+        .then(r => commit(types.ACTUALIZAR, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getListadoCompuesto({ commit, state }, { params }){
+    addInstruccion( {commit }, {inst}) {
+        commit(types.ADD_INSTRUCTIONS, {inst:inst})
+    },
+    getListadoCompuesto({ commit, state }, { tablas }){
         commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("tbs", JSON.stringify(tablas))
         params.append("user", state.token.user)
         params.append("token", state.token.token)
-        API.getListado(params)
+        API.getListadoCompuesto(params)
         .then( r => commit(types.GET_LISTADOS_COMPUESTOS, {result: r}))
         .catch(error => {
+            console.log(error)
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
@@ -38,6 +42,18 @@ export default {
     login({ commit }, { params }){
         commit(types.GET_REQUEST)
         API.login(params).then( r => commit(types.GET_TOKEN, {token: r}))
+        .catch(error => {
+           commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    addItem({commit, state}, { item, tb_name }){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.token.user)
+        params.append("token", state.token.token)
+        params.append("reg", JSON.stringify(item))
+        params.append("tb_name", tb_name)
+        API.addItem(params).then(r=> commit(types.ADD_ITEM, {item:r.reg, tb_name:tb_name}))
         .catch(error => {
            commit(types.ERROR_REQUEST, {error: error})
         })
