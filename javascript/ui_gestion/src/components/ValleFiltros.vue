@@ -13,7 +13,7 @@
           :key="'op_' + i"
         >
           <v-btn class="ma-2" :color="isSelected ? 'primary' : ''" @click="toggle">{{
-            f.text
+            f
           }}</v-btn>
         </v-item>
       </v-item-group>
@@ -32,19 +32,22 @@ export default {
   watch: {
     selected(v) {
       let f = {
-        is_and: this.filtro.is_and ? true : false,
         filters: [],
+        selected: [],
       };
-      if (v != undefined) {
+      if (v == undefined || (typeof v == "object" && Object.keys(v).length == 0)) {
+        console.log("all");
+        f.filters = Object.values(this.filtro.all);
+      } else {
         if (this.filtro.multiple) {
-          f.filters = Object.keys(this.selected).map((k) => {
+          f.filters = Object.values(this.selected).map((k) => {
+            f.selected.push(k);
             return this.filtro.filters[k];
           });
         } else {
-          f.filters.push(this.filtro.filters[v]);
+          f.selected.push(v);
+          f.filters.push(Object.values(this.filtro.filters)[v]);
         }
-      } else {
-        f.filters = this.filtro.all;
       }
 
       this.$emit("on_filter", f);

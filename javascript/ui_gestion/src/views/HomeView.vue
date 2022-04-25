@@ -7,6 +7,7 @@ export default {
   components: { ValleMenuBtn },
   data: () => ({
     items: [
+      { title: "Camareros pase", link: "/camareros_pase" },
       { title: "Camareros", link: "/camareros" },
       { title: "Teclados", link: "/teclados" },
       { title: "Precios", link: "/precios" },

@@ -5,5 +5,6 @@ export default {
     token: null,
     secFilter: [],
     teclas: null,
-    instrucciones: null
+    instrucciones: null,
+    itemsFiltrados: []
 }

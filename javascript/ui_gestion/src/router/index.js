@@ -4,6 +4,7 @@ import CamarerosView from '@/views/CamarerosView'
 import PreciosView from '@/views/PreciosView'
 import TecladosView from '@/views/TecladosView'
 import CajasView from '@/views/CajasView'
+import CamarerosPaseView from '@/views/CamarerosPaseView'
 
 const routes = [
   {
@@ -15,6 +16,11 @@ const routes = [
     path: '/camareros',
     component: CamarerosView,
     name: 'camareros'
+  },
+  {
+    path: '/camareros_pase',
+    component: CamarerosPaseView,
+    name: 'camareros_pase'
   },
   {
     path: '/teclados',

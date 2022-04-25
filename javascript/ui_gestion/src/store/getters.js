@@ -31,23 +31,22 @@ export default {
 
     },
     getItemsFiltered: (state) => (filter, tb_name) =>{
+        var f = filter.filters
         if (!state[tb_name]) return []
-        if (filter.filters.length == 0) return state[tb_name]
+        if (f.length == 0) return state[tb_name]
         return Object.values(state[tb_name])
         .filter( o => {
-            let is_corret = false
-            if (filter.is_and){
-                is_corret = true
-                Object.values(filter.filters).forEach((e, i) => {
-                    var k = Object.keys(e)[0];
-                    is_corret = is_corret && o[k] == filter.filters[i][k]
-                })
-            }else{
-                Object.values(filter.filters).forEach((e, i) => {
-                    var k = Object.keys(e)[0];
-                    is_corret = is_corret || o[k] == filter.filters[i][k]
-                })
-            }
+            var is_corret = false
+           
+            f.forEach((q) => {
+                if (!is_corret){
+                    is_corret = true
+                    Object.keys(q).map( (k) => {
+                        is_corret = is_corret && o[k] == q[k]
+                        //console.log(o.nombre, o[k], q[k], is_corret)
+                    });
+                } 
+            });
             
             return is_corret
         })

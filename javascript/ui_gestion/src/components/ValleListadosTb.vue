@@ -5,13 +5,13 @@
         <th v-for="(h, i) in headers" :key="i">
           {{ h.toUpperCase() }}
         </th>
-        <th class="text-center">HERRAMIENTAS</th>
+        <th class="text-center" v-if="tools">HERRAMIENTAS</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(item, i) in items" :key="i">
         <td v-for="(reg, j) in columns" :key="j">{{ item[reg] }}</td>
-        <td class="text-center">
+        <td class="text-center" v-if="tools">
           <v-menu anchor="start bottom" origin="auto">
             <template v-slot:activator="{ props }">
               <v-btn :id="'btn_' + i" v-bind="props" size="small" color="#cfb6d4"

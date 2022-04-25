@@ -50,7 +50,7 @@ export default {
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
     handlerShow() {
-      this.$emit("on_show", !this.show);
+      this.$emit("on_visible_change", !this.show);
     },
     enviar() {
       if (this.tipo == "add") {
@@ -69,7 +69,7 @@ export default {
   },
   watch: {
     show(v) {
-      this.$emit("on_show", v);
+      this.$emit("on_visible_change", v);
     },
   },
 };
