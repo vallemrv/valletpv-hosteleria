@@ -300,6 +300,14 @@ class Familias(models.Model):
     numtapas = models.IntegerField("Numero de tapas", db_column='NumTapas', null=True, blank=True)  # Field name made lowercase.
     receptor = models.ForeignKey('Receptores',  on_delete=models.CASCADE, db_column='IDReceptor')  # Field name made lowercase.
 
+    @staticmethod
+    def update_for_devices():
+        rows = Familias.objects.all()
+        objs = []
+        for r in rows:
+            objs.append(model_to_dict(r))
+        return objs
+
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -728,6 +736,14 @@ class Receptores(models.Model):
     activo = models.BooleanField(db_column='Activo', default=True)  # Field name made lowercase.
     descripcion = models.CharField(db_column='Descripcion', max_length=200, default="")  # Field name made lowercase.
 
+    @staticmethod
+    def update_for_devices():
+        rows = Receptores.objects.all()
+        objs = []
+        for r in rows:
+            objs.append(model_to_dict(r))
+        return objs
+
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
@@ -982,7 +998,8 @@ class Teclas(models.Model):
             row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
             seccioncom = r.teclascom_set.all().first()
             row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
-            row["OrdenCom"] = seccioncom.orden if seccioncom else -1;
+            row["OrdenCom"] = seccioncom.orden if seccioncom else -1
+            row["familia__nombre__familias"] = r.familia.nombre
             objs.append(row)
         return objs
    

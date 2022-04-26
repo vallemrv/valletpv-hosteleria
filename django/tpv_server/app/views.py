@@ -1,4 +1,5 @@
 import json
+from attr import field
 from django.shortcuts import render
 from tokenapi.http import JsonResponse
 from django.apps import apps
@@ -42,8 +43,22 @@ def add_reg(request):
     tb_name = request.POST["tb_name"]
     reg = json.loads(request.POST["reg"])
     model = apps.get_model(app_name, tb_name)
-    obj = model(**reg)
+    obj = model()
+    
+    for key in reg:
+        if hasattr(obj, key):
+            setattr(obj, key, reg[key])      
+        else:
+            if "__" in key:
+                attr, field, str_parent = key.split("__")
+                parent = apps.get_model(app_name, str_parent)
+                filter = {field:reg[key]}
+                p = parent.objects.filter(**filter).first()
+                if p:
+                    setattr(obj, attr, p)
+
     obj.save()
+
     return JsonResponse({"reg":json.dumps(model_to_dict(obj))})
 
 @token_required
@@ -69,8 +84,22 @@ def modifcar_reg(inst):
     obj = model.objects.filter(id=id).first()
     if (obj):
         for key in reg:
-            setattr(obj, key, reg[key])
-            
+            if hasattr(obj, key):
+                field = getattr(obj, key)
+                if "models" in str(type(field)):
+                    attr = field.__class__.objects.get(pk=reg[key])
+                else:
+                    attr = reg[key] 
+                setattr(obj, key, attr)      
+            else:
+                if "__" in key:
+                    attr, field, str_model = key.split("__")
+                    parent = apps.get_model(app_name, str_model)
+                    filter = {field:reg[key]}
+                    p = parent.objects.filter(**filter).first()
+                    if p:
+                        setattr(obj, attr, p)
+
         obj.save()
 
 def delete_reg(inst):

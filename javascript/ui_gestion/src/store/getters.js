@@ -1,4 +1,23 @@
 export default {
+    getFilters: (state) => (tb_name, field, v) =>{
+        if (!state[tb_name]) return []
+        var filters = []
+        Object.values(state[tb_name]).forEach((e)=>{
+            var filter = {}
+            filter[v] = e[field]
+            filters.push(filter)
+        })
+        
+        return filters;
+    },
+    getListValues: (state) => (tb_name, field) =>{
+        if (!state[tb_name]) return []
+        var lista = []
+        Object.values(state[tb_name]).forEach((e)=>{
+            lista.push(e[field])
+        })
+        return lista;
+    },
     getTeclasBySec: (state) => () =>{
         if (!state.teclas) return [];
         return Object.values(state.teclas)
@@ -34,6 +53,24 @@ export default {
         var f = filter.filters
         if (!state[tb_name]) return []
         if (f.length == 0) return state[tb_name]
+
+        if (filter.include){
+            return Object.values(state[tb_name])
+            .filter( o => {
+                var is_corret = false
+            
+                f.forEach((q) => {
+                    if (!is_corret){
+                        is_corret = true
+                        Object.keys(q).map( (k) => {
+                            is_corret = is_corret && o[k].includes(q[k])
+                        });
+                    } 
+                });
+                
+                return is_corret
+            })
+        }
         return Object.values(state[tb_name])
         .filter( o => {
             var is_corret = false
@@ -43,7 +80,6 @@ export default {
                     is_corret = true
                     Object.keys(q).map( (k) => {
                         is_corret = is_corret && o[k] == q[k]
-                        //console.log(o.nombre, o[k], q[k], is_corret)
                     });
                 } 
             });

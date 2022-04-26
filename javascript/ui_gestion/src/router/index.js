@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView'
 import CamarerosView from '@/views/CamarerosView'
 import PreciosView from '@/views/PreciosView'
-import TecladosView from '@/views/TecladosView'
+import TeclasView from '@/views/TeclasView'
 import CajasView from '@/views/CajasView'
 import CamarerosPaseView from '@/views/CamarerosPaseView'
 
@@ -24,7 +24,7 @@ const routes = [
   },
   {
     path: '/teclados',
-    component: TecladosView,
+    component: TeclasView,
     name: 'teclados'
   },
   {

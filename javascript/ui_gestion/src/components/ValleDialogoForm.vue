@@ -6,15 +6,6 @@
         <v-card-text>
           <v-row>
             <v-col v-for="(f, i) in form" :key="i" cols="12">
-              <v-text-field
-                v-if="f.tp == 'text'"
-                v-model="item[f.col]"
-                :label="f.label"
-                hide-details="auto"
-                :rules="rules"
-                type="text"
-                autocomplete="false"
-              ></v-text-field>
               <v-combobox
                 v-if="f.tp == 'multiple'"
                 v-model="item[f.col]"
@@ -24,6 +15,23 @@
                 outlined
                 dense
               ></v-combobox>
+              <v-select
+                v-else-if="f.tp == 'select'"
+                :items="f.choices"
+                :label="f.label"
+                item-text="nombre"
+                item-value="id"
+                v-model="item[f.col]"
+              ></v-select>
+              <v-text-field
+                v-else
+                v-model="item[f.col]"
+                :label="f.label"
+                hide-details="auto"
+                :rules="rules"
+                :type="f.tp"
+                autocomplete="false"
+              ></v-text-field>
             </v-col>
           </v-row>
         </v-card-text>

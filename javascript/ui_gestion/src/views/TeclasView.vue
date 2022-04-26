@@ -30,78 +30,109 @@ import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 export default {
   components: { ValleEditorItem, ValleDialogoForm },
   computed: {
-    ...mapGetters(["getItemsFiltered"]),
-    ...mapState(["camareros"]),
+    ...mapGetters(["getItemsFiltered", "getListValues", "getFilters"]),
+    ...mapState(["teclas", "familias", "secciones"]),
+    filtro() {
+      return {
+        caption: this.getListValues("secciones", "nombre"),
+        filters: this.getFilters("secciones", "id", "IDSeccion"),
+        tools: [],
+        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
+        all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
+        multiple: true,
+      };
+    },
+    form() {
+      return [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "p1", label: "Precio 1", tp: "number" },
+        {
+          col: "p2",
+          label: "Precio 2",
+          tp: "number",
+        },
+        {
+          col: "tag",
+          label: "tag",
+          tp: "number",
+        },
+        {
+          col: "familia__nombre__familias",
+          label: "Familia",
+          tp: "select",
+          choices: this.getListValues("familias", "nombre"),
+        },
+      ];
+    },
   },
   data() {
-    const col = ["nombre", "apellidos", "permisos"];
+    const col = ["nombre", "p1", "p2"];
     return {
-      title: "Camareros",
-      tb_name: "camareros",
+      title: "Teclas",
+      tb_name: "teclas",
       localFilter: [],
       showDialog: false,
       itemSel: null,
-      form: [
+      dddform: [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "apellidos", label: "1º Apellido", tp: "text" },
+        { col: "p1", label: "Precio 1", tp: "number" },
         {
-          col: "permisos",
-          label: "Permisos",
-          choices: ["borrar_mesas", "borrar_lineas"],
-          tp: "multiple",
+          col: "p2",
+          label: "Precio 2",
+          tp: "number",
+        },
+        {
+          col: "tag",
+          label: "tag",
+          tp: "number",
+        },
+        {
+          col: "familia__nombre__familias",
+          label: "Familia",
+          tp: "select",
+          choices: [],
         },
       ],
-      filtro: {
-        caption: ["borrados", "activos"],
-        filters: [{ activo: 0 }, { autorizado: 1 }],
-        all: [{ activo: 1 }],
+      extfiltro: {
+        caption: [],
+        filters: [],
+        tools: [],
+        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
+        all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
         multiple: false,
       },
       tabla: {
         headers: col,
         keys: col,
       },
-      multiple_tools: {
-        activos: [
-          { op: "minus", text: "Desactivar", icon: "mdi-account-minus" },
-          { op: "edit", text: "Editar", icon: "mdi-account-edit" },
-          {
-            op: "unlock",
-            text: "Desbloquear",
-            icon: "mdi-lock-open",
-          },
-        ],
-        borrados: [
-          { op: "activar", text: "Activar", icon: "mdi-account-arrow-left" },
-          { op: "rm", text: "Borrado definitivo", icon: "mdi-delete" },
-        ],
-      },
-      tools: [],
+      tools: [
+        { op: "edit", text: "Editar", icon: "mdi-account-edit" },
+        {
+          op: "rm",
+          text: "Borrar",
+          icon: "mdi-delete",
+        },
+      ],
     };
   },
   methods: {
-    ...mapActions(["getListado", "addInstruccion"]),
+    ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     cargar_reg() {
-      let params = new FormData();
-      params.append("tb", this.tb_name);
-      this.getListado({ params: params });
+      var request = ["teclas"];
+      if (!this.familias || this.familias.length <= 0) request.push("familias");
+      if (!this.secciones || this.secciones.length <= 0) request.push("secciones");
+      this.getListadoCompuesto({ tablas: request });
     },
     on_visible_change(value) {
       this.showDialog = value;
     },
     on_click_filter(lfilter) {
       this.localFilter = lfilter;
-      var selected = lfilter.selected;
-      if (selected && selected.length > 0) {
-        var op = this.filtro.caption[selected[0]];
-        this.tools = this.multiple_tools[op];
-      } else {
-        this.tools = this.multiple_tools["activos"];
-      }
       this.$store.state.itemsFiltrados = this.getItemsFiltered(
         this.localFilter,
         this.tb_name
       );
+      //this.form[4].choices = this.getListValues("familias", "nombre");
     },
 
     on_click_tools(v, op) {
@@ -148,8 +179,8 @@ export default {
             tipo: "rm",
             id: v.id,
           };
-          let cam = this.$store.state.camareros;
-          this.$store.state.camareros = cam.filter((e) => {
+          let ls = this.$store.state[this.tb_name];
+          this.$store.state[this.tb_name] = ls.filter((e) => {
             return e.id != v.id;
           });
       }
@@ -160,7 +191,7 @@ export default {
     },
   },
   watch: {
-    camareros(v) {
+    teclas(v) {
       if (v) {
         this.on_click_filter(this.localFilter);
       } else {
@@ -171,7 +202,7 @@ export default {
   mounted() {
     this.localFilter = Object.values(this.filtro);
     this.localFilter.filters = Object.values(this.filtro.all);
-    if (this.camareros) {
+    if (this.teclas) {
       this.on_click_filter(this.localFilter);
     } else {
       this.cargar_reg();
