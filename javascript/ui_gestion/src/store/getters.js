@@ -57,8 +57,9 @@ export default {
                 
                 return is_corret
             })
+            
         }
-        
+       
         return Object.values(state[tb_name])
         .filter( o => {
             var is_corret = false

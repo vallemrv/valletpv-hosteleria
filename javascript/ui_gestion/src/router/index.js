@@ -1,47 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { gestionRoutes  } from './gestion'
 import HomeView from '@/views/HomeView'
-import CamarerosView from '@/views/CamarerosView'
-import PreciosView from '@/views/PreciosView'
-import TeclasView from '@/views/TeclasView'
-import CajasView from '@/views/CajasView'
-import CamarerosPaseView from '@/views/CamarerosPaseView'
+import GestionView from '@/views/gestion/GestionView'
+import VentasView from '@/views/ventas/VentasView'
+
 
 const routes = [
+  ... gestionRoutes,
   {
     path: '/',
     name: 'home',
     component: HomeView
   },
   {
-    path: '/camareros',
-    component: CamarerosView,
-    name: 'camareros'
+    path: '/gestion',
+    name: 'gestion',
+    component: GestionView
   },
   {
-    path: '/camareros_pase',
-    component: CamarerosPaseView,
-    name: 'camareros_pase'
-  },
-  {
-    path: '/teclados',
-    component: TeclasView,
-    name: 'teclados'
-  },
-  {
-    path: '/precios',
-    component: PreciosView,
-    name: 'precios'
-  },
-  {
-    path: '/cierres_caja',
-    component: CajasView,
-    name: 'cajas'
+    path: '/ventas',
+    name: 'ventas',
+    component: VentasView
   },
 ]
 
+
 const router = createRouter({
   base: "/",
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory("/"),
   routes
 })
 

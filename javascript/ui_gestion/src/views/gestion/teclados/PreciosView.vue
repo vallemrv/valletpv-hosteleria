@@ -94,7 +94,6 @@ export default {
       this.secciones.length == 0
     ) {
       this.getTablas();
-    } else {
     }
   },
 };

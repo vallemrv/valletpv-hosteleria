@@ -38,8 +38,8 @@ export default {
   components: { ValleInbox },
   data: () => ({
     items: [
-      { title: "Gestion", link: "gestion" },
-      { title: "Ventas", link: "ventas" },
+      { title: "Gestion", link: { name: "gestion" } },
+      { title: "Ventas", link: { name: "ventas" } },
     ],
     menu: false,
   }),

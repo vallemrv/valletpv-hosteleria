@@ -19,7 +19,7 @@
     <v-col cols="12">
       <valle-filtros :filtro="filtro" @on_filter="on_filter"></valle-filtros>
     </v-col>
-    <v-col cols="12">
+    <v-col cols="12" v-if="tabla">
       <valle-listados-tb
         :items="itemsFiltrados"
         :columns="tabla.keys"

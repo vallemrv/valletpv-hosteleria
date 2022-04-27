@@ -33,7 +33,9 @@ export default {
     ...mapGetters(["getItemById", "getListValues"]),
     ...mapState(["secciones"]),
     itemsSecciones() {
-      return this.secciones ? this.getListValues("secciones", "nombre") : [];
+      return this.secciones
+        ? ["Ninguna", ...this.getListValues("secciones", "nombre")]
+        : ["Ninguna"];
     },
   },
   methods: {

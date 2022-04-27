@@ -3,12 +3,23 @@
     :title="title"
     :filtro="filtro"
     :tb_name="tb_name"
+    :form="form"
     :tabla="tabla"
     :tools="tools"
     @on_click_filter="on_click_filter"
     @on_click_tools="on_click_tools"
   >
   </valle-editor-item>
+  <valle-dialogo-form
+    @on_visible_change="on_visible_change"
+    :show="showDialog"
+    title="Editar"
+    :item="itemSel"
+    :form="form"
+    :tb_name="tb_name"
+    tipo="md"
+  >
+  </valle-dialogo-form>
 </template>
 
 <script>
@@ -28,17 +39,22 @@ export default {
       title: "Camareros",
       tb_name: "camareros",
       localFilter: [],
+      showDialog: false,
+      itemSel: null,
+      form: [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "apellidos", label: "1º Apellido", tp: "text" },
+        {
+          col: "permisos",
+          label: "Permisos",
+          choices: ["borrar_mesas", "borrar_lineas"],
+          tp: "multiple",
+        },
+      ],
       filtro: {
-        caption: ["No activos", "activos"],
-        tools: ["no_activos", "activos"],
-        filters: [
-          { activo: 1, autorizado: 0 },
-          { activo: 1, autorizado: 1 },
-        ],
-        all: [
-          { activo: 1, autorizado: 0 },
-          { activo: 1, autorizado: 1 },
-        ],
+        caption: ["borrados", "activos"],
+        filters: [{ activo: 0 }, { autorizado: 1 }],
+        all: [{ activo: 1 }],
         multiple: false,
       },
       tabla: {
@@ -47,22 +63,18 @@ export default {
       },
       multiple_tools: {
         activos: [
-          { op: "minus", text: "Desautorizar", icon: "mdi-account-minus" },
+          { op: "minus", text: "Desactivar", icon: "mdi-account-minus" },
+          { op: "edit", text: "Editar", icon: "mdi-account-edit" },
           {
             op: "unlock",
             text: "Desbloquear",
             icon: "mdi-lock-open",
           },
         ],
-        no_activos: [
-          { op: "plus", text: "Autorizar", icon: "mdi-account-plus" },
-          {
-            op: "unlock",
-            text: "Desbloquear",
-            icon: "mdi-lock-open",
-          },
+        borrados: [
+          { op: "activar", text: "Activar", icon: "mdi-account-arrow-left" },
+          { op: "rm", text: "Borrado definitivo", icon: "mdi-delete" },
         ],
-        all: null,
       },
       tools: [],
     };
@@ -70,9 +82,7 @@ export default {
   methods: {
     ...mapActions(["getListado", "addInstruccion"]),
     cargar_reg() {
-      let params = new FormData();
-      params.append("tb", this.tb_name);
-      this.getListado({ params: params });
+      this.getListado({ tabla: this.tb_name });
     },
     on_visible_change(value) {
       this.showDialog = value;
@@ -81,10 +91,10 @@ export default {
       this.localFilter = lfilter;
       var selected = lfilter.selected;
       if (selected && selected.length > 0) {
-        var op = this.filtro.tools[selected[0]];
+        var op = this.filtro.caption[selected[0]];
         this.tools = this.multiple_tools[op];
       } else {
-        this.tools = this.multiple_tools["all"];
+        this.tools = this.multiple_tools["activos"];
       }
       this.$store.state.itemsFiltrados = this.getItemsFiltered(
         this.localFilter,
@@ -95,23 +105,33 @@ export default {
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
+        case "edit":
+          this.titleDialogo = "Editar";
+          v.permisos = this.$tools.stringToArray(v.permisos);
+          this.itemSel = v;
+          this.showDialog = true;
+          this.tipo = "md";
+          break;
         case "minus":
           inst = {
             tb: this.tb_name,
-            reg: { autorizado: 0 },
+            reg: { activo: 0, autorizado: 0 },
             tipo: "md",
             id: v.id,
           };
+          v.activo = 0;
           v.autorizado = 0;
+
           break;
-        case "plus":
+        case "activar":
           inst = {
             tb: this.tb_name,
-            reg: { autorizado: 1 },
+            reg: { activo: 1 },
             tipo: "md",
             id: v.id,
           };
-          v.autorizado = 1;
+          v.activo = 1;
+
           break;
         case "unlock":
           inst = {
@@ -120,11 +140,21 @@ export default {
             tipo: "md",
             id: v.id,
           };
-          v.pass_field = "";
-          break;
+        case "rm":
+          inst = {
+            tb: this.tb_name,
+            tipo: "rm",
+            id: v.id,
+          };
+          let cam = this.$store.state.camareros;
+          this.$store.state.camareros = cam.filter((e) => {
+            return e.id != v.id;
+          });
       }
-      this.addInstruccion({ inst: inst });
-      this.on_click_filter(this.localFilter);
+      if (op != "edit") {
+        this.addInstruccion({ inst: inst });
+        this.on_click_filter(this.localFilter);
+      }
     },
   },
   watch: {

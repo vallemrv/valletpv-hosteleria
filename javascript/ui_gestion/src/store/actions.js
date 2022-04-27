@@ -41,8 +41,10 @@ export default {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getListado({ commit, state }, { params }){
+    getListado({ commit, state }, { tabla }){
         commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("tb", tabla)
         params.append("user", state.token.user)
         params.append("token", state.token.token)
         API.getListado(params)

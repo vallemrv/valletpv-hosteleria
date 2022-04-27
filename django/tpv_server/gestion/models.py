@@ -766,7 +766,6 @@ class Receptores(models.Model):
 class Secciones(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
-    color = models.CharField(db_column='Color', max_length=20, null=True)  # Field name made lowercase.
     rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
     orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
     

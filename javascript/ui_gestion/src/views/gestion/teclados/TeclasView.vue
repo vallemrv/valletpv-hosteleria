@@ -44,7 +44,7 @@ export default {
         filters: this.getFilters("secciones", "id", ["IDSeccion", "IDSec2"]),
         tools: [],
         text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
-        all: [{ IDSeccion: -1 }, { IDSec2: -2 }],
+        all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
         multiple: true,
       };
     },
@@ -60,16 +60,6 @@ export default {
         {
           col: "tag",
           label: "tag",
-          tp: "text",
-        },
-        {
-          col: "descripcion_r",
-          label: "Texto para la recepción",
-          tp: "text",
-        },
-        {
-          col: "descripcion_t",
-          label: "Texto para el ticket",
           tp: "text",
         },
         {
