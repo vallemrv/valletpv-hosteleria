@@ -2,7 +2,7 @@
   <v-card elevation="3" title="Filtros" class>
     <v-divider></v-divider>
     <v-card-text>
-      <v-row v-if="filtro.text_filters">
+      <v-row v-if="filtro && filtro.text_filters">
         <v-col cols="12">
           <v-expansion-panels>
             <v-expansion-panel>
@@ -24,7 +24,7 @@
         </v-col>
       </v-row>
 
-      <v-row v-if="filtro.filters">
+      <v-row v-if="filtro && filtro.filters">
         <v-col cols="12">
           <v-expansion-panels>
             <v-expansion-panel>
@@ -46,7 +46,7 @@
                       <v-item v-slot="{ isSelected, toggle }">
                         <v-btn
                           class="w-100 text-caption"
-                          :color="isSelected ? 'primary' : ''"
+                          :color="isSelected ? 'primary' : '#cfb6d4'"
                           @click="toggle"
                           >{{ f }}</v-btn
                         >
@@ -96,6 +96,15 @@ export default {
 
       this.$emit("on_filter", f);
     },
+    add_to_filter(f, obj_f) {
+      if (obj_f.forEach) {
+        obj_f.forEach((e) => {
+          f.filters.push(e);
+        });
+      } else {
+        f.filters.push(obj_f);
+      }
+    },
   },
   watch: {
     selected(v) {
@@ -107,13 +116,13 @@ export default {
         f.filters = Object.values(this.filtro.all);
       } else {
         if (this.filtro.multiple) {
-          f.filters = Object.values(this.selected).map((k) => {
+          Object.values(this.selected).map((k) => {
             f.selected.push(k);
-            return this.filtro.filters[k];
+            this.add_to_filter(f, Object.values(this.filtro.filters)[k]);
           });
         } else {
           f.selected.push(v);
-          f.filters.push(Object.values(this.filtro.filters)[v]);
+          this.add_to_filter(f, Object.values(this.filtro.filters)[v]);
         }
       }
 

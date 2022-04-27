@@ -20,25 +20,31 @@
     tipo="md"
   >
   </valle-dialogo-form>
+  <valle-secciones-tecla-vue
+    :item="itemSel"
+    :show="showEditSec"
+    @close_edit_sec="on_close_edit_sec"
+  ></valle-secciones-tecla-vue>
 </template>
 
 <script>
 import { mapGetters, mapState, mapActions } from "vuex";
 import ValleEditorItem from "@/components/ValleEditorItem.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
+import ValleSeccionesTeclaVue from "@/comp_especificos/ValleSeccionesTecla.vue";
 
 export default {
-  components: { ValleEditorItem, ValleDialogoForm },
+  components: { ValleEditorItem, ValleDialogoForm, ValleSeccionesTeclaVue },
   computed: {
     ...mapGetters(["getItemsFiltered", "getListValues", "getFilters"]),
     ...mapState(["teclas", "familias", "secciones"]),
     filtro() {
       return {
         caption: this.getListValues("secciones", "nombre"),
-        filters: this.getFilters("secciones", "id", "IDSeccion"),
+        filters: this.getFilters("secciones", "id", ["IDSeccion", "IDSec2"]),
         tools: [],
         text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
-        all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
+        all: [{ IDSeccion: -1 }, { IDSec2: -2 }],
         multiple: true,
       };
     },
@@ -54,7 +60,17 @@ export default {
         {
           col: "tag",
           label: "tag",
-          tp: "number",
+          tp: "text",
+        },
+        {
+          col: "descripcion_r",
+          label: "Texto para la recepción",
+          tp: "text",
+        },
+        {
+          col: "descripcion_t",
+          label: "Texto para el ticket",
+          tp: "text",
         },
         {
           col: "familia__nombre__familias",
@@ -72,53 +88,27 @@ export default {
       tb_name: "teclas",
       localFilter: [],
       showDialog: false,
+      showEditSec: false,
       itemSel: null,
-      dddform: [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "p1", label: "Precio 1", tp: "number" },
-        {
-          col: "p2",
-          label: "Precio 2",
-          tp: "number",
-        },
-        {
-          col: "tag",
-          label: "tag",
-          tp: "number",
-        },
-        {
-          col: "familia__nombre__familias",
-          label: "Familia",
-          tp: "select",
-          choices: [],
-        },
-      ],
-      extfiltro: {
-        caption: [],
-        filters: [],
-        tools: [],
-        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
-        all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
-        multiple: false,
-      },
       tabla: {
         headers: col,
         keys: col,
       },
       tools: [
         { op: "edit", text: "Editar", icon: "mdi-account-edit" },
-        {
-          op: "rm",
-          text: "Borrar",
-          icon: "mdi-delete",
-        },
+        { op: "rm", text: "Borrar", icon: "mdi-delete" },
+        { op: "sec", text: "Modificar secciones", icon: "mdi-pencil" },
       ],
     };
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    on_close_edit_sec() {
+      this.showEditSec = false;
+    },
     cargar_reg() {
-      var request = ["teclas"];
+      var request = [];
+      if (!this.teclas || this.teclas.length <= 0) request.push("teclas");
       if (!this.familias || this.familias.length <= 0) request.push("familias");
       if (!this.secciones || this.secciones.length <= 0) request.push("secciones");
       this.getListadoCompuesto({ tablas: request });
@@ -132,9 +122,7 @@ export default {
         this.localFilter,
         this.tb_name
       );
-      //this.form[4].choices = this.getListValues("familias", "nombre");
     },
-
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
@@ -145,34 +133,10 @@ export default {
           this.showDialog = true;
           this.tipo = "md";
           break;
-        case "minus":
-          inst = {
-            tb: this.tb_name,
-            reg: { activo: 0, autorizado: 0 },
-            tipo: "md",
-            id: v.id,
-          };
-          v.activo = 0;
-          v.autorizado = 0;
-
+        case "sec":
+          this.showEditSec = true;
+          this.itemSel = v;
           break;
-        case "activar":
-          inst = {
-            tb: this.tb_name,
-            reg: { activo: 1 },
-            tipo: "md",
-            id: v.id,
-          };
-          v.activo = 1;
-
-          break;
-        case "unlock":
-          inst = {
-            tb: this.tb_name,
-            reg: { pass_field: "" },
-            tipo: "md",
-            id: v.id,
-          };
         case "rm":
           inst = {
             tb: this.tb_name,
@@ -184,7 +148,7 @@ export default {
             return e.id != v.id;
           });
       }
-      if (op != "edit") {
+      if (op != "edit" && op != "sec") {
         this.addInstruccion({ inst: inst });
         this.on_click_filter(this.localFilter);
       }

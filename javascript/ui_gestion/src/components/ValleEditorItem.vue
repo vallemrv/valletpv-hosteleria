@@ -1,6 +1,6 @@
 <template>
   <v-row class="pa-5">
-    <v-col col="12" class="">
+    <v-col cols="12" class="">
       <v-toolbar color="#cfb6d4">
         <v-toolbar-title>
           {{ title }}

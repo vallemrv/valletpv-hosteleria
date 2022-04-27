@@ -987,21 +987,25 @@ class Teclas(models.Model):
     @staticmethod
     def update_for_devices():
         rows = Teclas.objects.all()
-        row = None
         objs = []
-        for r in rows:
-            teclasseccion = r.teclaseccion_set.all()
-            row = model_to_dict(r)
-            row["Precio"] = r.p1 
-            row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
-            row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
-            row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
-            seccioncom = r.teclascom_set.all().first()
-            row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
-            row["OrdenCom"] = seccioncom.orden if seccioncom else -1
-            row["familia__nombre__familias"] = r.familia.nombre
-            objs.append(row)
+        for r in rows: 
+            objs.append(r.serialize())
         return objs
+
+    def serialize(self):
+        r = self
+        teclasseccion = r.teclaseccion_set.all()
+        row = model_to_dict(r)
+        row["Precio"] = r.p1 
+        row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
+        row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
+        row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
+        seccioncom = r.teclascom_set.all().first()
+        row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
+        row["OrdenCom"] = seccioncom.orden if seccioncom else -1
+        row["familia__nombre__familias"] = r.familia.nombre
+        
+        return row
    
     def get_color(self, hex=False):
         s = self.teclaseccion_set.all().first()

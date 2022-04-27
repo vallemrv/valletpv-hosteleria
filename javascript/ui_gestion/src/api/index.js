@@ -2,7 +2,14 @@ import axios from 'axios'
 //const url = "/"
 const url = "http://localhost:8000/"
 
+const post = (path, params) => {
+    return axios.post(url+path, params, {}).then(r => r.data)
+}
+
 export default {
+    modificarSecciones(params){
+        return post("app/mod_sec", params)
+    },
     addItem(params){
         return axios.post(url+"app/add_reg", params, {}).then(r => r.data)
     },

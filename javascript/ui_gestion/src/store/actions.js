@@ -1,6 +1,18 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
+    modificarSecciones( {commit, state}, {item}){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.token.user)
+        params.append("token", state.token.token) 
+        params.append("item", JSON.stringify(item))
+        API.modificarSecciones(params)
+        .then(r => commit(types.MOD_SEC, {item: r}))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
     actualizar( {commit, state}){
         commit(types.GET_REQUEST)
         let params = new FormData()

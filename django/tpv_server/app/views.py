@@ -5,11 +5,33 @@ from tokenapi.http import JsonResponse
 from django.apps import apps
 from django.forms.models import model_to_dict
 from tokenapi.decorators import token_required
-from gestion.models import Teclas, Subteclas, Secciones
+from gestion.models import Secciones, Teclas, Teclaseccion
 
 def inicio(request):
     return render(request, "index.html")
 
+#este es especifico para las teclasseccion
+@token_required
+def mod_sec(request):
+    item = json.loads(request.POST["item"])
+    Teclaseccion.objects.filter(tecla__pk=item['id']).delete()
+    tecla = Teclas.objects.get(pk=item['id'])
+    main_sec = Secciones.objects.filter(nombre=item["main_sec"]).first()
+    secundary_sec = Secciones.objects.filter(nombre=item["secundary_sec"]).first()
+    
+    if main_sec:
+        sec = Teclaseccion()
+        sec.tecla = tecla
+        sec.seccion = main_sec
+        sec.save()
+    
+    if secundary_sec:
+        sec = Teclaseccion()
+        sec.tecla = tecla
+        sec.seccion = secundary_sec
+        sec.save()
+
+    return JsonResponse(tecla.serialize())
 
 @token_required
 def getlistado(request):

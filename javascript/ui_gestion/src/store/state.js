@@ -3,8 +3,6 @@ export default {
     error: "",
     user: null,
     token: null,
-    secFilter: [],
-    teclas: null,
     instrucciones: null,
     itemsFiltrados: []
 }

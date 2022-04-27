@@ -57,6 +57,18 @@ export default {
         let result = Object.values(state[tb_name])
         result.push(JSON.parse(item))
         state[tb_name] = result
+    },
+    [types.MOD_SEC] (state, {item}){
+        console.log(item)
+        state.ocupado = false
+        state.error = null
+        let result = Object.values(state.teclas)
+        result.forEach(e => {
+            if (e.id == item.id){
+                e = item;
+            }
+        })
+        state.teclas = result
     }
         
 }
