@@ -61,7 +61,6 @@ export default {
     [types.MOD_SEC] (state, {item}){
         state.ocupado = false
         state.error = null
-        console.log(state.teclas)
         var result = Object.values(state.teclas)
         result.forEach((e,i) => {
             if (parseInt(e.id) == parseInt(item.id)){

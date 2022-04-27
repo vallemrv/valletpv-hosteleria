@@ -17,7 +17,7 @@
       </v-toolbar>
     </v-col>
     <v-col cols="12">
-      <valle-filtros :filtro="filtro" @on_filter="on_filter"></valle-filtros>
+      <valle-filtros :filtro="filtro" @click_filter="on_click_filter"></valle-filtros>
     </v-col>
     <v-col cols="12" v-if="tabla">
       <valle-listados-tb
@@ -25,11 +25,11 @@
         :columns="tabla.keys"
         :headers="tabla.headers"
         :tools="tools"
-        @on_click_tools="on_click_tools"
+        @click_tools="on_click_tools"
       ></valle-listados-tb>
     </v-col>
     <valle-dialogo-form
-      @on_visible_change="on_visible_change"
+      @close_dialogo="on_close_dialogo"
       :show="showDialog"
       :title="titleDialogo"
       :item="itemSel"
@@ -62,19 +62,19 @@ export default {
     ...mapState(["ocupado", "itemsFiltrados"]),
   },
   methods: {
-    on_filter(f) {
-      this.$emit("on_click_filter", f);
+    on_click_filter(f) {
+      this.$emit("click_filter", f);
     },
     on_click_new() {
       this.itemSel = this.$tools.newItem(this.form);
       this.showDialog = true;
       this.tipo = "add";
     },
-    on_visible_change(value) {
-      this.showDialog = value;
+    on_close_dialogo() {
+      this.showDialog = false;
     },
     on_click_tools(value, op) {
-      this.$emit("on_click_tools", value, op);
+      this.$emit("click_tools", value, op);
     },
   },
 };

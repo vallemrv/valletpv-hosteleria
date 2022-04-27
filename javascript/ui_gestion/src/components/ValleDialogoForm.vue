@@ -6,8 +6,26 @@
         <v-card-text>
           <v-row>
             <v-col v-for="(f, i) in form" :key="i" cols="12">
+              <v-menu v-if="f.tp == 'color'">
+                <template v-slot:activator="{ props }">
+                  <v-btn :color="col_sel" v-bind="props"> {{ f.label }} </v-btn>
+                </template>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-title>
+                      <v-color-picker
+                        :ref="color_key(f.col, i)"
+                        v-if="f.tp == 'color'"
+                        v-model="color_picker"
+                      >
+                      </v-color-picker>
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+
               <v-combobox
-                v-if="f.tp == 'multiple'"
+                v-else-if="f.tp == 'multiple'"
                 v-model="item[f.col]"
                 :items="f.choices"
                 :label="f.label"
@@ -37,7 +55,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="primary" @click="handlerShow">cancelar</v-btn>
+          <v-btn color="primary" @click="close_dialogo">cancelar</v-btn>
           <v-btn color="pink" @click="enviar">aceptar</v-btn>
         </v-card-actions>
       </v-card>
@@ -53,12 +71,39 @@ export default {
   data() {
     return {
       rules: [(value) => !!value || "Es necesario."],
+      field_color: {},
     };
+  },
+  computed: {
+    col_sel() {
+      return this.$tools.rgbToHex(
+        this.color_picker.r + "," + this.color_picker.g + "," + this.color_picker.b
+      );
+    },
+    color_picker: {
+      get: function () {
+        var col_name = this.field_color;
+        var color_sel = { r: 255, g: 0, b: 255, a: 1 };
+        if (this.item[col_name] && this.item[col_name] != "") {
+          var color_item = this.item[col_name].split(",");
+          color_sel = { r: color_item[0], g: color_item[1], b: color_item[2], a: 1 };
+        }
+        return color_sel;
+      },
+      set: function (v) {
+        var col_name = this.field_color;
+        this.item[col_name] = v.r + "," + v.g + "," + v.b;
+      },
+    },
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
-    handlerShow() {
-      this.$emit("on_visible_change", !this.show);
+    color_key(col, i) {
+      this.field_color = col;
+      return col + "_" + i;
+    },
+    close_dialogo() {
+      this.$emit("close_dialogo");
     },
     enviar() {
       if (this.tipo == "add") {
@@ -72,12 +117,14 @@ export default {
         };
         this.addInstruccion({ inst: inst });
       }
-      this.handlerShow();
+      this.close_dialogo();
     },
   },
   watch: {
     show(v) {
-      this.$emit("on_visible_change", v);
+      if (!v) {
+        this.$emit("close_dialogo");
+      }
     },
   },
 };

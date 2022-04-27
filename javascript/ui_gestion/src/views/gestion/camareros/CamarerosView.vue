@@ -6,12 +6,12 @@
     :form="form"
     :tabla="tabla"
     :tools="tools"
-    @on_click_filter="on_click_filter"
-    @on_click_tools="on_click_tools"
+    @click_filter="on_click_filter"
+    @click_tools="on_click_tools"
   >
   </valle-editor-item>
   <valle-dialogo-form
-    @on_visible_change="on_visible_change"
+    @close_dialogo="on_close_dialogo"
     :show="showDialog"
     title="Editar"
     :item="itemSel"
@@ -84,8 +84,8 @@ export default {
     cargar_reg() {
       this.getListado({ tabla: this.tb_name });
     },
-    on_visible_change(value) {
-      this.showDialog = value;
+    on_close_dialogo() {
+      this.showDialog = false;
     },
     on_click_filter(lfilter) {
       this.localFilter = lfilter;

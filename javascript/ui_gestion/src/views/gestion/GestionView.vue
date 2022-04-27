@@ -6,7 +6,10 @@ import ValleMenuBtn from "@/components/ValleMenuBtn";
 export default {
   components: { ValleMenuBtn },
   data: () => ({
-    items: [{ title: "Secciones", link: { name: "secciones" } }],
+    items: [
+      { title: "Secciones", link: { name: "secciones" } },
+      { title: "Vista teclas", link: { name: "vista" } },
+    ],
   }),
 };
 </script>

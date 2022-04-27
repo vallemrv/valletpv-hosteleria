@@ -94,7 +94,7 @@ export default {
         f.include = false;
       }
 
-      this.$emit("on_filter", f);
+      this.$emit("click_filter", f);
     },
     add_to_filter(f, obj_f) {
       if (obj_f.forEach) {
@@ -126,7 +126,7 @@ export default {
         }
       }
 
-      this.$emit("on_filter", f);
+      this.$emit("click_filter", f);
     },
   },
 };

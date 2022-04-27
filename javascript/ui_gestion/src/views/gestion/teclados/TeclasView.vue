@@ -6,12 +6,12 @@
     :form="form"
     :tabla="tabla"
     :tools="tools"
-    @on_click_filter="on_click_filter"
-    @on_click_tools="on_click_tools"
+    @click_filter="on_click_filter"
+    @click_tools="on_click_tools"
   >
   </valle-editor-item>
   <valle-dialogo-form
-    @on_visible_change="on_visible_change"
+    @close_dialogo="on_close_dialogo"
     :show="showDialog"
     title="Editar"
     :item="itemSel"
@@ -96,15 +96,15 @@ export default {
     on_close_edit_sec() {
       this.showEditSec = false;
     },
+    on_close_dialogo() {
+      this.showDialog = false;
+    },
     cargar_reg() {
       var request = [];
       if (!this.teclas || this.teclas.length <= 0) request.push("teclas");
       if (!this.familias || this.familias.length <= 0) request.push("familias");
       if (!this.secciones || this.secciones.length <= 0) request.push("secciones");
       this.getListadoCompuesto({ tablas: request });
-    },
-    on_visible_change(value) {
-      this.showDialog = value;
     },
     on_click_filter(lfilter) {
       this.localFilter = lfilter;
@@ -118,7 +118,6 @@ export default {
       switch (op) {
         case "edit":
           this.titleDialogo = "Editar";
-          v.permisos = this.$tools.stringToArray(v.permisos);
           this.itemSel = v;
           this.showDialog = true;
           this.tipo = "md";

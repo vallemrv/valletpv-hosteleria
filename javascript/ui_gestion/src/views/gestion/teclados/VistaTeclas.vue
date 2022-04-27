@@ -3,7 +3,7 @@
     <v-col cols="12" class="">
       <v-toolbar color="#cfb6d4">
         <v-toolbar-title>
-          Precios
+          Visa de teclas
           <v-progress-circular
             indeterminate
             color="primary"
@@ -21,18 +21,30 @@
       ></valle-filtros-vue>
     </v-col>
 
-    <valle-tecla-precio v-for="(tecla, i) in listTeclas" :key="i" :tecla="tecla">
-    </valle-tecla-precio>
+    <v-col cols="12">
+      <v-card>
+        <v-card-text>
+          <v-row class="text-center">
+            <v-col cols="4" class="text-left">Texto tecla</v-col>
+            <v-col cols="4">Texto ticket</v-col>
+            <v-col cols="4">Texto recepcion</v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-col>
+
+    <valle-listado-vista-tecla v-for="(tecla, i) in listTeclas" :key="i" :tecla="tecla">
+    </valle-listado-vista-tecla>
   </v-row>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from "vuex";
-import ValleTeclaPrecio from "@/comp_especificos/ValleTeclaPrecio";
+import ValleListadoVistaTecla from "@/comp_especificos/ValleListadoVistaTecla";
 import ValleFiltrosVue from "@/components/ValleFiltros.vue";
 
 export default {
-  components: { ValleTeclaPrecio, ValleFiltrosVue },
+  components: { ValleListadoVistaTecla, ValleFiltrosVue },
   data() {
     return {
       localFilter: null,

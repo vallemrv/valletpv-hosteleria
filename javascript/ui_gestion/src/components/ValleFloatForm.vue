@@ -1,100 +1,126 @@
 <template>
-
-     <v-menu
-        transition="scale-transition"
-        origin="center center"
-        v-model="mostrar"
-        >
-
-        <template v-slot:activator="{ props }">
-            <v-btn 
-            :elevation="elevation"
-            class="text-center"
-            v-bind="props"
-            @click.stop="() => {}">
-               <v-row class="pa-0 ma-0">
-                    <v-col cols="12" class="current_val"
-                    > {{ value }} </v-col> 
-                    <v-col cols="12" class="old_val" v-if="val_old"
-                    > {{ val_old }} </v-col>  
-                </v-row>   
-            </v-btn>
-        </template>
-        <v-card
-         width="200px">
-            <v-card-header>
-                  <v-text-field  
-                        v-model="val_modified"
-                        @click.stop=""
-                        hide-details="auto"
-                        :rules="rules"
-                        @keypress.enter="on_enter()"
-                        ></v-text-field>  
-            </v-card-header>
-        </v-card>
-    </v-menu>    
+  <v-menu
+    transition="scale-transition"
+    anchor="top center"
+    origin="top center"
+    v-model="mostrar"
+  >
+    <template v-slot:activator="{ props }">
+      <v-btn
+        block
+        :elevation="elevation"
+        class="text-center"
+        v-bind="props"
+        :color="col_sel"
+        @click.stop="() => {}"
+      >
+        <v-row cols="12" class="pa-0 ma-0 text-caption">
+          <div class="w-100" v-if="column != 'rgb'">
+            <v-col cols="12" color="#5868ff" class="current_val"> {{ _value }} </v-col>
+            <v-col cols="12" class="old_val" v-if="val_old"> {{ val_old }} </v-col>
+          </div>
+        </v-row>
+      </v-btn>
+    </template>
+    <v-card v-if="column == 'rgb'">
+      <v-card-text>
+        <v-color-picker @keypress.enter="on_enter()" v-model="color_picker">
+        </v-color-picker>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="on_enter()">Aceptar</v-btn>
+      </v-card-actions>
+    </v-card>
+    <v-card width="200px" v-else>
+      <v-card-header>
+        <v-text-field
+          v-model="val_modified"
+          @click.stop=""
+          hide-details="auto"
+          :rules="rules"
+          @keypress.enter="on_enter()"
+          :hint="hint"
+        ></v-text-field>
+      </v-card-header>
+    </v-card>
+  </v-menu>
 </template>
 
 <script>
-
-import { mapActions } from "vuex"
+import { mapActions } from "vuex";
 
 export default {
-    props:["item", "column", "rules", 
-            "app", "tb_name", "value"],
-    data: ()=>{
-        return {
-            elevation: 2,
-            mostrar: false,
-            val_modified: "",
-            val_old: null
+  props: ["item", "column", "rules", "hint", "app", "tb_name", "value"],
+  data: () => {
+    return {
+      elevation: 3,
+      mostrar: false,
+      val_modified: "",
+      val_old: null,
+    };
+  },
+  computed: {
+    col_sel() {
+      if (this.column == "rgb") {
+        return this.$tools.rgbToHex(
+          this.color_picker.r + "," + this.color_picker.g + "," + this.color_picker.b
+        );
+      } else {
+        return "";
+      }
+    },
+    color_picker: {
+      get: function () {
+        var color_sel = { r: 255, g: 0, b: 255, a: 1 };
+        if (this.item[this.column] && this.item[this.column] != "") {
+          var color_item = this.item[this.column].split(",");
+          color_sel = { r: color_item[0], g: color_item[1], b: color_item[2], a: 1 };
         }
+        return color_sel;
+      },
+      set: function (v) {
+        this.val_modified = v.r + "," + v.g + "," + v.b;
+        this.item[this.column] = this.val_modified;
+      },
     },
-    computed:{
-       
+    _value() {
+      if (this.val_modified == "") this.val_modified = this.item[this.column];
+      if (this.value) return this.value;
+      return this.val_modified;
     },
-    methods: {
-        ...mapActions(["addInstruccion"]),
-        on_enter(){
-            this.val_old = this.item[this.column]
-            this.item[this.column+"_old"] = this.val_old
-            this.item[this.column] = this.val_modified
-            this.mostrar = false
-            let inst = {
-                tb:this.tb_name,
-                app:this.app,
-                reg:{},
-                tipo:"md",
-                id:this.item.id
-            }
-            inst['reg'][this.column] = this.val_modified
-            this.addInstruccion({inst:inst})   
-           
-        },
-        
+  },
+  methods: {
+    ...mapActions(["addInstruccion"]),
+    on_enter() {
+      var app = this.app;
+      if (!app) app = "gestion";
+      this.val_old = this.item[this.column];
+      this.item[this.column + "_old"] = this.val_old;
+      this.item[this.column] = this.val_modified;
+      this.mostrar = false;
+      let inst = {
+        tb: this.tb_name,
+        app: app,
+        reg: {},
+        tipo: "md",
+        id: this.item.id,
+      };
+      inst["reg"][this.column] = this.val_modified;
+      this.addInstruccion({ inst: inst });
     },
-    watch: {
-        item(v){
-           this.val_modified = this.item[this.column]
-           this.val_old = this.item[this.column+"_old"]
-        }
-        
-    },
-    mounted() {
-        this.val_modified = this.item[this.column]
-    },
-}
+  },
+};
 </script>
 
 <style>
-   .current_val{
-       margin: 0;
-       padding: 0;
-   }
-   .old_val{
-       margin: 0;
-       padding: 0;
-       color: brown;
-       font-size: smaller;
-   }
+.current_val {
+  margin: 0;
+  padding: 0;
+}
+.old_val {
+  margin: 0;
+  padding: 0;
+  color: brown;
+  font-size: smaller;
+}
 </style>

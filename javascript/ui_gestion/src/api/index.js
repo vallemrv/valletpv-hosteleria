@@ -11,18 +11,18 @@ export default {
         return post("app/mod_sec", params)
     },
     addItem(params){
-        return axios.post(url+"app/add_reg", params, {}).then(r => r.data)
+        return post("app/add_reg", params)
     },
     actualizar(params){
-        return axios.post(url+"app/mod_regs", params, {}).then(r => r.data)
+        return post("app/mod_regs", params)
     },
     getListadoCompuesto(params){
-        return axios.post(url+"app/getListadoCompuesto",  params, {}).then(r => r.data);
+        return post("app/getListadoCompuesto",  params)
     },
     getListado(params){
-        return axios.post(url+"app/getListado",  params, {}).then(r => r.data);
+        return post("app/getListado",  params)
     },
     login(params){
-        return axios.post(url+"token/new.json", params, {}).then(r=>r.data)
+        return post("token/new.json", params)
     }
 }

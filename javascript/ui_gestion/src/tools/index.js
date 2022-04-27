@@ -7,7 +7,6 @@ export default {
                return hex.length == 1 ? "0" + hex : hex;
             },      
             rgbToHex(val){
-                console.log(val)
                 let rgb = val.split(",");
                 let r = parseInt(rgb[0]);
                 let g = parseInt(rgb[1]);

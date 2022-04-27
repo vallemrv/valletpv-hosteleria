@@ -5,7 +5,7 @@
     :tb_name="tb_name"
     :tabla="tabla"
     :tools="tools"
-    @on_click_filter="on_click_filter"
+    @click_filter="on_click_filter"
     @on_click_tools="on_click_tools"
   >
   </valle-editor-item>
