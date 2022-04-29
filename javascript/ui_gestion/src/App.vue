@@ -50,6 +50,6 @@ export default {
 
 <style scoped>
 .v-container {
-  padding-bottom: 105px;
+  min-height: 600px;
 }
 </style>

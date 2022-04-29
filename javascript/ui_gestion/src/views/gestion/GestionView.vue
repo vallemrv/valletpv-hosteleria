@@ -9,6 +9,7 @@ export default {
     items: [
       { title: "Secciones", link: { name: "secciones" } },
       { title: "Vista teclas", link: { name: "vista" } },
+      { title: "Teclados\n comanda", link: { name: "tecladoscom" } },
     ],
   }),
 };

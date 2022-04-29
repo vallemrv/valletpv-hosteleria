@@ -84,9 +84,8 @@ export default {
       },
     },
     _value() {
-      if (this.val_modified == "") this.val_modified = this.item[this.column];
       if (this.value) return this.value;
-      return this.val_modified;
+      else return this.item[this.column];
     },
   },
   methods: {
@@ -107,7 +106,20 @@ export default {
       };
       inst["reg"][this.column] = this.val_modified;
       this.addInstruccion({ inst: inst });
+      this.$emit("click_enter", this.item);
     },
+  },
+  watch: {
+    item(v) {
+      if (v) {
+        this.val_modified = this.item[this.column];
+        this.val_old = this.item[this.column + "_old"];
+      }
+    },
+  },
+  mounted() {
+    if (this.value) this.val_modified = this.value;
+    else this.val_modified = this.item[this.column];
   },
 };
 </script>

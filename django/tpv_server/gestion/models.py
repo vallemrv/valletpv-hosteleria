@@ -827,7 +827,7 @@ class SeccionesCom(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=11)  # Field name made lowercase.
     es_promocion = models.BooleanField(db_column='Es_promocion', blank=True, null=True, default="False")
-    descuento = models.DecimalField(db_column='Descuento', blank=True, null=True, max_digits=4, decimal_places=2, default='0')
+    descuento = models.IntegerField(db_column='Descuento', blank=True, null=True,  default='0')
     icono = models.CharField(db_column='Icono', max_length=15, choices=ICON_CHOICES, default="bar")
 
     @staticmethod

@@ -64,6 +64,27 @@ def add_reg(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb_name"]
     reg = json.loads(request.POST["reg"])
+    obj = add_reg_handler(app_name, tb_name, reg);
+
+    return JsonResponse({"reg":json.dumps(model_to_dict(obj))})
+
+@token_required
+def mod_regs(request):
+    insts = json.loads(request.POST["isnts"])
+    for inst in insts:
+        if inst["tipo"] == "md":
+            modifcar_reg(inst)
+        elif inst["tipo"] == "rm":
+            delete_reg(inst)
+        elif inst["tipo"] == "add":
+            app_name = inst["app"] if "app" in inst else "gestion"
+            tb_name = inst["tb"]
+            reg = inst["reg"]
+            add_reg_handler(app_name, tb_name, reg)
+            
+    return JsonResponse("success")
+
+def add_reg_handler(app_name, tb_name, reg):
     model = apps.get_model(app_name, tb_name)
     obj = model()
     
@@ -80,21 +101,7 @@ def add_reg(request):
                     setattr(obj, attr, p)
 
     obj.save()
-
-    return JsonResponse({"reg":json.dumps(model_to_dict(obj))})
-
-@token_required
-def mod_regs(request):
-    insts = json.loads(request.POST["isnts"])
-    for inst in insts:
-        if inst["tipo"] == "md":
-            modifcar_reg(inst)
-        elif inst["tipo"] == "rm":
-            delete_reg(inst)
-          
-
-    return JsonResponse("success")
-
+    return obj
 
 def modifcar_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"

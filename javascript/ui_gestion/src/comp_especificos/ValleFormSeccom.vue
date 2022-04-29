@@ -6,46 +6,30 @@
         <v-card-text>
           <v-row>
             <v-col v-for="(f, i) in form" :key="i" cols="12">
-              <v-menu v-if="f.tp == 'color'">
-                <template v-slot:activator="{ props }">
-                  <v-btn :color="col_sel" v-bind="props"> {{ f.label }} </v-btn>
-                </template>
-                <v-list>
-                  <v-list-item>
-                    <v-list-item-title>
-                      <v-color-picker
-                        :ref="color_key(f.col, i)"
-                        v-if="f.tp == 'color'"
-                        v-model="color_picker"
-                      >
-                      </v-color-picker>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
               <v-switch
-                v-else-if="f.tp == 'switch'"
+                v-if="f.tp == 'switch'"
                 v-model="item[f.col]"
                 :label="f.label"
                 color="success"
               ></v-switch>
-              <v-combobox
-                v-else-if="f.tp == 'multiple'"
-                v-model="item[f.col]"
-                :items="f.choices"
-                :label="f.label"
-                :multiple="f.tp"
-                outlined
-                dense
-              ></v-combobox>
               <v-select
                 v-else-if="f.tp == 'select'"
-                :items="f.choices"
+                :items="choices"
                 :label="f.label"
                 item-text="nombre"
                 item-value="id"
-                v-model="item[f.col]"
+                v-model="_val_sel"
               ></v-select>
+              <v-text-field
+                v-else-if="f.col == 'descuento'"
+                :disabled="!item['es_promocion']"
+                v-model="item[f.col]"
+                :label="f.label"
+                hide-details="auto"
+                :rules="rules"
+                :type="f.tp"
+                autocomplete="false"
+              ></v-text-field>
               <v-text-field
                 v-else
                 v-model="item[f.col]"
@@ -76,37 +60,68 @@ export default {
   data() {
     return {
       rules: [(value) => !!value || "Es necesario."],
-      field_color: {},
+      choices: [
+        "Bar",
+        "Bocadillo",
+        "Carne",
+        "Cocktel",
+        "Copa con rodaja de limon",
+        "Copa de vino",
+        "Cubalibre",
+        "Donut",
+        "Jarra de cerveza",
+        "Icono para llevar",
+        "Magdalena",
+        "Menu",
+        "Pescado",
+        "Pincho",
+        "Pizza",
+        "Plato humeante",
+        "Plato combinado",
+        "Plato sopa",
+        "Plato sopa con cuchara",
+        "Tarta",
+        "Taza cafe",
+      ],
+      values: [
+        "bar",
+        "bocadillo",
+        "carne",
+        "cocktel",
+        "copa_con_limon",
+        "copa_vino",
+        "cubalibre",
+        "donut",
+        "jarra_cerveza",
+        "llevar",
+        "magdalena",
+        "menu",
+        "pescado",
+        "pincho",
+        "pizza",
+        "plato",
+        "plato_combinado",
+        "sopa",
+        "sopa_cuchara",
+        "tarta",
+        "taza_cafe",
+      ],
     };
   },
   computed: {
-    col_sel() {
-      return this.$tools.rgbToHex(
-        this.color_picker.r + "," + this.color_picker.g + "," + this.color_picker.b
-      );
-    },
-    color_picker: {
-      get: function () {
-        var col_name = this.field_color;
-        var color_sel = { r: 255, g: 0, b: 255, a: 1 };
-        if (this.item[col_name] && this.item[col_name] != "") {
-          var color_item = this.item[col_name].split(",");
-          color_sel = { r: color_item[0], g: color_item[1], b: color_item[2], a: 1 };
-        }
-        return color_sel;
+    _val_sel: {
+      set(v) {
+        var index = this.choices.indexOf(v);
+        this.item["icono"] = this.values[index];
       },
-      set: function (v) {
-        var col_name = this.field_color;
-        this.item[col_name] = v.r + "," + v.g + "," + v.b;
+      get() {
+        var index = this.values.indexOf(this.item["icono"]);
+        return this.choices[index];
       },
     },
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
-    color_key(col, i) {
-      this.field_color = col;
-      return col + "_" + i;
-    },
     close_dialogo() {
       this.$emit("close_dialogo");
     },

@@ -1,31 +1,35 @@
 <template>
-  <v-dialog v-model="show">
-    <v-card width="550px" class="pa-5">
-      <v-card-title>
-        {{ data.title }}
-      </v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col :cols="data.cols" v-for="(item, i) in data.items" :key="i">
-            <v-card height="100px" :color="bg_color(item)">
-              <v-card-text>
-                {{ item.nombre }}
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+  <v-row class="pa-0 ma-0 text-center">
+    <v-col :cols="cols" class="pa-0 ma-0" v-for="(item, i) in items" :key="i">
+      <v-sheet class="pa-1">
+        <v-btn
+          block
+          class="text-caption"
+          @click="on_click(item)"
+          height="80px"
+          :color="bg_color(item)"
+        >
+          <span c>{{ item.nombre }}</span>
+        </v-btn>
+      </v-sheet>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
 export default {
-  props: ["show", "data"],
+  props: ["title", "cols", "items"],
   computed: {},
   methods: {
     bg_color(item) {
-      return this.$tools.rgbToHex(item.RGB);
+      if (item.RGB) {
+        return this.$tools.rgbToHex(item.RGB);
+      } else {
+        return "#cfb6d4";
+      }
+    },
+    on_click(item) {
+      this.$emit("click_tecla", item);
     },
   },
   watch: {
@@ -37,3 +41,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+span {
+  white-space: normal;
+}
+</style>

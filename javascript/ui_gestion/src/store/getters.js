@@ -35,6 +35,19 @@ export default {
         })
         return lista;
     },
+    getItemsOrdered: (state) => (items, column)  =>{
+        items.sort((a, b) => {
+            if (a[column] > b[column]) {
+            return -1;
+            }
+            if (a[column] < b[column]) {
+            return 1;
+            }
+            // a debe ser igual b
+            return 0;
+        });
+        return items;
+    },
     getItemsFiltered: (state) => (filter, tb_name) =>{
         var f = filter.filters
        

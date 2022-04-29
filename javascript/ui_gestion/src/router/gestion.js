@@ -4,6 +4,10 @@ import TeclasView from '@/views/gestion/teclados/TeclasView'
 import CamarerosView from '@/views/gestion/camareros/CamarerosView'
 import CamarerosPase from '@/views/gestion/camareros/CamarerosPaseView'
 import VistaTeclas from '@/views/gestion/teclados/VistaTeclas'
+import TecladosComanda from '@/views/gestion/teclados/TecladosComanda'
+
+
+
 
 const camarerosRoutes = [
     {
@@ -39,7 +43,14 @@ const tecladosRoutes = [
         path: '/gestion/teclados/vista_teclas',
         component: VistaTeclas,
         name: 'vista'
+    },
+     
+    {
+        path: '/gestion/teclados/teclados_comanda',
+        component: TecladosComanda,
+        name: 'tecladoscom'
     }
+    
 ]
 
 
