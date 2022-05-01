@@ -9,7 +9,7 @@ export default {
     items: [
       { title: "Camareros pase", link: { name: "camarerospase" } },
       { title: "Camareros", link: { name: "camareros" } },
-      { title: "Teclados", link: { name: "teclas" } },
+      { title: "Teclas", link: { name: "teclas" } },
       { title: "Precios", link: { name: "cambioprecios" } },
       { title: "Cajas", link: "/" },
     ],

@@ -29,31 +29,17 @@
           <v-card-text>
             {{ itemSel.nombre }}
             <v-btn icon @click="editar_tecla"> <v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn
-              icon
-              @click="agregar_subteclas"
-              v-if="itemSel.tipo == 'ML' && items.length < 18"
-            >
-              <v-icon>mdi-plus</v-icon></v-btn
-            >
             <v-btn icon @click="quitar_tecla"> <v-icon>mdi-delete</v-icon></v-btn>
-          </v-card-text>
-        </v-card>
-        <v-card elevation="2">
-          <v-card-text v-if="subItemSel">
-            {{ subItemSel.nombre }}
-            <v-btn icon @click="editar_subtecla"> <v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn icon @click="quitar_subtecla"> <v-icon>mdi-delete</v-icon></v-btn>
           </v-card-text>
         </v-card>
       </v-toolbar>
     </v-col>
 
-    <v-col cols="3">
-      <valle-teclados cols="12" @click_tecla="on_click_sec" :items="seccionescom">
+    <v-col cols="12" sm="5">
+      <valle-teclados cols="6" @click_tecla="on_click_sec" :items="secciones">
       </valle-teclados>
     </v-col>
-    <v-col cols="9">
+    <v-col cols="12" sm="7">
       <valle-teclados cols="4" :items="items" @click_tecla="on_click_tecla">
       </valle-teclados>
     </v-col>
@@ -76,16 +62,16 @@
     @change="on_change"
     :items="items"
     tb_name="teclas"
-    column="OrdenCom"
+    column="orden"
   ></ordenar-teclas>
 
   <agregar-teclas
     v-show="showAgregarTeclas"
     @close="() => (showAgregarTeclas = false)"
     @change="on_change"
-    tb_name="seccioncom"
-    field_parent="seccion__id__seccionescom"
-    field_item="IDSeccionCom"
+    tb_name="teclaseccion"
+    field_parent="seccion__id__secciones"
+    field_item="IDSeccion"
     :secSel="secSel"
   ></agregar-teclas>
 </template>
@@ -101,7 +87,7 @@ export default {
   components: { ValleTeclados, ValleDialogoForm, OrdenarTeclas, AgregarTeclas },
   data() {
     return {
-      title: "Teclados comanda",
+      title: "Teclados TPV",
       titleForm: "Editar",
       tipo: "md",
       showForm: false,
@@ -111,42 +97,19 @@ export default {
       items: [],
       secSel: null,
       itemSel: null,
-      subItemSel: null,
       itemSelEdit: null,
       selTbName: "",
       form: [],
       formTecla: [
-        {
-          col: "tipo",
-          label: "Tipo",
-          tp: "select",
-          keys: ["SP", "ML", "GR"],
-          choices: ["SIMPLE", "COMPUESTA", "GRUPO"],
-        },
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "tag", label: "Tag de busqueda", tp: "text" },
       ],
-      formSubtecla: [{ col: "nombre", label: "Nombre", tp: "text" }],
+      formSec: [{ col: "nombre", label: "Nombre", tp: "text" }],
     };
   },
   computed: {
-    ...mapState(["ocupado", "seccionescom", "teclas", "subteclas", "iconchoices"]),
+    ...mapState(["ocupado", "secciones", "teclas"]),
     ...mapGetters(["getItemsFiltered", "getItemsOrdered", "getListValues"]),
-    formSec() {
-      return [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        {
-          col: "icono",
-          label: "Icono",
-          tp: "select",
-          keys: this.getListValues("iconchoices", "keys"),
-          choices: this.getListValues("iconchoices", "choices"),
-        },
-        { col: "es_promocion", label: "Es promocion", tp: "switch" },
-        { col: "descuento", label: "Descueto", tp: "number" },
-      ];
-    },
-    newSubTecla() {
-      return { nombre: "", tecla_id: this.itemSel.id };
-    },
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
@@ -154,15 +117,6 @@ export default {
       this.titleForm = "Editar";
       this.tipo = "md";
       this.showForm = false;
-    },
-    agregar_subteclas() {
-      this.newSubTecla.nombre = "";
-      this.itemSelEdit = this.newSubTecla;
-      this.titleForm = "Agregar subtecla";
-      this.tipo = "add";
-      this.showForm = true;
-      this.selTbName = "subteclas";
-      this.form = this.formSubtecla;
     },
     editar_tecla() {
       this.itemSelEdit = this.itemSel;
@@ -175,41 +129,19 @@ export default {
       this.itemSelEdit = this.secSel;
       this.showForm = true;
       this.titleForm = "Editar seccion";
-      this.selTbName = "seccionescom";
+      this.selTbName = "secciones";
       this.form = this.formSec;
-    },
-    editar_subtecla() {
-      this.itemSelEdit = this.subItemSel;
-      this.showForm = true;
-      this.titleForm = "Editar subtecla";
-      this.selTbName = "subteclas";
-      this.form = this.formSubtecla;
-    },
-    quitar_subtecla() {
-      if (this.itemSel) {
-        var inst = {
-          tb: "subteclas",
-          tipo: "rm",
-          id: this.subItemSel.id,
-        };
-        this.subItemSel.tecla = -1;
-        this.subItemSel = null;
-        this.addInstruccion({ inst: inst });
-        this.items = this.getItemsFiltered(
-          { filters: [{ tecla: this.itemSel.id }] },
-          "subteclas"
-        );
-      }
     },
     quitar_tecla() {
       if (this.itemSel) {
         var inst = {
-          tb: "teclascom",
+          tb: "teclaseccion",
           tipo: "rm",
           filter: { tecla__pk: this.itemSel.id },
+          id: this.itemSel.id,
         };
-        this.itemSel.IDSeccionCom = -1;
-        this.subItemSel = null;
+        if (this.itemSel.IDSeccion == this.secSel.id) this.itemSel.IDSeccion = -1;
+        else this.itemSel.IDSec2 = -1;
         this.itemSel = null;
         this.addInstruccion({ inst: inst });
         this.on_change();
@@ -220,39 +152,29 @@ export default {
     },
     on_click_sec(sec) {
       var f = {
-        filters: [{ IDSeccionCom: sec.id }],
+        filters: [{ IDSeccion: sec.id }, { IDSec2: sec.id }],
       };
       var it = this.getItemsFiltered(f, "teclas");
-      this.items = this.getItemsOrdered(it, "OrdenCom");
-
+      this.items = this.getItemsOrdered(it, "orden");
       this.secSel = sec;
       this.itemSel = null;
-      this.subItemSel = null;
     },
     on_click_tecla(t) {
-      if (t.IDSeccion) {
-        this.itemSel = t;
-        if (t.tipo == "ML") {
-          this.items = this.getItemsFiltered({ filters: [{ tecla: t.id }] }, "subteclas");
-        }
-      } else {
-        this.subItemSel = t;
-      }
+      this.itemSel = t;
     },
     getTablas() {
       var request = [];
       if (!this.teclas || this.teclas.length <= 0) request.push("teclas");
-      if (!this.subteclas || this.subteclas.length <= 0) request.push("subteclas");
-      if (!this.seccionescom || this.seccionescom.length <= 0)
-        request.push("seccionescom");
-      if (!this.iconchoices || this.iconchoices.length <= 0) request.push("iconchoices");
+      if (!this.secciones || this.secciones.length <= 0) request.push("secciones");
       this.getListadoCompuesto({ tablas: request });
     },
   },
   watch: {
-    seccionescom(v) {
+    secciones(v) {
       if (v && v.length > 0 && this.items.length == 0) {
-        this.on_click_sec(v[0]);
+        var params = this.$route.params;
+        if (params) this.on_click_sec(v[params.id]);
+        else this.on_click_sec(v[0]);
       } else {
         this.getTablas();
       }
@@ -262,28 +184,20 @@ export default {
         this.getTablas();
       }
     },
-    subteclas(v) {
-      if (!v) {
-        this.getTablas();
-      } else if (this.itemSel) {
-        this.items = this.getItemsFiltered(
-          { filters: [{ tecla: this.itemSel.id }] },
-          "subteclas"
-        );
-      }
-    },
   },
   mounted() {
     if (
       !this.teclas ||
       this.teclas.length == 0 ||
-      !this.subteclas ||
-      this.subteclas.length == 0 ||
-      !this.seccionescom ||
-      this.seccionescom.length == 0
+      !this.secciones ||
+      this.secciones.length == 0
     ) {
       this.getTablas();
-    } else this.on_click_sec(this.seccionescom[0]);
+    } else {
+      var params = this.$route.params;
+      if (params) this.on_click_sec(this.secciones[params.id]);
+      else this.on_click_sec(this.secciones[0]);
+    }
   },
 };
 </script>

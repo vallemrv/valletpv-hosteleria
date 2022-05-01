@@ -36,7 +36,7 @@ import ValleFiltrosVue from "../components/ValleFiltros.vue";
 import { mapGetters, mapActions } from "vuex";
 export default {
   components: { ValleFloatFormVue, ValleFiltrosVue },
-  props: ["tb_name", "secSel"],
+  props: ["tb_name", "secSel", "field_parent", "field_item"],
   data() {
     return {
       items: [],
@@ -51,21 +51,25 @@ export default {
   methods: {
     ...mapActions(["addInstruccion"]),
     on_filter_change(f) {
-      this.items = this.getItemsFiltered(f, this.tb_name);
+      var aux = this.getItemsFiltered(f, "teclas");
+      this.items = Object.values(aux).filter((e) => {
+        return e[this.field_item] == -1;
+      });
     },
     add_item(item) {
       var inst = {
-        tb: "teclascom",
+        tb: this.tb_name,
         reg: {
           orden: 0,
           tecla__id__teclas: item.id,
-          seccion__id__seccionescom: this.secSel.id,
         },
         tipo: "add",
       };
-      console.log(this.secSel);
-      item.IDSeccionCom = this.secSel.id;
+      inst["reg"][this.field_parent] = this.secSel.id;
+      item[this.field_item] = this.secSel.id;
       item.OrdenCom = 0;
+      item.orden = 0;
+      item.RGB = this.secSel.rgb;
       this.addInstruccion({ inst: inst });
       this.$emit("change");
     },

@@ -3,14 +3,14 @@
     title="Secciones"
     :filtro="filter"
     :tabla="tabla"
-    tb_name="secciones"
+    :tb_name="tb_name"
     @click_filter="on_click_filter"
     @click_tools="on_click_tools"
     :form="form"
     :tools="tools"
   ></valle-editor-item-vue>
   <valle-dialogo-form-vue
-    @close_dialogo="() => (showDialogo = false)"
+    @close="() => (showDialogo = false)"
     :show="showDialogo"
     title="Editar"
     :item="itemSel"
@@ -18,11 +18,6 @@
     :tb_name="tb_name"
     tipo="md"
   ></valle-dialogo-form-vue>
-  <valle-teclados-dialogo
-    :close="() => (showTeclados = false)"
-    :show="showTeclados"
-    :data="estado"
-  ></valle-teclados-dialogo>
 </template>
 
 <script>
@@ -40,7 +35,6 @@ export default {
   data() {
     return {
       showDialogo: false,
-      showTeclados: false,
       filterModel: [],
       itemSel: null,
       tb_name: "secciones",
@@ -55,7 +49,11 @@ export default {
       ],
       tabla: {
         headers: ["Nombre", "Color", "Orden"],
-        keys: ["nombre", "rgb", "orden"],
+        keys: [
+          "nombre",
+          { col: "rgb", float: true, tipo: "color" },
+          { col: "orden", float: true },
+        ],
       },
       tools: [
         { op: "edit", text: "Editar", icon: "mdi-account-edit" },
@@ -63,7 +61,6 @@ export default {
         { op: "add", text: "Agregar teclas", icon: "mdi-table-plus" },
         { op: "show", text: "Ver teclado", icon: "mdi-eye" },
       ],
-      estado: {},
     };
   },
   methods: {
@@ -113,12 +110,8 @@ export default {
             return e.id != v.id;
           });
         case "show":
-          this.showTeclados = false;
-          var f = { filters: [{ IDSeccion: v.id }, { IDSec2: v.id }] };
-          this.estado.items = this.getItemsFiltered(f, "teclas");
-          this.estado.cols = "3";
-          this.estado.title = v.nombre;
-          this.showTeclados = true;
+          var index = this.secciones.indexOf(v);
+          this.$router.push({ name: "tecladostpv", params: { id: index } });
           break;
       }
       if (op != "edit" && op != "add" && op != "show") {
@@ -134,9 +127,6 @@ export default {
       } else {
         this.cargarRegistro();
       }
-    },
-    showDialogo(v) {
-      console.log(v);
     },
   },
   mounted() {

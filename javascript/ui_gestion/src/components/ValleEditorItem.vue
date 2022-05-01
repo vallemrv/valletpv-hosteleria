@@ -26,10 +26,11 @@
         :headers="tabla.headers"
         :tools="tools"
         @click_tools="on_click_tools"
+        :tb_name="tb_name"
       ></valle-listados-tb>
     </v-col>
     <valle-dialogo-form
-      @close_dialogo="on_close_dialogo"
+      @close="() => (showDialog = false)"
       :show="showDialog"
       :title="titleDialogo"
       :item="itemSel"
@@ -69,9 +70,6 @@ export default {
       this.itemSel = this.$tools.newItem(this.form);
       this.showDialog = true;
       this.tipo = "add";
-    },
-    on_close_dialogo() {
-      this.showDialog = false;
     },
     on_click_tools(value, op) {
       this.$emit("click_tools", value, op);

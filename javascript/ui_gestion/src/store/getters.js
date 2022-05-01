@@ -49,10 +49,10 @@ export default {
         return items;
     },
     getItemsFiltered: (state) => (filter, tb_name) =>{
+        
         var f = filter.filters
-       
         if (!state[tb_name]) return []
-        if (f.length == 0) return state[tb_name]
+        if (!f ||f.length == 0) return state[tb_name]
 
         if (filter.include){
             return Object.values(state[tb_name])

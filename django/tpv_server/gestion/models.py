@@ -822,6 +822,13 @@ ICON_CHOICES = (
     ("taza_cafe", "Taza cafe"),
 )
 
+class IconChoices(models.Model):
+    @staticmethod
+    def update_for_devices():
+        obj = []
+        for r in ICON_CHOICES:
+            obj.append({"choices":r[1], "keys":r[0]})
+        return obj;
 
 class SeccionesCom(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -901,7 +908,6 @@ class Servidos(models.Model):
 class Subteclas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas',  on_delete=models.CASCADE, db_column='IDTecla')  # Field name made lowercase.
-    tecla_child = models.ForeignKey('Teclas',  on_delete=models.SET_NULL, null=True, related_name='teclas_child')  # Field name made lowercase.
     nombre = models.CharField(max_length=100, null=True, blank=True)
     incremento = models.DecimalField(blank=True, null=True, max_digits=4, decimal_places=2, default='0')
     descripcion_r = models.CharField("Descripción recepción", db_column='Descripcion_r', max_length=300, null=True, blank=True)
@@ -1020,56 +1026,7 @@ class Teclas(models.Model):
 
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
-        return super().delete(*args, **kwargs)
-
-    def get_items_edit(self, orden=None, show_secciones=False):
-        if orden == None:
-            orden = self.orden
-
-        result = ""
-        if show_secciones:
-            secciones = self.teclaseccion_set.all().values_list("seccion__nombre", flat=True)
-            result= ", ".join(secciones)
-        else:
-           result = self.get_tipo_display()
-
-        obj = {
-            'cols': [self.nombre, "%.2f" % float(self.p1), "%.2f" % float(self.p2), result, orden],
-            'botones': [{'tipo':'edit', 'icon':'fas fa-edit'},
-                        {'tipo':'edit_orden', 'icon': 'fas fa-sort-amount-down'},
-                        {'tipo':'sugerencias', 'icon':'fas fa-comment'}],
-            "obj": {"id": self.id,"nombre":self.nombre, "orden":self.orden,
-                    "p1": "%.2f" % float(self.p1), "p2": "%.2f" % float(self.p2),
-                    "familia": self.familia.id,
-                    "tag": self.tag if self.tag else "", "ttf": self.ttf if self.ttf else "",
-                    "descripcion_r": self.descripcion_r if self.descripcion_r else "",
-                    "descripcion_t": self.descripcion_t if self.descripcion_t else "",
-                    "tipo": self.tipo, 'color': self.get_color(hex=True)
-                    }
-            }
-        
-        if self.tipo == "ML":
-            obj['botones'].append({'tipo':'ML', 'icon':'fas fa-grip-vertical'})
-        elif self.tipo == "GR":
-            obj['botones'].append({'tipo':'GR', 'icon':'fas fa-grip-vertical'})
-                   
-        obj['botones'].append({'tipo':'borrar', 'icon':'far fa-trash'})
-      
-        return obj
-
-    def get_items_add(self, show_secciones=False):
-        result = self.get_tipo_display()
-        if show_secciones:
-            secciones = self.teclaseccion_set.all().values_list("seccion__nombre", flat=True)
-            result= ", ".join(secciones)
-        else:
-            result = self.get_tipo_display()
-
-        return {'cols': [self.nombre, "%.2f" % float(self.p1), "%.2f" % float(self.p2), result, self.orden],
-                'botones': [{'tipo':'add', 'icon':'fa-plus'}],
-                'obj': {"id": self.id, "nombre": self.nombre}
-               }
-        
+        return super().delete(*args, **kwargs) 
 
 
     def __unicode__(self):

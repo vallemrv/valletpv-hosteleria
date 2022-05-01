@@ -20,7 +20,7 @@
                   :item="item"
                   :column="column"
                   :tb_name="tb_name"
-                  @click_enter="on_click_ordenar"
+                  @change="on_click_ordenar"
                 ></valle-float-form-vue>
               </v-col>
             </v-row>

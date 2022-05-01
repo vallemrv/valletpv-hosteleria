@@ -8,10 +8,10 @@
       </v-btn>
     </template>
 
-    <v-card variant="outlined" width="200px">
+    <v-card variant="outlined">
       <v-card-header> Actualizaciones </v-card-header>
       <v-spacer></v-spacer>
-      <v-list border class="mx-auto" max-width="256">
+      <v-list border class="mx-auto">
         <v-list-item>
           <v-list-item-title class="mr-10"> Pendientes </v-list-item-title>
           <v-spacer></v-spacer>
@@ -21,6 +21,14 @@
         </v-list-item>
       </v-list>
       <v-card-actions class="pl-16">
+        <v-btn
+          variant="outlined"
+          @click="
+            cancelar();
+            showMod = false;
+          "
+          >Cancelar</v-btn
+        >
         <v-btn
           variant="outlined"
           @click="
@@ -44,6 +52,10 @@ export default {
   },
   methods: {
     ...mapActions(["actualizar"]),
+    cancelar() {
+      this.$store.state.instrucciones = null;
+      this.$router.go(this.$router.currentRoute);
+    },
   },
 };
 </script>

@@ -22,6 +22,7 @@ export default {
   computed: {},
   methods: {
     bg_color(item) {
+      if (item.rgb) item.RGB = item.rgb;
       if (item.RGB) {
         return this.$tools.rgbToHex(item.RGB);
       } else {

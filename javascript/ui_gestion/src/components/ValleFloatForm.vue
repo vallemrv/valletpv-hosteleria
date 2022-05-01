@@ -15,21 +15,17 @@
         @click.stop="() => {}"
       >
         <v-row cols="12" class="pa-0 ma-0 text-caption">
-          <div class="w-100" v-if="column != 'rgb'">
+          <div class="w-100" v-if="!tipo || tipo == 'number'">
             <v-col cols="12" color="#5868ff" class="current_val"> {{ _value }} </v-col>
             <v-col cols="12" class="old_val" v-if="val_old"> {{ val_old }} </v-col>
           </div>
         </v-row>
       </v-btn>
     </template>
-    <v-card v-if="column == 'rgb'">
+    <v-card v-if="tipo == 'color'">
       <v-card-text>
-        <v-color-picker @keypress.enter="on_enter()" v-model="color_picker">
-        </v-color-picker>
+        <v-color-picker @change="on_enter()" v-model="color_picker"> </v-color-picker>
       </v-card-text>
-      <v-card-actions>
-        <v-btn @click="on_enter()">Aceptar</v-btn>
-      </v-card-actions>
     </v-card>
     <v-card width="200px" v-else>
       <v-card-header>
@@ -50,7 +46,7 @@
 import { mapActions } from "vuex";
 
 export default {
-  props: ["item", "column", "rules", "hint", "app", "tb_name", "value"],
+  props: ["item", "column", "rules", "hint", "app", "tb_name", "value", "tipo"],
   data: () => {
     return {
       elevation: 3,
@@ -106,7 +102,7 @@ export default {
       };
       inst["reg"][this.column] = this.val_modified;
       this.addInstruccion({ inst: inst });
-      this.$emit("click_enter", this.item);
+      this.$emit("change", this.item);
     },
   },
   watch: {
@@ -114,6 +110,11 @@ export default {
       if (v) {
         this.val_modified = this.item[this.column];
         this.val_old = this.item[this.column + "_old"];
+      }
+    },
+    mostrar(v) {
+      if (!v && this.tipo == "color") {
+        this.on_enter();
       }
     },
   },

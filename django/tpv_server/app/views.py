@@ -89,8 +89,14 @@ def add_reg_handler(app_name, tb_name, reg):
     obj = model()
     
     for key in reg:
+        
         if hasattr(obj, key):
-            setattr(obj, key, reg[key])      
+            field = getattr(obj, key)
+            if "models" in str(type(field)):
+                attr = field.__class__.objects.get(pk=reg[key])
+            else:
+                attr = reg[key] 
+            setattr(obj, key, attr)      
         else:
             if "__" in key:
                 attr, field, str_parent = key.split("__")
@@ -134,9 +140,9 @@ def modifcar_reg(inst):
 def delete_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
     tb_name = inst["tb"]
-    id = inst["id"]
+    filter = {"id": inst["id"]} if "id" in inst else inst["filter"]
     model = apps.get_model(app_name, tb_name)
 
-    obj = model.objects.filter(id=id).first()
+    obj = model.objects.filter(**filter).first()
     if (obj):
         obj.delete()

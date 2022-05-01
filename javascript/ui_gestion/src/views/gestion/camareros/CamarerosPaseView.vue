@@ -6,7 +6,7 @@
     :tabla="tabla"
     :tools="tools"
     @click_filter="on_click_filter"
-    @on_click_tools="on_click_tools"
+    @click_tools="on_click_tools"
   >
   </valle-editor-item>
 </template>

@@ -10,15 +10,17 @@
     </thead>
     <tbody>
       <tr v-for="(item, i) in items" :key="i">
-        <td v-for="(reg, j) in columns" :key="j">
+        <td v-for="(col, j) in columns" :key="j">
           <valle-float-form
-            v-if="reg == 'rgb' || reg == 'orden'"
+            v-if="col.float"
             :item="item"
-            :column="reg"
-            tb_name="secciones"
+            :column="col.col"
+            :tipo="col.tipo"
+            :rules="col.rules"
+            :tb_name="tb_name"
           ></valle-float-form>
 
-          <div v-else>{{ item[reg] }}</div>
+          <div v-else>{{ item[col] }}</div>
         </td>
         <td class="text-center" v-if="tools">
           <v-menu anchor="start bottom" origin="auto">
@@ -48,7 +50,7 @@
 import ValleFloatForm from "./ValleFloatForm.vue";
 export default {
   components: { ValleFloatForm },
-  props: ["items", "columns", "headers", "tools"],
+  props: ["items", "columns", "headers", "tools", "tb_name"],
   methods: {
     on_click_tools(v, op, btn) {
       this.$emit("click_tools", v, op);
