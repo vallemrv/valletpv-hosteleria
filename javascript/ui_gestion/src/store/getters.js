@@ -1,5 +1,5 @@
 export default {
-    getItemById: (state) => (tb_name, id) =>{
+     getItemById: (state) => (tb_name, id) =>{
         if (!state[tb_name]) return null
         var filter = Object.values(state[tb_name]).filter( (e) =>{
             return e.id == id
@@ -49,11 +49,10 @@ export default {
         return items;
     },
     getItemsFiltered: (state) => (filter, tb_name) =>{
-        
+        if (!filter) return Object.values(state[tb_name])
         var f = filter.filters
-        if (!state[tb_name]) return []
-        if (!f ||f.length == 0) return state[tb_name]
-
+        if (!f || f.length == 0 || !state[tb_name]) return []
+        
         if (filter.include){
             return Object.values(state[tb_name])
             .filter( o => {
@@ -63,7 +62,7 @@ export default {
                     if (!is_corret){
                         is_corret = true
                         Object.keys(q).map( (k) => {
-                            is_corret = is_corret && o[k].includes(q[k])
+                            is_corret = is_corret && o[k].toLowerCase().includes(q[k].toLowerCase())
                         });
                     } 
                 });

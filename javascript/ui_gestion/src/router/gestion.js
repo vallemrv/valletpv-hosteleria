@@ -6,7 +6,8 @@ import CamarerosPase from '@/views/gestion/camareros/CamarerosPaseView'
 import VistaTeclas from '@/views/gestion/teclados/VistaTeclas'
 import TecladosComanda from '@/views/gestion/teclados/TecladosComanda'
 import TecladosTPV from '@/views/gestion/teclados/TecladosTPV'
-
+import FamiliasView from '@/views/gestion/teclados/FamiliasView'
+import TeclasEspeciales from '@/views/gestion/teclados/TeclasEspeciales'
 
 
 const camarerosRoutes = [
@@ -23,6 +24,16 @@ const camarerosRoutes = [
 ]
 
 const tecladosRoutes = [
+    {
+        path: "/gestion/teclados/composicion",
+        component: TeclasEspeciales,
+        name: 'composicion'
+    },
+    {
+        path: "/gestion/teclados/familias",
+        component: FamiliasView,
+        name: 'familias'
+    },
     {
         path: "/gestion/teclados/precio",
         component: PreciosView,

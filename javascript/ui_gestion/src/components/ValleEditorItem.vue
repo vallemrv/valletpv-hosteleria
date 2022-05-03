@@ -16,7 +16,7 @@
         >
       </v-toolbar>
     </v-col>
-    <v-col cols="12">
+    <v-col cols="12" v-if="filtro">
       <valle-filtros :filtro="filtro" @click_filter="on_click_filter"></valle-filtros>
     </v-col>
     <v-col cols="12" v-if="tabla">

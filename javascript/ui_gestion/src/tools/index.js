@@ -23,7 +23,8 @@ export default {
                 let item = {}
                 form.forEach((e) => {
                     if (e.tp == "text") item[e.col] = "";
-                    else if( e.tp == "multiple") item[e.col] = []
+                    else if( e.tp == "multiple") item[e.col] = [];
+                    else item[e.col] = null
                 });
                 return item
             },
@@ -31,7 +32,7 @@ export default {
                 if (typeof(str) == "string"){
                     str = str.replaceAll("[", "").replaceAll("]","")
                     str = str.replaceAll("'", "").replaceAll('"',"")
-                    if (str == "") str = []
+                    if (str == "" || str == "0") str = []
                     else str = str.split(", ")
                 }
                 return str

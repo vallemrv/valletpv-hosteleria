@@ -32,13 +32,15 @@
             <v-btn
               icon
               @click="agregar_subteclas"
-              v-if="itemSel.tipo == 'ML' && items.length < 18"
+              v-if="itemSel.tipo == 'CM' && items.length < 18"
             >
               <v-icon>mdi-plus</v-icon></v-btn
             >
+
             <v-btn icon @click="quitar_tecla"> <v-icon>mdi-delete</v-icon></v-btn>
           </v-card-text>
         </v-card>
+
         <v-card elevation="2">
           <v-card-text v-if="subItemSel">
             {{ subItemSel.nombre }}
@@ -104,6 +106,7 @@ export default {
       title: "Teclados comanda",
       titleForm: "Editar",
       tipo: "md",
+      click: 0,
       showForm: false,
       showOrdenarTeclas: false,
       showAgregarTeclas: false,
@@ -116,15 +119,19 @@ export default {
       selTbName: "",
       form: [],
       formTecla: [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "cescripcion_t", label: "Texto ticket", tp: "text" },
+        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
+      ],
+      formGR: [
         {
           col: "tipo",
           label: "Tipo",
           tp: "select",
-          keys: ["SP", "ML", "GR"],
-          choices: ["SIMPLE", "COMPUESTA", "GRUPO"],
+          keys: ["SP", "CM"],
+          choices: ["SIMPLE", "COMPUESTA"],
         },
       ],
-      formSubtecla: [{ col: "nombre", label: "Nombre", tp: "text" }],
     };
   },
   computed: {
@@ -144,9 +151,6 @@ export default {
         { col: "descuento", label: "Descueto", tp: "number" },
       ];
     },
-    newSubTecla() {
-      return { nombre: "", tecla_id: this.itemSel.id };
-    },
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
@@ -156,13 +160,14 @@ export default {
       this.showForm = false;
     },
     agregar_subteclas() {
-      this.newSubTecla.nombre = "";
+      this.newSubTecla = this.$tools.newItem(this.formTecla);
+      this.newSubTecla.tecla_id = this.itemSel.id;
       this.itemSelEdit = this.newSubTecla;
       this.titleForm = "Agregar subtecla";
       this.tipo = "add";
       this.showForm = true;
       this.selTbName = "subteclas";
-      this.form = this.formSubtecla;
+      this.form = this.formTecla;
     },
     editar_tecla() {
       this.itemSelEdit = this.itemSel;
@@ -183,7 +188,7 @@ export default {
       this.showForm = true;
       this.titleForm = "Editar subtecla";
       this.selTbName = "subteclas";
-      this.form = this.formSubtecla;
+      this.form = this.formTecla;
     },
     quitar_subtecla() {
       if (this.itemSel) {
@@ -207,6 +212,7 @@ export default {
           tb: "teclascom",
           tipo: "rm",
           filter: { tecla__pk: this.itemSel.id },
+          id: this.itemSel.id,
         };
         this.itemSel.IDSeccionCom = -1;
         this.subItemSel = null;
@@ -232,8 +238,15 @@ export default {
     on_click_tecla(t) {
       if (t.IDSeccion) {
         this.itemSel = t;
-        if (t.tipo == "ML") {
+        this.click++;
+        if (t.tipo == "CM" && this.click == 2) {
           this.items = this.getItemsFiltered({ filters: [{ tecla: t.id }] }, "subteclas");
+        } else if (t.tipo != "CM" && this.click == 2) {
+          this.itemSelEdit = this.itemSel;
+          this.titleForm = "Editar tecla";
+          this.showForm = true;
+          this.selTbName = "teclas";
+          this.form = this.formGR;
         }
       } else {
         this.subItemSel = t;
@@ -272,6 +285,9 @@ export default {
         );
       }
     },
+    itemSel(v) {
+      this.click = 0;
+    },
   },
   mounted() {
     if (
@@ -280,7 +296,9 @@ export default {
       !this.subteclas ||
       this.subteclas.length == 0 ||
       !this.seccionescom ||
-      this.seccionescom.length == 0
+      this.seccionescom.length == 0 ||
+      !this.familias ||
+      this.familias.length == 0
     ) {
       this.getTablas();
     } else this.on_click_sec(this.seccionescom[0]);

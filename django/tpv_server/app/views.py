@@ -87,18 +87,22 @@ def mod_regs(request):
 def add_reg_handler(app_name, tb_name, reg):
     model = apps.get_model(app_name, tb_name)
     obj = model()
+   
     
     for key in reg:
-        
         if hasattr(obj, key):
             field = getattr(obj, key)
             if "models" in str(type(field)):
                 attr = field.__class__.objects.get(pk=reg[key])
+            elif "nonetype" in str(type(field)):
+                attr = reg[key]
+                key = key+"_id"
             else:
                 attr = reg[key] 
-            setattr(obj, key, attr)      
-        else:
-            if "__" in key:
+            setattr(obj, key, attr)  
+        elif hasattr(model, key):
+            setattr(obj, key+"_id", reg[key])      
+        elif "__" in key:
                 attr, field, str_parent = key.split("__")
                 parent = apps.get_model(app_name, str_parent)
                 filter = {field:reg[key]}
@@ -113,10 +117,10 @@ def modifcar_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
     tb_name = inst["tb"]
     reg = inst["reg"]
-    id = inst["id"]
+    filter = inst["filter"] if "filter" in inst else  {"id": inst["id"]}
     model = apps.get_model(app_name, tb_name)
 
-    obj = model.objects.filter(id=id).first()
+    obj = model.objects.filter(**filter).first()
     if (obj):
         for key in reg:
             if hasattr(obj, key):
@@ -140,7 +144,7 @@ def modifcar_reg(inst):
 def delete_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
     tb_name = inst["tb"]
-    filter = {"id": inst["id"]} if "id" in inst else inst["filter"]
+    filter = inst["filter"] if "filter" in inst else  {"id": inst["id"]}
     model = apps.get_model(app_name, tb_name)
 
     obj = model.objects.filter(**filter).first()

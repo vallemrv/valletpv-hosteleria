@@ -1,6 +1,6 @@
 <template>
   <valle-editor-item-vue
-    title="Secciones"
+    title="Familias"
     :tabla="tabla"
     :tb_name="tb_name"
     @click_tools="on_click_tools"
@@ -27,42 +27,61 @@ import { mapActions, mapGetters, mapState } from "vuex";
 export default {
   components: { ValleDialogoFormVue, ValleEditorItemVue, ValleTecladosDialogo },
   computed: {
-    ...mapState(["secciones", "itemsFiltrados"]),
-    ...mapGetters(["getItemsFiltered"]),
+    ...mapState(["familias", "receptores", "itemsFiltrados"]),
+    ...mapGetters(["getItemsFiltered", "getListValues"]),
+    form() {
+      return [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        {
+          col: "composicion",
+          label: "Composicion",
+          tp: "multiple",
+          choices: this.getListValues("familias", "nombre"),
+        },
+        { col: "cantidad", label: "Cantidad Composicion", tp: "number" },
+        {
+          col: "receptor",
+          label: "Receptor",
+          tp: "select",
+          choices: this.getListValues("receptores", "nombre"),
+          keys: this.getListValues("receptores", "id"),
+        },
+      ];
+    },
   },
   data() {
     return {
       showDialogo: false,
       itemSel: null,
-      tb_name: "secciones",
-      form: [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "rgb", label: "Color", tp: "color" },
-        { col: "orden", label: "Orden", tp: "number" },
-      ],
+      tb_name: "familias",
+
       tabla: {
-        headers: ["Nombre", "Color", "Orden"],
+        headers: ["Nombre", "Composicion", "Cantidad derivados", "Recetor"],
         keys: [
           "nombre",
-          { col: "rgb", float: true, tipo: "color" },
-          { col: "orden", float: true },
+          "composicion",
+          "cantidad",
+          { col: "receptor", key: "id", value: "nombre", tb_name: "receptores" },
         ],
       },
       tools: [
         { op: "edit", text: "Editar", icon: "mdi-account-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
-        { op: "add", text: "Agregar teclas", icon: "mdi-table-plus" },
-        { op: "show", text: "Ver teclado", icon: "mdi-eye" },
       ],
     };
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     cargarRegistro() {
-      if (!this.secciones || this.secciones.length == 0) {
-        this.getListadoCompuesto({ tablas: ["secciones"] });
+      if (
+        !this.receptores ||
+        this.receptores.length == 0 ||
+        !this.familias ||
+        this.familias.length == 0
+      ) {
+        this.getListadoCompuesto({ tablas: ["familias", "receptores", "teclas"] });
       } else {
-        this.$store.state.itemsFiltrados = this.secciones;
+        this.$store.state.itemsFiltrados = this.familias;
       }
     },
     on_click_tools(v, op) {
@@ -73,9 +92,6 @@ export default {
           this.itemSel = v;
           this.showDialogo = true;
           this.tipo = "md";
-          break;
-        case "add":
-          this.$router.push({ name: "teclas" });
           break;
         case "rm":
           inst = {
@@ -88,10 +104,6 @@ export default {
             return e.id != v.id;
           });
           break;
-        case "show":
-          var index = this.secciones.indexOf(v);
-          this.$router.push({ name: "tecladostpv", params: { id: index } });
-          break;
       }
       if (op != "edit" && op != "add" && op != "show") {
         this.addInstruccion({ inst: inst });
@@ -99,13 +111,14 @@ export default {
     },
   },
   watch: {
-    secciones(v) {
+    familias(v) {
       if (!v) {
         this.cargarRegistro();
       } else {
-        this.$store.state.itemsFiltrados = this.secciones;
+        this.$store.state.itemsFiltrados = this.familias;
       }
     },
+    receptores(v) {},
   },
   mounted() {
     this.cargarRegistro();

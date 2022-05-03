@@ -36,7 +36,12 @@
     </v-col>
 
     <v-col cols="12" sm="5">
-      <valle-teclados cols="6" @click_tecla="on_click_sec" :items="secciones">
+      <valle-teclados
+        cols="6"
+        @click_tecla="on_click_sec"
+        :items="secciones"
+        :is_collapsible="is_collapsible"
+      >
       </valle-teclados>
     </v-col>
     <v-col cols="12" sm="7">
@@ -95,6 +100,7 @@ export default {
       showAgregarTeclas: false,
       localFiter: null,
       items: [],
+      is_collapsible: ["xs"],
       secSel: null,
       itemSel: null,
       itemSelEdit: null,
@@ -109,7 +115,7 @@ export default {
   },
   computed: {
     ...mapState(["ocupado", "secciones", "teclas"]),
-    ...mapGetters(["getItemsFiltered", "getItemsOrdered", "getListValues"]),
+    ...mapGetters(["getItemsFiltered", "getItemsOrdered"]),
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
@@ -173,7 +179,7 @@ export default {
     secciones(v) {
       if (v && v.length > 0 && this.items.length == 0) {
         var params = this.$route.params;
-        if (params) this.on_click_sec(v[params.id]);
+        if (params.id) this.on_click_sec(v[params.id]);
         else this.on_click_sec(v[0]);
       } else {
         this.getTablas();
@@ -195,7 +201,7 @@ export default {
       this.getTablas();
     } else {
       var params = this.$route.params;
-      if (params) this.on_click_sec(this.secciones[params.id]);
+      if (params.id) this.on_click_sec(this.secciones[params.id]);
       else this.on_click_sec(this.secciones[0]);
     }
   },

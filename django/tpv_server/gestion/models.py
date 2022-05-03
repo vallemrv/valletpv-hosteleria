@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
+from django.forms import IntegerField
 from django.forms.models import model_to_dict
 
 from app.utility import rgbToHex
@@ -142,6 +143,22 @@ class Arqueocaja(models.Model):
 
         return ex
 
+
+
+PERMISOS_CHOICES = ["imprimir_factura", 
+"abrir_cajon", 
+"cobrar_ticket", 
+"borrar_linea", 
+"borrar_mesa"]
+
+class PermisosChoices(models.Model):
+    @staticmethod
+    def update_for_devices():
+        obj = []
+        for r in PERMISOS_CHOICES:
+            obj.append({"choices":r})
+        return obj;        
+
 class Camareros(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=100)  # Field name made lowercase.
@@ -150,7 +167,7 @@ class Camareros(models.Model):
     pass_field = models.CharField(db_column='Pass', max_length=100, null=True)  # Field name made lowercase. Field renamed because it was a Python reserved word.
     activo = models.IntegerField(db_column='Activo', default=1)  # Field name made lowercase.
     autorizado = models.IntegerField(db_column='Autorizado', default=1)  # Field name made lowercase.
-    permisos = models.CharField(db_column='Permisos', max_length=100, null=True, default="")  # Field name made lowercase. Field renamed because it was a Python reserved word.
+    permisos = models.CharField(db_column='Permisos', max_length=150, null=True, default="")  # Field name made lowercase. Field renamed because it was a Python reserved word.
     
     @staticmethod
     def update_from_device(row):
@@ -166,17 +183,10 @@ class Camareros(models.Model):
 
     @staticmethod
     def update_for_devices():
-        rows = Camareros.objects.filter(activo=1)
+        rows = Camareros.objects.all()
         tb = []
         for r in rows:
-            tb.append({
-                "ID":r.id,
-                "Nombre": r.nombre,
-                "Apellidos": r.apellidos,
-                "Pass": r.pass_field,
-                "autorizado": r.autorizado,
-                "permisos": r.permisos
-            })
+            tb.append(model_to_dict(r))
         return tb
     
     
@@ -296,8 +306,8 @@ class Efectivo(models.Model):
 class Familias(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=40)  # Field name made lowercase.
-    tipo = models.CharField(db_column='Tipo', max_length=6)  # Field name made lowercase.
-    numtapas = models.IntegerField("Numero de tapas", db_column='NumTapas', null=True, blank=True)  # Field name made lowercase.
+    composicion = models.CharField(db_column='Tipo', max_length=150)  # Field name made lowercase.
+    cantidad = models.IntegerField("Numero de tapas", db_column='NumTapas', default=0, null=True, blank=True)  # Field name made lowercase.
     receptor = models.ForeignKey('Receptores',  on_delete=models.CASCADE, db_column='IDReceptor')  # Field name made lowercase.
 
     @staticmethod
@@ -971,8 +981,7 @@ class Sugerencias(models.Model):
 
 TIPO_TECLA_CHOICE = [
     ("SP", "SIMPLE"),
-    ("ML", "COMPUESTA"),
-    ("GR", "GRUPO")
+    ("CM", "COMPUESTA")
     ]
 
 class Teclas(models.Model):
@@ -1008,7 +1017,7 @@ class Teclas(models.Model):
         seccioncom = r.teclascom_set.all().first()
         row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
         row["OrdenCom"] = seccioncom.orden if seccioncom else -1
-        row["familia__nombre__familias"] = r.familia.nombre
+        row["nombreFam"] = r.familia.nombre
         
         return row
    
@@ -1038,6 +1047,38 @@ class Teclas(models.Model):
     class Meta:
         db_table = 'teclas'
         ordering = ['-orden']
+
+
+class ComposicionTeclas(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    tecla = models.ForeignKey(Teclas,  on_delete=models.CASCADE, db_column='IDTecla')  # Field name made lowercase.
+    composicion = models.CharField(max_length=12)  # Field name made lowercase.
+    cantidad = models.IntegerField()  # Field name made lowercase.
+
+    @staticmethod
+    def update_for_devices():
+        rows = ComposicionTeclas.objects.all()
+        objs = []
+        
+        for r in rows: 
+            aux = model_to_dict(r)
+            aux["nombre"] = r.tecla.nombre
+            objs.append(aux)
+        return objs
+   
+    def save(self, *args, **kwargs):
+        Sync.actualizar(self._meta.db_table)
+        return super().save(*args, **kwargs)
+        
+
+    def delete(self, *args, **kwargs):
+        Sync.actualizar(self._meta.db_table)
+        return super().delete( *args, **kwargs)
+
+
+    class Meta:
+        db_table = 'composicionteclas'
+        ordering = ['id']
 
 
 class Teclascom(models.Model):

@@ -1,6 +1,6 @@
 <template>
   <v-table fixed-header>
-    <thead>
+    <thead v-if="items && items.length > 0">
       <tr>
         <th v-for="(h, i) in headers" :key="i">
           {{ h.toUpperCase() }}
@@ -20,7 +20,7 @@
             :tb_name="tb_name"
           ></valle-float-form>
 
-          <div v-else>{{ item[col] }}</div>
+          <div v-else>{{ col.key ? getName(col, item) : item[col] }}</div>
         </td>
         <td class="text-center" v-if="tools">
           <v-menu anchor="start bottom" origin="auto">
@@ -48,10 +48,25 @@
 
 <script>
 import ValleFloatForm from "./ValleFloatForm.vue";
+import { mapGetters } from "vuex";
 export default {
   components: { ValleFloatForm },
   props: ["items", "columns", "headers", "tools", "tb_name"],
+  computed: {
+    ...mapGetters(["getItemsFiltered"]),
+  },
   methods: {
+    getName(col, item) {
+      var f = {
+        filters: [],
+      };
+      var obj = {};
+      obj[col.key] = item[col.col];
+      f.filters.push(obj);
+      var v = this.getItemsFiltered(f, col.tb_name);
+      if (v.length > 0) return v[0][col.value];
+      return "";
+    },
     on_click_tools(v, op, btn) {
       this.$emit("click_tools", v, op);
       document.getElementById("btn_" + btn).click();

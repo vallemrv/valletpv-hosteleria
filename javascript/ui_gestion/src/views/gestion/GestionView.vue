@@ -7,6 +7,8 @@ export default {
   components: { ValleMenuBtn },
   data: () => ({
     items: [
+      { title: "Grupos y familias", link: { name: "familias" } },
+      { title: "Menú y ofertas", link: { name: "composicion" } },
       { title: "Secciones", link: { name: "secciones" } },
       { title: "Vista teclas", link: { name: "vista" } },
       { title: "Teclados comanda", link: { name: "tecladoscom" } },

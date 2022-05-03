@@ -1,5 +1,21 @@
 import * as types from "./mutations_types"
-import * as tools from "./tools"
+
+const contains_func = (instrucciones, inst, reg) => {
+    let contains = false;
+    instrucciones.forEach( (obj) => {
+        if (obj.id == inst.id){
+            if (reg){
+                var col_obj = Object.keys(obj.reg)[0]
+                var col_inst = Object.keys(inst.reg)[0]
+                if (col_obj == col_inst) {
+                    obj.reg = inst.reg
+                }
+            }        
+            contains = true
+        }
+    });
+    return contains;
+}   
 
 export default {  
     [types.GET_REQUEST] (state){
@@ -34,9 +50,9 @@ export default {
         state.error = null
         let contains = false;
         if (inst.tipo == "md"){
-            contains = tools.contains(state.instrucciones, inst, true);
+            contains = contains_func(state.instrucciones, inst, true);
         }else if ( inst.tipo == "rm"){
-            contains = tools.contains(state.instrucciones, inst, false);
+            contains = contains_func(state.instrucciones, inst, false);
         }
        
         if( !contains ){

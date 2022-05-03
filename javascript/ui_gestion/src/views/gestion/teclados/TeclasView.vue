@@ -11,7 +11,7 @@
   >
   </valle-editor-item>
   <valle-dialogo-form
-    @close_dialogo="on_close_dialogo"
+    @close="on_close_dialogo"
     :show="showDialog"
     title="Editar"
     :item="itemSel"
@@ -43,9 +43,9 @@ export default {
         caption: this.getListValues("secciones", "nombre"),
         filters: this.getFilters("secciones", "id", ["IDSeccion", "IDSec2"]),
         tools: [],
-        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "p1"] }],
+        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "tag"] }],
         all: [{ IDSeccion: -1 }, { IDSeccion: undefined }],
-        multiple: true,
+        multiple: false,
       };
     },
     form() {
@@ -63,9 +63,10 @@ export default {
           tp: "text",
         },
         {
-          col: "familia__nombre__familias",
+          col: "familia",
           label: "Familia",
           tp: "select",
+          keys: this.getListValues("familias", "id"),
           choices: this.getListValues("familias", "nombre"),
         },
       ];

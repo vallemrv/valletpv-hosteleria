@@ -24,6 +24,7 @@
                 :items="f.choices"
                 :label="f.label"
                 :multiple="f.tp"
+                :values="f.keys"
                 outlined
                 dense
               ></v-combobox>
@@ -67,15 +68,10 @@ export default {
   data() {
     return {
       rules: [(value) => !!value || "Es necesario."],
-      field_color: {},
     };
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
-    color_keys(col, i) {
-      this.field_color = col;
-      return col + "_" + i;
-    },
     close_dialogo() {
       this.$emit("close");
     },

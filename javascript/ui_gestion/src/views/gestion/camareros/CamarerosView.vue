@@ -11,7 +11,7 @@
   >
   </valle-editor-item>
   <valle-dialogo-form
-    @close_dialogo="on_close_dialogo"
+    @close="on_close_dialogo"
     :show="showDialog"
     title="Editar"
     :item="itemSel"
@@ -30,8 +30,20 @@ import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 export default {
   components: { ValleEditorItem, ValleDialogoForm },
   computed: {
-    ...mapGetters(["getItemsFiltered"]),
-    ...mapState(["camareros"]),
+    ...mapGetters(["getItemsFiltered", "getListValues"]),
+    ...mapState(["camareros", "permisoschoices"]),
+    form() {
+      return [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "apellidos", label: "1º Apellido", tp: "text" },
+        {
+          col: "permisos",
+          label: "Permisos",
+          choices: this.getListValues("permisoschoices", "choices"),
+          tp: "multiple",
+        },
+      ];
+    },
   },
   data() {
     const col = ["nombre", "apellidos", "permisos"];
@@ -41,19 +53,9 @@ export default {
       localFilter: [],
       showDialog: false,
       itemSel: null,
-      form: [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "apellidos", label: "1º Apellido", tp: "text" },
-        {
-          col: "permisos",
-          label: "Permisos",
-          choices: ["borrar_mesas", "borrar_lineas"],
-          tp: "multiple",
-        },
-      ],
       filtro: {
-        caption: ["borrados", "activos"],
-        filters: [{ activo: 0 }, { autorizado: 1 }],
+        caption: ["borrados"],
+        filters: [{ activo: 0 }],
         all: [{ activo: 1 }],
         multiple: false,
       },
@@ -63,16 +65,17 @@ export default {
       },
       multiple_tools: {
         activos: [
-          { op: "minus", text: "Desactivar", icon: "mdi-account-minus" },
           { op: "edit", text: "Editar", icon: "mdi-account-edit" },
+          { op: "minus", text: "Borrar", icon: "mdi-account-minus" },
           {
             op: "unlock",
             text: "Desbloquear",
             icon: "mdi-lock-open",
           },
+          { op: "pase", text: "Pase", icon: "mdi-room-service" },
         ],
         borrados: [
-          { op: "activar", text: "Activar", icon: "mdi-account-arrow-left" },
+          { op: "activar", text: "Incorparar", icon: "mdi-account-arrow-left" },
           { op: "rm", text: "Borrado definitivo", icon: "mdi-delete" },
         ],
       },
@@ -80,9 +83,9 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["getListado", "addInstruccion"]),
+    ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     cargar_reg() {
-      this.getListado({ tabla: this.tb_name });
+      this.getListadoCompuesto({ tablas: ["camareros", "permisoschoices"] });
     },
     on_close_dialogo() {
       this.showDialog = false;
@@ -105,6 +108,9 @@ export default {
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
+        case "pase":
+          this.$router.push({ name: "camarerospase" });
+          break;
         case "edit":
           this.titleDialogo = "Editar";
           v.permisos = this.$tools.stringToArray(v.permisos);
@@ -140,6 +146,7 @@ export default {
             tipo: "md",
             id: v.id,
           };
+          break;
         case "rm":
           inst = {
             tb: this.tb_name,
@@ -150,8 +157,9 @@ export default {
           this.$store.state.camareros = cam.filter((e) => {
             return e.id != v.id;
           });
+          break;
       }
-      if (op != "edit") {
+      if (op != "edit" && op != "pase") {
         this.addInstruccion({ inst: inst });
         this.on_click_filter(this.localFilter);
       }
@@ -169,7 +177,7 @@ export default {
   mounted() {
     this.localFilter = Object.values(this.filtro);
     this.localFilter.filters = Object.values(this.filtro.all);
-    if (this.camareros) {
+    if (this.camareros && this.permisoschoices) {
       this.on_click_filter(this.localFilter);
     } else {
       this.cargar_reg();
