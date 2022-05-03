@@ -51,6 +51,7 @@ export default {
       toolsComp: [
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
         { op: "md", text: "Editar", icon: "mdi-pencil" },
+        { op: "add", text: "Agregar composicion", icon: "mdi-group" },
       ],
       toolsTecla: [{ op: "add_comp", text: "Agregar composicion", icon: "mdi-group" }],
       tools: null,
@@ -130,10 +131,13 @@ export default {
     on_click_tools(v, op) {
       switch (op) {
         case "add_comp":
-          this.itemSel = { tecla: v.id, composicion: [], cantidad: 0 };
+        case "add":
           this.showDialog = true;
           this.titleForm = "Agregar composicion";
           this.tipo = "add";
+          if (op == "add")
+            this.itemSel = { tecla: v.tecla, composicion: [], cantidad: 0 };
+          else this.itemSel = { tecla: v.id, composicion: [], cantidad: 0 };
           break;
         case "md":
           this.itemSel = v;

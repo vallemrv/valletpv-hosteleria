@@ -1059,13 +1059,17 @@ class ComposicionTeclas(models.Model):
     def update_for_devices():
         rows = ComposicionTeclas.objects.all()
         objs = []
-        
         for r in rows: 
-            aux = model_to_dict(r)
-            aux["nombre"] = r.tecla.nombre
-            objs.append(aux)
+            objs.append(r.serialize())
         return objs
-   
+
+
+    def serialize(self):
+        r = self
+        aux = model_to_dict(r)
+        aux["nombre"] = r.tecla.nombre
+        return aux
+
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)

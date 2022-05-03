@@ -66,7 +66,12 @@ def add_reg(request):
     reg = json.loads(request.POST["reg"])
     obj = add_reg_handler(app_name, tb_name, reg);
 
-    return JsonResponse({"reg":json.dumps(model_to_dict(obj))})
+    if (hasattr(obj, "serialize")):
+        obj = obj.serialize()
+    else:
+        obj = model_to_dict(obj)
+
+    return JsonResponse({"reg":json.dumps(obj)})
 
 @token_required
 def mod_regs(request):

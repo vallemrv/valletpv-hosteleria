@@ -50,6 +50,6 @@ export default {
 
 <style scoped>
 .v-container {
-  min-height: 600px;
+  min-height: 82vh;
 }
 </style>
