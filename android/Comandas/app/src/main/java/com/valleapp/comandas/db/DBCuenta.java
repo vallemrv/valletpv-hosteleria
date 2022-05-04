@@ -108,7 +108,7 @@ public class DBCuenta extends DBBase {
 
     public List<JSONObject> getAll(String id)
     {
-        return filterList("IDMesa ="+id);
+        return filterList("IDMesa ="+id+" AND (estado = 'N' or estado ='P')" );
     }
 
     public Double getTotal(String id) {

@@ -73,7 +73,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     TextView infPedio;
     ServicioCom myServicio = null;
     boolean es_aplicable = true;
-
+    boolean pause = false;
 
     private ServiceConnection mConexion = new ServiceConnection() {
         @Override
@@ -87,10 +87,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 comanda = new Comanda((IComanda) cx);
                 seccionesCom = new SeccionesCom((ITeclados) cx, dbSecciones.getAll());
                 aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
-
+                cargarPreferencias();
                 ViewPager vpPager = findViewById(R.id.pager);
                 TextView title = findViewById(R.id.lblTitulo);
-
                 vpPager.setAdapter(aComanda);
                 try {
                     title.setText(cam.getString("Nombre") + " -- " + mesa.getString("Nombre"));
@@ -99,7 +98,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 }
 
 
-                cargarPreferencias();
+
             }
         }
 
@@ -151,7 +150,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     public void rellenarBotonera() {
         try {
-            if (dbTeclas != null) {
+            if (dbTeclas != null && sec != null) {
                 JSONArray lsart = dbTeclas.getAll(sec.getString("ID"), tarifa);
 
                 if (lsart.length() > 0) {
@@ -200,7 +199,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                             else {
                                 Double precio = a.getDouble("Precio");
                                 Double descuento = sec.getDouble("descuento");
-                                a.put("Precio", precio * descuento);
+                                a.put("Precio", precio - ((precio * descuento) /100));
                             }
                         }
 
@@ -344,7 +343,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
           p.put("idc",cam.getString("ID"));
           p.put("mensaje", comanda.getMensaje());
           if(myServicio!=null){
-              myServicio.addColaInstrucciones(new Instruccion(p, server+"/comandas/pedir"));
+              myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
               nota.EliminarComanda();
               dbMesas.abrirMesa(mesa.getString("ID"), "0");
               finish();
@@ -359,6 +358,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     }
 
     public void clickSugerencia(View v){
+        pause = true;
         JSONObject art = (JSONObject)v.getTag();
         Intent intent = new Intent(cx, Sugerencias.class);
         intent.putExtra("url", server);
@@ -367,6 +367,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     }
 
     public void clickBuscarArticulo(View v){
+        pause = true;
         Intent intent = new Intent(cx, BuscadorTeclas.class);
         intent.putExtra("Tarifa", String.valueOf(tarifa));
         startActivityForResult(intent, 100);
@@ -413,6 +414,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         Intent intent = new Intent(getBaseContext(), ServicioCom.class);
         intent.putExtra("server",server);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if (myServicio != null){
+            cargarPreferencias();
+        }
     }
 
     @Override
@@ -441,6 +445,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
             }
 
         }
+        pause = false;
     }
 
     @Override
@@ -457,7 +462,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     @Override
     protected void onPause() {
-        finish();
+        if(!pause) finish();
         super.onPause();
     }
 }

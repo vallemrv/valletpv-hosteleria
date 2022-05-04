@@ -7,18 +7,14 @@
 
 from __future__ import unicode_literals
 from datetime import datetime
-from turtle import update
+import json
 from uuid import uuid4
-
-from django.db.models import Q
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
-from django.forms import IntegerField
 from django.forms.models import model_to_dict
-
+from django.db.models import Q
 from app.utility import rgbToHex
-
 
 
 class PeticionesAutoria(models.Model):
@@ -142,8 +138,6 @@ class Arqueocaja(models.Model):
             })
 
         return ex
-
-
 
 PERMISOS_CHOICES = ["imprimir_factura", 
 "abrir_cajon", 
@@ -302,7 +296,6 @@ class Efectivo(models.Model):
     class Meta:
         db_table = 'efectivo'
 
-
 class Familias(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=40)  # Field name made lowercase.
@@ -338,7 +331,6 @@ class Familias(models.Model):
         db_table = 'familias'
         ordering = ['-id']
 
-
 class Gastos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo')  # Field name made lowercase.
@@ -357,7 +349,6 @@ class Gastos(models.Model):
 
     class Meta:
         db_table = 'gastos'
-
 
 class Historialnulos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -380,7 +371,6 @@ class Historialnulos(models.Model):
         db_table = 'historialnulos'
         ordering = ['-id']
 
-
 class HorarioUsr(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     hora_ini = models.CharField(db_column='Hora_ini', max_length=5)  # Field name made lowercase.
@@ -400,14 +390,41 @@ class HorarioUsr(models.Model):
     class Meta:
         db_table = 'horario_usr'
 
-
 class Infmesa(models.Model):
     uid = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100)  # Field name made lowercase.
     camarero = models.ForeignKey(Camareros,  on_delete=models.CASCADE, db_column='IDCam')  # Field name made lowercase.
     fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
-    ref = models.CharField(db_column='Ref', max_length=100)  # Field name made lowercase.
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase.
+
+    def componer_articulos(self):
+        lineas = self.lineaspedido_set.filter(estado="P", cantidad=-1)
+        obj_comp = []
+        for l in lineas:
+            familia = l.tecla.familia
+            try:
+                composicion = json.loads(familia.composicion.replace("'", '"'))
+            except:
+                composicion = []
+            if (len(composicion) > 0):
+                cantidad = familia.cantidad
+                
+                for a in lineas:
+                    if a.id == l.id:
+                        continue
+                    
+                    if a.tecla.familia.nombre in composicion:
+                        if a.id not in obj_comp and cantidad > 0:
+                            a.precio = 0
+                            a.estado = "R"
+                            a.save()
+                            obj_comp.append(a.id)
+                            cantidad = cantidad - 1
+                        elif cantidad == 0:
+                            l.es_compuesta = True
+                            l.save()
+                            break;    
+
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -423,40 +440,33 @@ class Infmesa(models.Model):
         db_table = 'infmesa'
         ordering = ['-fecha']
 
-
+ESTADO_CHOICES=[
+    ("A", "Anulado"),
+    ("P", "Pedido activo"),
+    ("R", "Regalo, promocion o grupo"),
+    ("C", "Linea cobrada"),
+]
 class Lineaspedido(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     pedido = models.ForeignKey('Pedidos',  on_delete=models.CASCADE, db_column='IDPedido')  # Field name made lowercase.
     infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     idart = models.IntegerField(db_column='IDArt')  # Field name made lowercase.
-    estado = models.CharField(db_column='Estado', max_length=1)  # Field name made lowercase.
+    estado = models.CharField(db_column='Estado', choices=ESTADO_CHOICES,  max_length=1, default="P")  # Field name made lowercase.
     precio = models.DecimalField(db_column='Precio', max_digits=6, decimal_places=2)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=400)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
+    es_compuesta = models.BooleanField(default=False)
+    cantidad = models.IntegerField(default=-1)
     
     @staticmethod
     def update_for_devices():
         mesas = Mesasabiertas.objects.all()
         lineas = []
         for m in mesas:
-            for l in Lineaspedido.objects.filter(infmesa__pk=m.infmesa.pk, estado='P'):
-                obj = {
-                    'ID': l.pk,
-                    'IDPedido': l.pedido_id,
-                    'UID': m.infmesa.pk,
-                    'IDArt': l.idart,
-                    'Estado': l.estado,
-                    'Precio': l.precio,
-                    'Nombre': l.nombre,
-                    'IDMesa': m.mesa.pk,
-                    'nomMesa': m.mesa.nombre,
-                    'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-                    'servido': Servidos.objects.filter(linea__pk=l.pk).count()
-                }
-                lineas.append(obj)
+            lineas = [*lineas, *m.get_lineaspedido()]
                 
         return lineas
-
+   
     def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
         num = -1
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
@@ -477,7 +487,7 @@ class Lineaspedido(models.Model):
                 else:
                     r.delete()
 
-            num = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
+            num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
            
             if num <= 0:
                 Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
@@ -497,7 +507,6 @@ class Lineaspedido(models.Model):
 
     class Meta:
         db_table = 'lineaspedido'
-
 
 class Mesas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -571,7 +580,6 @@ class Mesas(models.Model):
         db_table = 'mesas'
         ordering = ['-orden']
 
-
 class Mesasabiertas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
@@ -596,9 +604,7 @@ class Mesasabiertas(models.Model):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if mesa:
             uid = mesa.infmesa.pk
-            reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & (Q(estado='R') |
-                                              Q(estado='P') |
-                                              Q(estado='N')))
+            reg = Lineaspedido.objects.filter(estado="P", infmesa__pk=uid)
             for r in reg:
                 historial = Historialnulos()
                 historial.lineapedido_id = r.pk
@@ -645,7 +651,26 @@ class Mesasabiertas(models.Model):
                         l.save()
                 infmesa.delete()
 
-   
+    def get_lineaspedido(self):
+        lineas = []
+        m = self
+        for l in Lineaspedido.objects.filter(Q(infmesa__pk=m.infmesa.pk) & (Q(estado='P') | Q(estado="R"))):
+            obj = {
+                'ID': l.pk,
+                'IDPedido': l.pedido_id,
+                'UID': m.infmesa.pk,
+                'IDArt': l.idart,
+                'Estado': l.estado,
+                'Precio': l.precio,
+                'Nombre': l.nombre,
+                'IDMesa': m.mesa.pk,
+                'nomMesa': m.mesa.nombre,
+                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
+                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
+            }
+            lineas.append(obj)
+        return lineas
+
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
@@ -659,7 +684,6 @@ class Mesasabiertas(models.Model):
     class Meta:
         db_table = 'mesasabiertas'
         ordering = ['-id']
-
 
 class Mesaszona(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -687,7 +711,7 @@ class Pedidos(models.Model):
     mensaje =  models.CharField(db_column='Mensaje', max_length=300, default="", null=True)  # Field name made lowercase.
 
     @staticmethod
-    def agregar_nuevas_lineas(idm, idc, lineas):
+    def agregar_nuevas_lineas(idm, idc, lineas, mensaje=""):
         is_mesa_nueva = False
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if not mesa:
@@ -709,6 +733,7 @@ class Pedidos(models.Model):
         pedido.infmesa_id = mesa.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
+        pedido.mensaje = mensaje
         pedido.save()
 
         for pd in lineas:
@@ -716,14 +741,16 @@ class Pedidos(models.Model):
             for i in range(0, can):
                 linea = Lineaspedido()
                 linea.infmesa_id = mesa.infmesa.pk
-                linea.idart = pd["IDArt"]
+                linea.idart = pd["ID"] if "ID" in pd else pd["IDArt"]
                 linea.pedido_id = pedido.pk
                 linea.nombre = pd["Nombre"]
                 linea.precio = pd["Precio"]
-                linea.estado = 'R' if pd['Precio'] == 0 else 'P'
+                linea.estado =  'P' #'R' if pd['Precio'] == 0 else 'P'
+                linea.tecla_id = linea.idart
                 linea.save()
-
-        return is_mesa_nueva
+                
+        pedido.infmesa.componer_articulos()
+        return is_mesa_nueva, pedido
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -806,7 +833,6 @@ class Secciones(models.Model):
     class Meta:
         db_table = 'secciones'
         ordering = ['-orden']
-
 
 ICON_CHOICES = (
     ("bar", "Bar"),
@@ -1048,7 +1074,6 @@ class Teclas(models.Model):
         db_table = 'teclas'
         ordering = ['-orden']
 
-
 class ComposicionTeclas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey(Teclas,  on_delete=models.CASCADE, db_column='IDTecla')  # Field name made lowercase.
@@ -1084,7 +1109,6 @@ class ComposicionTeclas(models.Model):
         db_table = 'composicionteclas'
         ordering = ['id']
 
-
 class Teclascom(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey(Teclas,  on_delete=models.SET_NULL, db_column='IDTecla', null=True)  # Field name made lowercase.
@@ -1105,7 +1129,6 @@ class Teclascom(models.Model):
         db_table = 'teclascom'
         ordering = ['-orden']
 
-
 class Teclaseccion(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     seccion = models.ForeignKey(Secciones,  on_delete=models.CASCADE, db_column='IDSeccion')  # Field name made lowercase.
@@ -1123,7 +1146,6 @@ class Teclaseccion(models.Model):
 
     class Meta:
         db_table = 'teclaseccion'
-
 
 class Ticket(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -1155,9 +1177,8 @@ class Ticket(models.Model):
 
             for l in art:
                 can = int(l["Can"])
-                reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & Q(idart=l["IDArt"]) &
-                                                Q(precio=l["Precio"]) &
-                                                (Q(estado='P') | Q(estado='N')))[:can]
+                reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=l["IDArt"],
+                                                  precio=l["Precio"], estado='P')[:can]
 
                 for r in reg:
                     total = total + r.precio
@@ -1168,7 +1189,7 @@ class Ticket(models.Model):
                     r.estado = 'C'
                     r.save()
 
-            numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='N')) & Q(infmesa__pk=uid)).count()
+            numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if numart <= 0:
                 Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
                 Sync.actualizar(Mesasabiertas._meta.db_table)
@@ -1187,7 +1208,6 @@ class Ticket(models.Model):
 
     class Meta:
         db_table = 'ticket'
-
 
 class Ticketlineas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -1208,7 +1228,6 @@ class Ticketlineas(models.Model):
 
     class Meta:
         db_table = 'ticketlineas'
-
 
 class Zonas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.

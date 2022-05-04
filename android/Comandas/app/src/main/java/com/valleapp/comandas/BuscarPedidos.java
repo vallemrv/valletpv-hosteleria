@@ -95,7 +95,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
         ContentValues p = new ContentValues();
         p.put("art", objSel.toString());
         p.put("idz", objSel.getString("IDZona"));
-        myServicio.addColaInstrucciones(new Instruccion(p, server + "/pedidos/servido"));
+        myServicio.addColaInstrucciones(new Instruccion(p, "/pedidos/servido"));
         dbCuenta.artServido(objSel);
         lPedidos.remove(objSel);
         rellenarLista();

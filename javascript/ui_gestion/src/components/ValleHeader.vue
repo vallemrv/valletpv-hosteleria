@@ -80,7 +80,7 @@ export default {
     },
     error(v) {
       if (v) {
-        if (v.request && v.request.status == 401) {
+        if (v.request && v.request.status == 403) {
           this.salir();
         }
       }

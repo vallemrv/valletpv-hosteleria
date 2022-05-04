@@ -66,20 +66,14 @@ public class SeccionesCom extends Fragment {
                 b.setImageResource(d);
                 b.setTag(sec.getString("nombre"));
                 if (sec.getBoolean("es_promocion")){
-                    b.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            click.cobrarExtra(view);
-                            return false;
-                        }
+                    b.setOnLongClickListener(view1 -> {
+                        click.cobrarExtra(view1);
+                        return false;
                     });
                 }else{
-                    b.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            click.asociarBotonera(view);
-                            return false;
-                        }
+                    b.setOnLongClickListener(view12 -> {
+                        click.asociarBotonera(view12);
+                        return false;
                     });
                 }
             } catch (JSONException e) {

@@ -30,25 +30,9 @@ def get_cuenta(request):
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
     if m_abierta:
-        for l in Lineaspedido.objects.filter(infmesa__pk=m_abierta.infmesa.pk, estado='P'):
-            mesa = m_abierta.mesa
-            obj = {
-                'ID': l.pk,
-                'IDPedido': l.pedido_id,
-                'UID': m_abierta.infmesa.pk,
-                'IDArt': l.idart,
-                'Estado': l.estado,
-                'Precio': l.precio,
-                'Nombre': l.nombre,
-                'IDMesa': mesa.pk,
-                'nomMesa': mesa.nombre,
-                'IDZona': mesa.mesaszona_set.all().first().zona.pk,
-                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
-            }
-            lstArt.append(obj)
+        lstArt = m_abierta.get_lineaspedido()
 
     return JsonResponse(lstArt)
-
 
 @csrf_exempt
 def juntarmesas(request):
@@ -132,7 +116,6 @@ def mvlinea(request):
 @csrf_exempt
 def ls_aparcadas(request):
     return JsonResponse(Mesasabiertas.update_for_devices())
-
 
 @csrf_exempt
 def cuenta_add(request):
@@ -303,7 +286,7 @@ def getTicket(request, IDPedido):
         uid = mesa.infmesa.uid
         sql_pedido = ''.join([ 'SELECT Precio, Estado, IDArt, COUNT(IDArt) as Can, (Precio * COUNT(IDArt)) as Total, Nombre ',
                                'FROM lineaspedido ',
-                               " WHERE (Estado='P' OR Estado='N') AND UID='{0}' "
+                               " WHERE Estado='P' AND UID='{0}' "
                                "GROUP BY IDArt, Precio, Nombre, Estado ",
                                "ORDER BY Estado, IDArt ",]).format(uid)
 
@@ -326,7 +309,7 @@ def getTicket(request, IDPedido):
 
         sql_total = ''.join([' SELECT SUM(Precio) as ticket',
                              ' FROM lineaspedido',
-                             " WHERE (Estado='P' OR Estado='N') AND UID='{0}'"]).format(uid)
+                             " WHERE Estado='P' AND UID='{0}'"]).format(uid)
 
         total = 0
 

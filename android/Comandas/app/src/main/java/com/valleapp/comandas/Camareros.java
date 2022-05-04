@@ -19,6 +19,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -71,7 +72,7 @@ public class Camareros extends ActivityBase {
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
-            if (op.equals("listado")) {
+            if (op!=null && op.equals("listado")) {
                 try {
                     String res = msg.getData().getString("RESPONSE");
                     dbCamareros.rellenarTabla(new JSONArray(res));

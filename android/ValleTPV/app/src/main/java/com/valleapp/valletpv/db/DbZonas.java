@@ -110,4 +110,10 @@ public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
         }
         db.close();
     }
+
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
+    }
 }

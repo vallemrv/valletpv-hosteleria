@@ -53,4 +53,9 @@ public class DbMesasAbiertas implements IBaseDatos {
         }
         db.close();
     }
+
+    @Override
+    public void inicializar() {
+
+    }
 }

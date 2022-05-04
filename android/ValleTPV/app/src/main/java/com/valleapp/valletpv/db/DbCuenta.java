@@ -68,6 +68,12 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
     }
 
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
+    }
+
 
     public void replaceMesa(JSONArray datos, String IDMesa){
         // Gets the data repository in write mode

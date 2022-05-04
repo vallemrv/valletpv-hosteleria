@@ -347,7 +347,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                         ContentValues p = new ContentValues();
                         p.put("idz", zn.getString("ID"));
                         myServicio.addColaInstrucciones(new Instruccion(p,
-                                server + "/pedidos/getpendientes",
+                                "/pedidos/getpendientes",
                                 handlerOperaciones, "pedidos"));
                     }
 
@@ -365,7 +365,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             ContentValues p = new ContentValues();
             p.put("art", obj.toString());
             p.put("idz", zn.getString("ID"));
-            myServicio.addColaInstrucciones(new Instruccion(p, server+"/pedidos/servido"));
+            myServicio.addColaInstrucciones(new Instruccion(p, "/pedidos/servido"));
             dbCuenta.artServido(obj);
             rellenarPedido();
 
@@ -522,7 +522,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             p.put("idp",obj.getString("IDPedido"));
             p.put("id",obj.getString("IDArt"));
             p.put("Nombre",obj.getString("Nombre"));
-            myServicio.addColaInstrucciones(new Instruccion(p, server+"/impresion/reenviarlinea", handlerOperaciones, "reenviar"));
+            myServicio.addColaInstrucciones(new Instruccion(p, "/impresion/reenviarlinea", handlerOperaciones, "reenviar"));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -6,11 +6,10 @@
 # @License: Apache License v2.0
 
 from api_android.tools import send_update_ws
-from tokenapi.http import JsonError, JsonResponse
+from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 from django.db import connection
-from gestion.models import Camareros, Lineaspedido, Mesasabiertas, Servidos
+from gestion.models import  Lineaspedido, Mesasabiertas, Servidos
 import json
 
 @csrf_exempt
@@ -19,25 +18,36 @@ def  get_pendientes(request):
     mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz)
     lineas = []
     for m in mesas:
-        for l in Lineaspedido.objects.filter(infmesa__pk=m.infmesa.pk, estado='P'):
-            obj = {
-                'ID': l.pk,
-                'IDPedido': l.pedido_id,
-                'UID': m.infmesa.pk,
-                'IDArt': l.idart,
-                'Estado': l.estado,
-                'Precio': l.precio,
-                'Nombre': l.nombre,
-                'IDMesa': m.mesa.pk,
-                'nomMesa': m.mesa.nombre,
-                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
-            }
-            lineas.append(obj)
+        lineas = [*lineas, *m.get_lineaspedido()]
           
 
     return JsonResponse(lineas)
 
+@csrf_exempt
+def servido(request):
+    art = json.loads(request.POST["art"])
+    lineas = Lineaspedido.objects.filter(idart=art["IDArt"],
+                                         nombre=art["Nombre"],
+                                         precio=art["Precio"],
+                                         pedido_id=art["IDPedido"])
+
+    for l in lineas:
+        serv = Servidos()
+        serv.linea_id = l.pk
+        serv.save()
+
+    #enviar notficacion de update
+    update = {
+       "OP": "UPDATE",
+       "Tabla": "pendientes",
+       "receptor": "comandas",
+    }
+    send_update_ws(request, update)
+
+
+    return get_pendientes(request)
+
+#deprecated
 @csrf_exempt
 def  buscar(request):
     str = request.POST["str"]
@@ -69,27 +79,3 @@ def  buscar(request):
 
 
     return JsonResponse(lstObj)
-
-@csrf_exempt
-def servido(request):
-    art = json.loads(request.POST["art"])
-    lineas = Lineaspedido.objects.filter(idart=art["IDArt"],
-                                         nombre=art["Nombre"],
-                                         precio=art["Precio"],
-                                         pedido_id=art["IDPedido"])
-
-    for l in lineas:
-        serv = Servidos()
-        serv.linea_id = l.pk
-        serv.save()
-
-    #enviar notficacion de update
-    update = {
-       "OP": "UPDATE",
-       "Tabla": "pendientes",
-       "receptor": "comandas",
-    }
-    send_update_ws(request, update)
-
-
-    return get_pendientes(request)

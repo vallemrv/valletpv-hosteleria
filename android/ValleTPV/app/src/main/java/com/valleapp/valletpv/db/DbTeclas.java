@@ -122,6 +122,12 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
+    }
+
 
     @Override //En esta clase no son necesarios pero hay que implementarlos
     public void resetFlag(int id) {

@@ -5,7 +5,10 @@
 # @Last modified time: 2019-10-10T17:44:16+02:00
 # @License: Apache License v2.0
 
+from __future__ import barry_as_FLUFL
 from os import sync
+
+from django.forms import model_to_dict
 from api_android.tools import (send_update_ws, imprimir_pedido,
                                get_descripcion_pedido)
 from tokenapi.http import JsonResponse
@@ -210,54 +213,22 @@ def pedir(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     lineas = json.loads(request.POST["pedido"])
-
-    #Abrimos la mesa si no esta abierta..
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    if not mesa:
-      infmesa = Infmesa()
-      infmesa.ref = ""
-      infmesa.camarero_id = idc
-      infmesa.hora = datetime.now().strftime("%H:%M")
-      infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
-      infmesa.uid = idm + '-' + str(uuid4())
-      infmesa.save()
-
-      mesa = Mesasabiertas()
-      mesa.mesa_id = idm
-      mesa.infmesa_id = infmesa.pk
-      mesa.save()
-
-      #enviar notficacion de update
-      update = {
-         "OP": "UPDATE",
-         "Tabla": "mesasabiertas",
-         "receptor": "comandas",
-      }
-      send_update_ws(request, update)
+    is_updatable, pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, mensaje)
+    
+    if is_updatable:
+        #enviar notficacion de update
+        update = {
+           "OP": "UPDATE",
+           "Tabla": "mesasabiertas",
+           "receptor": "comandas",
+        }
+        send_update_ws(request, update)
 
 
-    pedido = Pedidos()
-    pedido.infmesa = (mesa.infmesa)
-    pedido.hora = datetime.now().strftime("%H:%M")
-    pedido.camarero_id = idc
-    pedido.mensaje = mensaje
-    pedido.save()
-
-    for l in lineas:
-        can = l["Can"]
-        for i in range(0, can):
-            linea = Lineaspedido()
-            linea.infmesa = mesa.infmesa
-            linea.idart = l["ID"]
-            linea.pedido_id = pedido.pk
-            linea.precio = l["Precio"]
-            linea.nombre = get_descripcion_pedido(l["ID"], l["Nombre"])
-            linea.estado = "R" if float(l["Precio"]) == 0.0 else "P"
-            linea.save()
-
-
+    
     imprimir_pedido(request, pedido.id)
     return HttpResponse("success")
+
 
 
 @csrf_exempt

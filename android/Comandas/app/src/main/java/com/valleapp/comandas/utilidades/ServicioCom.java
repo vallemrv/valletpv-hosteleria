@@ -122,8 +122,8 @@ public class ServicioCom extends Service {
         if (url != null){
             server = url;
             IniciarDB();
-            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones), 2000, 1);
-            timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 5000), 2000, 1);
+            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
+            timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 1000), 2000, 1);
             timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 20000), 2000, 1);
             return START_STICKY;
         }

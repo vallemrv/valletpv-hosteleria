@@ -81,6 +81,13 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
         }
         db.close();
     }
+
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
+    }
+
     @SuppressLint("Range")
     public JSONArray getAll(String id)
     {

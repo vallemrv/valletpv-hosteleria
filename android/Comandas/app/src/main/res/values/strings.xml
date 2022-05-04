@@ -36,5 +36,6 @@
     <string name="title_activity_autorias">Autorias</string>
     <string name="cancel">cancel</string>
     <string name="autorizar">autorizar</string>
+    <string name="contrase_a">Contraseña</string>
 
 </resources>

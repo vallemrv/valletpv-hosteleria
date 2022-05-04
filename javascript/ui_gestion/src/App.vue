@@ -35,11 +35,6 @@ export default {
   methods: {
     ...mapActions(["getListado"]),
   },
-  watch: {
-    offsetHeight(v) {
-      console.log(v);
-    },
-  },
   created() {
     if (localStorage.token) {
       this.$store.state.token = JSON.parse(localStorage.token);

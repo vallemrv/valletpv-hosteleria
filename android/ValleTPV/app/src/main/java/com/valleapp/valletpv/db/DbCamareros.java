@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 
@@ -31,7 +32,7 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, " +
+        db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, activo TEXT," +
                                                           "pass_field TEXT, " +
                                                           "autorizado TEXT, " +
                                                           "permisos TEXT, flag TEXT default '' )");
@@ -61,11 +62,13 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
         for (int i= 0 ; i < camareros.length(); i++){
             // Create a new map of values, where column names are the keys
             try {
+                Log.i("camareros", camareros.toString());
                  ContentValues values = new ContentValues();
-                 values.put("ID", camareros.getJSONObject(i).getInt("ID"));
-                 values.put("pass_field", camareros.getJSONObject(i).getString("Pass"));
+                 values.put("ID", camareros.getJSONObject(i).getInt("id"));
+                values.put("activo", camareros.getJSONObject(i).getString("activo"));
+                 values.put("pass_field", camareros.getJSONObject(i).getString("pass_field"));
                  values.put("autorizado", camareros.getJSONObject(i).getString("autorizado"));
-                 values.put("nombre", camareros.getJSONObject(i).getString("Nombre") + " " + camareros.getJSONObject(i).getString("Apellidos"));
+                 values.put("nombre", camareros.getJSONObject(i).getString("nombre") + " " + camareros.getJSONObject(i).getString("apellidos"));
                  values.put("permisos", camareros.getJSONObject(i).getString("permisos"));
                  db.insert("camareros", null, values);
             } catch (JSONException e) {
@@ -74,6 +77,12 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
 
         }
         db.close();
+    }
+
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
     }
 
     public JSONArray getAll()
@@ -85,9 +94,9 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
     public JSONArray filter(String cWhere){
         JSONArray lscam = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        String q = "";
+        String q = " WHERE activo='1' ";
         if (cWhere != null){
-            q = " Where " + cWhere;
+            q = q +" and "+ cWhere;
         }
         Cursor res =  db.rawQuery( "select * from camareros" + q, null );
         res.moveToFirst();
@@ -137,7 +146,7 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
     {
         String autorizado = a ? "1" : "0";
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros WHERE autorizado = '"+ autorizado + "'", null );
+        Cursor res =  db.rawQuery( "select * from camareros WHERE activo='1' and autorizado = '"+ autorizado + "'", null );
         ArrayList<JSONObject>  lscam = cargarRegistros(res);
         db.close();
         return lscam;
@@ -188,7 +197,7 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
 
     public ArrayList<JSONObject> getConPermiso(String permiso) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros where permisos  LIKE '%"+permiso+"%' AND autorizado = '1'", null );
+        Cursor res =  db.rawQuery( "select * from camareros where activo='1' and permisos  LIKE '%"+permiso+"%' AND autorizado = '1'", null );
         ArrayList<JSONObject>  lscam = cargarRegistros(res);
         db.close();
         return lscam;

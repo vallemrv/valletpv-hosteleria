@@ -19,6 +19,8 @@ public class TareaManejarInstrucciones extends TimerTask {
 
     private final Timer parent;
     private final Queue<Instruccion> cola;
+    private final String server;
+    private final long timeout;
 
 
     boolean procesado = true;
@@ -56,9 +58,11 @@ public class TareaManejarInstrucciones extends TimerTask {
         }
     };
 
-    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instruccion> colaInstrucciones) {
+    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instruccion> colaInstrucciones, String server, long timeout) {
         this.cola= colaInstrucciones;
         this.parent = timerManejarInstrucciones;
+        this.server = server;
+        this.timeout = timeout;
     }
 
     @Override
@@ -73,13 +77,13 @@ public class TareaManejarInstrucciones extends TimerTask {
                     Instruccion inst = cola.peek();
                     if (inst != null) {
                         procesado = false;
-                        new HTTPRequest(inst.getUrl(), inst.getParams(), "", handleHttp);
+                        new HTTPRequest(server + inst.getUrl(), inst.getParams(), "", handleHttp);
                     }
                 }
             }
 
             synchronized (parent) {
-                parent.wait(1000);
+                parent.wait((long) timeout);
             }
 
         }catch (Exception e){

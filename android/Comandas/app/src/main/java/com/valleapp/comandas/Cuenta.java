@@ -93,12 +93,9 @@ public class Cuenta extends Activity {
 
                 TextView l =  findViewById(R.id.txtTotal);
                 ListView lst =  findViewById(R.id.lstCuenta);
-
-
                 List<JSONObject> lineasTicket = dbCuenta.getAll(mesa.getString("ID"));
                 totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")));
                 l.setText(String.format("%s €", totalMesa));
-
                 lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineasTicket));
 
         } catch (JSONException e) {

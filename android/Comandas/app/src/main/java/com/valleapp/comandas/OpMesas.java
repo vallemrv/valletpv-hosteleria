@@ -252,9 +252,9 @@ public class OpMesas extends Activity {
             if(op.equals("art")){
                titulo = "Cambiar articulo "+mesa.getString("Nombre");
                art = new JSONObject(getIntent().getExtras().getString("art"));
-               url = server + "/cuenta/mvlinea";
+               url = "/cuenta/mvlinea";
             }else{
-               url = server + (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
+               url =  (op.equals("cambiar") ? "/cuenta/cambiarmesas" :"/cuenta/juntarmesas");
                titulo =  (op.equals("cambiar") ? "Cambiar mesa " : "Juntar mesa ") + mesa.getString("Nombre");
             }
            l.setText(titulo);
