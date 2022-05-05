@@ -25,14 +25,13 @@ def reparar_subteclas(request):
 
 
 def composicion(request):
-    from gestion.models import Mesasabiertas
+    from gestion.models import Mesasabiertas, ComposicionTeclas
     mesa = Mesasabiertas.objects.all().first()
     obj = []
     if mesa:
         for l in mesa.infmesa.lineaspedido_set.all():
-           obj.append({'nombre':l.nombre, "estado":l.estado})
-
+            obj.append({"nombre":l.nombre, "estado":l.estado})
            
-    return HttpResponse(obj)
+    return JsonResponse(obj)
 
 

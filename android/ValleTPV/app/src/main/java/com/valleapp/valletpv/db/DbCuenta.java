@@ -92,8 +92,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
     public List<JSONObject> getAll(String id)
     {
-        Log.i("DBCUENTA", "Leyendo todos los datos...");
-        return filterList("IDMesa ="+id);
+        return filterList("IDMesa ="+id + " AND (estado ='P' OR estado ='N')");
     }
 
     public Double getTotal(String id){

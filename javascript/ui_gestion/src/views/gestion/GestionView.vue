@@ -7,6 +7,7 @@ export default {
   components: { ValleMenuBtn },
   data: () => ({
     items: [
+      { title: "Receptores", link: { name: "receptores" } },
       { title: "Grupos y familias", link: { name: "familias" } },
       { title: "Menú y ofertas", link: { name: "composicion" } },
       { title: "Secciones", link: { name: "secciones" } },

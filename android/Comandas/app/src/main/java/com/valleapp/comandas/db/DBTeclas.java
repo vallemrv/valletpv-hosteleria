@@ -81,7 +81,7 @@ public class DBTeclas extends DBBase {
 
 
     public JSONArray findLike(String str, String t) {
-        return cargarRegistros("SELECT DISTINCT * FROM teclas WHERE Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
+        return cargarRegistros("SELECT DISTINCT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
     }
 
 

@@ -8,7 +8,7 @@ import TecladosComanda from '@/views/gestion/teclados/TecladosComanda'
 import TecladosTPV from '@/views/gestion/teclados/TecladosTPV'
 import FamiliasView from '@/views/gestion/teclados/FamiliasView'
 import TeclasEspeciales from '@/views/gestion/teclados/TeclasEspeciales'
-
+import ReceptoresView from '@/views/gestion/teclados/ReceptoresView'
 
 const camarerosRoutes = [
     {
@@ -24,6 +24,11 @@ const camarerosRoutes = [
 ]
 
 const tecladosRoutes = [
+    {
+        path: "/gestion/teclados/receptores",
+        component: ReceptoresView,
+        name: 'receptores'
+    },
     {
         path: "/gestion/teclados/composicion",
         component: TeclasEspeciales,

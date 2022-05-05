@@ -1,6 +1,6 @@
 <template>
   <valle-editor-item-vue
-    title="Secciones"
+    title="Receptores"
     :tabla="tabla"
     :tb_name="tb_name"
     @click_tools="on_click_tools"
@@ -21,48 +21,41 @@
 <script>
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import ValleEditorItemVue from "@/components/ValleEditorItem.vue";
-
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
   components: { ValleDialogoFormVue, ValleEditorItemVue },
   computed: {
-    ...mapState(["secciones", "itemsFiltrados"]),
+    ...mapState(["receptores", "itemsFiltrados"]),
     ...mapGetters(["getItemsFiltered"]),
   },
   data() {
     return {
       showDialogo: false,
       itemSel: null,
-      tb_name: "secciones",
+      tb_name: "receptores",
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "rgb", label: "Color", tp: "color" },
-        { col: "orden", label: "Orden", tp: "number" },
+        { col: "nomimp", label: "Nombre impresora", tp: "text" },
+        { col: "descripcion", label: "Descripción", tp: "text" },
       ],
       tabla: {
-        headers: ["Nombre", "Color", "Orden"],
-        keys: [
-          "nombre",
-          { col: "rgb", float: true, tipo: "color" },
-          { col: "orden", float: true },
-        ],
+        headers: ["Nombre", "Impresora", "Descripción"],
+        keys: ["nombre", "nomimp", "descripcion"],
       },
       tools: [
         { op: "edit", text: "Editar", icon: "mdi-account-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
-        { op: "add", text: "Agregar teclas", icon: "mdi-table-plus" },
-        { op: "show", text: "Ver teclado", icon: "mdi-eye" },
       ],
     };
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     cargarRegistro() {
-      if (!this.secciones || this.secciones.length == 0) {
-        this.getListadoCompuesto({ tablas: ["secciones"] });
+      if (!this.receptores || this.receptores.length == 0) {
+        this.getListadoCompuesto({ tablas: ["receptores"] });
       } else {
-        this.$store.state.itemsFiltrados = this.secciones;
+        this.$store.state.itemsFiltrados = this.receptores;
       }
     },
     on_click_tools(v, op) {
@@ -73,9 +66,6 @@ export default {
           this.itemSel = v;
           this.showDialogo = true;
           this.tipo = "md";
-          break;
-        case "add":
-          this.$router.push({ name: "teclas" });
           break;
         case "rm":
           inst = {
@@ -88,22 +78,18 @@ export default {
             return e.id != v.id;
           });
           break;
-        case "show":
-          var index = this.secciones.indexOf(v);
-          this.$router.push({ name: "tecladostpv", params: { id: index } });
-          break;
       }
-      if (op != "edit" && op != "add" && op != "show") {
+      if (op != "edit") {
         this.addInstruccion({ inst: inst });
       }
     },
   },
   watch: {
-    secciones(v) {
+    receptores(v) {
       if (!v) {
         this.cargarRegistro();
       } else {
-        this.$store.state.itemsFiltrados = this.secciones;
+        this.$store.state.itemsFiltrados = this.receptores;
       }
     },
   },

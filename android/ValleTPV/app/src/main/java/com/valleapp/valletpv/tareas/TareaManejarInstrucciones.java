@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.valleapp.valletpv.tools.HTTPRequest;
 import com.valleapp.valletpv.tools.Instrucciones;
@@ -61,10 +62,11 @@ public class TareaManejarInstrucciones extends TimerTask {
     @Override
     public void run() {
         try {
-            Instrucciones inst;
+
+            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
             if (procesado) {
                 synchronized (cola) {
-                    inst = cola.peek();
+                    Instrucciones inst = cola.peek();
                     if (inst != null) {
                         new HTTPRequest(inst.getUrl(), inst.getParams(), "", handleHttp);
                         procesado = false;

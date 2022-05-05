@@ -84,7 +84,7 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
 
 
     public JSONArray findLike(String str, String t) {
-        return cargarRegistros("SELECT * FROM teclas WHERE Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
+        return cargarRegistros("SELECT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
     }
 
 

@@ -134,7 +134,6 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                         e.printStackTrace();
                     }
                     String str = charSequence.toString();
-                    Log.i("tarifa", tarifa);
                     lsart = dbTeclas.findLike(str, tarifa);
                     handlerBusqueda.sendEmptyMessage(0);
                 }).start();

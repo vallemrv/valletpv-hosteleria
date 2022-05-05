@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.valleapp.comandas.utilidades.HTTPRequest;
 
@@ -32,7 +33,7 @@ public class TareaManejarAutorias extends TimerTask {
         public void handleMessage(@NonNull Message msg) {
             try {
                 String res = msg.getData().getString("RESPONSE");
-                if(res != null && res != "") {
+                if(res != null && res != "" && res != "autorias") {
                     JSONArray l = new JSONArray(res);
                     if (l.length() != autorizacionesSize) {
                         autorizacionesSize = l.length();

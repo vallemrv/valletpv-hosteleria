@@ -8,6 +8,8 @@
 from __future__ import unicode_literals
 from datetime import datetime
 import json
+from operator import truediv
+from pyexpat import model
 from uuid import uuid4
 from django.db import models
 from django.db import connection
@@ -397,8 +399,41 @@ class Infmesa(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase.
 
+    def unir_en_grupos(self):
+        grupos = self.lineaspedido_set.filter(tecla_id__in=ComposicionTeclas.objects.values_list("tecla_id"))
+        for gr in grupos:
+            for comp in ComposicionTeclas.objects.filter(tecla_id=gr.tecla_id):
+                comp_realizadas = LineasCompuestas.objects.filter(composicion__pk=comp.id,
+                                                                    linea_principal__pk=gr.id)
+                cantidad_realizada = comp_realizadas.count()
+                if (comp.cantidad <= cantidad_realizada):
+                    continue
+                for a in self.lineaspedido_set.filter(estado="P").exclude(pk=gr.pk):
+                    obj = comp_realizadas.filter(linea_compuesta=a.id).first()
+                    if obj:
+                        continue
+                    try:
+                        composicion = json.loads(comp.composicion.replace("'", '"'))
+                    except:
+                        composicion = []
+                    
+                    if a.tecla.familia.nombre in composicion:
+                        a.precio = 0
+                        a.estado = "M"
+                        a.save()
+                        lComp = LineasCompuestas()
+                        lComp.linea_principal = gr
+                        lComp.linea_compuesta = a.id
+                        lComp.composicion = comp
+                        lComp.save()
+                        cantidad_realizada = cantidad_realizada +1
+
+                    if (comp.cantidad <= cantidad_realizada):
+                        break
+
+
     def componer_articulos(self):
-        lineas = self.lineaspedido_set.filter(estado="P", cantidad=-1)
+        lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
         for l in lineas:
             familia = l.tecla.familia
@@ -407,9 +442,9 @@ class Infmesa(models.Model):
             except:
                 composicion = []
             if (len(composicion) > 0):
-                cantidad = familia.cantidad
+                cantidad = familia.cantidad - l.cantidad
                 
-                for a in lineas:
+                for a in lineas.order_by("-id"):
                     if a.id == l.id:
                         continue
                     
@@ -420,21 +455,21 @@ class Infmesa(models.Model):
                             a.save()
                             obj_comp.append(a.id)
                             cantidad = cantidad - 1
-                        elif cantidad == 0:
+                            l.cantidad = l.cantidad + 1
+                            l.save()
+
+                        if cantidad == 0:
                             l.es_compuesta = True
                             l.save()
-                            break;    
-
+                            break; 
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
         
-
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
-
 
     class Meta:
         db_table = 'infmesa'
@@ -443,8 +478,9 @@ class Infmesa(models.Model):
 ESTADO_CHOICES=[
     ("A", "Anulado"),
     ("P", "Pedido activo"),
-    ("R", "Regalo, promocion o grupo"),
+    ("R", "Regalo"),
     ("C", "Linea cobrada"),
+    ("M", "Pertenece a promocion o grupo")
 ]
 class Lineaspedido(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -456,7 +492,7 @@ class Lineaspedido(models.Model):
     nombre = models.CharField(db_column='Nombre', max_length=400)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
     es_compuesta = models.BooleanField(default=False)
-    cantidad = models.IntegerField(default=-1)
+    cantidad = models.IntegerField(default=0)
     
     @staticmethod
     def update_for_devices():
@@ -750,6 +786,7 @@ class Pedidos(models.Model):
                 linea.save()
                 
         pedido.infmesa.componer_articulos()
+        pedido.infmesa.unir_en_grupos()
         return is_mesa_nueva, pedido
 
     def save(self, *args, **kwargs):
@@ -1108,6 +1145,12 @@ class ComposicionTeclas(models.Model):
     class Meta:
         db_table = 'composicionteclas'
         ordering = ['id']
+
+class LineasCompuestas(models.Model):
+    id = models.AutoField(primary_key=True)
+    linea_principal = models.ForeignKey(Lineaspedido, models.CASCADE)
+    linea_compuesta = models.IntegerField()
+    composicion = models.ForeignKey(ComposicionTeclas, models.CASCADE)
 
 class Teclascom(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.

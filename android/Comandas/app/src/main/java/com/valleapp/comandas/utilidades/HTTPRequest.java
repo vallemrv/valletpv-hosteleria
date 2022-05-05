@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -38,7 +39,7 @@ public class HTTPRequest {
     }
 
 
-    public HTTPRequest(String strUrl, final ContentValues params, final String op, final Handler handler){
+    public HTTPRequest(String strUrl, final ContentValues params, final String op, final Handler handlerExternal){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;
 
@@ -73,28 +74,12 @@ public class HTTPRequest {
                             result.append(line);
                         }
 
-                        if (handler != null) {
-                            Message msg = handler.obtainMessage();
-                            Bundle bundle = msg.getData();
-                            if (bundle == null) bundle = new Bundle();
-                            bundle.putString("RESPONSE", result.toString());
-                            bundle.putString("op", op);
-                            msg.setData(bundle);
-                            handler.sendMessage(msg);
-                        }
+                        if(handlerExternal!= null) sendMessage(handlerExternal, op, result.toString());
 
 
                      } catch (Exception e) {
                         // TODO Auto-generated catch block
-                        if( handler != null) {
-                            Message msg = handler.obtainMessage();
-                            Bundle bundle = msg.getData();
-                            if (bundle == null) bundle = new Bundle();
-                            bundle.putString("RESPONSE", op);
-                            bundle.putString("op", "error");
-                            msg.setData(bundle);
-                            handler.sendMessage(msg);
-                        }
+                        Log.w("HTTPClient", "No hay conexion con el servidor");
                     }
                 }
             }.start();
@@ -106,6 +91,16 @@ public class HTTPRequest {
             if(conn != null) conn.disconnect();
         }
 
+    }
+
+    public void sendMessage(Handler handler, String op, String res){
+        Message msg = handler.obtainMessage();
+        Bundle bundle = msg.getData();
+        if (bundle == null) bundle = new Bundle();
+        bundle.putString("RESPONSE", res);
+        bundle.putString("op", op);
+        msg.setData(bundle);
+        handler.sendMessage(msg);
     }
 
 
