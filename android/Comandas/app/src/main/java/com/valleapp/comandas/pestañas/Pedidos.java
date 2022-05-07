@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -42,7 +41,7 @@ public class Pedidos extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.pedidos, container, false);
-        contenedor = v.findViewById(R.id.linear_layout);
+        contenedor = v.findViewById(R.id.listaPedidoComanda);
         return v;
     }
 

@@ -55,8 +55,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
     public void rellenarTabla(JSONArray datos){
         // Gets the data repository in write mode
-        Log.i("DBCUENTA", "Cargando datos");
-        SQLiteDatabase db = this.getWritableDatabase();
+       SQLiteDatabase db = this.getWritableDatabase();
         try{
            db.execSQL("DELETE FROM cuenta");
         }catch (SQLiteException e){

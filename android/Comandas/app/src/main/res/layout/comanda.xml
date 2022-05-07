@@ -44,27 +44,12 @@
     </RelativeLayout>
 
     <ListView
-        android:id="@+id/linear_layout"
+        android:id="@+id/listaPedidoComanda"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/txt_mensaje_autoria"
         android:layout_below="@+id/relativeLayout"
         android:layout_centerHorizontal="true" />
-
-
-    <EditText
-        android:id="@+id/txt_mensaje_autoria"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:hint="@string/nota"
-        android:selectAllOnFocus="false"
-        android:singleLine="false"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColorHint="#757575" />
-
-
-
 
 
 </RelativeLayout>

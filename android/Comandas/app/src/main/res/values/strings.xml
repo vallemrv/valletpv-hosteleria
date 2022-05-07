@@ -37,5 +37,16 @@
     <string name="cancel">cancel</string>
     <string name="autorizar">autorizar</string>
     <string name="contrase_a">Contraseña</string>
+    <string name="uno">1</string>
+    <string name="buscar">buscar</string>
+    <string name="dos">2</string>
+    <string name="tres">3</string>
+    <string name="cuatro">4</string>
+    <string name="cinco">5</string>
+    <string name="seis">6</string>
+    <string name="siete">7</string>
+    <string name="ocho">8</string>
+    <string name="nueve">9</string>
+    <string name="title_activity_refill">Rellenar</string>
 
 </resources>

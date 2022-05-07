@@ -8,17 +8,31 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.valleapp.comandas.adaptadores.AdaptadorComanda;
+import com.valleapp.comandas.adaptadores.AdaptadorPedidos;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.db.DBSecciones;
+import com.valleapp.comandas.db.DBSubTeclas;
+import com.valleapp.comandas.db.DBTeclas;
+import com.valleapp.comandas.interfaces.IComanda;
+import com.valleapp.comandas.interfaces.INota;
+import com.valleapp.comandas.interfaces.ITeclados;
+import com.valleapp.comandas.pestañas.Comanda;
+import com.valleapp.comandas.pestañas.SeccionesCom;
+import com.valleapp.comandas.utilidades.ActivityBase;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.JSON;
+import com.valleapp.comandas.utilidades.Nota;
+import com.valleapp.comandas.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,23 +40,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.valleapp.comandas.db.DBMesas;
-import com.valleapp.comandas.db.DBSecciones;
-import com.valleapp.comandas.db.DBSubTeclas;
-import com.valleapp.comandas.db.DBTeclas;
-import com.valleapp.comandas.utilidades.ActivityBase;
-import com.valleapp.comandas.utilidades.Instruccion;
-import com.valleapp.comandas.utilidades.JSON;
-import com.valleapp.comandas.interfaces.IComanda;
-import com.valleapp.comandas.interfaces.INota;
-import com.valleapp.comandas.interfaces.ITeclados;
-import com.valleapp.comandas.adaptadores.AdaptadorComanda;
-import com.valleapp.comandas.adaptadores.AdaptadorPedidos;
-import com.valleapp.comandas.pestañas.Comanda;
-import com.valleapp.comandas.utilidades.Nota;
-import com.valleapp.comandas.pestañas.SeccionesCom;
-import com.valleapp.comandas.utilidades.ServicioCom;
 
 
 public class HacerComandas extends ActivityBase implements  INota, IComanda, ITeclados {
@@ -56,6 +53,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     DBTeclas dbTeclas;
     DBSubTeclas dbSubTeclas;
     DBSecciones dbSecciones;
+    DBCuenta dbCuenta;
 
     Context cx = null;
     JSONObject cam = null;
@@ -84,6 +82,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 dbSecciones = (DBSecciones) myServicio.getDb("secciones_com");
                 dbTeclas = (DBTeclas) myServicio.getDb("teclas");
                 dbSubTeclas = (DBSubTeclas) myServicio.getDb("subteclas");
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 comanda = new Comanda((IComanda) cx);
                 seccionesCom = new SeccionesCom((ITeclados) cx, dbSecciones.getAll());
                 aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
@@ -341,8 +340,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
           p.put("idm",mesa.getString("ID"));
           p.put("pedido", nota.getLineas().toString());
           p.put("idc",cam.getString("ID"));
-          p.put("mensaje", comanda.getMensaje());
-          if(myServicio!=null){
+           if(myServicio!=null){
               myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
               nota.EliminarComanda();
               dbMesas.abrirMesa(mesa.getString("ID"), "0");
@@ -373,6 +371,18 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         startActivityForResult(intent, 100);
     }
 
+    public void onRefill(View view){
+        try {
+            pause = true;
+            Intent intent = new Intent(cx, Refill.class);
+            intent.putExtra("id_mesa", mesa.getString("ID"));
+            startActivityForResult(intent, 300);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void asociarBotonera(View view) {
         JSON json = new JSON();
         try {
@@ -386,12 +396,13 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hacer_comanda);
 
-        cantidad = findViewById(R.id.linear_layout);
+        cantidad = findViewById(R.id.listaPedidoComanda);
         infPedio = findViewById(R.id.lblPedido);
 
         cx = this;
@@ -445,6 +456,19 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
             }
 
         }
+        else if (requestCode == 300) {
+            if(resultCode == RESULT_OK){
+                String idpedido = data.getStringExtra("IDPedido");
+                List<JSONObject> lPedidos = dbCuenta.filterList("estado = 'P' AND IDPedido = "+idpedido);
+                for(JSONObject art: lPedidos){
+                    try {
+                        nota.addArt(art, art.getInt("Can"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+             }
+       }
         pause = false;
     }
 

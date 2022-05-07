@@ -22,7 +22,6 @@ public class Comanda extends Fragment {
     // Store instance variables
     ListView listaPedidos;
     TextView Can_art;
-    EditText mensaje;
     IComanda controlador;
 
      public Comanda(){}
@@ -51,7 +50,6 @@ public class Comanda extends Fragment {
         View view = inflater.inflate(R.layout.comanda, container, false);
         listaPedidos = view.findViewById(R.id.linear_layout);
         Can_art = view.findViewById(R.id.numArt);
-        mensaje = view.findViewById(R.id.txt_mensaje_autoria);
         return view;
     }
 
@@ -63,10 +61,5 @@ public class Comanda extends Fragment {
     public ListView getLista(){
         return listaPedidos;
     }
-
-    public String getMensaje(){
-         return mensaje.getText().toString();
-    }
-
 
 }

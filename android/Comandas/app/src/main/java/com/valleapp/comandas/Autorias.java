@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoriasAutorias extends ActivityBase {
+public class Autorias extends ActivityBase {
 
     List<JSONObject> lsObj;
     String server;

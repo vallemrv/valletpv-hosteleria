@@ -93,6 +93,12 @@
                android:configChanges="orientation"
                android:screenOrientation="portrait">
            </activity>
+           <activity
+               android:name="com.valleapp.comandas.Refill"
+               android:label="@string/title_activity_refill"
+               android:configChanges="orientation"
+               android:screenOrientation="portrait">
+           </activity>
        <service
            android:name=".utilidades.ServicioCom"
            android:enabled="true"

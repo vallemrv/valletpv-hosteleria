@@ -77,7 +77,7 @@ public class DBCuenta extends DBBase {
                     " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
-                lista.put(cargarRegistros(res));
+                lista.put(cargarRegistro(res));
                 res.moveToNext();
             }
             res.close();
@@ -161,7 +161,7 @@ public class DBCuenta extends DBBase {
                     " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
-                 lista.add(cargarRegistros(res));
+                 lista.add(cargarRegistro(res));
                  res.moveToNext();
             }
             res.close();
@@ -177,7 +177,7 @@ public class DBCuenta extends DBBase {
     }
 
     @SuppressLint("Range")
-    JSONObject cargarRegistros(Cursor res){
+    JSONObject cargarRegistro(Cursor res){
 
         JSONObject obj = new JSONObject();
         try{
@@ -242,7 +242,7 @@ public class DBCuenta extends DBBase {
         JSONArray ls = new JSONArray();
         res.moveToFirst();
         while (!res.isAfterLast()){
-            ls.put(cargarRegistros(res));
+            ls.put(cargarRegistro(res));
             res.moveToNext();
         }
 
@@ -307,6 +307,58 @@ public class DBCuenta extends DBBase {
            e.printStackTrace();
         }
         db.close();
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<JSONObject> getPedidosChoices(String idMesa) {
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta  WHERE estado ='P' AND IDMesa=" + idMesa +
+                " GROUP BY  IDArt, Nombre, Precio, Estado, IDPedido ORDER BY IDPedido", null);
+        ArrayList<JSONObject>  ls = new ArrayList<JSONObject> ();
+        res.moveToFirst();
+        int max = 3;
+        int count = 0;
+        int id_aux = -1;
+        String subtilte = "";
+        JSONObject o = null;
+        try {
+        while (!res.isAfterLast()){
+
+                int idPedido = res.getInt(res.getColumnIndex("IDPedido"));
+                String can = res.getString(res.getColumnIndex("Can"));
+                String nombre =  res.getString(res.getColumnIndex("Nombre"));
+                Log.i("cagada_nueva", nombre + "  "+ idPedido);
+                if (id_aux != idPedido) {
+                    id_aux = idPedido;
+                    if (o != null && subtilte!= ""){
+                        subtilte += ", etc..";
+                        o.put("subtitle", subtilte);
+                    }
+                    o = new JSONObject();
+                    o.put("IDPedido", id_aux);
+                    ls.add(o);
+                    count = 0;
+                    subtilte = "";
+                }
+                if (count < max){
+                    if (subtilte != "") subtilte += ", ";
+                    subtilte += can+ " "+ nombre;
+                    count++;
+                }
+                res.moveToNext();
+
+            }
+            if (o != null && subtilte!= ""){
+                subtilte += ", etc..";
+                o.put("subtitle", subtilte);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        res.close();
+        db.close();
+        return  ls;
     }
 }
 

@@ -209,11 +209,10 @@ def lsall(request):
 
 @csrf_exempt
 def pedir(request):
-    mensaje = request.POST["mensaje"] if 'mensaje' in request.POST else ""
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     lineas = json.loads(request.POST["pedido"])
-    is_updatable, pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, mensaje)
+    is_updatable, pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
     
     if is_updatable:
         #enviar notficacion de update

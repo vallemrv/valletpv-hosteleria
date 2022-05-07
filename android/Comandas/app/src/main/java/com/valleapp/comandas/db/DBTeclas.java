@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by valle on 13/10/14.
@@ -122,6 +124,5 @@ public class DBTeclas extends DBBase {
         }
         db.close();
     }
-
 
 }

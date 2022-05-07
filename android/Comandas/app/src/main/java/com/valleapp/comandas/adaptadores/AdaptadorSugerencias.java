@@ -37,13 +37,13 @@ public class AdaptadorSugerencias extends ArrayAdapter<JSONObject> {
         View rowView = inflater.inflate(R.layout.linea_simple, parent, false);
 
         try {
-            TextView can = (TextView) rowView.findViewById(R.id.lblSugerencia);
+            TextView can = (TextView) rowView.findViewById(R.id.labelTitle);
             // Set the text size 25 dip for ListView each item
             can.setTextSize(TypedValue.COMPLEX_UNIT_DIP,25);
 
             String sug = values.get(position).getString("sugerencia");
             can.setText(String.format("%s", sug));
-            RelativeLayout btnInfo = (RelativeLayout)rowView.findViewById(R.id.btnArt);
+            RelativeLayout btnInfo = (RelativeLayout)rowView.findViewById(R.id.item);
             btnInfo.setTag(sug);
 
         } catch (JSONException e) {

@@ -13,7 +13,7 @@
         android:contentDescription="@string/lista">
 
         <LinearLayout
-            android:id="@+id/linear_layout"
+            android:id="@+id/listaPedidoComanda"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"></LinearLayout>

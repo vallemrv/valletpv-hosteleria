@@ -744,10 +744,9 @@ class Pedidos(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     infmesa = models.ForeignKey(Infmesa,  on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
-    mensaje =  models.CharField(db_column='Mensaje', max_length=300, default="", null=True)  # Field name made lowercase.
-
+   
     @staticmethod
-    def agregar_nuevas_lineas(idm, idc, lineas, mensaje=""):
+    def agregar_nuevas_lineas(idm, idc, lineas):
         is_mesa_nueva = False
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if not mesa:
@@ -769,15 +768,15 @@ class Pedidos(models.Model):
         pedido.infmesa_id = mesa.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
-        pedido.mensaje = mensaje
         pedido.save()
 
         for pd in lineas:
+            print(pd)
             can = int(pd["Can"])
             for i in range(0, can):
                 linea = Lineaspedido()
                 linea.infmesa_id = mesa.infmesa.pk
-                linea.idart = pd["ID"] if "ID" in pd else pd["IDArt"]
+                linea.idart = pd["IDArt"] if "IDArt" in pd else pd["ID"]
                 linea.pedido_id = pedido.pk
                 linea.nombre = pd["Nombre"]
                 linea.precio = pd["Precio"]

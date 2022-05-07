@@ -13,6 +13,7 @@
         <entry key="app/src/main/res/layout/activity_autorias.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_camareros.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_cuenta.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_hacer_comanda.xml" value="0.24583333333333332" />
         <entry key="app/src/main/res/layout/activity_mesas.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_mostrar_pedidos.xml" value="1.0" />
         <entry key="app/src/main/res/layout/activity_preferencias.xml" value="0.18177083333333333" />
@@ -29,7 +30,10 @@
         <entry key="app/src/main/res/layout/linea_pedido_externo.xml" value="0.25" />
         <entry key="app/src/main/res/layout/linea_pedido_interno.xml" value="0.33" />
         <entry key="app/src/main/res/layout/linea_simple.xml" value="0.17481884057971014" />
+        <entry key="app/src/main/res/layout/linea_title_subtiltle.xml" value="0.18177083333333333" />
+        <entry key="app/src/main/res/layout/mesas.xml" value="0.24583333333333332" />
         <entry key="app/src/main/res/layout/pedidos.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/refill.xml" value="0.25" />
         <entry key="app/src/main/res/layout/teclados.xml" value="0.33" />
         <entry key="app/src/main/res/layout/texto_simple.xml" value="0.5" />
         <entry key="app/src/main/res/layout/varios.xml" value="0.18177083333333333" />
