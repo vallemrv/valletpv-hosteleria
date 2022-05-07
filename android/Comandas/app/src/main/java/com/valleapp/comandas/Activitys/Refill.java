@@ -38,7 +38,7 @@ public class Refill extends ActivityBase {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.refill);
+        setContentView(R.layout.activity_refill);
         idMesa = getIntent().getExtras().getString("id_mesa");
     }
 
