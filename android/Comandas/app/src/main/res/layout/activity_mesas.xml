@@ -86,6 +86,21 @@
 
     </LinearLayout>
 
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_send_mensaje"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="22dp"
+        android:onClick="mostrarSendMensajes"
+        fab:fab_colorNormal="@color/pink"
+        fab:fab_colorPressed="@color/pink_pressed"
+        fab:fab_icon="@drawable/reconect" />
+
 
     <FrameLayout
         android:id="@+id/loading"

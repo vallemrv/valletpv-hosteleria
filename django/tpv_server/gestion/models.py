@@ -892,6 +892,7 @@ ICON_CHOICES = (
     ("sopa_cuchara", "Plato sopa con cuchara"),
     ("tarta", "Tarta"),
     ("taza_cafe", "Taza cafe"),
+    ("aperitivo", "Plato doritos"),
 )
 
 class IconChoices(models.Model):

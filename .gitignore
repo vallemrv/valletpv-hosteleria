@@ -8,6 +8,7 @@ node_*/
 ignore*
 test_vue/
 gsui_dist/
+.gradle/
 
 
 

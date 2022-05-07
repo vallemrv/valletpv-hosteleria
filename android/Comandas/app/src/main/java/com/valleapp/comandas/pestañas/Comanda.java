@@ -48,7 +48,7 @@ public class Comanda extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.comanda, container, false);
-        listaPedidos = view.findViewById(R.id.linear_layout);
+        listaPedidos = view.findViewById(R.id.listaPedidoComanda);
         Can_art = view.findViewById(R.id.numArt);
         return view;
     }

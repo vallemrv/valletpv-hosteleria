@@ -228,8 +228,6 @@ def pedir(request):
     imprimir_pedido(request, pedido.id)
     return HttpResponse("success")
 
-
-
 @csrf_exempt
 def get_ultimas(request):
     args = json.loads(request.POST['args'])

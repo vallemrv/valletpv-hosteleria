@@ -341,19 +341,19 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                try {
+            try {
 
-                    if (zn != null) {
-                        ContentValues p = new ContentValues();
-                        p.put("idz", zn.getString("ID"));
-                        myServicio.addColaInstrucciones(new Instruccion(p,
-                                "/pedidos/getpendientes",
-                                handlerOperaciones, "pedidos"));
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (zn != null) {
+                    ContentValues p = new ContentValues();
+                    p.put("idz", zn.getString("ID"));
+                    myServicio.addColaInstrucciones(new Instruccion(p,
+                            "/pedidos/getpendientes",
+                            handlerOperaciones, "pedidos"));
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             }
         }, 5000);
 
@@ -430,6 +430,13 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         i.putExtra("peticiones", peticiones.toString());
         startActivity(i);
 
+    }
+
+    public void  mostrarSendMensajes(View v){
+        Intent i = new Intent(cx, Autorias.class);
+        i.putExtra("url", server);
+        i.putExtra("peticiones", peticiones.toString());
+        startActivity(i);
     }
 
     @SuppressLint("SetTextI18n")
