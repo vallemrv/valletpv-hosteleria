@@ -38,7 +38,7 @@ def marcar_rojo(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
     return JsonResponse({})
 
 @csrf_exempt
@@ -221,11 +221,11 @@ def pedir(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
 
 
     
-    imprimir_pedido(request, pedido.id)
+    imprimir_pedido(pedido.id)
     return HttpResponse("success")
 
 @csrf_exempt

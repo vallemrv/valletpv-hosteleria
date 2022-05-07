@@ -11,7 +11,7 @@ def send_test_mensaje(request, msg):
        "msg": msg,
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
     return HttpResponse("success")
 
 

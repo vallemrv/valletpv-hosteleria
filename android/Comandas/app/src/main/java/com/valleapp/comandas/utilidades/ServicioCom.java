@@ -15,6 +15,7 @@ import com.valleapp.comandas.db.DBBase;
 import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.db.DBReceptores;
 import com.valleapp.comandas.db.DBSugerencias;
 import com.valleapp.comandas.db.DBMesasAbiertas;
 import com.valleapp.comandas.db.DBSecciones;
@@ -66,20 +67,21 @@ public class ServicioCom extends Service {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            try{
-                switch (op){
-                    case "check_updates":
-                        delegadoHandleCheckUpdates(res);
-                        break;
-                    case "update_table":
-                        delegadoHandleUpdateTable(res);
-                        break;
+            if (res != null) {
+                try {
+                    switch (op) {
+                        case "check_updates":
+                            delegadoHandleCheckUpdates(res);
+                            break;
+                        case "update_table":
+                            delegadoHandleUpdateTable(res);
+                            break;
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-            }catch (Exception e){
-                e.printStackTrace();
             }
-
         }
     };
 
@@ -90,7 +92,6 @@ public class ServicioCom extends Service {
             String last = obj.getString("last");
             JSONArray objs = obj.getJSONArray("objs");
             IBaseDatos db = dbs.get(tb_name);
-            Log.i("ServicioCom", tb_name);
             synchronized (db){
                 db.rellenarTabla(objs);
             }
@@ -182,7 +183,8 @@ public class ServicioCom extends Service {
                     "teclas",
                     "subteclas",
                     "secciones_com",
-                    "sugerencias"
+                    "sugerencias",
+                    "receptores"
             };
 
         }
@@ -198,6 +200,7 @@ public class ServicioCom extends Service {
             dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
             dbs.put("sugerencias", new DBSugerencias(getApplicationContext()));
             dbs.put("mesasabiertas", new DBMesasAbiertas(dbMesas));
+            dbs.put("receptores", new DBReceptores(getApplicationContext()));
         }
 
 

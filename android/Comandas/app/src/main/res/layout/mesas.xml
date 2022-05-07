@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:id="@+id/scrollView3"
-        android:layout_weight="0.9"
-        android:background="@android:color/white"
-        android:layout_marginTop="4dp"
-        android:layout_marginRight="2dp">
 
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/pneMesas"
-            android:stretchColumns="*"
-            android:paddingBottom="50dp"></TableLayout>
+        <ScrollView
+                android:id="@+id/scrollView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:contentDescription="@string/lista"
+                android:paddingBottom="25dp">
 
-    </ScrollView>
+                <TableLayout
+                    android:id="@+id/pneMesas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="50dp"
+                    android:stretchColumns="*"></TableLayout>
 
+</ScrollView>
 
-</LinearLayout>
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_send_mensaje"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="22dp"
+            android:contentDescription="@string/mensaje"
+            android:onClick="mostrarSendMensajes"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/send_men" />
+</RelativeLayout>

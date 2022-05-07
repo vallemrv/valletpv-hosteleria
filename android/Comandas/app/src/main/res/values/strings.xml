@@ -48,5 +48,8 @@
     <string name="ocho">8</string>
     <string name="nueve">9</string>
     <string name="title_activity_refill">Rellenar</string>
+    <string name="mensaje">mensaje</string>
+    <string name="lista_mesas">Lista de mesas</string>
+    <string name="title_activity_sendmensajes">Mensajes</string>
 
 </resources>

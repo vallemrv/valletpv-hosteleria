@@ -31,7 +31,7 @@ public class TareaManejarInstrucciones extends TimerTask {
         public void handleMessage(@NonNull Message msg) {
             try {
                 String res = msg.getData().getString("RESPONSE");
-                 if(!res.equals("")) {
+                 if(res != null && !res.equals("")) {
                     synchronized (cola) {
                         Instruccion inst = cola.poll();
                         if (inst != null) {
@@ -48,11 +48,11 @@ public class TareaManejarInstrucciones extends TimerTask {
                         }
                     }
                 }
-                procesado = true;
 
             }catch (Exception e){
-                e.printStackTrace();
+                Log.w("Instrucciones", "Error al ejecutar instruccion en el servidor");
             }
+            procesado = true;
             super.handleMessage(msg);
 
         }
@@ -69,7 +69,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
+            Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
 
             if (procesado) {
 

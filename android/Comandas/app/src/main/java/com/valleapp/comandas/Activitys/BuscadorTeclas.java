@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,6 +20,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.db.DBTeclas;
 
 import org.json.JSONArray;

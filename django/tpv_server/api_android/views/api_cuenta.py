@@ -45,7 +45,7 @@ def juntarmesas(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
 
 
     return HttpResponse('success')
@@ -109,7 +109,7 @@ def mvlinea(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
          }
-         send_update_ws(request, update)
+         send_update_ws(update)
 
     return HttpResponse('success')
 
@@ -153,7 +153,7 @@ def cuenta_cobrar(request):
             "Tabla": "mesasabiertas",
             "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
             
     if (id > 0):
         send_imprimir_ticket(request, id)
@@ -198,7 +198,7 @@ def cuenta_rm_linea(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
         
 
     return HttpResponse('success')

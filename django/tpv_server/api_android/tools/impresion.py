@@ -7,14 +7,14 @@
 
 
 from django.db.models import  Count, Sum, F
-from api_android.tools.ws_tools import  (send_ticket_ws, send_pedidos_ws)
+from api_android.tools.ws_tools import  (send_mensaje_ws, send_pedidos_ws)
 from api_android.tools.ventas import get_descripcion_ticket
 from gestion.models import (Ticket,  Teclas,
                             Receptores, Pedidos,
                             Camareros)
 
 
-def imprimir_pedido(request, id):
+def imprimir_pedido(id):
     pedido = Pedidos.objects.get(pk=id)
     camareo = Camareros.objects.get(pk=pedido.camarero_id)
     mesa = pedido.infmesa.mesasabiertas_set.get().mesa
@@ -30,16 +30,16 @@ def imprimir_pedido(request, id):
                 "op": "pedido",
                 "hora": pedido.hora,
                 "receptor": receptor.nomimp,
+                "nom_receptor": receptor.nombre,
                 "receptor_activo": receptor.activo,
                 "camarero": camareo.nombre + " " + camareo.apellidos,
                 "mesa": mesa.nombre,
-                "mensaje": pedido.mensaje,
                 "lineas": []
             }
         l["precio"] = float(l["precio"])
         receptores[receptor.nombre]['lineas'].append(l)
 
-    send_pedidos_ws(request, receptores)
+    send_pedidos_ws(receptores)
 
 def send_imprimir_ticket(request, id):
     receptor_activo = request.POST["receptor_activo"] if "receptor_activo" in request.POST else None
@@ -72,6 +72,7 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
         "op": "ticket",
         "fecha": ticket.fecha + " " + ticket.hora,
         "receptor": receptor.nomimp,
+        "nom_receptor": receptor.nombre,
         "receptor_activo": receptor_activo if receptor_activo else receptor.activo,
         "abrircajon": abrircajon,
         "camarero": camarero.nombre + " " + camarero.apellidos,
@@ -81,4 +82,4 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
         "efectivo": ticket.entrega,
         'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']
     }
-    send_ticket_ws(None, obj)
+    send_mensaje_ws(obj)

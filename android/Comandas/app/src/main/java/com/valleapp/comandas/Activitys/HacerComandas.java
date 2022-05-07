@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorComanda;
 import com.valleapp.comandas.adaptadores.AdaptadorPedidos;
 import com.valleapp.comandas.db.DBCuenta;

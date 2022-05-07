@@ -1,10 +1,11 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ListView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorRefill;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.utilidades.ActivityBase;

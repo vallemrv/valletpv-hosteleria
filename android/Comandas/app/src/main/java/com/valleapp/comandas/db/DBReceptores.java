@@ -16,23 +16,20 @@ import java.util.ArrayList;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBCamareros extends DBBase {
+public class DBReceptores extends DBBase {
 
-    public DBCamareros(Context context) {
+    public DBReceptores(Context context) {
         super(context);
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, " +
-                                                          "pass_field TEXT, " +
-                                                          "autorizado TEXT, " +
-                                                          "permisos TEXT, flag TEXT default '' )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS receptores (ID INTEGER PRIMARY KEY, nombre TEXT)");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS camareros");
+        db.execSQL("DROP TABLE IF EXISTS receptores");
         onCreate(db);
     }
 
@@ -40,13 +37,9 @@ public class DBCamareros extends DBBase {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public JSONArray getAll()
-    {
-        return filter(null);
-    }
 
     @Override
-    public void rellenarTabla(JSONArray camareros){
+    public void rellenarTabla(JSONArray datos){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
@@ -55,16 +48,13 @@ public class DBCamareros extends DBBase {
             this.onCreate(db);
         }
         // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i < camareros.length(); i++){
+        for (int i= 0 ; i < datos.length(); i++){
             // Create a new map of values, where column names are the keys
             try {
                 ContentValues values = new ContentValues();
-                values.put("ID", camareros.getJSONObject(i).getInt("ID"));
-                values.put("pass_field", camareros.getJSONObject(i).getString("Pass"));
-                values.put("autorizado", camareros.getJSONObject(i).getString("autorizado"));
-                values.put("nombre", camareros.getJSONObject(i).getString("Nombre") + " " + camareros.getJSONObject(i).getString("Apellidos"));
-                values.put("permisos", camareros.getJSONObject(i).getString("permisos"));
-                db.insert("camareros", null, values);
+                values.put("ID", datos.getJSONObject(i).getInt("id"));
+                values.put("nombre", datos.getJSONObject(i).getString("nombre"));
+                db.insert("receptores", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -74,72 +64,28 @@ public class DBCamareros extends DBBase {
     }
 
 
-    @Override
+
     @SuppressLint("Range")
-    public JSONArray filter(String cWhere){
-        JSONArray lscam = new JSONArray();
+    public ArrayList<JSONObject> getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String q = "";
-        if (cWhere != null){
-            q = " Where " + cWhere;
-        }
-        Cursor res =  db.rawQuery( "select * from camareros" + q, null );
+        Cursor res =  db.rawQuery( "select * from receptores WHERE nombre NOT LIKE '%Nulo%' ", null );
         res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject cam = new JSONObject();
-                cam.put("Nombre", res.getString(res.getColumnIndex("nombre")));
-                cam.put("ID", res.getString(res.getColumnIndex("ID")));
-                cam.put("Pass", res.getString(res.getColumnIndex("pass_field")));
-                cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
-                cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
-                lscam.put(cam);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-        res.close();
-        db.close();
-        return lscam;
-    }
-
-    public ArrayList<JSONObject> getAutorizados(Boolean a)
-    {
-        String autorizado = a ? "1" : "0";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros WHERE autorizado = '"+ autorizado + "'", null );
-        ArrayList<JSONObject>  lscam = cargarRegistros(res);
-        db.close();
-        return lscam;
-    }
-
-    @SuppressLint("Range")
-    private ArrayList<JSONObject> cargarRegistros(Cursor res) {
-
-        ArrayList<JSONObject>  lscam = new ArrayList<>();
+        ArrayList<JSONObject>  ls = new ArrayList<>();
         res.moveToFirst();
 
         while(!res.isAfterLast()){
             try{
-                JSONObject cam = new JSONObject();
-                cam.put("Nombre", res.getString(res.getColumnIndex("nombre")));
-                cam.put("ID", res.getString(res.getColumnIndex("ID")));
-                cam.put("Pass", res.getString(res.getColumnIndex("pass_field")));
-                cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
-                cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
-                lscam.add(cam);
+                JSONObject receptor = new JSONObject();
+                receptor.put("nombre", res.getString(res.getColumnIndex("nombre")));
+                receptor.put("ID", res.getString(res.getColumnIndex("ID")));
+                ls.add(receptor);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
             res.moveToNext();
-
         }
         res.close();
-        return lscam;
+        return ls;
     }
 
 

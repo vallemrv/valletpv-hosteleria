@@ -8,8 +8,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 import json
-from operator import truediv
-from pyexpat import model
+from json import tool
 from uuid import uuid4
 from django.db import models
 from django.db import connection
@@ -18,6 +17,45 @@ from django.forms.models import model_to_dict
 from django.db.models import Q
 from app.utility import rgbToHex
 
+
+
+class HistorialMensajes(models.Model):
+    camarero = models.ForeignKey("Camareros", on_delete=models.CASCADE)
+    mensaje = models.CharField(max_length=300)
+    receptor = models.ForeignKey("Receptores", on_delete=models.CASCADE)
+
+    @staticmethod
+    def update_from_device(row):
+        from api_android.tools.ws_tools import send_mensaje_ws
+        c = None
+        if "ID" in row:
+            c = HistorialMensajes.objects.filter(id=row["ID"]).first()
+        if not c:
+            c = HistorialMensajes()
+            
+        print(row)    
+        c.camarero_id = row["camarero"]
+        c.receptor_id = row["receptor"]
+        c.mensaje = row["mensaje"]
+        c.save()
+        mensaje = {
+            "op": "mensaje",
+            "camarero": c.camarero.nombre + " " + c.camarero.apellidos,
+            "msg": c.mensaje,
+            "receptor": c.receptor.nomimp,
+            "nom_receptor": c.receptor.nombre
+        }
+        send_mensaje_ws(mensaje)
+
+    @staticmethod
+    def update_for_devices():
+        rows = HistorialMensajes.objects.all()
+        tb = []
+        for r in rows:
+            tb.append(model_to_dict(r))
+        return tb
+    
+    
 
 class PeticionesAutoria(models.Model):
     idautorizado = models.ForeignKey("Camareros", on_delete=models.CASCADE)
@@ -771,7 +809,6 @@ class Pedidos(models.Model):
         pedido.save()
 
         for pd in lineas:
-            print(pd)
             can = int(pd["Can"])
             for i in range(0, can):
                 linea = Lineaspedido()

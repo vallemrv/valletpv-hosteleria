@@ -86,7 +86,6 @@ public class ValleTPV extends Activity {
 
         lstautorizados.setOnItemClickListener((adapterView, view, i, l) -> {
             JSONObject obj = (JSONObject)view.getTag();
-            int id = 0;
             try {
                 obj.put("autorizado", "0");
                 dbCamareros.setAutorizado(obj.getInt("ID"), false);

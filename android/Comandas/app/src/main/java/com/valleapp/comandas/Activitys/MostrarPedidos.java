@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.utilidades.ActivityBase;
 import com.valleapp.comandas.utilidades.HTTPRequest;
@@ -171,7 +171,7 @@ public class MostrarPedidos extends ActivityBase {
 
     public void clickCambiar(View v){
         JSONObject m = (JSONObject)v.getTag();
-        Intent intent = new Intent(cx,OpMesas.class);
+        Intent intent = new Intent(cx, OpMesas.class);
         intent.putExtra("op","art");
         intent.putExtra("mesa", mesa.toString());
         intent.putExtra("art",m.toString());

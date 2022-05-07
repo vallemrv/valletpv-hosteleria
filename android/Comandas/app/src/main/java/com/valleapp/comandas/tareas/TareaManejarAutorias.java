@@ -33,7 +33,7 @@ public class TareaManejarAutorias extends TimerTask {
         public void handleMessage(@NonNull Message msg) {
             try {
                 String res = msg.getData().getString("RESPONSE");
-                if(res != null && res != "" && res != "autorias") {
+                if(res != null && res != "") {
                     JSONArray l = new JSONArray(res);
                     if (l.length() != autorizacionesSize) {
                         autorizacionesSize = l.length();
@@ -41,7 +41,7 @@ public class TareaManejarAutorias extends TimerTask {
                     }
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Log.w("Autorias", "Respuesta erronea del servidor");
             }
             procesado = true;
         }

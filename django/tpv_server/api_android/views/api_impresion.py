@@ -5,18 +5,14 @@
 # @Last modified time: 2019-01-31T16:11:02+01:00
 # @License: Apache License v2.0
 
-from api_android.tools import (send_pedidos_ws, send_ticket_ws,
+from api_android.tools import (send_pedidos_ws, send_mensaje_ws,
                                send_update_ws, send_imprimir_ticket)
-from tokenapi.http import JsonError, JsonResponse
-from gestion.models import (Pedidos, Lineaspedido, Ticket, Infmesa, Teclas,
-                            Arqueocaja, Efectivo, Ticketlineas, Receptores,
+from tokenapi.http import  JsonResponse
+from gestion.models import (Pedidos, Teclas, Receptores,
                             Mesasabiertas, Camareros)
 from django.http import HttpResponse
-from django.forms.models import model_to_dict
-from django.db.models import Q, Count, Sum, F
+from django.db.models import Count, Sum
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.fields import DecimalField
-from django.conf import settings
 from datetime import datetime
 
 
@@ -62,9 +58,9 @@ def preimprimir(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
 
-    send_ticket_ws(request, obj)
+    send_mensaje_ws(obj)
     return JsonResponse({})
 
 @csrf_exempt
@@ -88,6 +84,7 @@ def reenviarlinea(request):
                 "hora": pedido.hora,
                 "receptor_activo": receptor.activo,
                 "receptor": receptor.nomimp,
+                "nom_receptor": receptor.nombre,
                 "camarero": camareo.nombre + " " + camareo.apellidos,
                 "mesa": mesa.nombre,
                 "lineas": []
@@ -95,7 +92,7 @@ def reenviarlinea(request):
         l["precio"] = float(l["precio"])
         receptores[receptor.nombre]['lineas'].append(l)
 
-    send_pedidos_ws(request, receptores)
+    send_pedidos_ws(receptores)
     return HttpResponse("success")
 
 @csrf_exempt
@@ -106,7 +103,7 @@ def abrircajon(request):
         "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
         "receptor_activo": True,
     }
-    send_ticket_ws(request, obj)
+    send_mensaje_ws(obj)
     return HttpResponse("success")
 
 @csrf_exempt

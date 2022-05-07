@@ -5,7 +5,6 @@
 # @Last modified time: 2019-10-01T01:10:16+02:00
 # @License: Apache License v2.0
 
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from asgiref.sync import async_to_sync
@@ -13,7 +12,7 @@ from channels.layers import get_channel_layer
 
 import json
 
-def send_pedidos_ws(request, datos):
+def send_pedidos_ws(datos):
     for k, v in datos.items():
         try:
             channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
@@ -25,7 +24,7 @@ def send_pedidos_ws(request, datos):
         except Exception as e:
             print(e)
 
-def send_ticket_ws(request, v):
+def send_mensaje_ws(v):
     try:
         
         channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
@@ -38,7 +37,7 @@ def send_ticket_ws(request, v):
         print(e)
 
 
-def send_update_ws(request, v):
+def send_update_ws(v):
     try:
         channel_name = settings.EMPRESA + "_comunicaciones_" + v["receptor"]
         layer = get_channel_layer()

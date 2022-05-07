@@ -10,6 +10,7 @@ from multiprocessing.dummy import JoinableQueue
 from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from gestion.models import *
+from django.apps import apps
 
 
 from datetime import datetime
@@ -35,29 +36,16 @@ def update_for_devices(request):
     
     tbModel = None
     objs = []
-    if t == 'camareros':
-        tbModel = Camareros
-    elif t == 'mesas':
-        tbModel = Mesas
-    elif t == "zonas":
-        tbModel = Zonas
-    elif t == "secciones":
-        tbModel = Secciones
-    elif t == "teclas":
-        tbModel = Teclas
-    elif t in ["cuenta", "lineaspedido"]:
+    
+    if t in ["cuenta", "lineaspedido"]:
         tbModel = Lineaspedido
-    elif t == "mesasabiertas":
-        tbModel = Mesasabiertas
     elif t in  ["seccionescom", "secciones_com"]:
         tbModel = SeccionesCom
-    elif t == "sugerencias":
-        tbModel = Sugerencias
-    elif t == "subteclas":
-        tbModel = Subteclas
+    else:
+        tbModel = apps.get_model("gestion", t)
     
     
-    if tbModel:
+    if tbModel and hasattr(tbModel, "update_for_devices"):
         objs = tbModel.update_for_devices()
             
     
@@ -79,12 +67,12 @@ def update_for_devices(request):
 def update_from_devices(request):
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
-    tbs = []
+    
 
-    if tb == "camareros":
-        tbs.append(tb)
+    model = apps.get_model("gestion", tb)
+    if hasattr(model, "update_from_device"):
         for row in rows:
-            Camareros.update_from_device(row)
+            model.update_from_device(row)
     
     return JsonResponse(
          {"tb": tb, 

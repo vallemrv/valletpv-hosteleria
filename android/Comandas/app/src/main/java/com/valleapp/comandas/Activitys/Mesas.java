@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -25,6 +25,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorMesas;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
@@ -433,10 +434,13 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     }
 
     public void  mostrarSendMensajes(View v){
-        Intent i = new Intent(cx, Autorias.class);
-        i.putExtra("url", server);
-        i.putExtra("peticiones", peticiones.toString());
-        startActivity(i);
+        try {
+            Intent i = new Intent(cx, SendMensajes.class);
+            i.putExtra("camarero", cam.getString("ID"));
+            startActivity(i);
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     @SuppressLint("SetTextI18n")

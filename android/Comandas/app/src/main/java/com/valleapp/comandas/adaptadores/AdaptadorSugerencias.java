@@ -26,7 +26,9 @@ public class AdaptadorSugerencias extends ArrayAdapter<JSONObject> {
 
     public AdaptadorSugerencias(Context context, List<JSONObject> obj) {
         super(context, R.layout.linea_simple, obj);
-        this.cx = context;this.values= obj;
+        this.cx = context;
+        this.values= obj;
+
     }
 
     @Override

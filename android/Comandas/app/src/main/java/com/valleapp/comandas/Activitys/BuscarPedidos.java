@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorBuscarPedidos;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.utilidades.HTTPRequest;

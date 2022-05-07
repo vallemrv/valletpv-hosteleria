@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.adaptadores.AdaptadorEmpresas;
 

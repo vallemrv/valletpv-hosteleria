@@ -1,11 +1,10 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import static com.valleapp.comandas.R.drawable;
 import static com.valleapp.comandas.R.id;
 import static com.valleapp.comandas.R.layout;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -17,9 +16,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.utilidades.ActivityBase;

@@ -1,4 +1,4 @@
-package com.valleapp.comandas;
+package com.valleapp.comandas.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorSugerencias;
 import com.valleapp.comandas.db.DBSugerencias;
 import com.valleapp.comandas.utilidades.HTTPRequest;
@@ -90,7 +91,7 @@ public class Sugerencias extends Activity implements TextWatcher {
 
     }
 
-    public void clickSugerencia(View v){
+    public void onClickItemSimple(View v){
         aceptarSug(v.getTag().toString());
     }
 

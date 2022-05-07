@@ -28,7 +28,7 @@ def sel_camareros(request):
        "OP": "CAMBIO_TURNO",
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
     return JsonResponse({"cam":camarero})
 
 @csrf_exempt

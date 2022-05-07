@@ -42,7 +42,7 @@ def servido(request):
        "Tabla": "pendientes",
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
 
 
     return get_pendientes(request)

@@ -6,8 +6,6 @@
 # @License: Apache License v2.0
 
 
-
-from tokenapi.http import JsonResponse, HttpResponse
 from gestion.models import Teclas, Subteclas
 
 
