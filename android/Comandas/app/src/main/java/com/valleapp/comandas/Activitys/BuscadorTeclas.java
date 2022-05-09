@@ -16,14 +16,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.valleapp.comandas.R;
+import com.valleapp.comandas.db.DBSubTeclas;
 import com.valleapp.comandas.db.DBTeclas;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -33,6 +36,8 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
     String tarifa = "1";
     JSONArray lsart = new JSONArray();
     DBTeclas dbTeclas = new DBTeclas(this);
+    DBSubTeclas dbSubTeclas = new DBSubTeclas(this);
+    JSONObject artSel = null;
 
     private final Handler handlerBusqueda = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -50,6 +55,7 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
         TextView t = findViewById(R.id.txtBuscador);
         t.addTextChangedListener(this);
     }
+
 
 
     private void rellenaBotonera() {
@@ -89,16 +95,43 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                     btn.setTag(m);
                     btn.setSingleLine(false);
                     btn.setText(m.getString("Nombre").trim().replace(" ","\n"));
+                    if (m.has("RGB")){
                     String[] rgb = m.getString("RGB").split(",");
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
                     btn.setOnClickListener(view -> {
-                        JSONObject art = (JSONObject) view.getTag();
-                        Intent it = getIntent();
-                        it.putExtra("art", art.toString());
-                        setResult(RESULT_OK, it);
-                        finish();
+                        artSel = (JSONObject) view.getTag();
+                        try {
+                            if (artSel.getString("tipo").equals("SL")){
+                                Intent it = getIntent();
+                                it.putExtra("art", artSel.toString());
+                                setResult(RESULT_OK, it);
+                                finish();
+                            }else{
+                                lsart = dbSubTeclas.getAll(artSel.getString("ID"));
+                                rellenaBotonera();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     });
+                    } else{
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                        btn.setOnClickListener(view -> {
+                            try {
+                                JSONObject sub = (JSONObject) view.getTag();
+                                Intent it = getIntent();
+                                String nom = artSel.getString("Nombre");
+                                String subnom = sub.getString("Nombre");
+                                artSel.put("Nombre", nom+" "+subnom);
+                                it.putExtra("art", artSel.toString());
+                                setResult(RESULT_OK, it);
+                                finish();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                     row.addView(v, rowparams);
 
                     if (((i + 1) % 3) == 0) {
