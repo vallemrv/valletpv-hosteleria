@@ -71,6 +71,7 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = [
      'django.contrib.auth.backends.ModelBackend',
+     'tokenapi.backends.TokenBackend',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

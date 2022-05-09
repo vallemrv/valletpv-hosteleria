@@ -4,3 +4,5 @@ channels-redis
 django-tokenapi
 Jinja2
 django-webpack-loader
+django-cors-headers
+pymsql

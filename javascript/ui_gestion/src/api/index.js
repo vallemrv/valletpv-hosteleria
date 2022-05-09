@@ -1,6 +1,7 @@
 import axios from 'axios'
 //const url = "/"
-const url = "http://localhost:8000/"
+const url = "http://tpvsl.valletpv.es/"
+//const url = "http://localhost:8000/"
 
 const post = (path, params) => {
     return axios.post(url+path, params, {}).then(r => r.data)

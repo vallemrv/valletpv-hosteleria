@@ -21,9 +21,9 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.urls import  include, path
+from django.urls import  include, path, re_path
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 
 
 
@@ -36,6 +36,7 @@ urlpatterns = [
             ),
             name="favicon" # name of our view
         ),
-    path('', include("app.urls")),
+    path("app/", include("app.urls"), name="app"),
+    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"))
 
 ]
