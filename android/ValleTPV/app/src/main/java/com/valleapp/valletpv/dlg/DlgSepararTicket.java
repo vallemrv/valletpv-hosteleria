@@ -3,7 +3,6 @@ package com.valleapp.valletpv.dlg;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,8 +27,8 @@ public class DlgSepararTicket extends Dialog{
     Double totalCobro = 0.00;
     ListView lstArt;
 
-    ArrayList<JSONObject> lineasTicket = new ArrayList<JSONObject>();
-    ArrayList<JSONObject> separados = new ArrayList<JSONObject>();
+    ArrayList<JSONObject> lineasTicket = new ArrayList<>();
+    ArrayList<JSONObject> separados = new ArrayList<>();
 
 
 
@@ -49,7 +48,7 @@ public class DlgSepararTicket extends Dialog{
 
          ok.setOnClickListener(view -> clickCobrarSeparados(view));
 
-         s.setOnClickListener(view -> clickSalirSeparados(view));
+         s.setOnClickListener(view -> clickSalirSeparados());
 
         tot.setText(String.format("Total cobro %01.2f €", totalCobro));
 
@@ -75,28 +74,25 @@ public class DlgSepararTicket extends Dialog{
 
 
 
-        lstCobros.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            try {
-                JSONObject art = (JSONObject)view.getTag();
-                int can = art.getInt("Can");
-                int canCobro = art.getInt("CanCobro")-1;
-                totalCobro -= art.getDouble("Precio");
-                tot.setText(String.format("Total cobro %01.2f €", totalCobro));
-                art.put("CanCobro", canCobro);
-                if (can > canCobro){
-                    if (!lineasTicket.contains(art))
-                        lineasTicket.add(art);
-                }
-                if (canCobro == 0) separados.remove(art);
-                lstCobros.setAdapter(new AdaptadorSepararTicket(getContext(), separados, true));
-                lstArt.setAdapter(new AdaptadorSepararTicket(getContext(), lineasTicket, false));
+        lstCobros.setOnItemClickListener((adapterView, view, i, l) -> {
+        try {
+            JSONObject art = (JSONObject)view.getTag();
+            int can = art.getInt("Can");
+            int canCobro = art.getInt("CanCobro")-1;
+            totalCobro -= art.getDouble("Precio");
+            tot.setText(String.format("Total cobro %01.2f €", totalCobro));
+            art.put("CanCobro", canCobro);
+            if (can > canCobro){
+                if (!lineasTicket.contains(art))
+                    lineasTicket.add(art);
+            }
+            if (canCobro == 0) separados.remove(art);
+            lstCobros.setAdapter(new AdaptadorSepararTicket(getContext(), separados, true));
+            lstArt.setAdapter(new AdaptadorSepararTicket(getContext(), lineasTicket, false));
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         });
 
 
@@ -124,7 +120,7 @@ public class DlgSepararTicket extends Dialog{
         controlador.mostarCobrar(arts, totalCobro);
     }
 
-    public void clickSalirSeparados(View view){
+    public void clickSalirSeparados(){
         cancel();
     }
 

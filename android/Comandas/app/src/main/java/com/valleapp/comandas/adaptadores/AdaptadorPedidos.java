@@ -39,7 +39,7 @@ public class AdaptadorPedidos extends ArrayAdapter<JSONObject> {
         try {
             TextView nombre = rowView.findViewById(R.id.lblDescripcion);
             JSONObject art = values.get(position);
-            nombre.setText(String.format("%s",art.getString("Nombre")));
+            nombre.setText(String.format("%s",art.getString("Descripcion")));
 
             ImageButton btnRm = rowView.findViewById(R.id.btnBorrar);
             btnRm.setTag(art);

@@ -53,8 +53,6 @@ public class BuscarPedidos extends Activity implements TextWatcher {
             try {
                 myServicio = ((ServicioCom.MyBinder) iBinder).getService();
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
-
-
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -69,7 +67,6 @@ public class BuscarPedidos extends Activity implements TextWatcher {
     @SuppressLint("HandlerLeak")
     private final Handler handelerBusqueda = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-
             rellenarLista();
         }
     };
@@ -132,7 +129,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
                       e.printStackTrace();
                   }
                   String str = charSequence.toString();
-                  lPedidos = dbCuenta.filterList("Nombre LIKE '%"+ str +"%' AND servido = 0");
+                  lPedidos = dbCuenta.filterList("Descripcion LIKE '%"+ str +"%' AND servido = 0");
                   handelerBusqueda.sendEmptyMessage(0);
               }).start();
 

@@ -9,7 +9,7 @@ from api_android.tools import (send_pedidos_ws, send_mensaje_ws,
                                send_update_ws, send_imprimir_ticket)
 from tokenapi.http import  JsonResponse
 from gestion.models import (Pedidos, Teclas, Receptores,
-                            Mesasabiertas, Camareros)
+                            Mesasabiertas, Camareros, Sync)
 from django.http import HttpResponse
 from django.db.models import Count, Sum
 from django.views.decorators.csrf import csrf_exempt
@@ -23,23 +23,19 @@ def preimprimir(request):
     infmesa = mesa_abierta.infmesa
     infmesa.numcopias = infmesa.numcopias + 1
     infmesa.save()
+    Sync.actualizar("mesasabiertas")
     camareo = infmesa.camarero
     mesa = mesa_abierta.mesa
     lineas = infmesa.lineaspedido_set.filter(estado="P")
-    lineas = lineas.values("idart", "precio").annotate(can=Count('idart'),
+    lineas = lineas.values("idart", "descripcion_t", "precio").annotate(can=Count('idart'),
                                                        totallinea=Sum("precio"))
-    lineas_ticket = []
-    for l in lineas:
-        try:
-            art = Teclas.objects.get(id=l["idart"])
-            l["nombre"] = art.nombre
-        except:
-            art = infmesa.lineaspedido_set.filter(idart=l["idart"]).first()
-            if art:
-                l["nombre"] = art.nombre
-        lineas_ticket.append(l)
+    
 
     receptor = Receptores.objects.get(nombre='Ticket')
+    lineas_ticket = []
+    for l in lineas:
+        lineas_ticket.append(l)
+
     obj = {
       "op": "preticket",
       "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
@@ -67,32 +63,35 @@ def preimprimir(request):
 def reenviarlinea(request):
     idp = request.POST["idp"];
     id = request.POST["id"];
-    nombre = request.POST["Nombre"];
+    nombre = request.POST["Descripcion"];
     pedido = Pedidos.objects.get(pk=idp)
     camareo = Camareros.objects.get(pk=pedido.camarero_id)
-    mesa = pedido.infmesa.mesasabiertas_set.get().mesa
-    lineas = pedido.lineaspedido_set.filter(idart=id, nombre=nombre).values("idart",
-                                           "nombre",
-                                           "precio",
-                                           "pedido_id").annotate(can=Count('idart'))
-    receptores = {}
-    for l in lineas:
-        receptor = Teclas.objects.get(id=l['idart']).familia.receptor
-        if receptor.nombre not in receptores:
-            receptores[receptor.nombre] = {
-                "op": "urgente",
-                "hora": pedido.hora,
-                "receptor_activo": receptor.activo,
-                "receptor": receptor.nomimp,
-                "nom_receptor": receptor.nombre,
-                "camarero": camareo.nombre + " " + camareo.apellidos,
-                "mesa": mesa.nombre,
-                "lineas": []
-            }
-        l["precio"] = float(l["precio"])
-        receptores[receptor.nombre]['lineas'].append(l)
+    try:
+        mesa = pedido.infmesa.mesasabiertas_set.get().mesa
+    except:
+        mesa = None
+    if mesa:
+        lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
+                                            "descripcion",
+                                            "estado",
+                                            "pedido_id").annotate(can=Count('idart'))
+        receptores = {}
+        for l in lineas:
+            receptor = Teclas.objects.get(id=l['idart']).familia.receptor
+            if receptor.nombre not in receptores:
+                receptores[receptor.nombre] = {
+                    "op": "urgente",
+                    "hora": pedido.hora,
+                    "receptor_activo": receptor.activo,
+                    "receptor": receptor.nomimp,
+                    "nom_receptor": receptor.nombre,
+                    "camarero": camareo.nombre + " " + camareo.apellidos,
+                    "mesa": mesa.nombre,
+                    "lineas": []
+                }
+            receptores[receptor.nombre]['lineas'].append(l)
 
-    send_pedidos_ws(receptores)
+        send_pedidos_ws(receptores)
     return HttpResponse("success")
 
 @csrf_exempt

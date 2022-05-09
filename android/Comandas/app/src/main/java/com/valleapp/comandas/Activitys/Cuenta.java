@@ -147,6 +147,7 @@ public class Cuenta extends Activity {
             try {
                 ContentValues p = new ContentValues();
                 p.put("idm", mesa.getString("ID"));
+                dbmesa.marcarRojo(mesa.getString("ID"));
                 myServicio.addColaInstrucciones(new Instruccion(p,"/impresion/preimprimir"));
                 finish();
             } catch (JSONException e) {

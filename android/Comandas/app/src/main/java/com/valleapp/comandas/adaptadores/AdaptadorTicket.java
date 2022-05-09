@@ -39,7 +39,7 @@ public class AdaptadorTicket extends ArrayAdapter<JSONObject> {
             TextView p =  rowView.findViewById(R.id.lblPrecio);
             TextView t =  rowView.findViewById(R.id.lblTotal);
             can.setText(String.format("%s", values.get(position).getString("Can")));
-            nombre.setText(String.format("%s",values.get(position).getString("Nombre")));
+            nombre.setText(String.format("%s",values.get(position).getString("descripcion_t")));
             p.setText(String.format("%.2f €", values.get(position).getDouble("Precio")));
             t.setText(String.format("%.2f €", values.get(position).getDouble("Total")));
         } catch (JSONException e) {

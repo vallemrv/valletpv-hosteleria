@@ -41,8 +41,6 @@ import java.util.ArrayList;
 
 public class Camareros extends ActivityBase {
 
-
-
     ArrayList<JSONObject> lscam = null;
     private DBCamareros dbCamareros;
 
@@ -63,7 +61,6 @@ public class Camareros extends ActivityBase {
             myServicio = null;
         }
     };
-
 
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
         public void handleMessage(Message msg) {
@@ -91,10 +88,12 @@ public class Camareros extends ActivityBase {
     @Override
     protected void onResume() {
         cargarPreferencias();
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        intent.putExtra("url", server);
-        startService(intent);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if (server != null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            intent.putExtra("url", server);
+            startService(intent);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }
         super.onResume();
     }
 

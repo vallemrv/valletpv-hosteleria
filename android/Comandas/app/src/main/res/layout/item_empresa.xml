@@ -2,34 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/item_empresa"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:layout_height="70sp"
     android:onClick="clickSelEmpresa"
+    android:orientation="horizontal"
     android:padding="5dip">
 
     <TextView
         android:id="@+id/nombre_empresa_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dip"
         android:layout_weight="0.8"
-        android:text="TextView"
-        android:textSize="25dip"
-        android:layout_marginTop="5dip"/>
+        android:text="@string/nombre_emp"
+        android:textSize="25sp" />
 
     <ImageView
         android:id="@+id/icon_empresa_activa"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_weight="0.1"
-        android:src="@drawable/check"
+        android:contentDescription="@string/aceptar"
+        android:padding="5dp"
         android:scaleType="fitCenter"
-        android:padding="5dp"/>
+        android:src="@drawable/check" />
 
     <ImageButton
         android:id="@+id/boton_borrar_empresa"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_weight="0.1"
         android:background="@drawable/bg_pink"
         android:contentDescription="@string/borrar_item"
         android:minWidth="48dp"

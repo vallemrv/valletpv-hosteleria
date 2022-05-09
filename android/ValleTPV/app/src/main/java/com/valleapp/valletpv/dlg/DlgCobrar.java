@@ -92,7 +92,6 @@ public class DlgCobrar extends Dialog{
     }
 
     public void clickTarjeta(View v){
-        Log.i("DLGCobrar", String.valueOf(entrega));
         if (entrega == totalCobro) {
             controlador.cobrar(lineas, totalCobro, 0.00);
             this.cancel();

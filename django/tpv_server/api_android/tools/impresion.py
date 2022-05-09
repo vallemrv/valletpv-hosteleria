@@ -5,10 +5,9 @@
 # @Last modified time: 2019-04-22T01:43:07+02:00
 # @License: Apache License v2.0
 
-
 from django.db.models import  Count, Sum, F
+from django.forms import model_to_dict
 from api_android.tools.ws_tools import  (send_mensaje_ws, send_pedidos_ws)
-from api_android.tools.ventas import get_descripcion_ticket
 from gestion.models import (Ticket,  Teclas,
                             Receptores, Pedidos,
                             Camareros)
@@ -19,9 +18,11 @@ def imprimir_pedido(id):
     camareo = Camareros.objects.get(pk=pedido.camarero_id)
     mesa = pedido.infmesa.mesasabiertas_set.get().mesa
     lineas = pedido.lineaspedido_set.values("idart",
-                                           "nombre",
-                                           "precio",
+                                           "descripcion",
+                                           "estado",
                                            "pedido_id").annotate(can=Count('idart'))
+    
+    
     receptores = {}
     for l in lineas:
         receptor = Teclas.objects.get(id=l['idart']).familia.receptor
@@ -36,7 +37,7 @@ def imprimir_pedido(id):
                 "mesa": mesa.nombre,
                 "lineas": []
             }
-        l["precio"] = float(l["precio"])
+    
         receptores[receptor.nombre]['lineas'].append(l)
 
     send_pedidos_ws(receptores)
@@ -49,24 +50,24 @@ def send_imprimir_ticket(request, id):
 
 def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
     
+    
     ticket = Ticket.objects.get(pk=id)
     camarero = Camareros.objects.get(pk=ticket.camarero_id)
     lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__idart"),
-                                                    precio=F("linea__precio"))
+                                                    precio=F("linea__precio"),
+                                                    descripcion_t=F("linea__descripcion_t"))
 
     lineas = lineas.values("idart",
+                           "descripcion_t",
                            "precio").annotate(can=Count('idart'),
                                               totallinea=Sum("precio"))
-    lineas_ticket = []
-    for l in lineas:
-        nombre = ""
-        art = ticket.ticketlineas_set.filter(linea__idart=l["idart"]).first()
-        if art:
-            nombre = art.linea.nombre
-        l["nombre"] = get_descripcion_ticket(l["idart"], nombre)
-        lineas_ticket.append(l)
+    
 
     receptor = Receptores.objects.get(nombre='Ticket')
+    print(lineas)
+    lineas_ticket = []
+    for l in lineas:
+        lineas_ticket.append(l)
 
     obj = {
         "op": "ticket",
@@ -77,9 +78,11 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
         "abrircajon": abrircajon,
         "camarero": camarero.nombre + " " + camarero.apellidos,
         "mesa": ticket.mesa,
-        "lineas": lineas_ticket,
+        "lineas":lineas_ticket,
         "num": ticket.id,
         "efectivo": ticket.entrega,
         'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']
     }
+
+ 
     send_mensaje_ws(obj)

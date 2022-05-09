@@ -39,7 +39,7 @@ public class AdaptadorBuscarPedidos extends ArrayAdapter<JSONObject> {
             TextView nombre = rowView.findViewById(R.id.lblNombre);
             TextView cantidad = rowView.findViewById(R.id.lblCantidad);
             JSONObject art = values.get(position);
-            nombre.setText(String.format("%s - %s",art.getString("Nombre"), art.getString(("nomMesa"))));
+            nombre.setText(String.format("%s - %s",art.getString("Descripcion"), art.getString(("nomMesa"))));
             cantidad.setText(String.format("%s",art.getString("Can")));
 
             ImageButton btnRm = rowView.findViewById(R.id.btnBorrarPedido);

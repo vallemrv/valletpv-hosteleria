@@ -1,11 +1,12 @@
 
-from gettext import install
+from datetime import datetime
 import json
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from tokenapi.http import JsonResponse
-from gestion.models import Camareros, Lineaspedido, Mesas, Mesasabiertas, PeticionesAutoria
-
+from gestion.models import (Camareros, Lineaspedido, Mesas, Receptores,
+                            Mesasabiertas, PeticionesAutoria, Ticket)
+from api_android.tools import (send_imprimir_ticket, send_mensaje_ws,
+                                 send_update_ws)
 
 @csrf_exempt
 def send_informacion(request):
@@ -55,7 +56,7 @@ def get_lista_autorizaciones(request):
         elif p.accion == "borrar_linea":
             camarero = Camareros.objects.get(id=inst["idc"])
             mesa = Mesas.objects.get(id=inst["idm"])
-            nombre = inst["Nombre"]
+            nombre = inst["Descripcion"]
             can = inst["can"]
             motivo = inst["motivo"]
             mensajes.append({"tipo": "peticion", "idpeticion": p.pk, "mensaje":camarero.nombre+ " "
@@ -63,6 +64,15 @@ def get_lista_autorizaciones(request):
             + mesa.nombre +" por el motivo:  "+ motivo})
         elif p.accion == "informacion":
             mensajes.append({"tipo": "informacion", "idpeticion": p.pk, "mensaje": "Mensaje de "+inst["autor"]+": \n "+ inst["mensaje"]})
+        elif p.accion == "cobrar_ticket":
+            camarero = Camareros.objects.get(id=inst["idc"])
+            mesa = Mesas.objects.get(id=inst["idm"])
+            mensajes.append({"tipo":"peticion", "idpeticion": p.pk, "mensaje": camarero.nombre + " "
+            + camarero.apellidos+" solicita permiso para cobrar "+ mesa.nombre})
+        elif p.accion == "abrir_cajon":
+            camarero = Camareros.objects.get(id=inst["idc"])
+            mensajes.append({"tipo":"peticion", "idpeticion": p.pk, "mensaje": camarero.nombre + " "
+            + camarero.apellidos+" solicita permiso para abrir cajon" })
 
     return JsonResponse(mensajes)
 
@@ -78,7 +88,31 @@ def gestionar_peticion(request):
             Mesasabiertas.borrar_mesa_abierta(int(inst["idm"]), int(inst["idc"]), inst["motivo"])
         elif p.accion == "borrar_linea":
             Lineaspedido.borrar_linea_pedido(int(inst["idm"]), inst["Precio"], int(inst["idArt"]), int(inst["can"]), 
-                int(inst["idc"]), inst["motivo"], inst["Estado"], inst["Nombre"])
+                int(inst["idc"]), inst["motivo"], inst["Estado"], inst["Descripcion"])
+        elif p.accion == "abrir_cajon":
+            obj = {
+                "op": "open",
+                "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+                "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
+                "receptor_activo": True,
+            }
+            send_mensaje_ws(obj)
+        elif p.accion == "cobrar_ticket":
+            numart, total, id = Ticket.cerrar_cuenta(inst["idm"], inst["idc"], inst["entrega"], json.loads(inst["art"]))
+    
+            if (numart <= 0):
+                #enviar notficacion de update
+                update = {
+                    "OP": "UPDATE",
+                    "Tabla": "mesasabiertas",
+                    "receptor": "comandas",
+                }
+                send_update_ws(update)
+                    
+            if (id > 0):
+                send_imprimir_ticket(request, id)
+
+
 
     p.delete()
         

@@ -51,5 +51,9 @@
     <string name="mensaje">mensaje</string>
     <string name="lista_mesas">Lista de mesas</string>
     <string name="title_activity_sendmensajes">Mensajes</string>
+    <string name="mesa">Mesa</string>
+    <string name="cambiar_mesa">cambiar_mesa</string>
+    <string name="nombre_emp">Nombre emp</string>
+    <string name="aceptar">aceptar</string>
 
 </resources>

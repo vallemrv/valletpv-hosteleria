@@ -100,11 +100,12 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     break;
                 case "autorias":
                     try {
-                        if(!viendo_mensajes) {
+                        peticiones = new JSONArray(res);
+                        if(!viendo_mensajes && peticiones.length() > 0) {
                             MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
                             m.start();
                         }
-                        peticiones = new JSONArray(res);
+
                         manejarAurotias();
                     }catch (Exception e){
                         e.printStackTrace();
@@ -255,7 +256,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
 
                 TableRow.LayoutParams rowparams = new TableRow.LayoutParams(
-                        0, Math.round(metrics.density * 120));
+                        0, Math.round(metrics.density * 150));
 
                 rowparams.setMargins(5,5,5,5);
 
@@ -532,7 +533,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             ContentValues p = new ContentValues();
             p.put("idp",obj.getString("IDPedido"));
             p.put("id",obj.getString("IDArt"));
-            p.put("Nombre",obj.getString("Nombre"));
+            p.put("Descripcion",obj.getString("Descripcion"));
             myServicio.addColaInstrucciones(new Instruccion(p, "/impresion/reenviarlinea", handlerOperaciones, "reenviar"));
         } catch (Exception e) {
             e.printStackTrace();

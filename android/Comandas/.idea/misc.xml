@@ -11,22 +11,24 @@
         <entry key="app/src/main/res/drawable/fondo_redondeado_btn_xml.xml" value="0.19" />
         <entry key="app/src/main/res/drawable/fondo_redondo_btn_xml.xml" value="0.12" />
         <entry key="app/src/main/res/layout/activity_autorias.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_buscar_pedidos.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_camareros.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_cuenta.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_hacer_comanda.xml" value="0.24583333333333332" />
         <entry key="app/src/main/res/layout/activity_mensajes.xml" value="0.11955420466058764" />
         <entry key="app/src/main/res/layout/activity_mesas.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/activity_mostrar_pedidos.xml" value="1.0" />
+        <entry key="app/src/main/res/layout/activity_mostrar_pedidos.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_preferencias.xml" value="0.18177083333333333" />
-        <entry key="app/src/main/res/layout/boton_mesa.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/activity_refill.xml" value="0.19882246376811594" />
+        <entry key="app/src/main/res/layout/boton_mesa.xml" value="0.25" />
         <entry key="app/src/main/res/layout/btn_art.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/comanda.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/dialog_crear_empresa.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/dialog_create_pass.xml" value="0.24230072463768115" />
         <entry key="app/src/main/res/layout/dialog_enter_pass.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/item_empresa.xml" value="0.46405228758169936" />
-        <entry key="app/src/main/res/layout/item_pedido.xml" value="0.18177083333333333" />
-        <entry key="app/src/main/res/layout/linea_art.xml" value="0.18177083333333333" />
+        <entry key="app/src/main/res/layout/item_pedido.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/linea_art.xml" value="0.67" />
         <entry key="app/src/main/res/layout/linea_autoria.xml" value="0.33" />
         <entry key="app/src/main/res/layout/linea_pedido_externo.xml" value="0.25" />
         <entry key="app/src/main/res/layout/linea_pedido_interno.xml" value="0.33" />

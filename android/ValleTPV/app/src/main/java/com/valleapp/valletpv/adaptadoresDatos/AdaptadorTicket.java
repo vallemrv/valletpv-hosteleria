@@ -47,7 +47,7 @@ public class AdaptadorTicket extends ArrayAdapter<JSONObject> implements View.On
             TextView p = (TextView) rowView.findViewById(R.id.lblPrecio);
             TextView t = (TextView) rowView.findViewById(R.id.lblTotal);
             can.setText(String.format("%s", values.get(position).getString("Can")));
-            nombre.setText(String.format("%s",values.get(position).getString("Nombre")));
+            nombre.setText(String.format("%s",values.get(position).getString("descripcion_t")));
             p.setText(String.format("%01.2f €", values.get(position).getDouble("Precio")));
             t.setText(String.format("%01.2f €", values.get(position).getDouble("Total")));
             ImageButton rm = (ImageButton)rowView.findViewById(R.id.btn_borrar);

@@ -27,16 +27,18 @@ public class DBCuenta extends DBBase {
         super(context);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
-                "Nombre TEXT, Precio DOUBLE, IDPedido INTEGER, " +
+                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, IDPedido INTEGER, " +
                 "IDMesa INTEGER, flag TEXT default ''," +
                 "IDArt INTEGER," +
                 "nomMesa TEXT, IDZona TEXT," +
                 "servido INTEGER )");
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -44,6 +46,7 @@ public class DBCuenta extends DBBase {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
@@ -74,7 +77,7 @@ public class DBCuenta extends DBBase {
 
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
                     " FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                 lista.put(cargarRegistro(res));
@@ -114,7 +117,6 @@ public class DBCuenta extends DBBase {
     public Double getTotal(String id) {
         SQLiteDatabase db = this.getReadableDatabase();
         double s = 0.0;
-
         try {
             Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
                     "FROM cuenta WHERE IDMesa=" + id, null);
@@ -158,7 +160,7 @@ public class DBCuenta extends DBBase {
 
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
                     " FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                  lista.add(cargarRegistro(res));
@@ -182,7 +184,8 @@ public class DBCuenta extends DBBase {
         JSONObject obj = new JSONObject();
         try{
             obj.put("ID", res.getString(res.getColumnIndex("ID")));
-            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
             obj.put("Can", res.getString(res.getColumnIndex("Can")));
             obj.put("CanCobro", 0);
             obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
@@ -211,7 +214,8 @@ public class DBCuenta extends DBBase {
                 int idMesa = datos.getJSONObject(i).getInt("IDMesa");
                 values.put("ID", id);
                 values.put("IDArt", datos.getJSONObject(i).getInt("IDArt"));
-                values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
+                values.put("Descripcion", datos.getJSONObject(i).getString("Descripcion"));
+                values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
                 values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));
                 values.put("IDMesa", idMesa);
                 values.put("Estado", datos.getJSONObject(i).getString("Estado"));
@@ -238,7 +242,7 @@ public class DBCuenta extends DBBase {
         }
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
-                " GROUP BY  IDArt, Nombre, Precio, Estado, IDPedido ORDER BY ID DESC", null);
+                " GROUP BY  IDArt, Descripcion, Precio, Estado, IDPedido ORDER BY ID DESC", null);
         JSONArray ls = new JSONArray();
         res.moveToFirst();
         while (!res.isAfterLast()){
@@ -300,8 +304,8 @@ public class DBCuenta extends DBBase {
         try {
             ContentValues p = new ContentValues();
             p.put("servido", 1);
-            db.update("cuenta", p, "IDArt = ? AND Nombre = ? AND Precio = ? AND IDPedido = ? ",
-                    new String[]{obj.getString("IDArt"), obj.getString("Nombre"),
+            db.update("cuenta", p, "IDArt = ? AND Descripcion = ? AND Precio = ? AND IDPedido = ? ",
+                    new String[]{obj.getString("IDArt"), obj.getString("Descripcion"),
                             obj.getString("Precio"), obj.getString("IDPedido")});
         }catch (Exception e){
            e.printStackTrace();
@@ -314,7 +318,7 @@ public class DBCuenta extends DBBase {
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta  WHERE estado ='P' AND IDMesa=" + idMesa +
-                " GROUP BY  IDArt, Nombre, Precio, Estado, IDPedido ORDER BY IDPedido", null);
+                " GROUP BY  IDArt, Descripcion, Precio, Estado, IDPedido ORDER BY IDPedido", null);
         ArrayList<JSONObject>  ls = new ArrayList<JSONObject> ();
         res.moveToFirst();
         int max = 3;
@@ -327,8 +331,7 @@ public class DBCuenta extends DBBase {
 
                 int idPedido = res.getInt(res.getColumnIndex("IDPedido"));
                 String can = res.getString(res.getColumnIndex("Can"));
-                String nombre =  res.getString(res.getColumnIndex("Nombre"));
-                Log.i("cagada_nueva", nombre + "  "+ idPedido);
+                String nombre =  res.getString(res.getColumnIndex("Descripcion"));
                 if (id_aux != idPedido) {
                     id_aux = idPedido;
                     if (o != null && subtilte!= ""){

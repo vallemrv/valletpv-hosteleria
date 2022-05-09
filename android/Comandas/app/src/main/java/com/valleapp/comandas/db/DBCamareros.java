@@ -22,6 +22,7 @@ public class DBCamareros extends DBBase {
         super(context);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, " +
                                                           "pass_field TEXT, " +
@@ -29,6 +30,7 @@ public class DBCamareros extends DBBase {
                                                           "permisos TEXT, flag TEXT default '' )");
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -36,6 +38,7 @@ public class DBCamareros extends DBBase {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
@@ -59,10 +62,10 @@ public class DBCamareros extends DBBase {
             // Create a new map of values, where column names are the keys
             try {
                 ContentValues values = new ContentValues();
-                values.put("ID", camareros.getJSONObject(i).getInt("ID"));
-                values.put("pass_field", camareros.getJSONObject(i).getString("Pass"));
+                values.put("ID", camareros.getJSONObject(i).getInt("id"));
+                values.put("pass_field", camareros.getJSONObject(i).getString("pass_field"));
                 values.put("autorizado", camareros.getJSONObject(i).getString("autorizado"));
-                values.put("nombre", camareros.getJSONObject(i).getString("Nombre") + " " + camareros.getJSONObject(i).getString("Apellidos"));
+                values.put("nombre", camareros.getJSONObject(i).getString("nombre") + " " + camareros.getJSONObject(i).getString("apellidos"));
                 values.put("permisos", camareros.getJSONObject(i).getString("permisos"));
                 db.insert("camareros", null, values);
             } catch (JSONException e) {

@@ -17,6 +17,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
+import com.valleapp.valletpv.db.DBSubTeclas;
+import com.valleapp.valletpv.db.DbCamareros;
 import com.valleapp.valletpv.db.DbCuenta;
 import com.valleapp.valletpv.db.DbMesas;
 import com.valleapp.valletpv.db.DbSecciones;
@@ -60,9 +63,11 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     DbTeclas dbTeclas;
     DbCuenta dbCuenta;
     DbMesas dbMesas;
+    DBSubTeclas dbSubteclas;
 
     JSONObject cam = null;
     JSONObject mesa = null;
+    JSONObject artSel = null;
 
     List<JSONObject> lineas = null;
     JSONArray lsartresul = null;
@@ -82,6 +87,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     final Context cx = this;
 
+
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -92,6 +98,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dbMesas = (DbMesas) myServicio.getDb("mesas");
                 dbSecciones = (DbSecciones) myServicio.getDb("secciones");
                 dbTeclas = (DbTeclas) myServicio.getDb("teclas");
+                dbSubteclas = (DBSubTeclas) myServicio.getDb("subteclas");
                 rellenarSecciones();
                 rellenarTicket();
 
@@ -126,7 +133,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             try {
-                setEstadoAutoFinish(true, false);
+                setEstadoAutoFinish(true, true);
                 String res = msg.getData().getString("RESPONSE");
                 if (res != null) {
                     JSONArray datos = new JSONArray(res);
@@ -180,11 +187,12 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
                     btn.setOnClickListener(view -> {
-                        setEstadoAutoFinish(true, false);
+                        setEstadoAutoFinish(true, true);
                         sec =  view.getTag().toString();
                         try {
-                            JSONArray  lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
+                            JSONArray  lsart = dbTeclas.getAll(sec, mesa.getInt("Tarifa"));
                             rellenarArticulos(lsart);
+                            lsartresul = lsart;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -199,6 +207,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
                 JSONArray lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
                 rellenarArticulos(lsart);
+                lsartresul = lsart;
+
 
             }
 
@@ -269,20 +279,64 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     btn.setId(i);
                     btn.setTag(m);
 
-                    btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",m.getDouble("Precio")));
 
-                    String[] rgb = m.getString("RGB").split(",");
-                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                    if (m.has("RGB")){
+                        btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",m.getDouble("Precio")));
+                        String[] rgb = m.getString("RGB").split(",");
+                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
-                    btn.setOnClickListener(view -> {
-                        try {
-                            JSONObject art = (JSONObject) view.getTag();
-                            art.put("Can", cantidad);
-                            pedirArt(art);
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    });
+                        btn.setOnClickListener(view -> {
+                            try {
+                                artSel = (JSONObject) view.getTag();
+                                artSel = new JSONObject(artSel.toString());
+                                artSel.put("Can", cantidad);
+                                artSel.put("Descripcion", componerDescripcion(artSel, "descripcion_r"));
+                                artSel.put("descripcion_t", componerDescripcion(artSel, "descripcion_t"));
+                                if (artSel.getString("tipo").equals("SP")) {
+                                    pedirArt(artSel);
+                                }else{
+                                    rellenarArticulos(dbSubteclas.getAll(artSel.getString("ID")));
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        });
+                    }else{
+                        final Double precio = this.artSel.getDouble("Precio")+ m.getDouble("Incremento");
+                        btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",precio));
+
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                        btn.setOnClickListener(view -> {
+                            try {
+                                JSONObject sub = (JSONObject) view.getTag();
+                                Intent it = getIntent();
+                                String des = sub.getString("descripcion_r");
+                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                    artSel.put("Descripcion", des);
+                                }else{
+                                    String nom = artSel.getString("Descripcion");
+                                    String subnom = sub.getString("Nombre");
+                                    artSel.put("Descripcion", nom+" "+subnom);
+
+                                }
+                                des = sub.getString("descripcion_t");
+                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                    artSel.put("descripcion_t", des);
+                                }else if(artSel.getString("descripcion_t") == artSel.getString("Nombre")){
+                                    String nom = artSel.getString("descripcion_t");
+                                    String subnom = sub.getString("Nombre");
+                                    artSel.put("descripcion_t", nom+" "+subnom);
+                                }
+                                artSel.put("Precio", precio);
+                                it.putExtra("art", artSel.toString());
+                                setResult(RESULT_OK, it);
+                                pedirArt(artSel);
+                                rellenarArticulos(lsartresul);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                     row.addView(btn, rowparams);
 
                     if (((i+1) % 5) == 0) {
@@ -299,6 +353,25 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             e.printStackTrace();
         }
     }
+
+
+    private String componerDescripcion(JSONObject o, String descipcion){
+        String aux = "";
+        try {
+            JSONObject s  = new JSONObject();
+            String des = o.getString(descipcion);
+            if (des != null && !des.equals("null") && !des.equals("")) {
+                aux = des;
+            }else{
+                aux = o.getString("Nombre");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  aux;
+    }
+
+
 
     @SuppressLint("DefaultLocale")
     private void rellenarTicket() {
@@ -335,7 +408,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         if( totalMesa > 0) {
             try {
                 setEstadoAutoFinish(true, true);
-                this.aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+                aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
                 DlgSepararTicket dlg = new DlgSepararTicket(this,this);
                 dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
@@ -357,6 +430,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 ContentValues p = new ContentValues();
                 p.put("idm", mesa.getString("ID"));
                 if(myServicio!=null) myServicio.preImprimir(p);
+                dbMesas.marcarRojo(mesa.getString("ID"));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -364,8 +438,22 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     }
 
     public void abrirCajon(View v){
-        setEstadoAutoFinish(false, false);
-        if(myServicio!=null) myServicio.abrirCajon();
+        setEstadoAutoFinish(true,false);
+        DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+        if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
+            try {
+                JSONObject p = new JSONObject();
+                p.put("idc", cam.getString("ID"));
+                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                        dbCamareros, this,
+                        p, "abrir_cajon");
+                dlg.show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            if (myServicio != null) myServicio.abrirCajon();
+        }
     }
 
     public void cobrarMesa(View v){
@@ -499,7 +587,9 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 @Override
                 public void run() {
                     if(!stop) {
-                        if (!reset) finish();
+                        if (!reset){
+                            finish();
+                        }
                         else reset = false;
                     }
                 }
@@ -541,22 +631,35 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     @Override
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
         try {
-            setEstadoAutoFinish(true, false);
-            ContentValues p = new ContentValues();
-            p.put("idm", mesa.getString("ID"));
-            p.put("idc", cam.getString("ID"));
-            p.put("entrega", Double.toString(entrega));
-            p.put("art", lsart.toString());
-            dbCuenta.eliminar(mesa.getString("ID"), lsart);
-            if(myServicio!=null) {
-                myServicio.cobrarCuenta(p);
-                if (totalCobro - totalMesa == 0) {
-                    dbMesas.cerrarMesa(mesa.getString("ID"));
-                    finish();
-                } else {
-                    rellenarTicket();
+            setEstadoAutoFinish(true, true);
+            DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+            if(dbCamareros.getConPermiso("cobrar_ticket").size() > 0) {
+                JSONObject p = new JSONObject();
+                p.put("idm", mesa.getString("ID"));
+                p.put("idc", cam.getString("ID"));
+                p.put("entrega", Double.toString(entrega));
+                p.put("art", lsart.toString());
+                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                        dbCamareros, this,
+                        p, "cobrar_ticket");
+                dlg.show();
+            }else{
+                ContentValues p = new ContentValues();
+                p.put("idm", mesa.getString("ID"));
+                p.put("idc", cam.getString("ID"));
+                p.put("entrega", Double.toString(entrega));
+                p.put("art", lsart.toString());
+                dbCuenta.eliminar(mesa.getString("ID"), lsart);
+                if (myServicio != null) {
+                    myServicio.cobrarCuenta(p);
+                    if (totalCobro - totalMesa == 0) {
+                        dbMesas.cerrarMesa(mesa.getString("ID"));
+                        finish();
+                    } else {
+                        rellenarTicket();
+                    }
+                    sendMessageMesaCobrada(entrega, entrega - totalCobro);
                 }
-                sendMessageMesaCobrada(entrega, entrega-totalCobro);
             }
 
         } catch (JSONException e) {
@@ -594,7 +697,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 int canArt = art.getInt("Can");
                 if (cantidad > canArt) cantidad = canArt;
                 art.put("Can", cantidad);
-                txtInfo.setText("Borrar " + cantidad + " "+art.getString("Nombre"));
+                txtInfo.setText("Borrar " + cantidad + " "+art.getString("descripcion_t"));
                 resetCantidad();
             }catch (Exception e){
                 e.printStackTrace();
@@ -685,19 +788,37 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try{
 
             if (myServicio != null){
-                JSONObject p = new JSONObject();
-                p.put("idm",  mesa.getString("ID"));
-                p.put("Precio", art.getString("Precio"));
-                p.put("idArt", art.getString("IDArt"));
-                p.put("can", art.getString("Can"));
-                p.put("idc", cam.getString("ID"));
-                p.put("motivo", motivo);
-                p.put("Estado", art.getString("Estado"));
-                p.put("Nombre", art.getString("Nombre"));
-                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                        myServicio.getDb("camareros"), this,
-                        p, "borrar_linea");
-                dlg.show();
+                DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+                if(dbCamareros.getConPermiso("borrar_linea").size() > 0) {
+                    JSONObject p = new JSONObject();
+                    p.put("idm",  mesa.getString("ID"));
+                    p.put("Precio", art.getString("Precio"));
+                    p.put("idArt", art.getString("IDArt"));
+                    p.put("can", art.getString("Can"));
+                    p.put("idc", cam.getString("ID"));
+                    p.put("motivo", motivo);
+                    p.put("Estado", art.getString("Estado"));
+                    p.put("Descripcion", art.getString("Descripcion"));
+                    DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                            dbCamareros, this,
+                            p, "borrar_linea");
+                    dlg.show();
+                }else{
+                    ContentValues p = new ContentValues();
+                    p.put("idm",  mesa.getString("ID"));
+                    p.put("Precio", art.getString("Precio"));
+                    p.put("idArt", art.getString("IDArt"));
+                    p.put("can", art.getString("Can"));
+                    p.put("idc", cam.getString("ID"));
+                    p.put("motivo", motivo);
+                    p.put("Estado", art.getString("Estado"));
+                    p.put("Descripcion", art.getString("Descripcion"));
+                    JSONArray ls = new JSONArray();
+                    ls.put(new JSONObject(art.toString()));
+                    dbCuenta.eliminar(mesa.getString("ID"), ls);
+                    myServicio.rmLinea(p);
+                    rellenarTicket();
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

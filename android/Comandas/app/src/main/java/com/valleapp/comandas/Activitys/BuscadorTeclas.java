@@ -57,6 +57,21 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
     }
 
 
+    private String componerDescripcion(JSONObject o, String descipcion){
+        String aux = "";
+        try {
+            String des = o.getString(descipcion);
+            if (des != null && !des.equals("null") && !des.equals("")) {
+                aux =  o.getString(descipcion);
+            }else{
+                aux = o.getString("Nombre");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  aux;
+    }
+
 
     private void rellenaBotonera() {
 
@@ -100,9 +115,12 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
                     btn.setOnClickListener(view -> {
-                        artSel = (JSONObject) view.getTag();
                         try {
-                            if (artSel.getString("tipo").equals("SL")){
+                            artSel = (JSONObject) view.getTag();
+                            artSel = new JSONObject(artSel.toString());
+                            artSel.put("Descripcion", componerDescripcion(artSel, "descripcion_r"));
+                            artSel.put("descripcion_t", componerDescripcion(artSel, "descripcion_t"));
+                            if (artSel.getString("tipo").equals("SP")){
                                 Intent it = getIntent();
                                 it.putExtra("art", artSel.toString());
                                 setResult(RESULT_OK, it);
@@ -121,9 +139,23 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                             try {
                                 JSONObject sub = (JSONObject) view.getTag();
                                 Intent it = getIntent();
-                                String nom = artSel.getString("Nombre");
-                                String subnom = sub.getString("Nombre");
-                                artSel.put("Nombre", nom+" "+subnom);
+                                String des = sub.getString("descripcion_r");
+                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                    artSel.put("Descripcion", des);
+                                }else{
+                                    String nom = artSel.getString("Descripcion");
+                                    String subnom = sub.getString("Nombre");
+                                    artSel.put("Descripcion", nom+" "+subnom);
+
+                                }
+                                des = sub.getString("descripcion_t");
+                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                    artSel.put("descripcion_t", des);
+                                }else if(artSel.getString("descripcion_t") == artSel.getString("Nombre")){
+                                    String nom = artSel.getString("descripcion_t");
+                                    String subnom = sub.getString("Nombre");
+                                    artSel.put("descripcion_t", nom+" "+subnom);
+                                }
                                 it.putExtra("art", artSel.toString());
                                 setResult(RESULT_OK, it);
                                 finish();

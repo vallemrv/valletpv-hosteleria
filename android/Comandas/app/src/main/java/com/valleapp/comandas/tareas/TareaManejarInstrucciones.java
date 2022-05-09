@@ -69,7 +69,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
+            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
 
             if (procesado) {
 

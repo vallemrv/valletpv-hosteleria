@@ -6,6 +6,7 @@
 # @License: Apache license vesion 2.0
 
 
+from calendar import c
 from distutils.command.config import config
 from re import M
 from textwrap import indent
@@ -28,9 +29,10 @@ class receptor_manager():
         message = json.loads(msg)
         message = json.loads(message["message"])
         op = message["op"]
-        
         if op == "open":
             ws.doc.abrir_cajon()
+        elif op == "mensaje":
+             ws.doc.printMensaje(message["camarero"], message["msg"])
         elif op == "desglose":
             ws.doc.printDesglose(message["fecha"], message["lineas"])
         elif op == "ticket":
@@ -38,6 +40,8 @@ class receptor_manager():
                 ws.doc.abrir_cajon()
             if str(message["receptor_activo"]).strip() == "True":
                 cambio = float(message['efectivo']) - float(message['total'])
+                if cambio < 0:
+                    cambio = 0
                 ws.doc.imprimirTicket(message['num'], message['camarero'], message['fecha'], message["mesa"],
                                    message['total'], message['efectivo'], cambio, message['lineas'])
         elif op == "pedido" and str(message["receptor_activo"]).strip() == "True":

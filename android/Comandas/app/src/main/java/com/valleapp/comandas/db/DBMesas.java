@@ -24,6 +24,7 @@ public class DBMesas extends DBBase {
         super(context);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS mesas " +
                 "(ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, " +
@@ -31,6 +32,7 @@ public class DBMesas extends DBBase {
                 "num INTEGER, flag TEXT default '', Orden INTEGER)");
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -38,6 +40,7 @@ public class DBMesas extends DBBase {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }

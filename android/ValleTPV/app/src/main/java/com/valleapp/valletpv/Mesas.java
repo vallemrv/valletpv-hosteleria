@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -485,7 +486,22 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     }
 
     public void clickAbrirCaja(View v){
-        if(myServicio!=null) myServicio.abrirCajon();
+        setEstadoAutoFinish(true,false);
+        DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+        if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
+            try {
+                JSONObject p = new JSONObject();
+                p.put("idc", cam.getString("ID"));
+                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                    dbCamareros, this,
+                    p, "abrir_cajon");
+                dlg.show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            if (myServicio != null) myServicio.abrirCajon();
+        }
     }
 
     public void clickCambiarMesa(View v){
@@ -598,7 +614,9 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             @Override
             public void run() {
                 if (!stop){
-                    if(!reset) finish();
+                    if(!reset){
+                        finish();
+                    }
                     else reset = false;
                 }
             }
@@ -665,16 +683,26 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
 
             if (myServicio != null){
-                JSONObject p = new JSONObject();
-                p.put("motivo", motivo);
-                p.put("idm",idm);
-                p.put("idc", cam.getString("ID"));
-
-
-                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                                               myServicio.getDb("camareros"), this,
-                                               p, "borrar_mesa");
-                dlg.show();
+                DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+                if(dbCamareros.getConPermiso("borrar_mesa").size() > 0) {
+                    JSONObject p = new JSONObject();
+                    p.put("motivo", motivo);
+                    p.put("idm", idm);
+                    p.put("idc", cam.getString("ID"));
+                    DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                            dbCamareros, this,
+                            p, "borrar_mesa");
+                    dlg.show();
+                }else{
+                    ContentValues p = new ContentValues();
+                    p.put("motivo", motivo);
+                    p.put("idm", idm);
+                    p.put("idc", cam.getString("ID"));
+                    dbCuenta.eliminar(idm);
+                    dbMesas.cerrarMesa(idm);
+                    myServicio.rmMesa(p);
+                    rellenarMesas();
+                }
             }
 
         } catch (JSONException e) {

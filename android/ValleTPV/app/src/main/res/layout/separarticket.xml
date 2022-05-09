@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="570dp"
-        android:layout_height="500dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="600sp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,19 +16,18 @@
 
         <TextView
             android:id="@+id/lblTotalCobro"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7"
+            android:layout_weight="1"
             android:text="@string/cantida_a_cobrar"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textSize="20sp" />
 
         <ImageButton
             android:id="@+id/btn_aceptar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_margin="5dp"
-            android:layout_weight="0.15"
             android:background="@drawable/fondo_btn_xml"
             android:contentDescription="@string/ok"
             android:padding="10dp"
@@ -39,10 +37,9 @@
 
         <ImageButton
             android:id="@+id/btn_salir"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_margin="5dp"
-            android:layout_weight="0.15"
             android:background="@drawable/fondo_btn_xml"
             android:contentDescription="@string/salir"
             android:padding="10dp"
@@ -51,64 +48,64 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.8"
+        android:background="#ffffbbee"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="0.8"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:background="#ffffbbee"
-            android:baselineAligned="false">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@android:color/white"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"
-                android:background="@android:color/white"
-                android:orientation="vertical">
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/articulos_pendientes"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:text="@string/articulos_pendientes"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            <ListView
+                android:id="@+id/lstArticulos"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="0.5" />
+        </LinearLayout>
 
-                <ListView
-                    android:id="@+id/lstArticulos"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_weight="0.5" />
-            </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@android:color/white"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.5"
-                android:background="@android:color/white"
-                android:orientation="vertical">
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|center_horizontal"
+                android:text="@string/articulos_separados"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center|center_horizontal"
-                    android:text="@string/articulos_separados"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <ListView
-                    android:id="@+id/lstCobros"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.5" />
-            </LinearLayout>
-
-
+            <ListView
+                android:id="@+id/lstCobros"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5" />
         </LinearLayout>
 
 
     </LinearLayout>
+
+
+</LinearLayout>
 
 

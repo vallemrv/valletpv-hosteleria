@@ -86,7 +86,7 @@ public class MostrarPedidos extends ActivityBase {
                     TextView t = v.findViewById(R.id.lblCantidad);
                     TextView s = v.findViewById(R.id.lblNombre);
                     t.setText(String.format("%s", art.getString("Can")));
-                    s.setText(String.format("%s",art.getString("Nombre")));
+                    s.setText(String.format("%s",art.getString("Descripcion")));
                     RelativeLayout btn = v.findViewById(R.id.btnPedir);
                     ImageButton btnCamb = v.findViewById(R.id.btnCambiar);
                     btnCamb.setTag(art);
@@ -162,7 +162,7 @@ public class MostrarPedidos extends ActivityBase {
             ContentValues p = new ContentValues();
             p.put("idp",obj.getString("IDPedido"));
             p.put("id",obj.getString("IDArt"));
-            p.put("Nombre",obj.getString("Nombre"));
+            p.put("Descripcion",obj.getString("Descripcion"));
             new HTTPRequest(server+"/impresion/reenviarlinea",p,"", handlerHttp);
         } catch (JSONException e) {
             e.printStackTrace();

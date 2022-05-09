@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:orientation="horizontal"
-            android:padding="5sp">
+            android:padding="1sp">
 
             <ImageButton
                 android:id="@+id/btn_denegar"

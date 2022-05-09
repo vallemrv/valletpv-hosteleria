@@ -33,7 +33,7 @@ class HistorialMensajes(models.Model):
         if not c:
             c = HistorialMensajes()
             
-        print(row)    
+    
         c.camarero_id = row["camarero"]
         c.receptor_id = row["receptor"]
         c.mensaje = row["mensaje"]
@@ -527,11 +527,12 @@ class Lineaspedido(models.Model):
     idart = models.IntegerField(db_column='IDArt')  # Field name made lowercase.
     estado = models.CharField(db_column='Estado', choices=ESTADO_CHOICES,  max_length=1, default="P")  # Field name made lowercase.
     precio = models.DecimalField(db_column='Precio', max_digits=6, decimal_places=2)  # Field name made lowercase.
-    nombre = models.CharField(db_column='Nombre', max_length=400)  # Field name made lowercase.
+    descripcion = models.CharField(db_column='Descripcion', default=None,  max_length=400, null=True)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
-    es_compuesta = models.BooleanField(default=False)
-    cantidad = models.IntegerField(default=0)
-    
+    es_compuesta = models.BooleanField("Grupo o simple", default=False)
+    cantidad = models.IntegerField("Cantidad de articulos que lo compone", default=0)
+    descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
+   
     @staticmethod
     def update_for_devices():
         mesas = Mesasabiertas.objects.all()
@@ -546,7 +547,7 @@ class Lineaspedido(models.Model):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if mesa:
             uid = mesa.infmesa.pk
-            reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=idArt, estado=s, precio=p, nombre=n)[:can]
+            reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=idArt, estado=s, precio=p, descripcion=n)[:can]
     
             for r in reg:
                 if motivo != 'null':
@@ -736,11 +737,12 @@ class Mesasabiertas(models.Model):
                 'IDArt': l.idart,
                 'Estado': l.estado,
                 'Precio': l.precio,
-                'Nombre': l.nombre,
+                'Descripcion': l.descripcion,
                 'IDMesa': m.mesa.pk,
                 'nomMesa': m.mesa.nombre,
                 'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-                'servido': Servidos.objects.filter(linea__pk=l.pk).count()
+                'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
+                'descripcion_t': l.descripcion_t,
             }
             lineas.append(obj)
         return lineas
@@ -789,7 +791,6 @@ class Pedidos(models.Model):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if not mesa:
             infmesa = Infmesa()
-            infmesa.ref = ""
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
             infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
@@ -815,12 +816,16 @@ class Pedidos(models.Model):
                 linea.infmesa_id = mesa.infmesa.pk
                 linea.idart = pd["IDArt"] if "IDArt" in pd else pd["ID"]
                 linea.pedido_id = pedido.pk
-                linea.nombre = pd["Nombre"]
+                linea.descripcion = pd["Descripcion"]
+                linea.descripcion_t = pd["descripcion_t"]
                 linea.precio = pd["Precio"]
                 linea.estado =  'P' #'R' if pd['Precio'] == 0 else 'P'
                 linea.tecla_id = linea.idart
                 linea.save()
-                
+
+        pedido.infmesa.numcopias = 0
+        pedido.infmesa.save()   
+        Sync.actualizar("mesasabiertas")     
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
         return is_mesa_nueva, pedido

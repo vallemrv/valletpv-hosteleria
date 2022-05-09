@@ -65,9 +65,10 @@ public class Nota {
     public void addArt(JSONObject art, int can){
         try {
             this.num+=can;
-            art.put("Can",1);
             for(int i = 0;i<can;i++){
-                comanda.add(new JSONObject(art.toString()));
+                art = new JSONObject(art.toString());
+                art.put("Can", 1);
+                comanda.add(art);
             }
             this.GuardarComanda();
 
@@ -121,8 +122,8 @@ public class Nota {
 
     public void addSug( String sug) {
         try{
-            String nombre = this.artSel.getString("Nombre")+" "+sug;
-            this.artSel.put("Nombre", nombre);
+            String nombre = this.artSel.getString("Descripcion")+" "+sug;
+            this.artSel.put("Descripcion", nombre);
             this.GuardarComanda();
         }catch (Exception e){
             e.printStackTrace();

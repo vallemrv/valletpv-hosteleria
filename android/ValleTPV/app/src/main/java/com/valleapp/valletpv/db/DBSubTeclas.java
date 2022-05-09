@@ -23,7 +23,9 @@ public class DBSubTeclas extends DBBase  {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS subteclas (ID INTEGER PRIMARY KEY, Nombre TEXT, Incremento DOUBLE, IDTecla INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS subteclas (ID INTEGER PRIMARY KEY, " +
+                " Nombre TEXT, Incremento DOUBLE, IDTecla INTEGER," +
+                " descripcion_t TEXT, descripcion_r TEXT)");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -55,6 +57,8 @@ public class DBSubTeclas extends DBBase  {
                  values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
                  values.put("Incremento", datos.getJSONObject(i).getString("incremento"));
                  values.put("IDTecla", datos.getJSONObject(i).getString("tecla"));
+                 values.put("descripcion_r", datos.getJSONObject(i).getString("descripcion_r"));
+                 values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
                  db.insert("subteclas", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -76,6 +80,8 @@ public class DBSubTeclas extends DBBase  {
                 JSONObject obj = new JSONObject();
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
                 obj.put("Incremento", res.getString(res.getColumnIndex("Incremento")));
+                obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+                obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
                 ls.put(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -87,9 +93,4 @@ public class DBSubTeclas extends DBBase  {
         res.close();db.close();
         return ls;
     }
-
-
-
-
-
 }

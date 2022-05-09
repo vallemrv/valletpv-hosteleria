@@ -36,7 +36,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
-                "Nombre TEXT, Precio DOUBLE, " +
+                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, " +
                 "IDMesa INTEGER, flag TEXT default ''," +
                 "IDArt INTEGER )");
     }
@@ -137,7 +137,8 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
             for(int i=0;i<can;i++) {
                     ContentValues values = new ContentValues();
                     values.put("IDArt", art.getInt("ID"));
-                    values.put("Nombre", art.getString("Nombre"));
+                    values.put("Descripcion", art.getString("Descripcion"));
+                    values.put("descripcion_t", art.getString("descripcion_t"));
                     values.put("Precio", art.getDouble("Precio"));
                     values.put("IDMesa", IDMesa);
                     values.put("Estado", "N");
@@ -156,7 +157,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
                 JSONObject art = lsart.getJSONObject(i);
                 String sql = "DELETE FROM cuenta WHERE ID IN (SELECT ID FROM cuenta WHERE IDMesa="
                                + IDMesa + " AND IDArt=" + art.getString("IDArt")
-                                        + " AND Nombre='" + art.getString("Nombre")+"'"
+                                        + " AND Descripcion='" + art.getString("Descripcion")+"'"
                                         + " AND Precio=" + art.getString("Precio")
                                         + " AND Estado='" + art.getString("Estado") + "' LIMIT "+art.getString("Can")+")";
                 db.execSQL(sql);
@@ -200,12 +201,13 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
         try {
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can FROM cuenta WHERE IDMesa=" + id +" AND Estado = 'N'"+
-                    " Group by IDArt, Nombre, Precio, Estado", null);
+                    " Group by IDArt, Descripcion, Precio, Estado", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                 try {
                     JSONObject obj = new JSONObject();
-                    obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+                    obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
+                    obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
                     obj.put("Can", res.getString(res.getColumnIndex("Can")));
                     obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
                     obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
@@ -261,7 +263,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
         try {
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                 lista.put(cargarRegistros(res));
@@ -289,7 +291,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
 
         try {
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Nombre, Precio, Estado ORDER BY ID DESC", null);
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                  lista.add(cargarRegistros(res));
@@ -310,9 +312,9 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
     JSONObject cargarRegistros(Cursor res){
         JSONObject obj = new JSONObject();
         try{
-
-            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
             obj.put("Can", res.getString(res.getColumnIndex("Can")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
             obj.put("CanCobro", 0);
             obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
             obj.put("Total", res.getString(res.getColumnIndex("Total")));
@@ -335,7 +337,8 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
                 db.delete("cuenta","ID = ?", new String[]{id});
                 values.put("ID", id);
                 values.put("IDArt", datos.getJSONObject(i).getInt("IDArt"));
-                values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
+                values.put("Descripcion", datos.getJSONObject(i).getString("Descripcion"));
+                values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
                 values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));
                 values.put("IDMesa", idMesa);
                 values.put("Estado", datos.getJSONObject(i).getString("Estado"));

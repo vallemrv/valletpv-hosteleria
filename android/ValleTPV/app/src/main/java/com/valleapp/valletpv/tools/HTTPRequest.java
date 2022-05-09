@@ -78,6 +78,7 @@ public class HTTPRequest {
 
                      } catch (Exception e) {
                         // TODO Auto-generated catch block
+                        if(handlerExternal!= null) sendMessage(handlerExternal, "ERROR", null);
                        Log.w("HTTPClient", "No hay conexion con el servidor");
                     }
                 }

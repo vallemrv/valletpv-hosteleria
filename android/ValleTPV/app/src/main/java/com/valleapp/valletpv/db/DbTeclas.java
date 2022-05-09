@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 
@@ -32,8 +33,8 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS  teclas (" +
                 "ID INTEGER PRIMARY KEY, Nombre TEXT, P1 DOUBLE, P2 DOUBLE, Precio DOUBLE," +
-                " RGB TEXT, IDSeccion INTEGER, Tag TEXT, Orden INTEGER, IDSec2 INTEGER, " +
-                " descripcion_t TEXT )");
+                " RGB TEXT, IDSeccion INTEGER, Tag TEXT, Orden INTEGER, IDSec2 INTEGER, tipo TEXT, " +
+                " descripcion_t TEXT, descripcion_r TEXT )");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -60,7 +61,9 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
                 obj.put("ID", res.getString(res.getColumnIndex("ID")));
                 obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
+                obj.put("tipo", res.getString(res.getColumnIndex("tipo")));
                 obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+                obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
                 if (tarifa == 2)   obj.put("Precio", res.getString(res.getColumnIndex("P2")));
                 else  obj.put("Precio", res.getString(res.getColumnIndex("P1")));
                 ls.put(obj);
@@ -112,7 +115,9 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
                 values.put("Tag", datos.getJSONObject(i).getString("tag"));
                 values.put("IDSec2", datos.getJSONObject(i).getString("IDSec2"));
                 values.put("Orden", datos.getJSONObject(i).getString("orden"));
+                values.put("tipo", datos.getJSONObject(i).getString("tipo"));
                 values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
+                values.put("descripcion_r", datos.getJSONObject(i).getString("descripcion_r"));
                 db.insert("teclas", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();

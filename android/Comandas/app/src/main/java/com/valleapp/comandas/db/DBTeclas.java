@@ -25,6 +25,7 @@ public class DBTeclas extends DBBase {
         super(context);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS  teclas (" +
                 "ID INTEGER PRIMARY KEY, Nombre TEXT, P1 DOUBLE, P2 DOUBLE, Precio DOUBLE," +
@@ -33,6 +34,7 @@ public class DBTeclas extends DBBase {
                 " descripcion_t TEXT, descripcion_r TEXT, tipo TEXT )");
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -40,6 +42,7 @@ public class DBTeclas extends DBBase {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }

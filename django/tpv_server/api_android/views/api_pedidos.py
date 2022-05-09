@@ -27,7 +27,7 @@ def  get_pendientes(request):
 def servido(request):
     art = json.loads(request.POST["art"])
     lineas = Lineaspedido.objects.filter(idart=art["IDArt"],
-                                         nombre=art["Nombre"],
+                                         descripcion=art["Descripcion"],
                                          precio=art["Precio"],
                                          pedido_id=art["IDPedido"])
 
@@ -47,35 +47,3 @@ def servido(request):
 
     return get_pendientes(request)
 
-#deprecated
-@csrf_exempt
-def  buscar(request):
-    str = request.POST["str"]
-    lstObj = []
-    mz = "(SELECT mesaszona.IDZona, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesaszona ON mesaszona.IDMesa=mesasabiertas.IDMesa) as mz";
-    m = "(SELECT mesas.Nombre AS nomMesa, mesasabiertas.UID FROM mesasabiertas LEFT JOIN mesas ON mesas.ID=mesasabiertas.IDMesa) as m";
-    s = "(SELECT IDLinea FROM servidos)";
-    lpedidos = ''.join(['SELECT m.nomMesa, mz.IDZona, l.ID, l.Precio, count(l.IDArt) as Can, l.Nombre,  l.IDArt, IDPedido ',
-               'FROM lineaspedido as l LEFT JOIN {0} ON mz.UID=l.UID LEFT JOIN {1} ON m.UID=l.UID ',
-               'WHERE (Estado="P" OR Estado="R")  AND l.Nombre LIKE "%{3}%" AND l.ID NOT IN {2} ',
-               'GROUP BY l.IDArt, l.Nombre, l.Precio, l.IDPedido, l.UID, m.nomMesa ',
-               'ORDER BY l.ID DESC']).format(mz, m, s, str)
-
-    with connection.cursor() as cursor:
-        cursor.execute(lpedidos)
-        rows = cursor.fetchall()
-        for r in rows:
-            if r[0]:
-                lstObj.append({
-                   'nomMesa': r[0],
-                   'IDZona': r[1],
-                   'ID': r[2],
-                   'Precio': r[3],
-                   'Can': r[4],
-                   'Nombre': r[5],
-                   'IDArt': r[6],
-                   'IDPedido': r[7]
-                })
-
-
-    return JsonResponse(lstObj)

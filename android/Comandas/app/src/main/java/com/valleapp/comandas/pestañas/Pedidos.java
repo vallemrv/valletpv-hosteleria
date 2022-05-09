@@ -59,7 +59,7 @@ public class Pedidos extends Fragment {
             TextView t =  v.findViewById(R.id.lblCantidad);
             TextView s =  v.findViewById(R.id.lblNombre);
             t.setText(String.format("%s", art.getString("Can")));
-            s.setText(String.format("%s - %s", art.getString("Nombre"), art.getString("nomMesa")));
+            s.setText(String.format("%s - %s", art.getString("Descripcion"), art.getString("nomMesa")));
             LinearLayout btn =  v.findViewById(R.id.btnPedir);
             ImageButton btnCamb =  v.findViewById(R.id.btnBorrarPedido);
             btnCamb.setTag(art);

@@ -11,8 +11,7 @@ from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
-from api_android.tools import (send_imprimir_ticket, send_update_ws,
-                               get_descripcion_ticket)
+from api_android.tools import (send_imprimir_ticket, send_update_ws)
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
                             Infmesa, Servidos, Sync, Ticket, Ticketlineas, Historialnulos)
 from datetime import datetime
@@ -20,9 +19,6 @@ from uuid import uuid4
 import json
 
 
-@csrf_exempt
-def ticket(request):
-    return getTicket(request, -1)
 
 @csrf_exempt
 def get_cuenta(request):
@@ -60,7 +56,7 @@ def cambiarmesas(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
 
     return HttpResponse('success')
 
@@ -113,9 +109,6 @@ def mvlinea(request):
 
     return HttpResponse('success')
 
-@csrf_exempt
-def ls_aparcadas(request):
-    return JsonResponse(Mesasabiertas.update_for_devices())
 
 @csrf_exempt
 def cuenta_add(request):
@@ -131,7 +124,7 @@ def cuenta_add(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(request, update)
+        send_update_ws(update)
 
     
 
@@ -142,7 +135,9 @@ def cuenta_cobrar(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     entrega = request.POST["entrega"]
+    
     art = json.loads(request.POST["art"])
+   
 
     numart, total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
     
@@ -173,7 +168,7 @@ def cuenta_rm(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(request, update)
+    send_update_ws(update)
 
     return HttpResponse('success')
 
@@ -203,125 +198,4 @@ def cuenta_rm_linea(request):
 
     return HttpResponse('success')
 
-@csrf_exempt
-def cuenta_ls_ticket(request):
-    offset = request.POST['offset'] if 'offset' in request.POST else 0
-    sql_pedido = ''.join([ 'SELECT ticket.ID, Fecha, Hora, Entrega, Mesa, SUM( Precio ) AS Total ',
-                           'FROM ticket ',
-                           'INNER JOIN ticketlineas ON ticket.ID=ticketlineas.IDTicket ',
-                           'INNER JOIN lineaspedido ON lineaspedido.ID=ticketlineas.IDLinea ',
-                           "GROUP BY ticket.ID ",
-                           "ORDER BY ticket.ID DESC ",
-                           "LIMIT {0}, {1} ",]).format(offset, 100)
 
-
-    lineas = []
-    with connection.cursor() as cursor:
-        cursor.execute(sql_pedido)
-        rows = cursor.fetchall()
-        for r in rows:
-            lineas.append({
-               'ID': r[0],
-               'Fecha': r[1],
-               'Hora': r[2],
-               'Entrega': r[3],
-               'Mesa': r[4],
-               'Total': r[5],
-               })
-
-    return JsonResponse(lineas)
-
-@csrf_exempt
-def cuenta_ls_linea(request):
-    id = request.POST["id"]
-    sql_pedido = ''.join(['SELECT COUNT(lineaspedido.IDArt) As Can, lineaspedido.IDArt,  lineaspedido.Precio, ',
-                          'SUM( Precio ) AS Total, ',
-                          'CASE lineaspedido.IDArt ',
-                             'WHEN  0 THEN lineaspedido.Nombre ',
-                             'ELSE teclas.Nombre ',
-                           'END AS Nombre ',
-                           'FROM lineaspedido ',
-                           'LEFT JOIN teclas ON lineaspedido.IDArt=teclas.ID ',
-                           "INNER JOIN ticketlineas ON lineaspedido.ID=ticketlineas.IDLinea ",
-                           "INNER JOIN ticket ON ticket.ID=ticketlineas.IDTicket ",
-                           "WHERE ticket.ID={0} ",
-                           "GROUP BY lineaspedido.IDArt, lineaspedido.Nombre, lineaspedido.Precio ",
-                           ]).format(id)
-
-    lineas = []
-    with connection.cursor() as cursor:
-        cursor.execute(sql_pedido)
-        rows = cursor.fetchall()
-        for r in rows:
-            lineas.append({
-               'Can': r[0],
-               'IDArt': r[1],
-               'Precio': r[2],
-               'Total': r[3],
-               'Nombre': get_descripcion_ticket(r[1], r[4]),
-               })
-
-
-
-    sql_total = ''.join(['SELECT SUM( Precio ) AS Total ',
-                         'FROM ticket ',
-                         "INNER JOIN ticketlineas ON ticket.ID=ticketlineas.IDTicket ",
-                         "INNER JOIN lineaspedido ON lineaspedido.ID=ticketlineas.IDLinea ",
-                         "WHERE ticket.ID={0} "]).format(id)
-
-    total = 0
-
-    with connection.cursor() as cursor:
-        cursor.execute(sql_total)
-        row = cursor.fetchone()
-        total = row[0]
-
-    return JsonResponse({'lineas':lineas, 'total': total, 'IDTicket': id})
-
-def getTicket(request, IDPedido):
-    lstObj = {}
-    idm = request.POST["idm"];
-    mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-    if mesa:
-        uid = mesa.infmesa.uid
-        sql_pedido = ''.join([ 'SELECT Precio, Estado, IDArt, COUNT(IDArt) as Can, (Precio * COUNT(IDArt)) as Total, Nombre ',
-                               'FROM lineaspedido ',
-                               " WHERE Estado='P' AND UID='{0}' "
-                               "GROUP BY IDArt, Precio, Nombre, Estado ",
-                               "ORDER BY Estado, IDArt ",]).format(uid)
-
-        lineas = []
-        with connection.cursor() as cursor:
-            cursor.execute(sql_pedido)
-            rows = cursor.fetchall()
-            for r in rows:
-
-                lineas.append({
-                   'Precio': r[0],
-                   'Estado': r[1],
-                   'IDArt': r[2],
-                   'Can': r[3],
-                   'Total': r[4],
-                   'Nombre': get_descripcion_ticket(r[2],r[5]),
-                   })
-
-
-
-        sql_total = ''.join([' SELECT SUM(Precio) as ticket',
-                             ' FROM lineaspedido',
-                             " WHERE Estado='P' AND UID='{0}'"]).format(uid)
-
-        total = 0
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql_total)
-            row = cursor.fetchone()
-            total = row[0]
-
-        lstObj  = {
-          "lineas": lineas,
-          "total": total,
-          "pedido": IDPedido
-        }
-
-    return JsonResponse(lstObj)

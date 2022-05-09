@@ -18,17 +18,15 @@ public class TareaManejarInstrucciones extends TimerTask {
 
     private final Timer parent;
     private final Queue<Instrucciones> cola;
-
-
+    private final long timeout;
     boolean procesado = true;
-
 
     Handler handleHttp = new Handler(Looper.myLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
             try {
                 String res = msg.getData().getString("RESPONSE");
-                if(!res.equals("")) {
+                if(res!= null && !res.equals("")) {
                     synchronized (cola) {
                         Instrucciones inst = cola.poll();
                         if (inst != null) {
@@ -46,17 +44,19 @@ public class TareaManejarInstrucciones extends TimerTask {
 
                     }
                 }
-                procesado = true;
+
             }catch (Exception e){
                 e.printStackTrace();
             }
+            procesado = true;
             super.handleMessage(msg);
 
         }
     };
 
-    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instrucciones> colaInstrucciones) {
+    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instrucciones> colaInstrucciones, long timeout) {
         this.cola= colaInstrucciones; this.parent = timerManejarInstrucciones;
+        this.timeout = timeout;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TareaManejarInstrucciones extends TimerTask {
             }
 
             synchronized (parent) {
-                parent.wait(3000);
+                parent.wait(timeout);
             }
 
         }catch (Exception e){

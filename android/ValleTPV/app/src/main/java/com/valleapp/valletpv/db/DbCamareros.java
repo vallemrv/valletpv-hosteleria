@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 
@@ -62,7 +62,6 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
         for (int i= 0 ; i < camareros.length(); i++){
             // Create a new map of values, where column names are the keys
             try {
-                Log.i("camareros", camareros.toString());
                  ContentValues values = new ContentValues();
                  values.put("ID", camareros.getJSONObject(i).getInt("id"));
                 values.put("activo", camareros.getJSONObject(i).getString("activo"));

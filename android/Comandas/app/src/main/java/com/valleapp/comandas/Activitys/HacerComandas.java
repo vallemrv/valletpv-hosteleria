@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -96,9 +97,6 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
             }
         }
 
@@ -209,6 +207,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
 
                         btn.setOnClickListener(view -> {
+                            findViewById(R.id.btn_reffil).setVisibility(View.GONE);
                             JSONObject art = (JSONObject) view.getTag();
                             pedirArt(art);
                         });
@@ -273,7 +272,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                     btn.setTag(m);
                     btn.setSingleLine(false);
                     btn.setText(m.getString("Nombre"));
-                    btn.setOnClickListener(view -> addSug((JSONObject)view.getTag()));
+                    btn.setOnClickListener(view -> addSubTecla((JSONObject)view.getTag()));
                     btn.setBackgroundResource(R.drawable.bg_pink);
                     row.addView(v, rowparams);
 
@@ -292,16 +291,43 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     }
 
-    private void addSug(JSONObject sub){
+    private String componerDescripcion(JSONObject o, String descipcion){
+        String aux = "";
+        try {
+            String des = o.getString(descipcion);
+            if (des != null && !des.equals("null") && !des.equals("")) {
+                aux =  o.getString(descipcion);
+            }else{
+                aux = o.getString("Nombre");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  aux;
+    }
+
+
+    private void addSubTecla(JSONObject sub){
 
         try {
-            mostrarToast(sub.getString("Nombre"));
-            String nom = this.artSel.getString("Nombre");
-            String sug = sub.getString("Nombre");
-            Double precio = this.artSel.getDouble("Precio")+ sub.getDouble("Incremento");
-            this.artSel.put("Nombre",nom+" "+sug);
-            this.artSel.put("Precio",precio);
-            nota.addArt(this.artSel,can);
+            String des = sub.getString("descripcion_r");
+            if (des != null && !des.equals("null") && !des.equals("") ){
+                artSel.put("Descripcion", des);
+            }else{
+                String nom = artSel.getString("Descripcion");
+                String subnom = sub.getString("Nombre");
+                artSel.put("Descripcion", nom+" "+subnom);
+
+            }
+            des = sub.getString("descripcion_t");
+            if (des != null && !des.equals("null") && !des.equals("") ){
+                artSel.put("descripcion_t", des);
+            }else if(artSel.getString("descripcion_t") == artSel.getString("Nombre")){
+                String nom = artSel.getString("descripcion_t");
+                String subnom = sub.getString("Nombre");
+                artSel.put("descripcion_t", nom+" "+subnom);
+            }
+            nota.addArt(artSel, can);
             rellenarBotonera();
 
         } catch (JSONException e) {
@@ -311,12 +337,15 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     private void pedirArt(JSONObject art) {
         try {
-
             mostrarToast(art.getString("Nombre"));
+            JSONObject aux = new JSONObject(art.toString());
+            aux.put("Descripcion", componerDescripcion(aux, "descripcion_r"));
+            aux.put("descripcion_t", componerDescripcion(aux, "descripcion_t"));
+
             if(art.getString("tipo").equals("SP")){
-                nota.addArt(art,can);
+               nota.addArt(aux, can);
             }else{
-                this.artSel = art;
+                this.artSel = aux;
                 rellenarSub();
             }
 
@@ -326,6 +355,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     }
 
     public void clickMenu(View v) throws JSONException {
+        findViewById(R.id.btn_reffil).setVisibility(View.GONE);
         sec = dbSecciones.filter("Nombre = '"+v.getTag().toString()+"'").getJSONObject(0);
         rellenarBotonera();
     }
@@ -338,9 +368,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     public void clickEnviarComanda(View v){
         try{
           ContentValues p = new ContentValues();
-          p.put("idm",mesa.getString("ID"));
+          p.put("idm", mesa.getString("ID"));
           p.put("pedido", nota.getLineas().toString());
-          p.put("idc",cam.getString("ID"));
+          p.put("idc", cam.getString("ID"));
            if(myServicio!=null){
               myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
               nota.EliminarComanda();

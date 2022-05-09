@@ -154,5 +154,12 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
         return lista;
     }
 
+    public void marcarRojo(String id) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues v = new ContentValues();
+        v.put("num", "1");
+        db.update("mesas", v, "ID = ?", new String[]{id});
+        db.close();
+    }
 
 }

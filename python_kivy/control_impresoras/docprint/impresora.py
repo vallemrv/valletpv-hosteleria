@@ -39,6 +39,33 @@ class DocPrint():
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
+    def printMensaje(self, camarero, msg):
+    
+        try:
+            if self.tipo == "Network":
+                printer = Network(self.params, timeout=1)
+            if self.tipo == "Usb":
+                printer = Usb(*self.params)
+            if self.tipo == "File":
+                printer = File(self.params)
+
+
+
+            with EscposIO(printer) as p:
+                p.printer.codepage = 'cp858'
+                
+                p.writelines("Mensajito", align='center', width=2, height=2)
+                p.writelines(camarero, height=2, width=2, font='a', align='center')
+                p.writelines("------------------------------------------",
+                              align='center')
+                p.writelines("")
+                p.writelines(msg, align='center',  height=2)
+                p.writelines("")
+                p.writelines("")
+
+        except Exception as e:
+            print("[ERROR  ] %s" % e)
+
     def printDesglose(self, fecha, lineas):
 
         if type(fecha) is datetime:
@@ -118,17 +145,21 @@ class DocPrint():
 
 
                 for ln in lineas:
-                    p.writelines("{0: >3} {1: <20} {2:5.2f} € {3:6.2f} €".format(ln['can'], ln['nombre'],
+                    p.writelines("{0: >3} {1: <20} {2:5.2f} € {3:6.2f} €".format(ln['can'], ln['descripcion_t'],
                                   float(ln['precio']), float(ln['totallinea'])), density=1, align='center')
 
 
                 p.writelines("",  text_type='bold',  font='b', align='center')
                 p.writelines("Total: {0:0.2f} €".format(float(total)),
                               align='right', height=2)
-                p.writelines("Efectivo: {0:0.2f} €".format(float(efectivo)),
-                              align='right')
-                p.writelines("Cambio: {0:0.2f} €".format(float(cambio)),
-                              align='right', )
+                if float(efectivo) > 0:
+                    p.writelines("Efectivo: {0:0.2f} €".format(float(efectivo)),
+                                align='right')
+                    p.writelines("Cambio: {0:0.2f} €".format(float(cambio)),
+                                align='right', )
+                else:
+                    p.writelines("")
+                    p.writelines("Pago con tarjeta", align='right')
 
                 p.writelines("",  text_type='bold',  font='a', align='center')
                 p.writelines("Factura simplificada",  text_type='bold',  font='a', align='center')
@@ -162,8 +193,8 @@ class DocPrint():
 
                 p.writelines("")
                 for ln in lineas:
-                    p.writelines("{0: >3} {1: <25} {2:0.2f}".format(ln['can'], ln['nombre'],
-                                  float(ln["precio"])), height=2, align='center' )
+                    p.writelines("{0: >3} {1: <25} {2}".format(ln['can'], ln['descripcion'],
+                                  ln["estado"]), height=2, align='center' )
 
 
                 p.writelines("")
@@ -195,8 +226,8 @@ class DocPrint():
 
                 p.writelines("")
                 for ln in lineas:
-                    p.writelines("{0: >3} {1: <25} {2:0.2f}".format(ln['can'], ln['nombre'],
-                                  float(ln["precio"])), height=2, align='center' )
+                    p.writelines("{0: >3} {1: <25} {2}".format(ln['can'], ln['descripcion'],
+                                  ln["estado"]), height=2, align='center' )
 
 
                 p.writelines("")
@@ -234,7 +265,7 @@ class DocPrint():
                 p.writelines('------------------------------------------', align='center')
 
                 for ln in lineas:
-                    p.writelines("{0: >3} {1: <20} {2:5.2f} € {3:6.2f} €".format(ln['can'], ln['nombre'],
+                    p.writelines("{0: >3} {1: <20} {2:5.2f} € {3:6.2f} €".format(ln['can'], ln['descripcion_t'],
                                   float(ln['precio']), float(ln['totallinea'])), align='center', font="a")
 
                 p.writelines("")

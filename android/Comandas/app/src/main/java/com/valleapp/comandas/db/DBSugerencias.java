@@ -24,10 +24,12 @@ public class DBSugerencias extends DBBase {
         super(context);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ tb_name +" (ID TEXT PRIMARY KEY, IDTecla TEXT, sugerencia TEXT )");
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -35,6 +37,7 @@ public class DBSugerencias extends DBBase {
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }

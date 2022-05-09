@@ -12,7 +12,7 @@ import com.valleapp.comandas.R;
 
 public class ActivityBase extends FragmentActivity {
 
-    protected String server = "";
+    protected String server = null;
     protected final Context cx = this;
     protected ServicioCom myServicio;
 
