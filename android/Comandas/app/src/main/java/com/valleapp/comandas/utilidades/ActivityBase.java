@@ -9,12 +9,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.comandas.R;
+import com.valleapp.comandas.db.DBCamareros;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ActivityBase extends FragmentActivity {
 
     protected String server = null;
     protected final Context cx = this;
     protected ServicioCom myServicio;
+    protected JSONObject cam = null;
 
     protected void mostrarToast(String texto){
         Toast toast = new Toast(cx);
@@ -47,5 +52,22 @@ public class ActivityBase extends FragmentActivity {
         toast.setDuration(Toast.LENGTH_LONG);
         toast.setGravity(gravity, 0, 0);
         toast.show();
+    }
+
+    @Override
+    protected void onResume() {
+        if (myServicio != null && cam != null) {
+            try {
+                DBCamareros aux = (DBCamareros) myServicio.getDb("camareros");
+                JSONArray ls = aux.filter("ID=" + cam.getString("ID") + " AND autorizado = '1'");
+                if (ls.length() == 0) {
+                    finish();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        super.onResume();
     }
 }

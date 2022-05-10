@@ -169,7 +169,11 @@ public class Preferencias extends Activity {
         return null;
     }
 
-
+    @Override
+    protected void onPause() {
+        finish();
+        super.onPause();
+    }
 
 
 

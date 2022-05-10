@@ -11,6 +11,7 @@ import android.os.Message;
 import android.util.Log;
 
 
+import com.valleapp.comandas.Activitys.Camareros;
 import com.valleapp.comandas.db.DBBase;
 import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
@@ -61,6 +62,8 @@ public class ServicioCom extends Service {
     String[] tbNameUpdateFast;
     String[] tbNameUpdateLow;
 
+    private JSONObject cam;
+
 
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
@@ -93,10 +96,21 @@ public class ServicioCom extends Service {
             JSONArray objs = obj.getJSONArray("objs");
             IBaseDatos db = dbs.get(tb_name);
             synchronized (db){
+                Log.i("camareros_exit", tb_name);
                 db.rellenarTabla(objs);
+                dbTbUpdates.upTabla(tb_name, last);
+                if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
+
+                if (tb_name.equalsIgnoreCase("camareros") && cam != null){
+                    DBCamareros dbCam = (DBCamareros) db;
+
+                    JSONArray ls = dbCam.filter("ID=" + cam.getString("ID") + " AND autorizado = '1'");
+                    if (ls.length() == 0) {
+                        System.exit(0);
+                    }
+                }
             }
-            dbTbUpdates.upTabla(tb_name, last);
-            if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -216,6 +230,10 @@ public class ServicioCom extends Service {
 
     public IBaseDatos getDb(String nombre){
         return dbs.get(nombre);
+    }
+
+    public void setCamarero(JSONObject cam) {
+        this.cam = cam;
     }
 
     public class MyBinder extends Binder{

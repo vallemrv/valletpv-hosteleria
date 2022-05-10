@@ -244,6 +244,8 @@ public class Camareros extends ActivityBase {
 
     }
 
+
+
     public void descargarCamarerosActivos(){
         new HTTPRequest(server+"/camareros/listado",
                 new ContentValues(),

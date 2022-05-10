@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorMesas;
+import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBZonas;
@@ -42,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -137,6 +139,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                myServicio.setCamarero(cam);
                 Timer t = new Timer();
                 t.schedule(new TimerTask() {
                     @Override
