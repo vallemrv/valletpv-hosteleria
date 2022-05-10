@@ -13,3 +13,4 @@ def listado_camareros(request):
         objres.append(model_to_dict(c))
 
     return JsonResponse(objres)
+
