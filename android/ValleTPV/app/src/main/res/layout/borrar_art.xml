@@ -60,7 +60,7 @@
             android:src="@drawable/editar" />
 
         <ImageButton
-            android:id="@+id/btn_salir"
+            android:id="@+id/btn_salir_monedas"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"

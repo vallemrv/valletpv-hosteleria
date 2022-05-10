@@ -72,7 +72,7 @@
             android:layout_height="80dp"
             android:layout_margin="5dp"
             android:background="@drawable/fondo_btn_xml"
-            android:onClick="AddEfectivo"
+            android:onClick="addEfectivo"
             android:text="@string/agregar_efectivo"
             android:textColor="#000000" />
 
@@ -81,7 +81,7 @@
             android:layout_height="80dp"
             android:layout_margin="5dp"
             android:background="@drawable/fondo_btn_xml"
-            android:onClick="AddGastos"
+            android:onClick="addGastos"
             android:text="@string/agregar_gastos"
             android:textColor="#000000" />
 
@@ -99,7 +99,7 @@
             android:layout_height="80dp"
             android:layout_margin="5dp"
             android:background="@drawable/fondo_btn_xml"
-            android:onClick="ArquearCaja"
+            android:onClick="arquearCaja"
             android:text="@string/arqueo_de_caja"
             android:textColor="#000000" />
 

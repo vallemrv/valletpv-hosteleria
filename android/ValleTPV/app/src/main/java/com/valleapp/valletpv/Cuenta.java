@@ -17,7 +17,6 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -689,7 +688,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             final Button inv = dlg.findViewById(R.id.btnInv);
             final ImageButton ok =  dlg.findViewById(R.id.btn_ok);
             final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
-            final ImageButton exit =  dlg.findViewById(R.id.btn_salir);
+            final ImageButton exit =  dlg.findViewById(R.id.btn_salir_monedas);
 
             final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
             final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);

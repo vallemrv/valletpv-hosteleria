@@ -40,8 +40,10 @@ public class DlgMensajes extends Dialog implements IControlMensajes {
     @Override
     public void sendMensaje(String IDRecptor, String mensaje) {
         TextView t = findViewById(R.id.txt_mensaje);
-        this.controlador.sendMensaje(IDRecptor, t.getText().toString());
-        cancel();
+        if (!t.getText().toString().equals("")) {
+            this.controlador.sendMensaje(IDRecptor, t.getText().toString());
+            cancel();
+        }
     }
 
     public void mostrarReceptores(List<JSONObject> lista){

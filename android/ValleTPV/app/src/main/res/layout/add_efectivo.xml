@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtCantidad"
-        android:layout_alignEnd="@+id/btn_salir"
+        android:layout_alignEnd="@+id/btn_salir_monedas"
         android:ems="10"
         android:hint="@string/moneda"
         android:importantForAutofill="no"
@@ -34,7 +34,7 @@
         android:textSize="35sp" />
 
     <ImageButton
-        android:id="@+id/btn_salir"
+        android:id="@+id/btn_salir_monedas"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below="@+id/txtMoneda"
@@ -51,7 +51,7 @@
         android:textSize="35sp" />
 
     <ImageButton
-        android:id="@+id/btn_aceptar"
+        android:id="@+id/btn_aceptar_monedas"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below="@+id/txtMoneda"
@@ -59,7 +59,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_toStartOf="@+id/btn_salir"
+        android:layout_toStartOf="@+id/btn_salir_monedas"
         android:background="@drawable/fondo_btn_xml"
         android:contentDescription="@string/ok"
         android:padding="10dp"

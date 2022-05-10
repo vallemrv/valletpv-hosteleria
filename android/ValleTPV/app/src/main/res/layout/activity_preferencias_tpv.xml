@@ -15,7 +15,7 @@
             android:importantForAutofill="no" />
 
         <Button
-            android:id="@+id/btn_aceptar"
+            android:id="@+id/btn_aceptar_monedas"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="0.1"

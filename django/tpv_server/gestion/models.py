@@ -296,13 +296,13 @@ class Cierrecaja(models.Model):
         return total
 
     def get_desglose_ventas(self):
-        sql_pedido = ''.join(['SELECT COUNT(IDArt) as Can, Nombre, SUM(lp.Precio) AS Total ',
+        sql_pedido = ''.join(['SELECT COUNT(IDArt) as Can, lp.Descripcion_t, SUM(lp.Precio) AS Total ',
                               'FROM ticketlineas AS tk ',
                               'INNER JOIN lineaspedido AS lp ON tk.IDLinea=lp.ID ',
                               'INNER JOIN ticket ON ticket.ID=tk.IDTicket ',
                               "WHERE ticket.ID >= {0} AND ticket.ID <= {1} " ,
-                              " GROUP BY lp.IDArt, lp.Nombre, lp.Precio ",
-                              " ORDER BY lp.Nombre"
+                              " GROUP BY lp.IDArt, lp.Descripcion_t, lp.Precio ",
+                              " ORDER BY lp.descripcion_t"
                             ]).format(self.ticketcom, self.ticketfinal)
 
         lineas = []
@@ -310,9 +310,10 @@ class Cierrecaja(models.Model):
             cursor.execute(sql_pedido)
             rows = cursor.fetchall()
             for r in rows:
+                nombre = r[1] if r[1] else ""
                 lineas.append({
                    'Can': r[0],
-                   'Nombre': r[1],
+                   'Nombre': nombre,
                    'Total': r[2],
                    })
         return lineas

@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -329,7 +328,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         Window window = dlgListadoTicket.getWindow();
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         final ImageButton imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
-        final ImageButton salir = dlgListadoTicket.findViewById(R.id.btn_salir);
+        final ImageButton salir = dlgListadoTicket.findViewById(R.id.btn_salir_monedas);
         final ImageButton ls =  dlgListadoTicket.findViewById(R.id.btnListado);
         imp.setVisibility(View.GONE);
         ls.setVisibility(View.GONE);
@@ -535,7 +534,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         final Button inv = dlg.findViewById(R.id.btnInv);
         final ImageButton ok =  dlg.findViewById(R.id.btn_ok);
         final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
-        final ImageButton exit = dlg.findViewById(R.id.btn_salir);
+        final ImageButton exit = dlg.findViewById(R.id.btn_salir_monedas);
         final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
         final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
         txtInfo.setText("Borrado de mesa completa");

@@ -2,7 +2,6 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -39,7 +38,7 @@ public class DlgCobrar extends Dialog{
         lblCambio = (TextView) findViewById(R.id.lblCambio);
         ImageButton tj = findViewById(R.id.btnTarjeta);
         ImageButton ef = (ImageButton)findViewById(R.id.btnEfectivo);
-        ImageButton s = (ImageButton)findViewById(R.id.btn_salir);
+        ImageButton s = (ImageButton)findViewById(R.id.btn_salir_monedas);
         s.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

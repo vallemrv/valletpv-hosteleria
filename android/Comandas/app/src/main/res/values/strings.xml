@@ -55,5 +55,7 @@
     <string name="cambiar_mesa">cambiar_mesa</string>
     <string name="nombre_emp">Nombre emp</string>
     <string name="aceptar">aceptar</string>
+    <string name="title">Title</string>
+    <string name="subtitle">SubTitle</string>
 
 </resources>

@@ -70,7 +70,7 @@ public class MostrarPedidos extends ActivityBase {
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    (int) (metrics.density * 50f));
+                    (int) (metrics.density * 65f));
 
                 params.setMargins(5,0,5,0);
 

@@ -32,7 +32,7 @@ public class DlgVarios extends Dialog {
         final TextView can = this.findViewById(R.id.txt_varios_can);
         final TextView p =  this.findViewById(R.id.txt_varios_precio);
         final TextView nom =  this.findViewById(R.id.txt_varios_nombre);
-        ImageButton ok = this.findViewById(R.id.btn_aceptar);
+        ImageButton ok = this.findViewById(R.id.btn_aceptar_monedas);
         ImageButton s = this.findViewById(R.id.btn_varios_salir);
 
         can.setText("");

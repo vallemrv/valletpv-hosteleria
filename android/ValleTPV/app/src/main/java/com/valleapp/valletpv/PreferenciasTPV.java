@@ -21,7 +21,7 @@ public class PreferenciasTPV extends Activity {
         setContentView(R.layout.activity_preferencias_tpv);
         final Context cx = this;
         final EditText txt = findViewById(R.id.txtUrl);
-        Button btn = findViewById(R.id.btn_aceptar);
+        Button btn = findViewById(R.id.btn_aceptar_monedas);
         JSONObject obj = cargarPreferencias();
 
         if(obj!=null) try {

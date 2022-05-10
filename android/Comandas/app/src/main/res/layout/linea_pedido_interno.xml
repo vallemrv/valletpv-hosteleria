@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="80dp"
     android:onClick="clickMoverArt"
     android:orientation="horizontal">
 
@@ -44,17 +44,22 @@
 
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/btnCambiar"
-        android:layout_width="0sp"
+    <FrameLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:layout_weight="0.12"
-        android:background="@drawable/fondo_redondeado_btn_xml"
-        android:contentDescription="@string/cambiar_linea"
-        android:onClick="clickCambiar"
-        android:padding="5dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/cambiarmesa" />
+        android:layout_weight="0.12">
+
+        <ImageButton
+            android:id="@+id/btnCambiar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="@drawable/fondo_redondeado_btn_xml"
+            android:contentDescription="@string/cambiar_linea"
+            android:onClick="clickCambiar"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cambiarmesa" />
+    </FrameLayout>
 
 </LinearLayout>
