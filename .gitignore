@@ -8,11 +8,16 @@ server_*
 *.sqlite3
 node*
 **/control_impresoras/test*
+dist/
+*.apk
+*.aab
+.gradle/
 
 #excepciones
 !manage_template.py
 !test_ws/
 !management/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
