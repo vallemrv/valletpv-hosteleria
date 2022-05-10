@@ -4,6 +4,16 @@ from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+@csrf_exempt
+def camarero_add(request):
+    nombre = request.POST["nombre"]
+    apellido = request.POST["apellido"]
+    c = Camareros()
+    c.nombre = nombre
+    c.apellidos = apellido
+    c.save()
+
+    return JsonResponse("success")
 
 @csrf_exempt
 def listado_camareros(request):

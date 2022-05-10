@@ -6,7 +6,7 @@
 # @License: Apache License v2.0
 
 
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -199,3 +199,49 @@ def cuenta_rm_linea(request):
     return HttpResponse('success')
 
 
+@csrf_exempt
+def cuenta_ls_ticket(request):
+    offset = request.POST['offset'] if 'offset' in request.POST else 0
+
+    rows = Ticket.objects.all().order_by("-id")[offset:100]
+    
+    lineas = []
+    
+    for r in rows:
+        total = r.ticketlineas_set.aggregate(total=Sum("linea__precio"))["total"]
+        lineas.append({
+            'ID': r.id,
+            'Fecha': r.fecha,
+            'Hora': r.hora,
+            'Entrega': r.entrega,
+            'Mesa': r.mesa,
+            'Total': total,
+            })
+
+    return JsonResponse(lineas)
+
+@csrf_exempt
+def cuenta_ls_linea(request):
+    id = request.POST["id"]
+    ticket = Ticket.objects.get(pk=id)
+    rows = ticket.ticketlineas_set.values("linea__idart",  
+                                          "linea__descripcion_t",
+                                          "linea__precio").annotate(can=Count('linea__idart'),
+                                                                    total=Sum("linea__precio"))
+
+    lineas = []
+    for r in rows:
+        lineas.append({
+            "idart": r["linea__idart"],
+            "Nombre": r["linea__descripcion_t"],
+            "Precio": r["linea__precio"],
+            "Total": r["total"],
+            "Can": r["can"]
+        })
+
+
+    total = ticket.ticketlineas_set.aggregate(total=Sum("linea__precio"))["total"]
+
+
+
+    return JsonResponse({'lineas':lineas, 'total': total, 'IDTicket': id})

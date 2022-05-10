@@ -115,6 +115,16 @@ public class DbTbUpdates extends DBBase{
         return hay;
     }
 
+    public void vaciar(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try{
+            db.execSQL("DELETE FROM "+tb_name);
+        }catch (SQLiteException e){
+            this.onCreate(db);
+        }
+        db.close();
+    }
+
 
     public boolean is_updatable(JSONObject obj) {
         boolean isUp = true;

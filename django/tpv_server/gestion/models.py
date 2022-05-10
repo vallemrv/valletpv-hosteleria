@@ -206,14 +206,12 @@ class Camareros(models.Model):
     @staticmethod
     def update_from_device(row):
         c = Camareros.objects.filter(id=row["ID"]).first()
-        if not c:
-            c = Camareros()
-            
-        c.autorizado = int(row["autorizado"])
-        c.pass_field = row["Pass"]
-        c.permisos = row["permisos"]
-        c.save()
-        
+        if c:
+            c.autorizado = int(row["autorizado"])
+            c.pass_field = row["Pass"]
+            c.permisos = row["permisos"]
+            c.save()
+       
 
     @staticmethod
     def update_for_devices():
@@ -790,6 +788,7 @@ class Pedidos(models.Model):
     def agregar_nuevas_lineas(idm, idc, lineas):
         is_mesa_nueva = False
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        
         if not mesa:
             infmesa = Infmesa()
             infmesa.camarero_id = idc
@@ -797,6 +796,7 @@ class Pedidos(models.Model):
             infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
+            
 
             mesa = Mesasabiertas()
             mesa.mesa_id = idm

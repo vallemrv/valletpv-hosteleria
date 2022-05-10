@@ -2,6 +2,8 @@ from django.urls import path
 from api_android import views as api_views
 
 urlpatterns  = [
+    path("lsticket", api_views.cuenta_ls_ticket, name="lsticket"),
+    path("lslineas", api_views.cuenta_ls_linea, name="lslineas"),
     path("get_cuenta", api_views.get_cuenta, name="get_cuenta"),
     path("juntarmesas", api_views.juntarmesas, name="cuenta_juntarmesas"),
     path("cambiarmesas", api_views.cambiarmesas, name="cuenta_cambiarmesas"),

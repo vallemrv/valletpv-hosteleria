@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.valleapp.comandas.R;
+import com.valleapp.comandas.db.DbTbUpdates;
 import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.adaptadores.AdaptadorEmpresas;
 
@@ -103,6 +104,8 @@ public class Preferencias extends Activity {
             JSONObject obj = new JSONObject();
             obj.put("lista", lista);
             rellenarLista(obj);
+            DbTbUpdates db = new DbTbUpdates(cx);
+            db.vaciar();
 
         } catch (JSONException e) {
             e.printStackTrace();

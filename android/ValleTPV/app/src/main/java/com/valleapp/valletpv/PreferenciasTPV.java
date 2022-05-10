@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.db.DbTbUpdates;
 import com.valleapp.valletpv.tools.JSON;
 
 import org.json.JSONException;
@@ -39,6 +40,8 @@ public class PreferenciasTPV extends Activity {
             JSON json = new JSON();
             json.serializar("preferencias.dat", obj1,cx);
             Toast.makeText(getApplicationContext(),"Datos guardados correctamente",Toast.LENGTH_SHORT).show();
+            DbTbUpdates db = new DbTbUpdates(cx);
+            db.vaciar();
             finish();
 
         } catch (JSONException e) {
