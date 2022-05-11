@@ -473,32 +473,33 @@ class Infmesa(models.Model):
         lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
         for l in lineas:
-            familia = l.tecla.familia
-            try:
-                composicion = json.loads(familia.composicion.replace("'", '"'))
-            except:
-                composicion = []
-            if (len(composicion) > 0):
-                cantidad = familia.cantidad - l.cantidad
-                
-                for a in lineas.order_by("-id"):
-                    if a.id == l.id:
-                        continue
+            if hasattr(l.tecla, "familia"):
+                familia = l.tecla.familia
+                try:
+                    composicion = json.loads(familia.composicion.replace("'", '"'))
+                except:
+                    composicion = []
+                if (len(composicion) > 0):
+                    cantidad = familia.cantidad - l.cantidad
                     
-                    if a.tecla.familia.nombre in composicion:
-                        if a.id not in obj_comp and cantidad > 0:
-                            a.precio = 0
-                            a.estado = "R"
-                            a.save()
-                            obj_comp.append(a.id)
-                            cantidad = cantidad - 1
-                            l.cantidad = l.cantidad + 1
-                            l.save()
+                    for a in lineas.order_by("-id"):
+                        if a.id == l.id:
+                            continue
+                        
+                        if hasattr(a.tecla, "familia") and (a.tecla.familia.nombre in composicion):
+                            if a.id not in obj_comp and cantidad > 0:
+                                a.precio = 0
+                                a.estado = "R"
+                                a.save()
+                                obj_comp.append(a.id)
+                                cantidad = cantidad - 1
+                                l.cantidad = l.cantidad + 1
+                                l.save()
 
-                        if cantidad == 0:
-                            l.es_compuesta = True
-                            l.save()
-                            break; 
+                            if cantidad == 0:
+                                l.es_compuesta = True
+                                l.save()
+                                break; 
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -584,13 +585,9 @@ class Lineaspedido(models.Model):
 
 class Mesas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    nombre = models.CharField(db_column='Nombre', unique=True, max_length=50)  # Field name made lowercase.
-    orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre',  max_length=50)  # Field name made lowercase.
+    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
 
-    @staticmethod
-    def update_from_device(row):
-        pass
-        
 
     @staticmethod
     def update_for_devices():
@@ -602,24 +599,23 @@ class Mesas(models.Model):
         lsMesas = []
         mesas = Mesas.objects.all()
         for m in mesas:
-            zona =  m.mesaszona_set.all().first()
-            if zona:
-                zona = zona.zona
-                obj = {
-                'ID': m.id,
-                'Nombre': m.nombre,
-                'Orden': m.orden,
-                'num': 0,
-                'abierta': False,
-                'RGB': zona.rgb,
-                'IDZona': zona.id,
-                "Tarifa": zona.tarifa,
-                }
+           
+            mz = m.mesaszona_set.first()
+            obj = {
+            'ID': m.id,
+            'Nombre': m.nombre,
+            'Orden': m.orden,
+            'num': 0,
+            'abierta': False,
+            'RGB': mz.zona.rgb if mz else "207,182,212",
+            'IDZona': mz.zona.id if mz else -1,
+            "Tarifa": mz.zona.tarifa if mz else 1,
+            }
    
-                mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=m.id).first()
-                if mesa_abierta:
-                    obj["num"] = mesa_abierta.infmesa.numcopias
-                    obj["abierta"] = True;
+            mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=m.id).first()
+            if mesa_abierta:
+                obj["num"] = mesa_abierta.infmesa.numcopias
+                obj["abierta"] = True;
 
             lsMesas.append(obj)
         return lsMesas
@@ -821,7 +817,7 @@ class Pedidos(models.Model):
                 linea.descripcion_t = pd["descripcion_t"]
                 linea.precio = pd["Precio"]
                 linea.estado =  'P' #'R' if pd['Precio'] == 0 else 'P'
-                linea.tecla_id = linea.idart
+                linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
                 linea.save()
 
         pedido.infmesa.numcopias = 0
@@ -883,7 +879,7 @@ class Secciones(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
     rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
-    orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
+    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
     
     @staticmethod
     def update_for_devices():
@@ -1037,13 +1033,6 @@ class Subteclas(models.Model):
         for sub in Subteclas.objects.all():
             a.append(model_to_dict(sub))
         return a
-
-
-    def get_color(self, hex=False):
-        if self.tecla_child:
-            return self.tecla_child.get_color(hex)
-        else:
-            return self.tecla.get_color(hex)
 
         
     def save(self, *args, **kwargs):
@@ -1199,7 +1188,7 @@ class Teclascom(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey(Teclas,  on_delete=models.SET_NULL, db_column='IDTecla', null=True)  # Field name made lowercase.
     seccion = models.ForeignKey(SeccionesCom,  on_delete=models.CASCADE, db_column='IDSeccion')  # Field name made lowercase.
-    orden = models.IntegerField(db_column='Orden')  # Field name made lowercase.
+    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
    
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -1228,7 +1217,6 @@ class Teclaseccion(models.Model):
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
-
 
     class Meta:
         db_table = 'teclaseccion'
@@ -1291,7 +1279,6 @@ class Ticket(models.Model):
         Sync.actualizar(self._meta.db_table)
         return super().delete( *args, **kwargs)
 
-
     class Meta:
         db_table = 'ticket'
 
@@ -1299,8 +1286,6 @@ class Ticketlineas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE, db_column='IDTicket')  # Field name made lowercase.
     linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
-
-    
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -1329,7 +1314,6 @@ class Zonas(models.Model):
             objs.append(model_to_dict(z))
         return  objs
         
-
     def __unicode__(self):
         return self.nombre
 

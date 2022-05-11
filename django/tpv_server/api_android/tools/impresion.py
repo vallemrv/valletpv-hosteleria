@@ -64,7 +64,6 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
     
 
     receptor = Receptores.objects.get(nombre='Ticket')
-    print(lineas)
     lineas_ticket = []
     for l in lineas:
         lineas_ticket.append(l)

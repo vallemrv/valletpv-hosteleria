@@ -1,5 +1,6 @@
 package com.valleapp.comandas.Activitys;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,7 +11,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -46,7 +46,6 @@ import java.util.List;
 
 public class HacerComandas extends ActivityBase implements  INota, IComanda, ITeclados {
 
-    private AdaptadorComanda aComanda;
     private Comanda comanda = null;
     private SeccionesCom seccionesCom = null;
     private String server = "";
@@ -75,7 +74,8 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     boolean es_aplicable = true;
     boolean pause = false;
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @SuppressLint("SetTextI18n")
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
@@ -87,7 +87,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 comanda = new Comanda((IComanda) cx);
                 seccionesCom = new SeccionesCom((ITeclados) cx, dbSecciones.getAll());
-                aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
+                AdaptadorComanda aComanda = new AdaptadorComanda(getSupportFragmentManager(), comanda, seccionesCom);
                 cargarPreferencias();
                 ViewPager vpPager = findViewById(R.id.pager);
                 TextView title = findViewById(R.id.lblTitulo);
@@ -128,6 +128,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     }
 
+    @SuppressLint("SetTextI18n")
     public void rellenarComanda() {
         List<JSONObject> lPedidos = new ArrayList<>();
         comanda.setCantidad("0");
@@ -150,30 +151,25 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         try {
             if (dbTeclas != null && sec != null) {
                 JSONArray lsart = dbTeclas.getAll(sec.getString("ID"), tarifa);
+                LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
+                ll.removeAllViews();
 
                 if (lsart.length() > 0) {
 
-                    LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
-                    ll.removeAllViews();
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-                    params.weight = 1;
-
-
-                    LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(
+                    rowParams.weight = 1;
+                    LinearLayout.LayoutParams colParams = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
-                    rowparams.weight = 1;
-                    rowparams.setMargins(5, 5, 5, 5);
+                    colParams.weight = 1;
+                    colParams.setMargins(5, 5, 5, 5);
 
 
                     LinearLayout row = new LinearLayout(cx);
                     row.setOrientation(LinearLayout.HORIZONTAL);
 
-                    ll.addView(row, params);
-
+                    ll.addView(row, rowParams);
 
                     for (int i = 0; i < lsart.length(); i++) {
 
@@ -181,7 +177,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
                         LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                                 (Context.LAYOUT_INFLATER_SERVICE);
-                        View v = inflater.inflate(R.layout.btn_art, null);
+                        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
                         Button btn = v.findViewById(R.id.boton_art);
                         String[] rgb = a.getString("RGB").split(",");
@@ -190,18 +186,18 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                         btn.setId(i);
                         btn.setSingleLine(false);
 
-                        String nombre = "";
+
 
                         if (sec.getBoolean("es_promocion")) {
                             if (!es_aplicable) btn.setBackgroundResource(R.drawable.bg_red);
                             else {
-                                Double precio = a.getDouble("Precio");
-                                Double descuento = sec.getDouble("descuento");
+                                double precio = a.getDouble("Precio");
+                                double descuento = sec.getDouble("descuento");
                                 a.put("Precio", precio - ((precio * descuento) /100));
                             }
                         }
 
-                        nombre = a.getString("Nombre");
+                        String nombre = a.getString("Nombre");
                         btn.setText(nombre.trim());
                         btn.setTag(new JSONObject(a.toString()));
 
@@ -212,12 +208,12 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                             pedirArt(art);
                         });
 
-                        row.addView(v, rowparams);
+                        row.addView(v, colParams);
 
                         if ((i < lsart.length() - 1) && ((i + 1) % 3) == 0) {
                             row = new LinearLayout(cx);
                             row.setOrientation(LinearLayout.HORIZONTAL);
-                            ll.addView(row, params);
+                            ll.addView(row, rowParams);
                         }
                     }
                 }
@@ -235,27 +231,34 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         try {
 
             JSONArray lsart = dbSubTeclas.getAll(artSel.getString("ID"));
+            LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
+            ll.removeAllViews();
+            int length = lsart.length();
+            if ( length > 0) {
 
-            if (lsart.length() > 0) {
-
-                LinearLayout ll = (LinearLayout) seccionesCom.getPanel();
-
-                ll.removeAllViews();
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
-                LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        (int) (metrics.density * 100));
+                int w = (int) (metrics.density * 100);
+                int ww = 0;
+                if (length > 9 ){
+                     w = LinearLayout.LayoutParams.MATCH_PARENT;
+                     ww = 1;
+                }
 
-                rowparams.weight = 1;
-                rowparams.setMargins(5,5,5,5);
+                LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, w);
+                rowParams.weight = ww;
+
+                LinearLayout.LayoutParams colParms = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT );
+
+                colParms.weight = 1;
+
+                colParms.setMargins(5,5,5,5);
 
                 LinearLayout row = new LinearLayout(cx);
                 row.setOrientation(LinearLayout.HORIZONTAL);
-                ll.addView(row, params);
+                ll.addView(row, rowParams);
 
                 for (int i = 0; i < lsart.length(); i++) {
 
@@ -263,7 +266,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
                     LayoutInflater inflater = (LayoutInflater)cx.getSystemService
                             (Context.LAYOUT_INFLATER_SERVICE);
-                    View v = inflater.inflate(R.layout.btn_art, null);
+                    @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
 
                     Button btn = v.findViewById(R.id.boton_art);
@@ -274,12 +277,12 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                     btn.setText(m.getString("Nombre"));
                     btn.setOnClickListener(view -> addSubTecla((JSONObject)view.getTag()));
                     btn.setBackgroundResource(R.drawable.bg_pink);
-                    row.addView(v, rowparams);
+                    row.addView(v, colParms);
 
                     if ((i<lsart.length()-1) && ((i + 1) % 3) == 0) {
                         row = new LinearLayout(cx);
                         row.setOrientation(LinearLayout.HORIZONTAL);
-                        ll.addView(row, params);
+                        ll.addView(row, rowParams);
                     }
                 }
             }
@@ -295,7 +298,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         String aux = "";
         try {
             String des = o.getString(descipcion);
-            if (des != null && !des.equals("null") && !des.equals("")) {
+            if (!des.equals("null") && !des.equals("")) {
                 aux =  o.getString(descipcion);
             }else{
                 aux = o.getString("Nombre");
@@ -311,7 +314,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
         try {
             String des = sub.getString("descripcion_r");
-            if (des != null && !des.equals("null") && !des.equals("") ){
+            if (!des.equals("null") && !des.equals("")){
                 artSel.put("Descripcion", des);
             }else{
                 String nom = artSel.getString("Descripcion");
@@ -320,13 +323,14 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
             }
             des = sub.getString("descripcion_t");
-            if (des != null && !des.equals("null") && !des.equals("") ){
+            if (!des.equals("null") && !des.equals("")){
                 artSel.put("descripcion_t", des);
-            }else if(artSel.getString("descripcion_t") == artSel.getString("Nombre")){
+            }else if(artSel.getString("descripcion_t").equals(artSel.getString("Nombre"))){
                 String nom = artSel.getString("descripcion_t");
                 String subnom = sub.getString("Nombre");
                 artSel.put("descripcion_t", nom+" "+subnom);
             }
+            mostrarToast(artSel.getString("Descripcion"));
             nota.addArt(artSel, can);
             rellenarBotonera();
 
@@ -337,13 +341,14 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     private void pedirArt(JSONObject art) {
         try {
-            mostrarToast(art.getString("Nombre"));
+
             JSONObject aux = new JSONObject(art.toString());
             aux.put("Descripcion", componerDescripcion(aux, "descripcion_r"));
             aux.put("descripcion_t", componerDescripcion(aux, "descripcion_t"));
 
             if(art.getString("tipo").equals("SP")){
-               nota.addArt(aux, can);
+                mostrarToast(art.getString("Nombre"));
+                nota.addArt(aux, can);
             }else{
                 this.artSel = aux;
                 rellenarSub();
@@ -360,6 +365,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         rellenarBotonera();
     }
 
+    @SuppressLint("SetTextI18n")
     public void clickCan(View v){
         can = Integer.parseInt(v.getTag().toString());
         cantidad.setText(Integer.toString(can));
@@ -373,7 +379,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
           p.put("idc", cam.getString("ID"));
            if(myServicio!=null){
               myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
-              nota.EliminarComanda();
+              nota.eliminarComanda();
               dbMesas.abrirMesa(mesa.getString("ID"), "0");
               finish();
           }
@@ -463,7 +469,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     @Override
     public void onBackPressed() {
-        nota.EliminarComanda();
+        //nota.eliminarComanda();
         super.onBackPressed();
     }
 
@@ -505,7 +511,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     @Override
     protected void onDestroy() {
-        if(mConexion!=null && myServicio!=null) unbindService(mConexion);
+        if(myServicio != null) unbindService(mConexion);
         super.onDestroy();
     }
 

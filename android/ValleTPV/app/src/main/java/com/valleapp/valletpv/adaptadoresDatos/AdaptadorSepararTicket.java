@@ -26,7 +26,7 @@ public class AdaptadorSepararTicket extends ArrayAdapter<JSONObject>{
 
 
     public AdaptadorSepararTicket(Context context, ArrayList<JSONObject> values, boolean separados) {
-        super(context, R.layout.item_art, (java.util.List<JSONObject>) values);
+        super(context, R.layout.item_art,  values);
         this.context = context;   this.values = values; this.separados = separados;
     }
 
@@ -40,14 +40,14 @@ public class AdaptadorSepararTicket extends ArrayAdapter<JSONObject>{
             JSONObject art = values.get(position);
             int can = art.getInt("Can");
             int canCobro = art.getInt("CanCobro");
-            TextView lblCan = (TextView) rowView.findViewById(R.id.lblCan);
-            TextView nombre = (TextView) rowView.findViewById(R.id.lblNombre);
+            TextView lblCan =  rowView.findViewById(R.id.lblCan);
+            TextView nombre =  rowView.findViewById(R.id.lblNombre);
             if(separados) can = canCobro;
             else{
                 can = can-canCobro;
             }
             lblCan.setText(String.format("%s", can));
-            nombre.setText(String.format("%s", art.getString("Nombre")));
+            nombre.setText(String.format("%s", art.getString("Descripcion")));
             rowView.setTag(art);
         } catch (JSONException e) {
             e.printStackTrace();

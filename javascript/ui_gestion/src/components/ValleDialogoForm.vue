@@ -79,11 +79,12 @@ export default {
       if (this.tipo == "add") {
         this.addItem({ item: this.item, tb_name: this.tb_name });
       } else {
+        var id = this.item.id ? this.item.id : this.item.ID;
         let inst = {
           tb: this.tb_name,
           reg: this.item,
           tipo: "md",
-          id: this.item.id,
+          id: id,
         };
         this.addInstruccion({ inst: inst });
       }

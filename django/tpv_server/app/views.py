@@ -95,18 +95,19 @@ def add_reg_handler(app_name, tb_name, reg):
    
     
     for key in reg:
-        if hasattr(obj, key):
-            field = getattr(obj, key)
+        k_lower = key.lower()
+        if hasattr(obj, k_lower):
+            field = getattr(obj, k_lower)
             if "models" in str(type(field)):
                 attr = field.__class__.objects.get(pk=reg[key])
             elif "nonetype" in str(type(field)):
                 attr = reg[key]
-                key = key+"_id"
+                k_lower = k_lower+"_id"
             else:
                 attr = reg[key] 
-            setattr(obj, key, attr)  
-        elif hasattr(model, key):
-            setattr(obj, key+"_id", reg[key])      
+            setattr(obj, k_lower, attr)  
+        elif hasattr(model, k_lower):
+            setattr(obj, k_lower+"_id", reg[key])      
         elif "__" in key:
                 attr, field, str_parent = key.split("__")
                 parent = apps.get_model(app_name, str_parent)
@@ -122,19 +123,28 @@ def modifcar_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
     tb_name = inst["tb"]
     reg = inst["reg"]
-    filter = inst["filter"] if "filter" in inst else  {"id": inst["id"]}
+    filter = ""
+    if "filter" in inst:
+        filter = inst["filter"] 
+    elif "id" in inst:
+        filter =  {"id": inst["id"]}
+    elif "ID" in inst:
+        filter = {"id": inst["ID"]}
+    
+
     model = apps.get_model(app_name, tb_name)
 
     obj = model.objects.filter(**filter).first()
     if (obj):
         for key in reg:
-            if hasattr(obj, key):
-                field = getattr(obj, key)
+            k_lower = key.lower()
+            if hasattr(obj, k_lower):
+                field = getattr(obj, k_lower)
                 if "models" in str(type(field)):
                     attr = field.__class__.objects.get(pk=reg[key])
                 else:
                     attr = reg[key] 
-                setattr(obj, key, attr)      
+                setattr(obj, k_lower, attr)      
             else:
                 if "__" in key:
                     attr, field, str_model = key.split("__")

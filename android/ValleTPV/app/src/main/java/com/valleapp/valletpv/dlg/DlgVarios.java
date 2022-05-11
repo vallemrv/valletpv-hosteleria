@@ -3,6 +3,7 @@ package com.valleapp.valletpv.dlg;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -52,7 +53,8 @@ public class DlgVarios extends Dialog {
                     art.put("ID", "0");
                     art.put("Precio", p.getText().toString().replace(",", "."));
                     art.put("Can", strCan);
-                    art.put("Nombre", nombre);
+                    art.put("Descripcion", nombre);
+                    art.put("descripcion_t", nombre);
                     controlador.pedirArt(art);
                 } catch (JSONException e) {
                     e.printStackTrace();

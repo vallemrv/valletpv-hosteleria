@@ -110,10 +110,11 @@ public class Camareros extends ActivityBase {
     public void mostrarListado(){
         try {
             lscam = dbCamareros.getAutorizados(true);
+            TableLayout ll = findViewById(id.pneCamareros);
+            ll.removeAllViews();
 
             if(lscam.size()>0){
-                TableLayout ll = findViewById(id.pneCamareros);
-                ll.removeAllViews();
+
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT );
@@ -208,7 +209,6 @@ public class Camareros extends ActivityBase {
                     i++;
                 }
             }
-
         }catch (Exception e){
             e.printStackTrace();
         }

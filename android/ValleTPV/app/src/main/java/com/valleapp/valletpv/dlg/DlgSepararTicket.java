@@ -38,13 +38,13 @@ public class DlgSepararTicket extends Dialog{
         this.controlador = controlador;
         setContentView(R.layout.separarticket);
 
-        final TextView tot = (TextView) findViewById(R.id.lblTotalCobro);
+        final TextView tot = findViewById(R.id.lblTotalCobro);
         ImageButton ok = findViewById(R.id.btn_aceptar_monedas);
         ImageButton s = findViewById(R.id.btn_salir_monedas);
 
-        final ListView lstCobros = (ListView)findViewById(R.id.lstCobros);
+        final ListView lstCobros = findViewById(R.id.lstCobros);
 
-        lstArt = (ListView)findViewById(R.id.lstArticulos);
+        lstArt = findViewById(R.id.lstArticulos);
 
          ok.setOnClickListener(view -> clickCobrarSeparados(view));
 

@@ -9,6 +9,8 @@ export default {
     items: [
       { title: "Receptores", link: { name: "receptores" } },
       { title: "Grupos y familias", link: { name: "familias" } },
+      { title: "Zonas", link: { name: "zonas" } },
+      { title: "Mesas", link: { name: "mesas" } },
       { title: "Menú y ofertas", link: { name: "composicion" } },
       { title: "Secciones", link: { name: "secciones" } },
       { title: "Vista teclas", link: { name: "vista" } },

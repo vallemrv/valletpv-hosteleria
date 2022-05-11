@@ -10,10 +10,9 @@ from django.db.models import Q, Sum, Count
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db import connection
 from api_android.tools import (send_imprimir_ticket, send_update_ws)
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
-                            Infmesa, Servidos, Sync, Ticket, Ticketlineas, Historialnulos)
+                            Infmesa,  Sync, Ticket)
 from datetime import datetime
 from uuid import uuid4
 import json
@@ -137,8 +136,6 @@ def cuenta_cobrar(request):
     entrega = request.POST["entrega"]
     
     art = json.loads(request.POST["art"])
-   
-
     numart, total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
     
     if (numart <= 0):
@@ -241,7 +238,4 @@ def cuenta_ls_linea(request):
 
 
     total = ticket.ticketlineas_set.aggregate(total=Sum("linea__precio"))["total"]
-
-
-
     return JsonResponse({'lineas':lineas, 'total': total, 'IDTicket': id})

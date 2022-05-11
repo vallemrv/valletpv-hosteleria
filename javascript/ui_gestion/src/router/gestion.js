@@ -9,6 +9,8 @@ import TecladosTPV from '@/views/gestion/teclados/TecladosTPV'
 import FamiliasView from '@/views/gestion/teclados/FamiliasView'
 import TeclasEspeciales from '@/views/gestion/teclados/TeclasEspeciales'
 import ReceptoresView from '@/views/gestion/teclados/ReceptoresView'
+import ZonasView from '@/views/gestion/mesas/ZonasView'
+import MesasView from '@/views/gestion/mesas/MesasView'
 
 const camarerosRoutes = [
     {
@@ -20,6 +22,18 @@ const camarerosRoutes = [
         path: "/gestion/camareros/edicion",
         component: CamarerosView,
         name: 'camareros'
+    }
+]
+const zonasRoutes = [
+    {
+        path: "/gestion/zonas",
+        component: ZonasView,
+        name: 'zonas'
+    },
+    {
+        path: "/gestion/mesas",
+        component: MesasView,
+        name: 'mesas'
     }
 ]
 
@@ -76,5 +90,5 @@ const tecladosRoutes = [
 
 
 export const gestionRoutes = [
-    ...camarerosRoutes, ...tecladosRoutes
+    ...camarerosRoutes, ...tecladosRoutes, ...zonasRoutes,
 ]

@@ -196,7 +196,7 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
 
     public ArrayList<JSONObject> getConPermiso(String permiso) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros where activo='1' and permisos  LIKE '%"+permiso+"%' AND autorizado = '1'", null );
+        Cursor res =  db.rawQuery( "select * from camareros where activo='1' and permisos  LIKE '%"+permiso+"%' ", null );
         ArrayList<JSONObject>  lscam = cargarRegistros(res);
         db.close();
         return lscam;

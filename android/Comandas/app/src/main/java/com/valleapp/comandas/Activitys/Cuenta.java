@@ -12,10 +12,17 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.valleapp.comandas.R;
+import com.valleapp.comandas.adaptadores.AdaptadorTicket;
+import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
+import com.valleapp.comandas.utilidades.HTTPRequest;
+import com.valleapp.comandas.utilidades.Instruccion;
+import com.valleapp.comandas.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,15 +30,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.valleapp.comandas.R;
-import com.valleapp.comandas.adaptadores.AdaptadorTicket;
-import com.valleapp.comandas.db.DBCamareros;
-import com.valleapp.comandas.db.DBCuenta;
-import com.valleapp.comandas.db.DBMesas;
-import com.valleapp.comandas.utilidades.HTTPRequest;
-import com.valleapp.comandas.utilidades.Instruccion;
-import com.valleapp.comandas.utilidades.ServicioCom;
 
 
 public class Cuenta extends Activity {
@@ -89,23 +87,22 @@ public class Cuenta extends Activity {
          }
     };
 
+    @SuppressLint("DefaultLocale")
     private void rellenarTicket() {
         try {
-
-
-                TextView l =  findViewById(R.id.txtTotal);
-                ListView lst =  findViewById(R.id.lstCuenta);
-                List<JSONObject> lineasTicket = dbCuenta.getAll(mesa.getString("ID"));
-                totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")));
-                l.setText(String.format("%s €", totalMesa));
-                lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineasTicket));
-
+            TextView l =  findViewById(R.id.txtTotal);
+            ListView lst =  findViewById(R.id.lstCuenta);
+            List<JSONObject> lineasTicket = dbCuenta.getAll(mesa.getString("ID"));
+            totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")));
+            l.setText(String.format("%s €", totalMesa));
+            lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineasTicket));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

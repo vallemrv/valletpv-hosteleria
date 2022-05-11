@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.valleapp.comandas.interfaces.INota;
-import com.valleapp.comandas.utilidades.JSON;
 
 /**
  * Created by valle on 18/09/14.
@@ -20,7 +19,7 @@ public class Nota {
 
     private int num= 0;
 
-    String nombre="";
+    String nombre;
     Context cx;
     INota controlador;
     JSONObject artSel = null;
@@ -33,7 +32,7 @@ public class Nota {
             e.printStackTrace();
         }
         this.cx = cx; this.controlador = ctr;
-        this.CargarComanda();
+        this.cargarComanda();
     }
 
 
@@ -55,7 +54,7 @@ public class Nota {
         try {
            this.num--;
            comanda.remove(art);
-           this.GuardarComanda();
+           this.guardarComanda();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -70,14 +69,14 @@ public class Nota {
                 art.put("Can", 1);
                 comanda.add(art);
             }
-            this.GuardarComanda();
+            this.guardarComanda();
 
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private void CargarComanda(){
+    private void cargarComanda(){
         JSON json = new JSON();
         try {
             JSONObject cm = json.deserializar(nombre+".dat", cx);
@@ -99,7 +98,7 @@ public class Nota {
 
     }
 
-    private void GuardarComanda(){
+    private void guardarComanda(){
         JSON json = new JSON();
         try {
             JSONObject cm = new JSONObject();
@@ -113,7 +112,7 @@ public class Nota {
     }
 
 
-    public void EliminarComanda(){
+    public void eliminarComanda(){
         this.comanda = new ArrayList<>();
         this.num = 0;
         cx.deleteFile(nombre + ".dat");
@@ -124,7 +123,7 @@ public class Nota {
         try{
             String nombre = this.artSel.getString("Descripcion")+" "+sug;
             this.artSel.put("Descripcion", nombre);
-            this.GuardarComanda();
+            this.guardarComanda();
         }catch (Exception e){
             e.printStackTrace();
         }

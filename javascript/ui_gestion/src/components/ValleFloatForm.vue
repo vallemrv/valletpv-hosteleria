@@ -93,12 +93,13 @@ export default {
       this.item[this.column + "_old"] = this.val_old;
       this.item[this.column] = this.val_modified;
       this.mostrar = false;
+      var id = this.item.id ? this.item.id : this.item.ID;
       let inst = {
         tb: this.tb_name,
         app: app,
         reg: {},
         tipo: "md",
-        id: this.item.id,
+        id: id,
       };
       inst["reg"][this.column] = this.val_modified;
       this.addInstruccion({ inst: inst });
