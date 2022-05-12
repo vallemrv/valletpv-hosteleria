@@ -5,17 +5,15 @@
 # @Last modified time: 2019-10-10T17:44:16+02:00
 # @License: Apache License v2.0
 
-from api_android.tools import (send_update_ws, imprimir_pedido)
+from api_android.tools import send_mensaje_devices, imprimir_pedido
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db import connection
 from django.db.models import  Count
-from gestion.models import (Mesasabiertas, SeccionesCom, Subteclas, Sync,
-                            Teclas, Infmesa, Pedidos,  Camareros)
+from gestion.models import (Mesasabiertas, Sync,
+                            Teclas, Pedidos,  Camareros)
 
-from datetime import datetime
-from uuid import uuid4
+
 import json
 
 
@@ -33,7 +31,7 @@ def marcar_rojo(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
     return JsonResponse({})
 
 
@@ -49,10 +47,10 @@ def pedir(request):
         #enviar notficacion de update
         update = {
            "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
+           "Tabla": ["mesasabiertas"],
            "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
 
 
     

@@ -3,25 +3,24 @@ package com.valleapp.comandas.tareas;
 import android.content.ContentValues;
 import android.os.Handler;
 
-
 import com.valleapp.comandas.utilidades.HTTPRequest;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class TareaUpdateForDevices extends TimerTask {
+public class TareaCheckWebsocket extends TimerTask {
+
     private final String server;
     private final Handler handler;
     private final Timer parent;
     private final long timeout;
     String[] tablasUpdatables;
 
-    public TareaUpdateForDevices(String[] tablasUpdatables, String server,
-                                 Handler handler,
-                                 Timer parent,
-                                 long timeout){
-        this.tablasUpdatables = tablasUpdatables;
+    public TareaCheckWebsocket(String server,
+                               Handler handler,
+                               Timer parent,
+                               long timeout){
         this.server = server;
         this.handler = handler;
         this.parent = parent;

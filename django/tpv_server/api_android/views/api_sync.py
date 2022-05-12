@@ -6,7 +6,6 @@
 # @License: Apache License v2.0
 
 import json
-from multiprocessing.dummy import JoinableQueue
 from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from gestion.models import *
@@ -27,7 +26,6 @@ def get_tb_up_last(request):
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()
 
-   
     return JsonResponse({"nombre": t, "last": tb_sync.last})
 
 @csrf_exempt
@@ -56,7 +54,7 @@ def update_for_devices(request):
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()
 
-
+    
     return JsonResponse(
         {"nombre": t, 
         "last": tb_sync.last, 

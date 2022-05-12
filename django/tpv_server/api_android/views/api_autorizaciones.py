@@ -5,8 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from tokenapi.http import JsonResponse
 from gestion.models import (Camareros, Lineaspedido, Mesas, Receptores,
                             Mesasabiertas, PeticionesAutoria, Ticket)
-from api_android.tools import (send_imprimir_ticket, send_mensaje_ws,
-                                 send_update_ws)
+from api_android.tools import (send_imprimir_ticket, send_mensaje_devices, send_mensaje_impresora)
 
 @csrf_exempt
 def send_informacion(request):
@@ -27,6 +26,13 @@ def send_informacion(request):
         peticion.instrucciones = json.dumps({"mensaje":men, "autor": autor})
         peticion.idautorizado = Camareros.objects.get(id=i)
         peticion.save()
+
+    send_mensaje_devices({
+        "OP": "mensajes",
+        "receptor": "comandas",
+        "idreceptor": idreceptor if idreceptor > 0 else 'all'
+    })
+
     return JsonResponse("success")
 
 
@@ -42,7 +48,10 @@ def pedir_autorizacion(request):
 
 @csrf_exempt
 def get_lista_autorizaciones(request):
-    peticiones = PeticionesAutoria.objects.filter(idautorizado=request.POST["idautorizado"])
+    return JsonResponse(get_lista_men(request.POST["idautorizado"]))
+
+def get_lista_men(id):    
+    peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
     mensajes = []
     for p in peticiones:
         inst = json.loads(p.instrucciones)
@@ -73,16 +82,15 @@ def get_lista_autorizaciones(request):
             camarero = Camareros.objects.get(id=inst["idc"])
             mensajes.append({"tipo":"peticion", "idpeticion": p.pk, "mensaje": camarero.nombre + " "
             + camarero.apellidos+" solicita permiso para abrir cajon" })
-
-    return JsonResponse(mensajes)
+    return mensajes
 
 
 @csrf_exempt
 def gestionar_peticion(request):
     aceptada = request.POST["aceptada"]
     idpeticion = request.POST["idpeticion"]
-    p = PeticionesAutoria.objects.get(id=idpeticion)
-    if aceptada == "1":
+    p = PeticionesAutoria.objects.filter(id=idpeticion).first()
+    if p and aceptada == "1":
         inst = json.loads(p.instrucciones)
         if p.accion == "borrar_mesa":
             Mesasabiertas.borrar_mesa_abierta(int(inst["idm"]), int(inst["idc"]), inst["motivo"])
@@ -96,7 +104,7 @@ def gestionar_peticion(request):
                 "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
                 "receptor_activo": True,
             }
-            send_mensaje_ws(obj)
+            send_mensaje_impresora(obj)
         elif p.accion == "cobrar_ticket":
             numart, total, id = Ticket.cerrar_cuenta(inst["idm"], inst["idc"], inst["entrega"], json.loads(inst["art"]))
     
@@ -107,14 +115,14 @@ def gestionar_peticion(request):
                     "Tabla": "mesasabiertas",
                     "receptor": "comandas",
                 }
-                send_update_ws(update)
+                send_mensaje_devices(update)
                     
             if (id > 0):
                 send_imprimir_ticket(request, id)
 
 
 
-    p.delete()
+        p.delete()
         
 
     return JsonResponse("susccess")

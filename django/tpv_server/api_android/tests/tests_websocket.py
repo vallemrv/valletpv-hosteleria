@@ -1,4 +1,4 @@
-from api_android.tools import send_update_ws
+from api_android.tools import send_mensaje_devices
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -11,7 +11,7 @@ def send_test_mensaje(request, msg):
        "msg": msg,
        "receptor": "comandas",
     }
-    send_update_ws(update)
+    send_mensaje_devices(update)
     return HttpResponse("success")
 
 

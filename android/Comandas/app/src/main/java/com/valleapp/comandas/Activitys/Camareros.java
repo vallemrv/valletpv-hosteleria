@@ -114,13 +114,9 @@ public class Camareros extends ActivityBase {
             ll.removeAllViews();
 
             if(lscam.size()>0){
-
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.MATCH_PARENT );
-
-
-
 
                 TableRow row = new TableRow(cx);
                 ll.addView(row, params);

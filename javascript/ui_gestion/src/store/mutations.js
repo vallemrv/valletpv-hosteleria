@@ -9,9 +9,11 @@ const contains_func = (instrucciones, inst, reg) => {
                 var col_inst = Object.keys(inst.reg)[0]
                 if (col_obj == col_inst) {
                     obj.reg = inst.reg
+                    contains = true;
                 }
-            }        
-            contains = true
+            } else{       
+            contains = true;
+            }
         }
     });
     return contains;

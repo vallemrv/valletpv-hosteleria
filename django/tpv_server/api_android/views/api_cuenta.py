@@ -10,7 +10,7 @@ from django.db.models import Q, Sum, Count
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from api_android.tools import (send_imprimir_ticket, send_update_ws)
+from api_android.tools import (send_imprimir_ticket, send_mensaje_devices)
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
                             Infmesa,  Sync, Ticket)
 from datetime import datetime
@@ -40,7 +40,7 @@ def juntarmesas(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(update)
+    send_mensaje_devices(update)
 
 
     return HttpResponse('success')
@@ -55,7 +55,7 @@ def cambiarmesas(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(update)
+    send_mensaje_devices(update)
 
     return HttpResponse('success')
 
@@ -104,7 +104,7 @@ def mvlinea(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
          }
-         send_update_ws(update)
+         send_mensaje_devices(update)
 
     return HttpResponse('success')
 
@@ -123,10 +123,10 @@ def cuenta_add(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
 
     
-
+    
     return HttpResponse('success')
 
 @csrf_exempt
@@ -145,7 +145,7 @@ def cuenta_cobrar(request):
             "Tabla": "mesasabiertas",
             "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
             
     if (id > 0):
         send_imprimir_ticket(request, id)
@@ -165,7 +165,7 @@ def cuenta_rm(request):
        "Tabla": "mesasabiertas",
        "receptor": "comandas",
     }
-    send_update_ws(update)
+    send_mensaje_devices(update)
 
     return HttpResponse('success')
 
@@ -190,7 +190,7 @@ def cuenta_rm_linea(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
         
 
     return HttpResponse('success')

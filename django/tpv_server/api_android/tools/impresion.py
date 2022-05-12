@@ -6,8 +6,7 @@
 # @License: Apache License v2.0
 
 from django.db.models import  Count, Sum, F
-from django.forms import model_to_dict
-from api_android.tools.ws_tools import  (send_mensaje_ws, send_pedidos_ws)
+from api_android.tools.ws_tools import  send_mensaje_impresora
 from gestion.models import (Ticket,  Teclas,
                             Receptores, Pedidos,
                             Camareros)
@@ -40,7 +39,7 @@ def imprimir_pedido(id):
     
         receptores[receptor.nombre]['lineas'].append(l)
 
-    send_pedidos_ws(receptores)
+    send_mensaje_impresora(receptores)
 
 def send_imprimir_ticket(request, id):
     receptor_activo = request.POST["receptor_activo"] if "receptor_activo" in request.POST else None
@@ -84,4 +83,4 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
     }
 
  
-    send_mensaje_ws(obj)
+    send_mensaje_impresora(obj)

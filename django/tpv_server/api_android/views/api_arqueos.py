@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.fields import DecimalField
 from django.db import connection
-from api_android.tools import send_mensaje_ws
+from api_android.tools import send_mensaje_impresora
 from api_android.tools.mails import send_cierre, getUsuariosMail
 from gestion.models import (Arqueocaja, Cierrecaja, Efectivo, Gastos,
                             Receptores, Ticket)
@@ -165,5 +165,5 @@ def imprimir_desglose(request, arqueo):
             "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
             "lineas": lineas_retirada
         }
-        send_mensaje_ws(obj_desglose)
-        send_mensaje_ws(obj_cambio)
+        send_mensaje_impresora(obj_desglose)
+        send_mensaje_impresora(obj_cambio)

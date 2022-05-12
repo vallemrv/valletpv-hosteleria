@@ -107,7 +107,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                             MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
                             m.start();
                         }
-
                         manejarAurotias();
                     }catch (Exception e){
                         e.printStackTrace();
@@ -153,8 +152,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     }
                 },1000);
                 try {
-                    myServicio.initTimerAutorias(handlerOperaciones, cam.getString("ID"),
-                            server+"/autorizaciones/get_lista_autorizaciones");
+                    myServicio.initTimerAutorias(handlerOperaciones, cam.getString("ID"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

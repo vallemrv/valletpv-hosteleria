@@ -85,7 +85,7 @@
     v-show="showAgregarTeclas"
     @close="() => (showAgregarTeclas = false)"
     @change="on_change"
-    tb_name="seccioncom"
+    tb_name="teclascom"
     field_parent="seccion__id__seccionescom"
     field_item="IDSeccionCom"
     :secSel="secSel"

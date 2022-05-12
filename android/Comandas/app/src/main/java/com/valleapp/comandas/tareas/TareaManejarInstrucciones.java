@@ -30,28 +30,33 @@ public class TareaManejarInstrucciones extends TimerTask {
         @Override
         public void handleMessage(@NonNull Message msg) {
             try {
-                String res = msg.getData().getString("RESPONSE");
-                 if(res != null && !res.equals("")) {
-                    synchronized (cola) {
-                        Instruccion inst = cola.poll();
-                        if (inst != null) {
-                            Handler handlerInst = inst.getHandler();
-                            if (handlerInst != null) {
-                                Message msgInst = handlerInst.obtainMessage();
-                                Bundle bundle = msg.getData();
-                                if (bundle == null) bundle = new Bundle();
-                                bundle.putString("RESPONSE", res);
-                                bundle.putString("op", inst.getOp());
-                                msgInst.setData(bundle);
-                                handlerInst.sendMessage(msgInst);
+                String op = msg.getData().getString("op");
+                if (op != null && op.equals("ERROR")){
+                    cola.poll();
+                }else {
+                    String res = msg.getData().getString("RESPONSE");
+                    if (res != null && !res.equals("")) {
+                        synchronized (cola) {
+                            Instruccion inst = cola.poll();
+                            if (inst != null) {
+                                Handler handlerInst = inst.getHandler();
+                                if (handlerInst != null) {
+                                    Message msgInst = handlerInst.obtainMessage();
+                                    Bundle bundle = msg.getData();
+                                    if (bundle == null) bundle = new Bundle();
+                                    bundle.putString("RESPONSE", res);
+                                    bundle.putString("op", inst.getOp());
+                                    msgInst.setData(bundle);
+                                    handlerInst.sendMessage(msgInst);
+                                }
                             }
                         }
                     }
                 }
-
             }catch (Exception e){
                 Log.w("Instrucciones", "Error al ejecutar instruccion en el servidor");
             }
+
             procesado = true;
             super.handleMessage(msg);
 
@@ -69,7 +74,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
+            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()) +" "+procesado);
 
             if (procesado) {
 

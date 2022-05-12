@@ -8,7 +8,6 @@
 from __future__ import unicode_literals
 from datetime import datetime
 import json
-from json import tool
 from uuid import uuid4
 from django.db import models
 from django.db import connection
@@ -26,14 +25,13 @@ class HistorialMensajes(models.Model):
 
     @staticmethod
     def update_from_device(row):
-        from api_android.tools.ws_tools import send_mensaje_ws
+        from api_android.tools.ws_tools import send_mensaje_impresora
         c = None
         if "ID" in row:
             c = HistorialMensajes.objects.filter(id=row["ID"]).first()
         if not c:
             c = HistorialMensajes()
             
-    
         c.camarero_id = row["camarero"]
         c.receptor_id = row["receptor"]
         c.mensaje = row["mensaje"]
@@ -45,7 +43,7 @@ class HistorialMensajes(models.Model):
             "receptor": c.receptor.nomimp,
             "nom_receptor": c.receptor.nombre
         }
-        send_mensaje_ws(mensaje)
+        send_mensaje_impresora(mensaje)
 
     @staticmethod
     def update_for_devices():
@@ -83,17 +81,28 @@ class PeticionesAutoria(models.Model):
         return super().delete( *args, **kwargs)
 
 class Sync(models.Model):
+   
+
     nombre = models.CharField(max_length=50) 
     last = models.CharField(max_length=26)
 
     @staticmethod
     def actualizar(tb_name):
+        from api_android.tools import send_mensaje_devices
         sync = Sync.objects.filter(nombre=tb_name).first()
         if not sync:
             sync = Sync()
         sync.nombre = tb_name.lower()
         sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         sync.save()
+
+        update = {
+           "op": "sync_actualizar",
+           "nombre": sync.nombre,
+           "last": sync.last,
+           "receptor": "comandas",
+        }
+        send_mensaje_devices(update)
         
 class Arqueocaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -975,9 +984,9 @@ class SeccionesCom(models.Model):
 
         
     def save(self, *args, **kwargs):
-        if self.descuento and self.descuento > 1:
-            self.descuento = 1
-        elif not self.descuento  or  self.descuento < 0:
+        if self.descuento and int(self.descuento) > 100:
+            self.descuento = 100
+        elif not self.descuento  or  int(self.descuento) < 0:
             self.descuento = 0
 
         Sync.actualizar(self._meta.db_table)
@@ -1109,7 +1118,7 @@ class Teclas(models.Model):
         row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
         row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
         row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
-        seccioncom = r.teclascom_set.all().first()
+        seccioncom = r.teclascom_set.first()
         row["IDSeccionCom"] = seccioncom.seccion.id if seccioncom else -1
         row["OrdenCom"] = seccioncom.orden if seccioncom else -1
         row["nombreFam"] = r.familia.nombre

@@ -5,8 +5,7 @@
 # @Last modified time: 2019-01-31T16:11:02+01:00
 # @License: Apache License v2.0
 
-from api_android.tools import (send_pedidos_ws, send_mensaje_ws,
-                               send_update_ws, send_imprimir_ticket)
+from api_android.tools import (send_mensaje_devices, send_imprimir_ticket, send_mensaje_impresora)
 from tokenapi.http import  JsonResponse
 from gestion.models import (Pedidos, Teclas, Receptores,
                             Mesasabiertas, Camareros, Sync)
@@ -54,9 +53,9 @@ def preimprimir(request):
            "Tabla": "mesasabiertas",
            "receptor": "comandas",
         }
-        send_update_ws(update)
+        send_mensaje_devices(update)
 
-    send_mensaje_ws(obj)
+    send_mensaje_impresora(obj)
     return JsonResponse({})
 
 @csrf_exempt
@@ -91,7 +90,7 @@ def reenviarlinea(request):
                 }
             receptores[receptor.nombre]['lineas'].append(l)
 
-        send_pedidos_ws(receptores)
+        send_mensaje_impresora(receptores)
     return HttpResponse("success")
 
 @csrf_exempt
@@ -102,7 +101,7 @@ def abrircajon(request):
         "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
         "receptor_activo": True,
     }
-    send_mensaje_ws(obj)
+    send_mensaje_impresora(obj)
     return HttpResponse("success")
 
 @csrf_exempt

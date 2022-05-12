@@ -65,6 +65,7 @@ export default {
       return {
         caption: this.getListValues("secciones", "nombre"),
         filters: this.getFilters("secciones", "id", ["IDSeccion", "IDSec2"]),
+        text_filters: [{ label: "Buscar teclas", fields: ["nombre", "tag"] }],
         all: [{ IDSeccion: -1 }],
         multiple: false,
       };

@@ -12,6 +12,7 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -56,7 +57,7 @@ public class HTTPRequest {
             final HttpURLConnection finalConn = conn;
              new Thread(){
                 public void run(){
-
+                    int statusCode = -1;
                     try {
 
 
@@ -64,6 +65,8 @@ public class HTTPRequest {
                         wr.writeBytes(getParams(params));
                         wr.flush();
                         wr.close();
+
+                         statusCode = finalConn.getResponseCode();
 
                         InputStream in = new BufferedInputStream(finalConn.getInputStream());
                         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -74,13 +77,17 @@ public class HTTPRequest {
                             result.append(line);
                         }
 
-                        if(handlerExternal!= null) sendMessage(handlerExternal, op, result.toString());
+                        if (handlerExternal != null)
+                            sendMessage(handlerExternal, op, result.toString());
 
 
+
+                     } catch ( ConnectException e){
+                        if(handlerExternal!= null) sendMessage(handlerExternal, "no_connexion", null);
                      } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        if(handlerExternal!= null) sendMessage(handlerExternal, "ERROR", null);
-                        Log.w("HTTPClient", "Error en la conexxion con el servidor");
+                         // TODO Auto-generated catch block
+                        if(handlerExternal!= null && statusCode==500) sendMessage(handlerExternal, "ERROR", null);
+
                     }
                 }
             }.start();

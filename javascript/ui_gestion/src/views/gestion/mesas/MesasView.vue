@@ -39,10 +39,15 @@ export default {
         all: [{ IDZona: -1 }],
       };
     },
-    form() {
+    formMZona() {
       return [
-        { col: "Nombre", label: "Nombre", tp: "text" },
-        { col: "Orden", label: "Orden", tp: "number" },
+        {
+          col: "zona",
+          label: "Zona",
+          tp: "select",
+          keys: this.getListValues("zonas", "id"),
+          choices: this.getListValues("zonas", "nombre"),
+        },
       ];
     },
   },
@@ -56,9 +61,15 @@ export default {
         headers: ["Nombre", "Orden"],
         keys: ["Nombre", { col: "Orden", float: true }],
       },
+      form: [],
       tools: [
         { op: "edit", text: "Editar", icon: "mdi-account-edit" },
+        { op: "edit_zona", text: "Editar zona", icon: "mdi-table-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
+      ],
+      formMesa: [
+        { col: "Nombre", label: "Nombre", tp: "text" },
+        { col: "Orden", label: "Orden", tp: "number" },
       ],
     };
   },
