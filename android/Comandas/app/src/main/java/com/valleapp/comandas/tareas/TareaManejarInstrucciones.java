@@ -24,7 +24,7 @@ public class TareaManejarInstrucciones extends TimerTask {
 
 
     boolean procesado = true;
-
+    int count = 0;
 
     Handler handleHttp = new Handler(Looper.myLooper()){
         @Override
@@ -75,9 +75,7 @@ public class TareaManejarInstrucciones extends TimerTask {
         try {
 
             //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()) +" "+procesado);
-
             if (procesado) {
-
                 synchronized (cola) {
                     Instruccion inst = cola.peek();
                     if (inst != null) {
@@ -85,10 +83,17 @@ public class TareaManejarInstrucciones extends TimerTask {
                         new HTTPRequest(server + inst.getUrl(), inst.getParams(), "", handleHttp);
                     }
                 }
+            }else{
+                count++;
+            }
+
+            if (count > 5) {
+                count = 0;
+                procesado = true;
             }
 
             synchronized (parent) {
-                parent.wait((long) timeout);
+                parent.wait(timeout);
             }
 
         }catch (Exception e){

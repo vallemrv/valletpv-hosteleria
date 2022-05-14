@@ -24,10 +24,16 @@ import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
 import com.valleapp.valletpv.tareas.TareaUpdateForDevices;
 import com.valleapp.valletpv.tareas.TareaUpdateFromDevices;
 
+import org.java_websocket.WebSocket;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.framing.Framedata;
+import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -47,6 +53,8 @@ public class ServicioCom extends Service {
     Timer timerUpdateLow = new Timer();
     Timer timerUpdateFromDevices = new Timer();
     Timer timerManejarInstrucciones = new Timer();
+    Timer checkWebsocket = new Timer();
+
 
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
@@ -60,6 +68,9 @@ public class ServicioCom extends Service {
     String[] tbNameUpdateLow;
 
 
+    private JSONObject cam;
+    WebSocketClient client;
+    boolean isWebsocketClose = false;
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -82,6 +93,70 @@ public class ServicioCom extends Service {
         }
     };
 
+    public void crearWebsocket() {
+        super.onCreate();
+        try {
+            client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
+                    "/comunicacion/sync_devices")) {
+
+                @Override
+                public void onWebsocketPong(WebSocket conn, Framedata f) {
+                    super.onWebsocketPong(conn, f);
+                }
+
+                @Override
+                public void onOpen(ServerHandshake serverHandshake) {
+                    // Devolución de llamada después de que se abre la conexión
+                    isWebsocketClose = false;
+                    timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 1000), 1000);
+                    timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 1000), 5000);
+                }
+
+
+                @Override
+                public void onMessage(String message) {
+                    try {
+                        if (message.contains("sync_actualizar")) {
+                            Timer t = new Timer();
+                            t.schedule(new TimerTask(){
+                                @Override
+                                public void run() {
+                                    delegadoHandleCheckUpdates(message);
+                                }
+                            }, 2000);
+
+                        }
+                    }catch (Exception ignored){}
+                }
+
+                @Override
+                public void onError(Exception ex) {
+                    // devolución de llamada por error de conexión
+                    Log.i("Websocket", "Error de conexion....");
+                    isWebsocketClose = true;
+                }
+
+                @Override
+                public void onClose(int code, String reason, boolean remote) {
+                    // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
+                    Log.i("Websocket", "Websocket close....");
+                    isWebsocketClose = true;
+                }
+
+                @Override
+                public void onMessage(ByteBuffer bytes) {
+                    // El mensaje de flujo de bytes devuelto
+                    Log.i("Websocket","socket bytebuffer bytes");
+                }
+            };
+
+            client.connect();
+        } catch (Exception ignored) {
+
+        }
+    }
+
+
     private void delegadoHandleUpdateTable(String res) {
         try{
             JSONObject obj = new JSONObject(res);
@@ -89,11 +164,13 @@ public class ServicioCom extends Service {
             String last = obj.getString("last");
             JSONArray objs = obj.getJSONArray("objs");
             IBaseDatos db = dbs.get(tb_name);
-            synchronized (db){
-                db.rellenarTabla(objs);
+            if (db != null) {
+                synchronized (dbTbUpdates) {
+                    db.rellenarTabla(objs);
+                    dbTbUpdates.upTabla(tb_name, last);
+                    if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
+                }
             }
-            dbTbUpdates.upTabla(tb_name, last);
-            if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -101,13 +178,15 @@ public class ServicioCom extends Service {
 
     private void delegadoHandleCheckUpdates(String res) {
         try {
-            JSONObject obj = new JSONObject(res);
-            if(dbTbUpdates.is_updatable(obj)){
-                ContentValues p = new ContentValues();
-                p.put("tb", obj.getString("nombre"));
-                new HTTPRequest(server +"/sync/update_for_devices", p,"update_table", controller_http);
+            synchronized (dbTbUpdates) {
+                JSONObject obj = new JSONObject(res);
+                String t = obj.getString("nombre");
+                if (dbs.containsKey(t) && dbTbUpdates.is_updatable(obj)) {
+                    ContentValues p = new ContentValues();
+                    p.put("tb", t);
+                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -121,10 +200,17 @@ public class ServicioCom extends Service {
         if (url != null){
             server = url;
             IniciarDB();
+            crearWebsocket();
             timerUpdateFromDevices.schedule(new TareaUpdateFromDevices(dbs, timerUpdateFromDevices, colaUpdate, server, dbTbUpdates), 5000, 1);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, 1000), 2000, 1);
-            //timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 2000), 2000, 1);
-            //timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 20000), 2000, 1);
+            checkWebsocket.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (isWebsocketClose && client!= null){
+                        client.reconnect();
+                    }
+                }
+            }, 2000, 5000);
             return START_STICKY;
         }
         return START_NOT_STICKY;
@@ -294,6 +380,7 @@ public class ServicioCom extends Service {
     }
 
     public void pedirAutorizacion(ContentValues p) {
+        Log.i("autorias", p.toString());
         new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, "", null);
     }
 

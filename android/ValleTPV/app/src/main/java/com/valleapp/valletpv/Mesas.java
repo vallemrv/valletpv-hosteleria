@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -84,6 +85,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if(myServicio!=null){
                 myServicio.setExHandler("mesas", handleHttp);
+                myServicio.setExHandler("mesasabiertas", handleHttp);
                 dbMesas = (DbMesas) myServicio.getDb("mesas");
                 dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
                 dbZonas = (DbZonas) myServicio.getDb("zonas");
@@ -131,9 +133,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                             }
                             break;
                     }
-
                 }
-
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -151,7 +151,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 ll.removeAllViews();
 
                 DisplayMetrics metrics = getResources().getDisplayMetrics();
-
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,Math.round(metrics.density * 100));

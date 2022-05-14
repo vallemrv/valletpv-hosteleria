@@ -16,6 +16,8 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class HTTPRequest {
@@ -55,7 +57,7 @@ public class HTTPRequest {
 
             // Execute HTTP Post Request
             final HttpURLConnection finalConn = conn;
-             new Thread(){
+            final Thread th = new Thread(){
                 public void run(){
                     int statusCode = -1;
                     try {
@@ -66,7 +68,8 @@ public class HTTPRequest {
                         wr.flush();
                         wr.close();
 
-                         statusCode = finalConn.getResponseCode();
+                        statusCode = finalConn.getResponseCode();
+                        finalConn.setReadTimeout(3000);
 
                         InputStream in = new BufferedInputStream(finalConn.getInputStream());
                         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -90,8 +93,9 @@ public class HTTPRequest {
 
                     }
                 }
-            }.start();
+            };
 
+            th.start();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

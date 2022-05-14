@@ -45,6 +45,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,6 +62,7 @@ public class ServicioCom extends Service {
     Timer timerUpdateLow = new Timer();
     Timer timerManejarInstrucciones = new Timer();
     Timer timerAurotias = new Timer();
+    Timer checkWebsocket = new Timer();
 
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
@@ -74,15 +76,14 @@ public class ServicioCom extends Service {
 
     private JSONObject cam;
     WebSocketClient client;
-
     boolean isWebsocketClose = false;
-    private String idautor;
+
 
     public void crearWebsocket() {
         super.onCreate();
         try {
             client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
-                    "/comunicacion/comandas")) {
+                    "/comunicacion/sync_devices")) {
 
                 @Override
                 public void onWebsocketPong(WebSocket conn, Framedata f) {
@@ -92,7 +93,6 @@ public class ServicioCom extends Service {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
                     // Devolución de llamada después de que se abre la conexión
-                    Log.i("Websocket", " conectado");
                     isWebsocketClose = false;
                     timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 1000), 1000);
                     timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 1000), 5000);
@@ -113,11 +113,16 @@ public class ServicioCom extends Service {
 
                         } else if (message.contains("mensajes")) {
                             JSONObject res = new JSONObject(message);
-                            if (res.getString("id").equals(idautor)){
+                            String id = res.getString("idreceptor");
+                            if (id.equals(cam.getString("ID")) || id.equals("all") ){
                                 Handler menHandler = exHandler.get("menHandler");
-                                if (menHandler != null )
-                                    new HTTPRequest(server+"/autorizaciones/get_lista_autorizaciones",
-                                                     new ContentValues(), "autorias", menHandler);
+
+                                if (menHandler != null ) {
+                                    ContentValues p = new ContentValues();
+                                    p.put("idautorizado", cam.getString("ID"));
+                                    new HTTPRequest(server + "/autorizaciones/get_lista_autorizaciones",
+                                            p, "autorias", menHandler);
+                                }
                             }
                         }
                     }catch (Exception e){}
@@ -126,7 +131,7 @@ public class ServicioCom extends Service {
                 @Override
                 public void onError(Exception ex) {
                     // devolución de llamada por error de conexión
-                    Log.i("Websocket", " error");
+                    Log.i("Websocket", "Error de conexion .....");
                     isWebsocketClose = true;
                 }
 
@@ -145,7 +150,7 @@ public class ServicioCom extends Service {
             };
 
             client.connect();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -182,10 +187,10 @@ public class ServicioCom extends Service {
             JSONArray objs = obj.getJSONArray("objs");
             IBaseDatos db = dbs.get(tb_name);
             if (db!= null) {
-                synchronized (db) {
+                synchronized (dbTbUpdates) {
                     db.rellenarTabla(objs);
                     dbTbUpdates.upTabla(tb_name, last);
-                    if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
+                    if (exHandler.containsKey(tb_name)) Objects.requireNonNull(exHandler.get(tb_name)).sendEmptyMessage(0);
                     if (tb_name.equalsIgnoreCase("camareros") && cam != null) {
                         DBCamareros dbCam = (DBCamareros) db;
                         JSONArray ls = dbCam.filter("ID=" + cam.getString("ID") + " AND autorizado = '1'");
@@ -203,15 +208,15 @@ public class ServicioCom extends Service {
 
     private void delegadoHandleCheckUpdates(String res) {
         try {
-            JSONObject obj = new JSONObject(res);
-            String t = obj.getString("nombre");
-            Log.i("DBS", t);
-            if(dbs.containsKey(t) && dbTbUpdates.is_updatable(obj)){
-                ContentValues p = new ContentValues();
-                p.put("tb", t);
-                new HTTPRequest(server +"/sync/update_for_devices", p,"update_table", controller_http);
+            synchronized (dbTbUpdates) {
+                JSONObject obj = new JSONObject(res);
+                String t = obj.getString("nombre");
+                if (dbs.containsKey(t) && dbTbUpdates.is_updatable(obj)) {
+                    ContentValues p = new ContentValues();
+                    p.put("tb", t);
+                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -226,6 +231,14 @@ public class ServicioCom extends Service {
             IniciarDB();
             crearWebsocket();
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
+            checkWebsocket.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (isWebsocketClose && client!= null){
+                        client.reconnect();
+                    }
+                }
+            }, 2000, 5000);
             return START_STICKY;
         }
         return START_NOT_STICKY;
@@ -244,7 +257,7 @@ public class ServicioCom extends Service {
             timerUpdateLow.cancel();
             timerAurotias.cancel();
             client.close();
-        }catch (Exception e){
+        }catch (Exception ignored){
 
         }
         super.onDestroy();
@@ -266,9 +279,8 @@ public class ServicioCom extends Service {
     }
 
     public void initTimerAutorias(Handler mainHandler, String idautoria){
-       this.idautor = idautoria;
-       exHandler.put("menjares", mainHandler);
-       timerAurotias.schedule(new TareaManejarAutorias(mainHandler, idautor, 1000, server+"/autorizaciones/get_lista_autorizaciones"), 2000);
+       exHandler.put("menHandler", mainHandler);
+       timerAurotias.schedule(new TareaManejarAutorias(mainHandler, idautoria, 1000, server+"/autorizaciones/get_lista_autorizaciones"), 2000);
     }
 
     public void addColaInstrucciones(Instruccion inst) {

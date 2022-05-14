@@ -1,6 +1,7 @@
 package com.valleapp.comandas.Activitys;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -64,6 +65,9 @@ public class Autorias extends ActivityBase {
     }
 
     public void salirAutorias(View v){
+        Intent it = getIntent();
+        it.putExtra("mensajes", lsObj.toString());
+        setResult(RESULT_OK, it);
         finish();
     }
 
@@ -85,6 +89,7 @@ public class Autorias extends ActivityBase {
 
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -92,7 +97,8 @@ public class Autorias extends ActivityBase {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
     }
 }

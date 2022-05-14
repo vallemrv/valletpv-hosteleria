@@ -14,15 +14,18 @@ import json
 
 def send_mensaje_impresora(v):
     try:
-        
-        channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
-        layer = get_channel_layer()
-        async_to_sync(layer.group_send)(channel_name, {
-            'type': 'send_message',
-            'content': json.dumps(v, cls=DjangoJSONEncoder)
-         })
+        if 'op' in v:
+            v = {v["receptor"]: v}
+        for o in v:
+            r = v[o]
+            channel_name = settings.EMPRESA + "_impresion_" + r["receptor"]
+            layer = get_channel_layer()
+            async_to_sync(layer.group_send)(channel_name, {
+                'type': 'send_message',
+                'content': json.dumps(r, cls=DjangoJSONEncoder)
+            })
     except Exception as e:
-        print(e)
+        print("[ERROR  impresoras ]"+ str(e))
 
 
 def send_mensaje_devices(v):
@@ -34,7 +37,7 @@ def send_mensaje_devices(v):
         'content': json.dumps(v)
         })
     except Exception as e:
-        print(e)
+        print("[ERROR  devices ]"+ str(e))
 
 
     

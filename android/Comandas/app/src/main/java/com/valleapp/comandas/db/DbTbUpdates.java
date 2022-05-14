@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
 
 import org.json.JSONArray;
@@ -99,10 +100,9 @@ public class DbTbUpdates extends DBBase{
         return ls;
     }
 
-    private boolean hayRegistros(String tb){
+    private boolean hayRegistros(String tb, SQLiteDatabase db){
         boolean hay = false;
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
+       try {
             Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? ", new String[]{tb});
             res.moveToFirst();
             int count = res.getInt(0);
@@ -111,7 +111,6 @@ public class DbTbUpdates extends DBBase{
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
         return hay;
     }
 
@@ -130,11 +129,12 @@ public class DbTbUpdates extends DBBase{
         boolean isUp = true;
         SQLiteDatabase db = null;
         try {
+
             String date = obj.getString("last");
             if (date.equals("")) return true;
             String tb = obj.getString("nombre");
-            isUp = !hayRegistros(tb);
             db = this.getReadableDatabase();
+            isUp = !hayRegistros(tb, db);
 
             if (!isUp) {
                 Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
@@ -145,8 +145,7 @@ public class DbTbUpdates extends DBBase{
             }
 
         } catch (Exception e) {
-            if (db != null)  this.onCreate(db);
-            e.printStackTrace();
+             e.printStackTrace();
         }
         if (db != null) db.close();
         return  isUp;
@@ -155,8 +154,8 @@ public class DbTbUpdates extends DBBase{
     public void upTabla(String tb, String last) {
         SQLiteDatabase db = null;
         try {
-            boolean hay = hayRegistros(tb);
             db =  this.getWritableDatabase();
+            boolean hay = hayRegistros(tb, db);
             ContentValues v = new ContentValues();
             v.put("nombre", tb);
             v.put("last", last);

@@ -20,7 +20,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     private final Queue<Instrucciones> cola;
     private final long timeout;
     boolean procesado = true;
-
+    int count = 0;
     Handler handleHttp = new Handler(Looper.myLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -67,7 +67,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()));
+            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()) + " "+ procesado);
             if (procesado) {
                 synchronized (cola) {
                     Instrucciones inst = cola.peek();
@@ -76,6 +76,12 @@ public class TareaManejarInstrucciones extends TimerTask {
                         procesado = false;
                     }
                 }
+            }else{
+                count ++;
+            }
+            if (count > 5) {
+                count = 0;
+                procesado = true;
             }
 
             synchronized (parent) {

@@ -13,8 +13,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,12 +145,12 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Message msg = handlerOperaciones.obtainMessage();
-                        Bundle b = msg.getData();
-                        if (b == null) b = new Bundle();
-                        b.putString("op", "mostrarmesas");
-                        msg.setData(b);
-                        handlerOperaciones.sendMessage(msg);
+                    Message msg = handlerOperaciones.obtainMessage();
+                    Bundle b = msg.getData();
+                    if (b == null) b = new Bundle();
+                    b.putString("op", "mostrarmesas");
+                    msg.setData(b);
+                    handlerOperaciones.sendMessage(msg);
                     }
                 },1000);
                 try {
@@ -156,7 +158,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         }
 
@@ -311,8 +312,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     });
 
                     row.addView(v, rowparams);
-
-
                     if (((i+1) % 3) == 0) {
                         row = new TableRow(cx);
                         listaMesas.addView(row, params);
@@ -340,12 +339,11 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     }
 
     public void getPendientes(){
-        Timer t = new Timer();
+        /*Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
             try {
-
                 if (zn != null) {
                     ContentValues p = new ContentValues();
                     p.put("idz", zn.getString("ID"));
@@ -353,13 +351,12 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                             "/pedidos/getpendientes",
                             handlerOperaciones, "pedidos"));
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
             }
         }, 5000);
-
+       */
     }
 
     public void clickServido(View v){
@@ -431,8 +428,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         Intent i = new Intent(cx, Autorias.class);
         i.putExtra("url", server);
         i.putExtra("peticiones", peticiones.toString());
-        startActivity(i);
-
+        startActivityForResult(i, 400);
     }
 
     public void  mostrarSendMensajes(View v){
@@ -442,6 +438,22 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             startActivity(i);
         }catch (JSONException e){
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 400) {
+            if(resultCode == RESULT_OK){
+                try{
+                    peticiones = new JSONArray(data.getStringExtra("mensajes"));
+                    manejarAurotias();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 

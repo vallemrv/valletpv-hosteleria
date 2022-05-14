@@ -29,8 +29,8 @@ def send_informacion(request):
 
     send_mensaje_devices({
         "OP": "mensajes",
-        "receptor": "comandas",
-        "idreceptor": idreceptor if idreceptor > 0 else 'all'
+        "receptor": "sync_devices",
+        "idreceptor": idreceptor if int(idreceptor) > 0 else 'all'
     })
 
     return JsonResponse("success")
@@ -38,11 +38,21 @@ def send_informacion(request):
 
 @csrf_exempt
 def pedir_autorizacion(request):
+    id = request.POST["idautorizado"]
+    
     peticion = PeticionesAutoria()
     peticion.accion = request.POST["accion"]
     peticion.instrucciones = request.POST["instrucciones"]
-    peticion.idautorizado = Camareros.objects.get(id=request.POST["idautorizado"])
+    peticion.idautorizado = Camareros.objects.filter(id=id).first()
+    
     peticion.save()
+    
+    send_mensaje_devices({
+        "OP": "mensajes",
+        "receptor": "sync_devices",
+        "idreceptor": id
+    })
+   
     return JsonResponse("success")
 
 
@@ -50,7 +60,8 @@ def pedir_autorizacion(request):
 def get_lista_autorizaciones(request):
     return JsonResponse(get_lista_men(request.POST["idautorizado"]))
 
-def get_lista_men(id):    
+def get_lista_men(id):   
+
     peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
     mensajes = []
     for p in peticiones:
@@ -121,7 +132,7 @@ def gestionar_peticion(request):
                 send_imprimir_ticket(request, id)
 
 
-
+    if p:
         p.delete()
         
 

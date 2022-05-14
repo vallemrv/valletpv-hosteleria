@@ -57,24 +57,29 @@ Builder.load_string('''
                 
 <ConfigPage>
     name: "config_page"
-    MDToolbar:
-        elevation: 10
-        pos_hint: {'top': 1}
-        title: "Configuracion"
-        left_action_items: [["chevron-left", lambda x: app.set_page("main_page")]] 
-        
+    MDGridLayout:
+        id: box
+        adaptive_height: True
+        cols: 1
+    
+        MDToolbar:
+            elevation: 10
+            pos_hint: {'top': 1}
+            title: "Configuracion"
+            left_action_items: [["chevron-left", lambda x: app.set_page("main_page")]] 
+            
 
-    AnchorLayout:
-        size_hint: 1,1
-        anchor_x: 'center'
-        anchor_y: 'center'
-        BoxLayout:
-            size_hint: .95,.95
-            orientation: 'vertical'
-            MDTextField:
-                hint_text: "Url servidor"
-            MDLabel:
-                text: "Esperando configuracion"
+        AnchorLayout:
+            size_hint: 1,1
+            anchor_x: 'center'
+            anchor_y: 'center'
+            BoxLayout:
+                size_hint: .95,.95
+                orientation: 'vertical'
+                MDTextField:
+                    hint_text: "Url servidor"
+                MDLabel:
+                    text: "Esperando configuracion"
             
 
 <MainPage>
@@ -128,10 +133,11 @@ class ConfigPage(MDScreen):
 
 class MainPage(MDScreen):
     sm = ObjectProperty()
-    buttons = ObjectProperty({
-        'exit-to-app': 'Salir',
-        'database-settings': 'Configurar',
-        'reload': 'Ver Ultimas'
+    buttons = ObjectProperty(
+        {
+        "Salir": 'exit-to-app',
+        'Cofinguracion': 'application-settings',
+        'Recargar ultimas': 'reload'
     })
 
     content = ObjectProperty()
@@ -139,10 +145,9 @@ class MainPage(MDScreen):
     def on_press_action(self, w):
         if (w.icon == 'exit-to-app'):
             MDApp.get_running_app().stop()
-        elif (w.icon == 'database-settings'):
+        elif (w.icon == 'application-settings'):
             self.sm.current="config_page"
         
-
 
 class AppMain(MDApp):
 

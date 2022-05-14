@@ -97,9 +97,8 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
         return ls;
     }
 
-    private boolean hayRegistros(String tb){
+    private boolean hayRegistros(String tb, SQLiteDatabase db){
         boolean hay = false;
-        SQLiteDatabase db = this.getWritableDatabase();
         try {
             Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? ", new String[]{tb});
             res.moveToFirst();
@@ -109,7 +108,6 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
         return hay;
     }
 
@@ -131,8 +129,8 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
             String date = obj.getString("last");
             if (date.equals("")) return true;
             String tb = obj.getString("nombre");
-            isUp = !hayRegistros(tb);
             db = this.getReadableDatabase();
+            isUp = !hayRegistros(tb, db);
 
             if (!isUp) {
                 Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
@@ -143,7 +141,6 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
             }
 
         } catch (Exception e) {
-            if (db != null)  this.onCreate(db);
             e.printStackTrace();
         }
         if (db != null) db.close();
@@ -153,8 +150,8 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
     public void upTabla(String tb, String last) {
         SQLiteDatabase db = null;
         try {
-            boolean hay = hayRegistros(tb);
             db =  this.getWritableDatabase();
+            boolean hay = hayRegistros(tb, db);
             ContentValues v = new ContentValues();
             v.put("nombre", tb);
             v.put("last", last);

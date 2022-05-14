@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ListView;
 

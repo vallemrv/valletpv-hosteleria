@@ -100,7 +100,7 @@ class Sync(models.Model):
            "op": "sync_actualizar",
            "nombre": sync.nombre,
            "last": sync.last,
-           "receptor": "comandas",
+           "receptor": "sync_devices",
         }
         send_mensaje_devices(update)
         
