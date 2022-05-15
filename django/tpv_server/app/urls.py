@@ -8,5 +8,5 @@ urlpatterns = [
     path('getListadoCompuesto', views.get_listado_compuesto, name="getListadoCompuesto"),
     path("mod_regs", views.mod_regs, name="mod_regs"),
     path("add_reg", views.add_reg, name="add_reg"),
-    path("mod_sec", views.mod_sec, name="mod_sec")
+    path("mod_sec", views.mod_sec, name="mod_sec"),
 ]

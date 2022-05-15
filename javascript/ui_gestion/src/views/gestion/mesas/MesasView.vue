@@ -17,7 +17,7 @@
     :item="itemSel"
     :form="form"
     :tb_name="tb_name"
-    tipo="md"
+    :tipo="tipo"
   ></valle-dialogo-form-vue>
 </template>
 
@@ -57,9 +57,13 @@ export default {
       itemSel: null,
       tb_name: "mesas",
       localFilter: [],
+      tipo: "md",
       tabla: {
         headers: ["Nombre", "Orden"],
-        keys: ["Nombre", { col: "Orden", float: true }],
+        keys: [
+          { col: "Nombre", float: true },
+          { col: "Orden", float: true },
+        ],
       },
       form: [],
       tools: [
@@ -86,6 +90,7 @@ export default {
       switch (op) {
         case "edit":
           this.titleDialogo = "Editar";
+          this.form = this.formMesa;
           this.itemSel = v;
           this.showDialogo = true;
           this.tipo = "md";
@@ -101,8 +106,20 @@ export default {
             return e.ID != v.ID;
           });
           break;
+        case "edit_zona":
+          this.titleDialogo = "Editar";
+          this.form = this.formMZona;
+          this.itemSel = {
+            tb_name: "mesaszona",
+            mesa: v.ID,
+            zona: v.IDZona,
+            filter: { mesa: v.ID, zona: v.IDZona },
+          };
+          this.showDialogo = true;
+          this.tipo = "md_teclados";
+          break;
       }
-      if (op != "edit") {
+      if (op != "edit" && op != "edit_zona") {
         this.addInstruccion({ inst: inst });
       }
     },
@@ -124,7 +141,11 @@ export default {
   mounted() {
     this.localFilter = Object.values(this.filtro);
     this.localFilter.filters = Object.values(this.filtro.all);
-    this.cargarRegistro();
+    if (this.mesas && this.mesas.length > 0) {
+      this.on_click_filter(this.localFilter);
+    } else {
+      this.cargarRegistro();
+    }
   },
 };
 </script>

@@ -85,10 +85,12 @@
     v-show="showAgregarTeclas"
     @close="() => (showAgregarTeclas = false)"
     @change="on_change"
-    tb_name="teclascom"
-    field_parent="seccion__id__seccionescom"
-    field_item="IDSeccionCom"
-    :secSel="secSel"
+    tb_name="teclas"
+    tb_mod="teclascom"
+    col="tecla"
+    col_parent="IDSeccionCom"
+    :item="itemAddTecla"
+    :filter="['tecla']"
   ></agregar-teclas>
 </template>
 
@@ -137,6 +139,12 @@ export default {
   computed: {
     ...mapState(["ocupado", "seccionescom", "teclas", "subteclas", "iconchoices"]),
     ...mapGetters(["getItemsFiltered", "getItemsOrdered", "getListValues"]),
+    itemAddTecla() {
+      return {
+        orden: 0,
+        seccion: this.secSel ? this.secSel.id : null,
+      };
+    },
     formSec() {
       return [
         { col: "nombre", label: "Nombre", tp: "text" },
@@ -247,7 +255,7 @@ export default {
           this.showForm = true;
           this.selTbName = "teclas";
           this.form = this.formGR;
-        }
+        } else if (this.click > 2) this.click = 0;
       } else {
         this.subItemSel = t;
       }
@@ -273,6 +281,9 @@ export default {
     teclas(v) {
       if (!v) {
         this.getTablas();
+      } else {
+        if (this.secSel) this.on_click_sec(this.secSel);
+        else this.on_click_sec(v[0]);
       }
     },
     subteclas(v) {

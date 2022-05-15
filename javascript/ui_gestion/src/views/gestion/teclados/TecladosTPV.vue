@@ -14,7 +14,7 @@
         <div v-if="secSel">
           {{ secSel.nombre }}
           <v-btn icon @click="editar_sec"> <v-icon>mdi-pencil</v-icon></v-btn>
-          <v-btn icon v-if="items.length < 18" @click="() => (showAgregarTeclas = true)">
+          <v-btn icon v-if="items.length < 30" @click="() => (showAgregarTeclas = true)">
             <v-icon>mdi-plus</v-icon></v-btn
           >
           <v-btn icon @click="() => (showOrdenarTeclas = true)">
@@ -74,10 +74,12 @@
     v-show="showAgregarTeclas"
     @close="() => (showAgregarTeclas = false)"
     @change="on_change"
-    tb_name="teclaseccion"
-    field_parent="seccion__id__secciones"
-    field_item="IDSeccion"
-    :secSel="secSel"
+    tb_name="teclas"
+    tb_mod="teclaseccion"
+    col="tecla"
+    col_parent="IDSeccion"
+    :item="itemAddTecla"
+    :filter="['tecla']"
   ></agregar-teclas>
 </template>
 
@@ -116,6 +118,11 @@ export default {
   computed: {
     ...mapState(["ocupado", "secciones", "teclas"]),
     ...mapGetters(["getItemsFiltered", "getItemsOrdered"]),
+    itemAddTecla() {
+      return {
+        seccion: this.secSel ? this.secSel.id : null,
+      };
+    },
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
@@ -188,6 +195,9 @@ export default {
     teclas(v) {
       if (!v) {
         this.getTablas();
+      } else {
+        if (this.secSel) this.on_click_sec(this.secSel);
+        else this.on_click_sec(v[0]);
       }
     },
   },

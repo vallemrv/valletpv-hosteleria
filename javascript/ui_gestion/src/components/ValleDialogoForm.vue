@@ -78,13 +78,22 @@ export default {
     enviar() {
       if (this.tipo == "add") {
         this.addItem({ item: this.item, tb_name: this.tb_name });
-      } else {
+      } else if (this.tipo == "md") {
         var id = this.item.id ? this.item.id : this.item.ID;
         let inst = {
           tb: this.tb_name,
           reg: this.item,
           tipo: "md",
           id: id,
+        };
+        this.addInstruccion({ inst: inst });
+      } else if (this.tipo == "md_teclados") {
+        let inst = {
+          tb: this.tb_name,
+          tb_mod: this.item.tb_name,
+          reg: this.item,
+          tipo: "md_teclados",
+          filter: this.item.filter,
         };
         this.addInstruccion({ inst: inst });
       }

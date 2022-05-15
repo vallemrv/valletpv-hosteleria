@@ -1,5 +1,4 @@
 import json
-from attr import field
 from django.shortcuts import render
 from tokenapi.http import JsonResponse
 from django.apps import apps
@@ -32,6 +31,8 @@ def mod_sec(request):
         sec.save()
 
     return JsonResponse(tecla.serialize())
+
+
 
 @token_required
 def getlistado(request):
@@ -66,41 +67,36 @@ def add_reg(request):
     reg = json.loads(request.POST["reg"])
     obj = add_reg_handler(app_name, tb_name, reg);
 
-    if (hasattr(obj, "serialize")):
-        obj = obj.serialize()
-    else:
-        obj = model_to_dict(obj)
-
-    return JsonResponse({"reg":json.dumps(obj)})
+    return JsonResponse(obj)
 
 @token_required
 def mod_regs(request):
     insts = json.loads(request.POST["isnts"])
     for inst in insts:
         if inst["tipo"] == "md":
-            modifcar_reg(inst)
+           modifcar_reg(inst)
         elif inst["tipo"] == "rm":
-            delete_reg(inst)
+           delete_reg(inst)
         elif inst["tipo"] == "add":
             app_name = inst["app"] if "app" in inst else "gestion"
             tb_name = inst["tb"]
             reg = inst["reg"]
             add_reg_handler(app_name, tb_name, reg)
+        elif inst["tipo"] == "md_teclados":
+            mod_teclados(inst)
             
     return JsonResponse("success")
 
 def add_reg_handler(app_name, tb_name, reg):
     model = apps.get_model(app_name, tb_name)
     obj = model()
-   
-    
     for key in reg:
         k_lower = key.lower()
         if hasattr(obj, k_lower):
             field = getattr(obj, k_lower)
             if "models" in str(type(field)):
                 attr = field.__class__.objects.get(pk=reg[key])
-            elif "nonetype" in str(type(field)):
+            elif "NoneType" in str(type(field)):
                 attr = reg[key]
                 k_lower = k_lower+"_id"
             else:
@@ -117,7 +113,13 @@ def add_reg_handler(app_name, tb_name, reg):
                     setattr(obj, attr, p)
 
     obj.save()
-    return obj
+
+    if (hasattr(obj, "serialize")):
+        obj = obj.serialize()
+    else:
+        obj = model_to_dict(obj)
+
+    return {"reg":json.dumps(obj)}
 
 def modifcar_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
@@ -165,3 +167,19 @@ def delete_reg(inst):
     obj = model.objects.filter(**filter).first()
     if (obj):
         obj.delete()
+
+
+def mod_teclados(inst):
+    item = inst["reg"]
+    app_name = inst["app"] if "app" in inst else "gestion"
+    tb_name = inst["tb_mod"]
+    filter = inst["filter"]
+    fl = {}
+    for f in filter:
+        fl[f+'__pk'] = item[f]
+    
+    model = apps.get_model(app_name, tb_name)
+    r = model.objects.filter(**fl)
+    r.delete()
+    
+    return add_reg_handler(app_name, tb_name, item)

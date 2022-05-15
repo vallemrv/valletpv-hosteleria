@@ -11,6 +11,7 @@ import TeclasEspeciales from '@/views/gestion/teclados/TeclasEspeciales'
 import ReceptoresView from '@/views/gestion/teclados/ReceptoresView'
 import ZonasView from '@/views/gestion/mesas/ZonasView'
 import MesasView from '@/views/gestion/mesas/MesasView'
+import TeclasByFamilias from '@/views/gestion/teclados/TeclasByFamilias'
 
 const camarerosRoutes = [
     {
@@ -85,6 +86,11 @@ const tecladosRoutes = [
         path: '/gestion/teclados/teclados_tpv/:id?',
         component: TecladosTPV,
         name: 'tecladostpv'
+    },
+    {
+        path: '/gestion/teclados/byfamilias/',
+        component: TeclasByFamilias,
+        name: 'byfamilias'
     }
 ]
 

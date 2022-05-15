@@ -81,8 +81,6 @@ class PeticionesAutoria(models.Model):
         return super().delete( *args, **kwargs)
 
 class Sync(models.Model):
-   
-
     nombre = models.CharField(max_length=50) 
     last = models.CharField(max_length=26)
 
@@ -252,8 +250,6 @@ class Cierrecaja(models.Model):
     ticketfinal = models.IntegerField(db_column='TicketFinal')  # Field name made lowercase.
     fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
-
-
 
     class Meta:
         db_table = 'cierrecaja'
@@ -608,26 +604,27 @@ class Mesas(models.Model):
         lsMesas = []
         mesas = Mesas.objects.all()
         for m in mesas:
-           
-            mz = m.mesaszona_set.first()
-            obj = {
-            'ID': m.id,
-            'Nombre': m.nombre,
-            'Orden': m.orden,
-            'num': 0,
-            'abierta': False,
-            'RGB': mz.zona.rgb if mz else "207,182,212",
-            'IDZona': mz.zona.id if mz else -1,
-            "Tarifa": mz.zona.tarifa if mz else 1,
-            }
-   
-            mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=m.id).first()
-            if mesa_abierta:
-                obj["num"] = mesa_abierta.infmesa.numcopias
-                obj["abierta"] = True;
-
-            lsMesas.append(obj)
+            lsMesas.append(m.serialize())
         return lsMesas
+
+    def serialize(self):
+        mz = self.mesaszona_set.first()
+        obj = {
+        'ID': self.id,
+        'Nombre': self.nombre,
+        'Orden': self.orden,
+        'num': 0,
+        'abierta': False,
+        'RGB': mz.zona.rgb if mz else "207,182,212",
+        'IDZona': mz.zona.id if mz else -1,
+        "Tarifa": mz.zona.tarifa if mz else 1,
+        }
+
+        mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=self.id).first()
+        if mesa_abierta:
+            obj["num"] = mesa_abierta.infmesa.numcopias
+            obj["abierta"] = True;
+        return obj
 
     def get_color(self, hex=False):
         s = self.mesaszona_set.all().first()
@@ -769,6 +766,9 @@ class Mesaszona(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     zona = models.ForeignKey('Zonas',  on_delete=models.CASCADE, db_column='IDZona')  # Field name made lowercase.
     mesa = models.ForeignKey(Mesas,  on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
+
+    def serialize(self):
+        return self.mesa.serialize()
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)

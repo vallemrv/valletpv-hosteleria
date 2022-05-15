@@ -16,6 +16,7 @@ export default {
       { title: "Vista teclas", link: { name: "vista" } },
       { title: "Teclados comanda", link: { name: "tecladoscom" } },
       { title: "Teclados TPV", link: { name: "tecladostpv" } },
+      { title: "Teclados por familias", link: { name: "byfamilias" } },
     ],
   }),
 };

@@ -36,12 +36,12 @@ import ValleFiltrosVue from "../components/ValleFiltros.vue";
 import { mapGetters, mapActions } from "vuex";
 export default {
   components: { ValleFloatFormVue, ValleFiltrosVue },
-  props: ["tb_name", "secSel", "field_parent", "field_item"],
+  props: ["tb_name", "tb_mod", "item", "col", "col_paren", "filter"],
   data() {
     return {
       items: [],
       filtro: {
-        text_filters: [{ label: "Buscar tecla", fields: ["nombre"] }],
+        text_filters: [{ label: "Buscar tecla", fields: ["nombre", "tag"] }],
       },
     };
   },
@@ -51,25 +51,18 @@ export default {
   methods: {
     ...mapActions(["addInstruccion"]),
     on_filter_change(f) {
-      var aux = this.getItemsFiltered(f, "teclas");
-      this.items = Object.values(aux).filter((e) => {
-        return e[this.field_item] == -1;
-      });
+      this.items = this.getItemsFiltered(f, "teclas");
     },
-    add_item(item) {
+    add_item(v) {
       var inst = {
         tb: this.tb_name,
-        reg: {
-          orden: 0,
-          tecla__id__teclas: item.id,
-        },
-        tipo: "add",
+        tb_mod: this.tb_mod,
+        reg: this.item,
+        tipo: "md_teclados",
+        filter: this.filter,
       };
-      inst["reg"][this.field_parent] = this.secSel.id;
-      item[this.field_item] = this.secSel.id;
-      item.OrdenCom = 0;
-      item.orden = 0;
-      item.RGB = this.secSel.rgb;
+      inst.reg[this.col] = v.id;
+      v[this.col_parent] = this.item[this.col_parent];
       this.addInstruccion({ inst: inst });
       this.$emit("change");
     },

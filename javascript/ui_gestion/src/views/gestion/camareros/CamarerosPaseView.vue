@@ -1,146 +1,70 @@
 <template>
-  <valle-editor-item
-    :title="title"
-    :filtro="filtro"
-    :tb_name="tb_name"
-    :tabla="tabla"
-    :tools="tools"
-    @click_filter="on_click_filter"
-    @click_tools="on_click_tools"
-  >
-  </valle-editor-item>
+  <v-toolbar color="#cfb6d4">
+    <v-toolbar-title>Camareros pase</v-toolbar-title>
+  </v-toolbar>
+
+  <v-row class="pa-5">
+    <v-col cols="12" v-for="(item, i) in items" :key="i">
+      <v-card class="pa-0">
+        <v-card-text>
+          <v-row>
+            <v-col class="pl-4 mt-4" cols="4">
+              {{ item.nombre }}
+            </v-col>
+            <v-col class="mt-4" cols="4">
+              {{ item.apellidos }}
+            </v-col>
+            <v-col cols="4">
+              <valle-switch
+                v-model="item.autorizado"
+                @change_value="on_change"
+                :item="item"
+                color="success"
+                label="activo"
+              ></valle-switch>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from "vuex";
-import ValleEditorItem from "@/components/ValleEditorItem.vue";
-import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
+import { mapState, mapActions } from "vuex";
+import ValleSwitch from "@/components/ValleSwitch";
 
 export default {
-  components: { ValleEditorItem, ValleDialogoForm },
-  computed: {
-    ...mapGetters(["getItemsFiltered"]),
-    ...mapState(["camareros"]),
-  },
-  data() {
-    const col = ["nombre", "apellidos", "permisos"];
-    return {
-      title: "Camareros",
-      tb_name: "camareros",
-      localFilter: [],
-      filtro: {
-        caption: ["No activos", "activos"],
-        tools: ["no_activos", "activos"],
-        filters: [
-          { activo: 1, autorizado: 0 },
-          { activo: 1, autorizado: 1 },
-        ],
-        all: [
-          { activo: 1, autorizado: 0 },
-          { activo: 1, autorizado: 1 },
-        ],
-        multiple: false,
-      },
-      tabla: {
-        headers: col,
-        keys: col,
-      },
-      multiple_tools: {
-        activos: [
-          { op: "minus", text: "Desautorizar", icon: "mdi-account-minus" },
-          {
-            op: "unlock",
-            text: "Desbloquear",
-            icon: "mdi-lock-open",
-          },
-        ],
-        no_activos: [
-          { op: "plus", text: "Autorizar", icon: "mdi-account-plus" },
-          {
-            op: "unlock",
-            text: "Desbloquear",
-            icon: "mdi-lock-open",
-          },
-        ],
-        all: null,
-      },
-      tools: [],
-    };
-  },
+  components: { ValleSwitch },
   methods: {
     ...mapActions(["getListado", "addInstruccion"]),
-    cargar_reg() {
-      this.getListado({ tabla: this.tb_name });
-    },
-    on_visible_change(value) {
-      this.showDialog = value;
-    },
-    on_click_filter(lfilter) {
-      this.localFilter = lfilter;
-      var selected = lfilter.selected;
-      if (selected && selected.length > 0) {
-        var op = this.filtro.tools[selected[0]];
-        this.tools = this.multiple_tools[op];
-      } else {
-        this.tools = this.multiple_tools["all"];
-      }
-      this.$store.state.itemsFiltrados = this.getItemsFiltered(
-        this.localFilter,
-        this.tb_name
-      );
-    },
-
-    on_click_tools(v, op) {
-      var inst = {};
-      switch (op) {
-        case "minus":
-          inst = {
-            tb: this.tb_name,
-            reg: { autorizado: 0 },
-            tipo: "md",
-            id: v.id,
-          };
-          v.autorizado = 0;
-          break;
-        case "plus":
-          inst = {
-            tb: this.tb_name,
-            reg: { autorizado: 1 },
-            tipo: "md",
-            id: v.id,
-          };
-          v.autorizado = 1;
-          break;
-        case "unlock":
-          inst = {
-            tb: this.tb_name,
-            reg: { pass_field: "" },
-            tipo: "md",
-            id: v.id,
-          };
-          v.pass_field = "";
-          break;
-      }
+    on_change(v) {
+      var inst = {
+        tb: "camareros",
+        tipo: "md",
+        reg: { autorizado: v.autorizado },
+        id: v.id,
+      };
       this.addInstruccion({ inst: inst });
-      this.on_click_filter(this.localFilter);
+    },
+  },
+  computed: {
+    ...mapState(["camareros"]),
+    items() {
+      if (!this.camareros) return [];
+      return Object.values(this.camareros).filter((e) => {
+        return (e.activo = 1);
+      });
     },
   },
   watch: {
     camareros(v) {
-      if (v) {
-        this.on_click_filter(this.localFilter);
-      } else {
-        this.cargar_reg();
-      }
+      if (!v) this.getListado({ tabla: "camareros" });
     },
   },
   mounted() {
-    this.localFilter = Object.values(this.filtro);
-    this.localFilter.filters = Object.values(this.filtro.all);
-    if (this.camareros) {
-      this.on_click_filter(this.localFilter);
-    } else {
-      this.cargar_reg();
+    if (!this.camareros) {
+      this.getListado({ tabla: "camareros" });
     }
   },
 };
