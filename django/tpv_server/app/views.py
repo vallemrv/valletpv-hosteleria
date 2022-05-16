@@ -1,5 +1,7 @@
 import json
 import os
+from sys import stdout
+from xml.etree.ElementInclude import include
 from django.shortcuts import render
 from tokenapi.http import JsonResponse
 from django.apps import apps
@@ -8,6 +10,7 @@ from tokenapi.decorators import token_required
 from django.conf import settings
 from gestion.models import Secciones, Teclas, Teclaseccion
 from datetime import datetime
+from django.core.management import call_command
 
 def inicio(request):
     return render(request, "index.html")
@@ -15,7 +18,6 @@ def inicio(request):
 @token_required
 def reset_db(request):
     media = settings.MEDIA_ROOT
-    script =  "manage_"+settings.EMPRESA+".py"
     tablas = [
         "efectivo",
         "gastos",
@@ -28,10 +30,13 @@ def reset_db(request):
         "camareros",
         "ticket"
     ]
-    models = "gestion." + " gestion.".join(tablas)
+    models = [] 
+    for t in tablas:
+        models.append("gestion." + t)
+    file = os.path.join(media, datetime.now().strftime("%Y_%m_%d_%H_%M_%S")+".json")
+    with open(file, "w") as f:
+        call_command("dumpdata", *models,  stdout=f)
     
-    os.system("python "+script+ " dumpdata " + models + " > "
-                      + media+"/"+datetime.now().strftime("%Y_%m_%d_%H_%M_%S")+".json")
     for m in tablas:
         model = apps.get_model("gestion", m)
         if (m != "camareros"):

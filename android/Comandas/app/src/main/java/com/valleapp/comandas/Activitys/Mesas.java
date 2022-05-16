@@ -339,6 +339,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     }
 
     public void getPendientes(){
+        rellenarPedido();
         /*Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
