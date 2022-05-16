@@ -1,6 +1,17 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
+    borrarVentas( {commit, state}){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.token.user)
+        params.append("token", state.token.token) 
+        API.borrar_ventas(params)
+        .then(r => commit(types.REQUEST_SUCCESS))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },    
     modificarSecciones( {commit, state}, {item}){
         commit(types.GET_REQUEST)
         let params = new FormData()

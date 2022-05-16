@@ -1,17 +1,15 @@
 <template>
-  <h1>Ventas</h1>
+  <valle-menu-btn :items="items"></valle-menu-btn>
 </template>
 <script>
 import ValleMenuBtn from "@/components/ValleMenuBtn";
+
 export default {
   components: { ValleMenuBtn },
   data: () => ({
     items: [
-      { title: "Camareros pase" },
-      { title: "Camareros" },
-      { title: "Teclados" },
-      { title: "Precios" },
-      { title: "Cajas" },
+      { title: "Cajas", link: { name: "" } },
+      { title: "Borrar ventas", link: { name: "borrar_ventas" } },
     ],
   }),
 };

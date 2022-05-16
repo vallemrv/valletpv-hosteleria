@@ -113,7 +113,7 @@ export default {
             tb_name: "mesaszona",
             mesa: v.ID,
             zona: v.IDZona,
-            filter: { mesa: v.ID, zona: v.IDZona },
+            filter: ["mesa"],
           };
           this.showDialogo = true;
           this.tipo = "md_teclados";

@@ -1,13 +1,46 @@
 import json
+import os
 from django.shortcuts import render
 from tokenapi.http import JsonResponse
 from django.apps import apps
 from django.forms.models import model_to_dict
 from tokenapi.decorators import token_required
+from django.conf import settings
 from gestion.models import Secciones, Teclas, Teclaseccion
+from datetime import datetime
 
 def inicio(request):
     return render(request, "index.html")
+
+@token_required
+def reset_db(request):
+    media = settings.MEDIA_ROOT
+    script =  "manage_"+settings.EMPRESA+".py"
+    tablas = [
+        "efectivo",
+        "gastos",
+        "arqueocaja",
+        "cierrecaja",
+        "lineaspedido",
+        "pedidos",
+        "infmesa",
+        "historialnulos",
+        "camareros",
+        "ticket"
+    ]
+    models = "gestion." + " gestion.".join(tablas)
+    
+    os.system("python "+script+ " dumpdata " + models + " > "
+                      + media+"/"+datetime.now().strftime("%Y_%m_%d_%H_%M_%S")+".json")
+    for m in tablas:
+        model = apps.get_model("gestion", m)
+        if (m != "camareros"):
+            model.objects.all().delete()
+        else:
+            model.objects.filter(activo=0).delete()
+    
+    return JsonResponse("success")
+    
 
 #este es especifico para las teclasseccion
 @token_required

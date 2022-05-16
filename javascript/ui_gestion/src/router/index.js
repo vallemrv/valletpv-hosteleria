@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { gestionRoutes  } from './gestion'
+import { ventasRoutes } from "./ventas"
 import HomeView from '@/views/HomeView'
 import GestionView from '@/views/gestion/GestionView'
 import VentasView from '@/views/ventas/VentasView'
 
 
 const routes = [
-  ... gestionRoutes,
+  ... gestionRoutes, ...ventasRoutes,
   {
     path: '/',
     name: 'home',

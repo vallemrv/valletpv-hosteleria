@@ -24,6 +24,10 @@ export default {
         state.ocupado= true;
         state.error = null;
     },
+    [types.REQUEST_SUCCESS] (state){
+        state.ocupado= false;
+        state.error = null;
+    },
     [types.ERROR_REQUEST] (state, {error}){
         state.ocupado= false;
         state.error = error;

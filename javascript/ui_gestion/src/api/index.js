@@ -8,6 +8,9 @@ const post = (path, params) => {
 }
 
 export default {
+    borrar_ventas(params){
+        return post("app/reset_db", params)
+    },
     modificarSecciones(params){
         return post("app/mod_sec", params)
     },

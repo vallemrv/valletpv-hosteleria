@@ -9,4 +9,5 @@ urlpatterns = [
     path("mod_regs", views.mod_regs, name="mod_regs"),
     path("add_reg", views.add_reg, name="add_reg"),
     path("mod_sec", views.mod_sec, name="mod_sec"),
+    path("reset_db", views.reset_db, name="reset_db"),
 ]
