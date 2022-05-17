@@ -134,9 +134,10 @@ def add_reg_handler(app_name, tb_name, reg):
             field = getattr(obj, k_lower)
             if "models" in str(type(field)):
                 attr = field.__class__.objects.get(pk=reg[key])
+                setattr(obj, k_lower, attr)
             elif "NoneType" in str(type(field)):
                 attr = reg[key]
-                k_lower = k_lower+"_id"
+                setattr(obj, k_lower+"_id", attr)
             else:
                 attr = reg[key] 
             setattr(obj, k_lower, attr)  

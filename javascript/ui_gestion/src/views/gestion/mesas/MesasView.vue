@@ -4,7 +4,7 @@
     :tabla="tabla"
     :tb_name="tb_name"
     @click_tools="on_click_tools"
-    :form="form"
+    :form="formMesa"
     :tools="tools"
     :filtro="filtro"
     @click_filter="on_click_filter"
@@ -13,9 +13,9 @@
   <valle-dialogo-form-vue
     @close="() => (showDialogo = false)"
     :show="showDialogo"
-    title="Editar"
+    title="Modificar"
     :item="itemSel"
-    :form="form"
+    :form="formMZona"
     :tb_name="tb_name"
     :tipo="tipo"
   ></valle-dialogo-form-vue>
@@ -65,15 +65,13 @@ export default {
           { col: "Orden", float: true },
         ],
       },
-      form: [],
       tools: [
-        { op: "edit", text: "Editar", icon: "mdi-account-edit" },
         { op: "edit_zona", text: "Editar zona", icon: "mdi-table-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
       ],
       formMesa: [
         { col: "Nombre", label: "Nombre", tp: "text" },
-        { col: "Orden", label: "Orden", tp: "number" },
+        { col: "Orden", label: "Orden", tp: "number", default: 0 },
       ],
     };
   },
@@ -88,13 +86,6 @@ export default {
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
-        case "edit":
-          this.titleDialogo = "Editar";
-          this.form = this.formMesa;
-          this.itemSel = v;
-          this.showDialogo = true;
-          this.tipo = "md";
-          break;
         case "rm":
           inst = {
             tb: this.tb_name,
@@ -119,7 +110,7 @@ export default {
           this.tipo = "md_teclados";
           break;
       }
-      if (op != "edit" && op != "edit_zona") {
+      if (op != "edit_zona") {
         this.addInstruccion({ inst: inst });
       }
     },

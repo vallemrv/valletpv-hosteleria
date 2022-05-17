@@ -43,6 +43,7 @@ export default {
           col: "receptor",
           label: "Receptor",
           tp: "select",
+          required: true,
           choices: this.getListValues("receptores", "nombre"),
           keys: this.getListValues("receptores", "id"),
         },

@@ -37,19 +37,18 @@ export default {
       tb_name: "secciones",
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "rgb", label: "Color", tp: "color" },
-        { col: "orden", label: "Orden", tp: "number" },
+        { col: "rgb", label: "Color", tp: "color", default: "255,0,255" },
+        { col: "orden", label: "Orden", tp: "number", default: 0 },
       ],
       tabla: {
         headers: ["Nombre", "Color", "Orden"],
         keys: [
-          "nombre",
+          { col: "nombre", float: true },
           { col: "rgb", float: true, tipo: "color" },
           { col: "orden", float: true },
         ],
       },
       tools: [
-        { op: "edit", text: "Editar", icon: "mdi-account-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
         { op: "add", text: "Agregar teclas", icon: "mdi-table-plus" },
         { op: "show", text: "Ver teclado", icon: "mdi-eye" },
@@ -68,12 +67,6 @@ export default {
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
-        case "edit":
-          this.titleDialogo = "Editar";
-          this.itemSel = v;
-          this.showDialogo = true;
-          this.tipo = "md";
-          break;
         case "add":
           this.$router.push({ name: "teclas" });
           break;
@@ -93,7 +86,7 @@ export default {
           this.$router.push({ name: "tecladostpv", params: { id: index } });
           break;
       }
-      if (op != "edit" && op != "add" && op != "show") {
+      if (op != "add" && op != "show") {
         this.addInstruccion({ inst: inst });
       }
     },

@@ -2,6 +2,15 @@ export default {
     install: (app, options) => {
         
         app.config.globalProperties.$tools = {
+            valid_form(item, form){
+                var text = "";
+               form.forEach((e) => {
+                   if (e.required && item[e.col] == null){
+                     text += e.label + " es obligatorio "
+                   }
+               }) 
+               return text == "" ? null : text    
+            },
             componentToHex(c)  {
                var hex = c.toString(16);
                return hex.length == 1 ? "0" + hex : hex;
@@ -22,7 +31,8 @@ export default {
             newItem(form){
                 let item = {}
                 form.forEach((e) => {
-                    if (e.tp == "text") item[e.col] = "";
+                    if (e.default != null) item[e.col] = e.default;
+                    else if (e.tp == "text") item[e.col] = "";
                     else if( e.tp == "multiple") item[e.col] = [];
                     else item[e.col] = null
                 });

@@ -1,7 +1,7 @@
 <template>
   <v-row v-show="!showOrdenarTeclas && !showAgregarTeclas">
-    <v-col cols="12" class="pa-2">
-      <v-toolbar color="#cfb6d4">
+    <v-col cols="12" class="pa-2 mb-5">
+      <v-toolbar class="mb-2" color="#cfb6d4">
         <v-toolbar-title>
           {{ title }}
           <v-progress-circular
@@ -17,38 +17,51 @@
           <v-btn icon v-if="items.length < 18" @click="() => (showAgregarTeclas = true)">
             <v-icon>mdi-plus</v-icon></v-btn
           >
-          <v-btn icon @click="() => (showOrdenarTeclas = true)">
+          <v-btn v-if="click <= 1" icon @click="() => (showOrdenarTeclas = true)">
             <v-icon>mdi-order-numeric-descending </v-icon></v-btn
           >
         </div>
       </v-toolbar>
-      <v-toolbar color="#cfb6d4" v-if="itemSel">
-        <v-toolbar-title></v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-card class="mr-2" :color="$tools.rgbToHex(itemSel.RGB)">
-          <v-card-text>
-            {{ itemSel.nombre }}
-            <v-btn icon @click="editar_tecla"> <v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn
-              icon
-              @click="agregar_subteclas"
-              v-if="itemSel.tipo == 'CM' && items.length < 18"
-            >
-              <v-icon>mdi-plus</v-icon></v-btn
-            >
+      <v-row>
+        <v-col cols="12" sm="6" v-if="itemSel">
+          <v-card :color="$tools.rgbToHex(itemSel.RGB)">
+            <v-card-text>
+              {{ itemSel.nombre }}
+              <v-btn class="float-right" icon variant="text" @click="editar_tecla">
+                <v-icon>mdi-pencil</v-icon></v-btn
+              >
+              <v-btn
+                icon
+                class="float-right"
+                variant="text"
+                @click="agregar_subteclas"
+                v-if="itemSel.tipo == 'CM' && items.length < 18"
+              >
+                <v-icon>mdi-plus</v-icon></v-btn
+              >
 
-            <v-btn icon @click="quitar_tecla"> <v-icon>mdi-delete</v-icon></v-btn>
-          </v-card-text>
-        </v-card>
-
-        <v-card elevation="2">
-          <v-card-text v-if="subItemSel">
-            {{ subItemSel.nombre }}
-            <v-btn icon @click="editar_subtecla"> <v-icon>mdi-pencil</v-icon></v-btn>
-            <v-btn icon @click="quitar_subtecla"> <v-icon>mdi-delete</v-icon></v-btn>
-          </v-card-text>
-        </v-card>
-      </v-toolbar>
+              <v-btn class="float-right" variant="text" icon @click="quitar_tecla">
+                <v-icon>mdi-delete</v-icon></v-btn
+              >
+              <div class="clearfix"></div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" v-if="subItemSel">
+          <v-card elevation="2">
+            <v-card-text>
+              {{ subItemSel.nombre }}
+              <v-btn class="float-right" icon variant="text" @click="editar_subtecla">
+                <v-icon>mdi-pencil</v-icon></v-btn
+              >
+              <v-btn class="float-right" icon variant="text" @click="quitar_subtecla">
+                <v-icon>mdi-delete</v-icon></v-btn
+              >
+              <div class="clearfix"></div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-col>
 
     <v-col cols="3">
@@ -122,7 +135,7 @@ export default {
       form: [],
       formTecla: [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "cescripcion_t", label: "Texto ticket", tp: "text" },
+        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
         { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
       ],
       formGR: [
@@ -308,11 +321,19 @@ export default {
       this.subteclas.length == 0 ||
       !this.seccionescom ||
       this.seccionescom.length == 0 ||
-      !this.familias ||
-      this.familias.length == 0
+      !this.iconchoices ||
+      this.iconchoices.length == 0
     ) {
       this.getTablas();
-    } else this.on_click_sec(this.seccionescom[0]);
+    } else {
+      this.on_click_sec(this.seccionescom[0]);
+    }
   },
 };
 </script>
+
+<style>
+.clearfix {
+  clear: both;
+}
+</style>

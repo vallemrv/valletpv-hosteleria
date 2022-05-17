@@ -1,5 +1,5 @@
 <template>
-  <v-select v-model="localValue" :items="items"> </v-select>
+  <v-select v-model="localValue" :items="items" hide-details="auto"> </v-select>
 </template>
 
 <script>

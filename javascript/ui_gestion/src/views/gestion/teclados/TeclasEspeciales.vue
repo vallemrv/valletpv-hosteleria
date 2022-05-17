@@ -82,11 +82,12 @@ export default {
     form() {
       return [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "p1", label: "Precio 1", tp: "number" },
+        { col: "p1", label: "Precio 1", tp: "number", required: true },
         {
           col: "p2",
           label: "Precio 2",
           tp: "number",
+          required: true,
         },
         {
           col: "tag",
@@ -97,6 +98,7 @@ export default {
           col: "familia",
           label: "Familia",
           tp: "select",
+          required: true,
           keys: this.getListValues("familias", "id"),
           choices: this.getListValues("familias", "nombre"),
         },
@@ -141,6 +143,7 @@ export default {
           break;
         case "md":
           this.itemSel = v;
+          v.composicion = this.$tools.stringToArray(v.composicion);
           this.showDialog = true;
           this.tipo = "md";
           this.titleForm = "Editar composicion";
@@ -156,7 +159,6 @@ export default {
             return e.id != v.id;
           });
           this.addInstruccion({ inst: inst });
-          //this.mostrarTeclasComp();
           break;
       }
     },

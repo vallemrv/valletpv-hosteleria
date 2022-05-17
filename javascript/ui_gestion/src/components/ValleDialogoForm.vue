@@ -1,7 +1,7 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="show">
-      <v-card :title="title" width="450px">
+    <v-dialog v-model="show" content-class="v-dialog--custom">
+      <v-card :title="title">
         <v-divider></v-divider>
         <v-card-text>
           <v-row>
@@ -17,6 +17,7 @@
                 v-model="item[f.col]"
                 :label="f.label"
                 color="success"
+                hide-details="auto"
               ></v-switch>
               <v-combobox
                 v-else-if="f.tp == 'multiple'"
@@ -25,6 +26,7 @@
                 :label="f.label"
                 :multiple="f.tp"
                 :values="f.keys"
+                hide-details="auto"
                 outlined
                 dense
               ></v-combobox>
@@ -40,14 +42,17 @@
                 v-model="item[f.col]"
                 :label="f.label"
                 hide-details="auto"
-                :rules="rules"
                 :type="f.tp"
                 autocomplete="false"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <v-alert v-show="textAlert" color="warning">{{ textAlert }} </v-alert>
+            </v-col>
           </v-row>
         </v-card-text>
         <v-divider></v-divider>
+
         <v-card-actions>
           <v-btn color="primary" @click="close_dialogo">cancelar</v-btn>
           <v-btn color="pink" @click="enviar">aceptar</v-btn>
@@ -66,38 +71,40 @@ export default {
   components: { ValleSelectVue, ValleColorInputVue },
   props: ["show", "item", "form", "title", "tb_name", "tipo"],
   data() {
-    return {
-      rules: [(value) => !!value || "Es necesario."],
-    };
+    return { textAlert: null };
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
     close_dialogo() {
+      this.textAlert = null;
       this.$emit("close");
     },
     enviar() {
-      if (this.tipo == "add") {
-        this.addItem({ item: this.item, tb_name: this.tb_name });
-      } else if (this.tipo == "md") {
-        var id = this.item.id ? this.item.id : this.item.ID;
-        let inst = {
-          tb: this.tb_name,
-          reg: this.item,
-          tipo: "md",
-          id: id,
-        };
-        this.addInstruccion({ inst: inst });
-      } else if (this.tipo == "md_teclados") {
-        let inst = {
-          tb: this.tb_name,
-          tb_mod: this.item.tb_name,
-          reg: this.item,
-          tipo: "md_teclados",
-          filter: this.item.filter,
-        };
-        this.addInstruccion({ inst: inst });
+      this.textAlert = this.$tools.valid_form(this.item, this.form);
+      if (!this.textAlert) {
+        if (this.tipo == "add") {
+          this.addItem({ item: this.item, tb_name: this.tb_name });
+        } else if (this.tipo == "md") {
+          var id = this.item.id ? this.item.id : this.item.ID;
+          let inst = {
+            tb: this.tb_name,
+            reg: this.item,
+            tipo: "md",
+            id: id,
+          };
+          this.addInstruccion({ inst: inst });
+        } else if (this.tipo == "md_teclados") {
+          let inst = {
+            tb: this.tb_name,
+            tb_mod: this.item.tb_name,
+            reg: this.item,
+            tipo: "md_teclados",
+            filter: this.item.filter,
+          };
+          this.addInstruccion({ inst: inst });
+        }
+        this.close_dialogo();
       }
-      this.close_dialogo();
     },
   },
   watch: {
@@ -109,3 +116,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-dialog--custom {
+  width: 90%;
+}
+</style>

@@ -37,19 +37,25 @@ export default {
       tb_name: "zonas",
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "rgb", label: "Color", tp: "color" },
-        { col: "orden", label: "Orden", tp: "number" },
+        { col: "rgb", label: "Color", tp: "color", default: "255,0,255" },
+        {
+          col: "tarifa",
+          label: "Tarifa",
+          tp: "select",
+          choices: ["1", "2"],
+          keys: [1, 2],
+          default: 1,
+        },
       ],
       tabla: {
-        headers: ["Nombre", "Color", "Orden"],
+        headers: ["Nombre", "Color", "Tarifa"],
         keys: [
-          "nombre",
+          { col: "nombre", float: true },
           { col: "rgb", float: true, tipo: "color" },
           { col: "tarifa", float: true },
         ],
       },
       tools: [
-        { op: "edit", text: "Editar", icon: "mdi-account-edit" },
         { op: "rm", text: "Borrar", icon: "mdi-delete" },
         { op: "add", text: "Agregar mesas", icon: "mdi-table-plus" },
       ],
@@ -67,12 +73,6 @@ export default {
     on_click_tools(v, op) {
       var inst = {};
       switch (op) {
-        case "edit":
-          this.titleDialogo = "Editar";
-          this.itemSel = v;
-          this.showDialogo = true;
-          this.tipo = "md";
-          break;
         case "add":
           this.$router.push({ name: "mesas" });
           break;
@@ -88,7 +88,7 @@ export default {
           });
           break;
       }
-      if (op != "edit" && op != "add" && op != "show") {
+      if (op != "add") {
         this.addInstruccion({ inst: inst });
       }
     },
