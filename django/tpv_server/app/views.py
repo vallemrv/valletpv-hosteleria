@@ -130,26 +130,15 @@ def add_reg_handler(app_name, tb_name, reg):
     obj = model()
     for key in reg:
         k_lower = key.lower()
-        if hasattr(obj, k_lower):
-            field = getattr(obj, k_lower)
-            if "models" in str(type(field)):
-                attr = field.__class__.objects.get(pk=reg[key])
-                setattr(obj, k_lower, attr)
-            elif "NoneType" in str(type(field)):
-                attr = reg[key]
-                setattr(obj, k_lower+"_id", attr)
+        if hasattr(model, k_lower):
+            field = getattr(model, k_lower)
+            attr = reg[key]
+            if "ForwardManyToOneDescriptor" in field.__class__.__name__:
+                k_lower =  k_lower+"_id"
             else:
                 attr = reg[key] 
             setattr(obj, k_lower, attr)  
-        elif hasattr(model, k_lower):
-            setattr(obj, k_lower+"_id", reg[key])      
-        elif "__" in key:
-                attr, field, str_parent = key.split("__")
-                parent = apps.get_model(app_name, str_parent)
-                filter = {field:reg[key]}
-                p = parent.objects.filter(**filter).first()
-                if p:
-                    setattr(obj, attr, p)
+        
 
     obj.save()
 
@@ -180,20 +169,14 @@ def modifcar_reg(inst):
         for key in reg:
             k_lower = key.lower()
             if hasattr(obj, k_lower):
-                field = getattr(obj, k_lower)
-                if "models" in str(type(field)):
-                    attr = field.__class__.objects.get(pk=reg[key])
+                field = getattr(model, k_lower)
+                attr = reg[key]
+                if "ForwardManyToOneDescriptor" in field.__class__.__name__:
+                    k_lower =  k_lower+"_id"
                 else:
                     attr = reg[key] 
-                setattr(obj, k_lower, attr)      
-            else:
-                if "__" in key:
-                    attr, field, str_model = key.split("__")
-                    parent = apps.get_model(app_name, str_model)
-                    filter = {field:reg[key]}
-                    p = parent.objects.filter(**filter).first()
-                    if p:
-                        setattr(obj, attr, p)
+            setattr(obj, k_lower, attr)        
+            
 
         obj.save()
 

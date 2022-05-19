@@ -17,15 +17,22 @@
         </v-card-text>
       </v-card>
     </v-col>
-    <v-col cols="6" v-for="(item, i) in items" :key="i">
-      <v-card>
+    <v-col cols="6" sm="4" v-for="(item, i) in items" :key="i">
+      <v-card class="h-100">
         <v-card-text>
           <v-row>
-            <v-col cols="8" v-if="item.descripcion_r">{{ item.descripcion_r }}</v-col>
-            <v-col cols="8" v-else>{{ item.nombre }}</v-col>
-            <v-col cols="4"
-              ><v-btn icon><v-icon @click="edit(item)">mdi-pencil</v-icon></v-btn></v-col
+            <v-col cols="6"
+              ><span>{{ item.nombre }}</span></v-col
             >
+            <v-col cols="6" class="text-right">
+              <v-btn size="x-small" variant="text" icon>
+                <v-icon @click="edit(item)">mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn size="x-small" variant="text" icon>
+                <v-icon @click="borrar(item)">mdi-delete</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="12" v-if="item.descripcion_r">{{ item.descripcion_r }}</v-col>
           </v-row>
         </v-card-text>
       </v-card>
@@ -36,7 +43,7 @@
     :show="showDialogo"
     :form="form"
     :item="itemSel"
-    title="Editar familia"
+    title="Editar tecla"
     tipo="md"
     tb_name="teclas"
   ></valle-dialogo-form-vue>
@@ -61,9 +68,10 @@ export default {
     ...mapGetters(["getListValues"]),
     form() {
       return [
-        { col: "nombre", tp: "text" },
+        { col: "nombre", label: "Nombre", tp: "text" },
         {
           col: "descripcion_r",
+          label: "Descripcion recepcion",
           tp: "text",
         },
         {
@@ -92,14 +100,26 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["getListadoCompuesto"]),
+    ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     edit(item) {
       this.itemSel = item;
       this.showDialogo = true;
     },
+    borrar(item) {
+      var inst = {
+        tb: "teclas",
+        tipo: "rm",
+        id: item.id,
+      };
+      let ls = this.$store.state["teclas"];
+      this.$store.state["teclas"] = ls.filter((e) => {
+        return e.id != item.id;
+      });
+      this.addInstruccion({ inst: inst });
+    },
   },
   mounted() {
-    this.getListadoCompuesto({ tablas: ["teclas", "familias"] });
+    this.getListadoCompuesto({ tablas: ["teclas", "subteclas", "familias"] });
   },
 };
 </script>

@@ -57,7 +57,7 @@
         <v-col cols="12" sm="6" v-if="subItemSel">
           <v-card elevation="2">
             <v-card-text>
-              {{ subItemSel.nombre }}
+              {{ itemSel.nombre + " " + itemSel.p1 }}
               <v-btn class="float-right" icon variant="text" @click="editar_subtecla">
                 <v-icon>mdi-pencil</v-icon></v-btn
               >
@@ -267,7 +267,7 @@ export default {
     },
     on_click_sec(sec) {
       var f = {
-        filters: [{ IDSeccion: sec.id }],
+        filters: [{ IDSeccion: sec.id }, { IDSec2: sec.id }],
       };
       var it = this.getItemsFiltered(f, "teclas");
       this.items = this.getItemsOrdered(it, "orden");

@@ -39,10 +39,13 @@
                 app="gestion"
                 tb_name="subteclas"
                 :rules="rules"
-                :value="precio(s, tecla.p1)"
+                :value="tecla.incremento"
+                :hint="precio(s, tecla.p2)"
               ></valle-float-form>
             </v-col>
-            <v-col cols="4">{{ precio(s, tecla.p2) }}</v-col>
+            <v-col cols="4">
+              {{ precio(s, tecla.p2) }}
+            </v-col>
           </v-row>
         </v-expansion-panel-text>
       </v-expansion-panel>

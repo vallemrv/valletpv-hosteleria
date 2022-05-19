@@ -46,7 +46,7 @@
 import { mapActions } from "vuex";
 
 export default {
-  props: ["item", "column", "rules", "hint", "app", "tb_name", "value", "tipo"],
+  props: ["item", "column", "rules", "hint", "app", "tb_name", "value", "tipo", "hint"],
   data: () => {
     return {
       elevation: 3,

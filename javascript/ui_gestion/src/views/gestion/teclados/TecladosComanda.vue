@@ -26,7 +26,7 @@
         <v-col cols="12" sm="6" v-if="itemSel">
           <v-card :color="$tools.rgbToHex(itemSel.RGB)">
             <v-card-text>
-              {{ itemSel.nombre }}
+              {{ itemSel.nombre + " " + itemSel.p1 }}
               <v-btn class="float-right" icon variant="text" @click="editar_tecla">
                 <v-icon>mdi-pencil</v-icon></v-btn
               >
