@@ -46,3 +46,10 @@ def servido(request):
 
     return get_pendientes(request)
 
+
+def get_pedidos_by_receptor(request):
+    rec = json.loads(request.POST["receptores"])
+    lineas = Lineaspedido.objects.filter(tecla__familia__receptor__pk=rec.id).values("pedido","descripcion", "estado")
+    for l in lineas:
+        print(l.descripcion)
+
