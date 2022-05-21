@@ -5,7 +5,8 @@
 # @Last modified time: 2019-10-10T17:44:16+02:00
 # @License: Apache License v2.0
 
-from api_android.tools import send_mensaje_devices, imprimir_pedido
+from api_android.tools import imprimir_pedido
+from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -25,15 +26,8 @@ def marcar_rojo(request):
     infmesa.save()
     Sync.actualizar("mesasabiertas")
     if infmesa.numcopias <= 1:
-        update = {
-           "op": "md",
-           "tb": "mesasabiertas",
-           "receptor": "comandas",
-           "obj":mesa_abierta.serialize(),
-           "device":""
-        }
-        send_mensaje_devices(update)
-    return JsonResponse({})
+        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize())
+    return JsonResponse("success")
 
 
 

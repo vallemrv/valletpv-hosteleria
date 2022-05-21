@@ -18,8 +18,6 @@ from app.utility import rgbToHex
 from comunicacion.tools import comunicar_cambios_devices, send_mensaje_impresora
 
 
-
-
 class HistorialMensajes(models.Model):
     camarero = models.ForeignKey("Camareros", on_delete=models.CASCADE)
     mensaje = models.CharField(max_length=300)
@@ -538,6 +536,16 @@ class Lineaspedido(models.Model):
             lineas = [*lineas, *m.get_lineaspedido()]
                 
         return lineas
+    
+    @staticmethod
+    def is_equals(self, linea):
+        equal = True
+        if int(linea["servido"]) != Servidos.objects.filter(linea__pk=self["ID"]).count() :
+            return False
+        if self["Estado"] != linea["Estado"]:
+            return False
+         
+        return equal
 
     def serialize(self):
         l = self
@@ -673,7 +681,6 @@ class Mesasabiertas(models.Model):
     infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     mesa = models.ForeignKey(Mesas, on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
 
-
     @staticmethod
     def update_for_devices():
         mesas = Mesasabiertas.objects.all()
@@ -681,7 +688,6 @@ class Mesasabiertas(models.Model):
         for m in mesas:
             objs.append(m.serialize())
         return objs
-
 
     @staticmethod
     def borrar_mesa_abierta(idm, idc, motivo):
@@ -703,9 +709,9 @@ class Mesasabiertas(models.Model):
 
             obj = mesa.serialize()
             obj["abierta"] = 0
+            obj["num"] = 0
             comunicar_cambios_devices("md", "mesasabiertas", obj)
             mesa.delete()
-
 
     @staticmethod
     def cambiar_mesas_abiertas(idp, ids):
@@ -721,12 +727,12 @@ class Mesasabiertas(models.Model):
             elif mesaP:
                 mesaP.mesa_id = ids
                 mesaP.save()
-                comunicar_cambios_devices("md", "mesasabiertas", {"ID":ids,"num":0, "abierta":1})
+                comunicar_cambios_devices("md", "mesasabiertas", mesaP.serialize())
                 comunicar_cambios_devices("md", "mesasabiertas", {"ID":idp,"num":0, "abierta":0})
             else:
                 Sync.actualizar("mesasabiertas")
 
-            print("holaa")
+            
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):
@@ -747,6 +753,7 @@ class Mesasabiertas(models.Model):
                 
                 obj = mesaS.serialize()
                 obj["abierta"] = 0
+                obj["num"] = 0
                 comunicar_cambios_devices("md", "mesasabiertas", obj)
                 infmesa.delete()
     
@@ -760,7 +767,7 @@ class Mesasabiertas(models.Model):
     def get_lineaspedido(self):
         lineas = []
         m = self
-        for l in Lineaspedido.objects.filter(Q(infmesa__pk=m.infmesa.pk) & (Q(estado='P') | Q(estado="R"))):
+        for l in Lineaspedido.objects.filter(Q(infmesa__pk=m.infmesa.pk) & (Q(estado='P') | Q(estado="R") | Q(estado="M"))):
             lineas.append(l.serialize())
         return lineas
 
@@ -1295,6 +1302,7 @@ class Ticket(models.Model):
                 for l in Mesasabiertas.objects.filter(infmesa__pk=uid):
                     s = l.serialize()
                     s["abierta"] = 0
+                    s["num"] = 0
                     comunicar_cambios_devices("md", "mesasabiertas", s)
                     l.delete()
                 Sync.actualizar(Mesasabiertas._meta.db_table)

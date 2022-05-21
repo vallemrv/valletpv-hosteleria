@@ -35,7 +35,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
             initialValues.put("abierta", 0);
             initialValues.put("num", "0");//Cerramos todas las mesas
             sqlDb.update("mesas", initialValues, null, null);
-
             for (int i=0; i < objs.length(); i ++) {
                 JSONObject o = objs.getJSONObject(i);
                 initialValues = new ContentValues();
@@ -44,8 +43,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
                 initialValues.put("num", o.getString("num"));
                 sqlDb.update("mesas", initialValues,"ID=?", new String[]{id});
             }
-        } catch (SQLException sql){
-            Log.i("ValleTPV", "Creando base de datos para mesas abiertas");
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -62,21 +59,20 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
     @Override
     public void insert(JSONObject o) {
-        try{
-        }catch (Exception e){}
+        db.insert(o);
     }
 
     @Override
     public void update(JSONObject o) {
+        SQLiteDatabase dbsql = db.getWritableDatabase();
         try{
-            SQLiteDatabase dbsql = db.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("abierta", o.getString("abierta"));
             values.put("num", o.getInt("num"));
             dbsql.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
-            dbsql.close();
         }catch (Exception e){
             e.printStackTrace();
         }
+        dbsql.close();
     }
 }

@@ -10,7 +10,8 @@ from django.db.models import Q, Sum, Count
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from api_android.tools import (send_imprimir_ticket, send_mensaje_devices)
+from api_android.tools import (send_imprimir_ticket)
+from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
                             Infmesa,  Sync, Ticket)
 from datetime import datetime
@@ -60,6 +61,7 @@ def mvlinea(request):
              mesa.infmesa_id = infmesa.pk
              mesa.mesa_id = idm
              mesa.save()
+             comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
 
 
          pedido = Pedidos()
@@ -71,10 +73,16 @@ def mvlinea(request):
          linea.infmesa_id =  mesa.infmesa.pk
          linea.pedido_id = pedido.pk
          linea.save()
+         comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
 
          numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__uid=uid)).count()
          if numart<=0:
-            Mesasabiertas.objects.filter(infmesa__uid=uid).delete()
+            for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
+                obj = m.serialize()
+                obj["abierta"] = 0
+                obj["num"] = 0
+                comunicar_cambios_devices("md", "mesasabiertas", obj)
+                m.delete()
             Sync.actualizar(Mesasabiertas._meta.db_table)
 
 
@@ -122,11 +130,7 @@ def cuenta_rm_linea(request):
     motivo = request.POST["motivo"]
     s = request.POST["Estado"]
     n = request.POST["Descripcion"]
-    
-    
     Lineaspedido.borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n)
-
-
     return HttpResponse('success')
 
 

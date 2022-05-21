@@ -30,19 +30,24 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
-
     public DBCuenta(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
+         db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
-                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, " +
-                "IDMesa INTEGER, " +
-                "IDArt INTEGER )");
+                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, IDPedido INTEGER, " +
+                "IDMesa INTEGER," +
+                "IDArt INTEGER," +
+                "nomMesa TEXT, IDZona TEXT," +
+                "servido INTEGER )");
+
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -50,21 +55,235 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         onCreate(db);
     }
 
+    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 
 
+    @Override
+    public JSONArray filter(String cWhere) {
+
+        String strWhere = "";
+        if (cWhere != null){
+            strWhere = " WHERE "+ cWhere;
+        }
+
+        JSONArray lista  = execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
+                " FROM cuenta " + strWhere +
+                " GROUP BY  IDArt,  Descripcion, Precio, Estado ORDER BY ID DESC");
+
+
+        return lista;
+    }
+
+    public List<JSONObject> filterList(String cWhere) {
+        List<JSONObject> lista = new ArrayList<>();
+        try {
+            String strWhere = "";
+            if (cWhere != null){
+                strWhere = " WHERE "+ cWhere;
+            }
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
+                    " FROM cuenta " + strWhere +
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                lista.add(cargarRegistro(res));
+                res.moveToNext();
+            }
+            res.close();
+
+            db.close();
+        }catch (SQLiteException e){
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+
+    private ContentValues caragarValues(JSONObject o){
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getString("ID"));
+            values.put("IDArt", o.getInt("IDArt"));
+            values.put("Descripcion", o.getString("Descripcion"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+            values.put("Precio", o.getDouble("Precio"));
+            values.put("IDMesa", o.getString("IDMesa"));
+            values.put("IDZona", o.getString("IDZona"));
+            values.put("nomMesa", o.getString("nomMesa"));
+            values.put("IDPedido", o.getString("IDPedido"));
+            values.put("Estado", o.getString("Estado"));
+            values.put("servido", o.getString("servido"));
+        }catch (Exception e){
+            Log.d("CUENTA-CARGARVALUES",  e.getMessage());
+        }
+        return values;
+    }
+
+    public List<JSONObject> getAll(String id) {
+        return filterList("IDMesa ="+id+" AND (estado = 'N' or estado ='P')" );
+    }
+
+    public double getTotal(String id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double s = 0.0;
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
+                    "FROM cuenta WHERE IDMesa=" + id+ " AND (estado = 'N' or estado ='P')", null);
+            cursor.moveToFirst();
+            if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
+                s = cursor.getDouble(0);
+            }
+            cursor.close();
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
+        db.close();
+        return s;
+    }
+
+    public void cambiarCuenta(String id, String id1) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try{
+            ContentValues values = new ContentValues();
+            values.put("IDMesa", id1);
+            db.update("cuenta", values, "IDMesa="+id, null);
+        }catch (SQLiteException e){
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @SuppressLint("Range")
+    JSONObject cargarRegistro(Cursor res){
+
+        JSONObject obj = new JSONObject();
+        try{
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+            int index_can = res.getColumnIndex("Can");
+            if (index_can >=  0) {
+                obj.put("Can", res.getString(res.getColumnIndex("Can")));
+                obj.put("CanCobro", 0);
+                obj.put("Total", res.getString(res.getColumnIndex("Total")));
+            }
+            obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
+            obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
+            obj.put("Estado", res.getString(res.getColumnIndex("Estado")));
+            obj.put("nomMesa", res.getString(res.getColumnIndex("nomMesa")));
+            obj.put("IDPedido", res.getString(res.getColumnIndex("IDPedido")));
+            obj.put("servido", res.getString(res.getColumnIndex("servido")));
+            obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
+            obj.put("IDMesa", res.getString(res.getColumnIndex("IDMesa")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    public JSONArray execSql(String sql) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor res = db.rawQuery(sql, null);
+        JSONArray ls = new JSONArray();
+        res.moveToFirst();
+        while (!res.isAfterLast()){
+            ls.put(cargarRegistro(res));
+            res.moveToNext();
+        }
+
+        db.close();
+        return  ls;
+    }
+
+    private int count(SQLiteDatabase db, String cWhere){
+        String w = "";
+        if (cWhere != null){
+            w = " WHERE "+cWhere;
+        }
+        Cursor mCount= db.rawQuery("select count(*) from cuenta "+ w, null);
+        mCount.moveToFirst();
+        return  mCount.getInt(0);
+    }
+
+    public void showDatos(String cWhere){
+        SQLiteDatabase db = getReadableDatabase();
+        String w = "";
+        if (cWhere != null){
+            w = " WHERE "+cWhere;
+        }
+        Cursor res= db.rawQuery("select * from cuenta "+ w, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()){
+            String dta = "";
+            for (int i=0; i< res.getColumnCount(); i++) {
+                dta += res.getColumnName(i)+ "="+ res.getString(i) + " - ";
+            }
+            Log.i("SHOWDATA", dta);
+            res.moveToNext();
+        }
+        res.close();
+        db.close();
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+        SQLiteDatabase db = getWritableDatabase();
+        try{
+            String id = o.getString("ID");
+            int count = count(db, "ID="+id);
+            ContentValues values = caragarValues(o);
+            if (count <= 0) {
+                db.insert("cuenta", null, values);
+            }else{
+                db.update("cuenta", values, "ID=?", new String[]{id});
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        SQLiteDatabase db = getWritableDatabase();
+        try{
+            String id = o.getString("ID");
+            ContentValues values = caragarValues(o);
+            db.update("cuenta", values, "ID=?", new String[]{id});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public void rm(JSONObject o) {
+        SQLiteDatabase db = getWritableDatabase();
+        try{
+            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
     public void rellenarTabla(JSONArray datos){
         // Gets the data repository in write mode
        SQLiteDatabase db = this.getWritableDatabase();
         try{
-           db.execSQL("DELETE FROM cuenta");
-        }catch (SQLiteException e){
-            Log.i("ValleTPV", "Creando base de datos para pedidos");
-            this.onCreate(db);
+            db.execSQL("DELETE FROM cuenta");
+            for(int i= 0; i < datos.length(); i++){
+                insert(datos.getJSONObject(i));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        insertarRegistros(db, datos);
         db.close();
 
     }
@@ -75,50 +294,19 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         this.onCreate(db);
     }
 
-
     public void replaceMesa(JSONArray datos, String IDMesa){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa + " AND Estado != 'N'");
-        }catch (SQLiteException e){
-            Log.i("ValleTPV", "Creando base de datos para pedidos");
-
-             this.onCreate(db);
-        }
-
-        insertarRegistros(db, datos);
-        db.close();
-    }
-
-    public List<JSONObject> getAll(String id)
-    {
-        return filterList("IDMesa ="+id + " AND (estado ='P' OR estado ='N')");
-    }
-
-    public Double getTotal(String id){
-        SQLiteDatabase db = this.getReadableDatabase();
-        double s = 0.0;
-
-        try {
-            Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket FROM cuenta WHERE IDMesa=" + id, null);
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-                s = cursor.getDouble(0);
+            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
+            for(int i= 0; i < datos.length(); i++){
+                insert(datos.getJSONObject(i));
             }
-            cursor.close();
-
-        }catch (SQLiteException e){
-            db.close();
-            db = this.getWritableDatabase();
-            this.onCreate(db);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
         db.close();
-        return s;
     }
-
-
 
     public void addArt(int IDMesa,  JSONObject art){
         // Gets the data repository in write mode
@@ -127,14 +315,14 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         try {
             int can = art.getInt("Can");
             for(int i=0;i<can;i++) {
-                    ContentValues values = new ContentValues();
-                    values.put("IDArt", art.getInt("ID"));
-                    values.put("Descripcion", art.getString("Descripcion"));
-                    values.put("descripcion_t", art.getString("descripcion_t"));
-                    values.put("Precio", art.getDouble("Precio"));
-                    values.put("IDMesa", IDMesa);
-                    values.put("Estado", "N");
-                    db.insert("cuenta", null, values);
+                ContentValues values = new ContentValues();
+                values.put("IDArt", art.getInt("ID"));
+                values.put("Descripcion", art.getString("Descripcion"));
+                values.put("descripcion_t", art.getString("descripcion_t"));
+                values.put("Precio", art.getDouble("Precio"));
+                values.put("IDMesa", IDMesa);
+                values.put("Estado", "N");
+                db.insert("cuenta", null, values);
             }
         }catch (JSONException e){
             e.printStackTrace();
@@ -154,10 +342,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
                                         + " AND Estado='" + art.getString("Estado") + "' LIMIT "+art.getString("Can")+")";
                 db.execSQL(sql);
             }
-        }catch (SQLiteException e){
-            e.printStackTrace();
-            this.onCreate(db);
-        } catch (JSONException e) {
+        }catch (Exception e){
             e.printStackTrace();
         }
         db.close();
@@ -169,7 +354,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
         }catch (SQLiteException e) {
             e.printStackTrace();
-            this.onCreate(db);
         }
         db.close();
     }
@@ -180,7 +364,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             db.execSQL("UPDATE cuenta SET Estado='P' WHERE IDMesa="+id);
         }catch (SQLiteException e){
             e.printStackTrace();
-            this.onCreate(db);
         }
         db.close();
     }
@@ -221,169 +404,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         return lista;
     }
 
-    public void cambiarCuenta(String id, String id1) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-            ContentValues values = new ContentValues();
-            values.put("IDMesa", id1);
-            db.update("cuenta", values, "IDMesa="+id, null);
-         }catch (SQLiteException e){
-            e.printStackTrace();
-         }
-        db.close();
-    }
 
 
-    @Override
-    public JSONArray filter(String cWhere) {
-        JSONArray lista = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+ cWhere;
-        }
-
-        try {
-            Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
-            res.moveToFirst();
-            while (!res.isAfterLast()) {
-                lista.put(cargarRegistros(res));
-                res.moveToNext();
-            }
-            res.close();
-        }catch (SQLiteException e){
-            db.close();
-            db = this.getWritableDatabase();
-            this.onCreate(db);
-        }
-        db.close();
-        return lista;
-    }
-
-
-    public List<JSONObject> filterList(String cWhere) {
-        List<JSONObject> lista = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+ cWhere;
-        }
-
-        try {
-            Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
-            res.moveToFirst();
-            while (!res.isAfterLast()) {
-                 lista.add(cargarRegistros(res));
-                 res.moveToNext();
-            }
-            res.close();
-        }catch (SQLiteException e){
-            e.printStackTrace();
-            db.close();
-            db = this.getWritableDatabase();
-            this.onCreate(db);
-        }
-        db.close();
-        return lista;
-    }
-
-    @SuppressLint("Range")
-    JSONObject cargarRegistros(Cursor res){
-        JSONObject obj = new JSONObject();
-        try{
-            obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
-            obj.put("Can", res.getString(res.getColumnIndex("Can")));
-            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
-            obj.put("CanCobro", 0);
-            obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
-            obj.put("Total", res.getString(res.getColumnIndex("Total")));
-            obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
-            obj.put("Estado", res.getString(res.getColumnIndex("Estado")));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return obj;
-    }
-
-    void insertarRegistros(SQLiteDatabase db, JSONArray datos) {
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++) {
-            // Create a new map of values, where column names are the keys
-            try {
-                int idMesa = datos.getJSONObject(i).getInt("IDMesa");
-                ContentValues values = new ContentValues();
-                String id = datos.getJSONObject(i).getString("ID");
-                db.delete("cuenta","ID = ?", new String[]{id});
-                values.put("ID", id);
-                values.put("IDArt", datos.getJSONObject(i).getInt("IDArt"));
-                values.put("Descripcion", datos.getJSONObject(i).getString("Descripcion"));
-                values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
-                values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));
-                values.put("IDMesa", idMesa);
-                values.put("Estado", datos.getJSONObject(i).getString("Estado"));
-                db.insert("cuenta", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-    @Override
-    public void rm(JSONObject o) {
-        try{
-            SQLiteDatabase db = getWritableDatabase();
-            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
-        }catch (Exception ignored){}
-    }
-
-    @Override
-    public void insert(JSONObject o) {
-      try{
-          SQLiteDatabase db = getWritableDatabase();
-
-          int idMesa = o.getInt("IDMesa");
-          ContentValues values = new ContentValues();
-          String id = o.getString("ID");
-          Cursor mCount= db.rawQuery("select count(*) from cuenta where ID="+id, null);
-          mCount.moveToFirst();
-          int count= mCount.getInt(0);
-          if (count <= 0) {
-              values.put("ID", id);
-              values.put("IDArt", o.getInt("IDArt"));
-              values.put("Descripcion", o.getString("Descripcion"));
-              values.put("descripcion_t", o.getString("descripcion_t"));
-              values.put("Precio", o.getDouble("Precio"));
-              values.put("IDMesa", idMesa);
-              values.put("Estado", o.getString("Estado"));
-              db.insert("cuenta", null, values);
-          }
-          db.close();
-      }catch (Exception ignored){}
-
-    }
-
-    @Override
-    public void update(JSONObject o) {
-        try{
-            SQLiteDatabase db = getWritableDatabase();
-            int idMesa = o.getInt("IDMesa");
-            ContentValues values = new ContentValues();
-            String id = o.getString("ID");
-            values.put("ID", id);
-            values.put("IDArt", o.getInt("IDArt"));
-            values.put("Descripcion", o.getString("Descripcion"));
-            values.put("descripcion_t", o.getString("descripcion_t"));
-            values.put("Precio", o.getDouble("Precio"));
-            values.put("IDMesa", idMesa);
-            values.put("Estado",o.getString("Estado"));
-            db.update("cuenta", values, "ID=?", new String[]{id});
-        }catch (Exception ignored){}
-    }
 }
 

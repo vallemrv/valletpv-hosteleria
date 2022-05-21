@@ -52,10 +52,10 @@ public class Cuenta extends Activity {
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 dbmesa = (DBMesas) myServicio.getDb("mesas");
 
-                //Atualizar cuenta.
+                /*//Atualizar cuenta.
                 ContentValues p = new ContentValues();
                 p.put("mesa_id",mesa.getString("ID"));
-                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);
+                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);*/
                 rellenarTicket();
 
             }catch (Exception e){
@@ -77,7 +77,14 @@ public class Cuenta extends Activity {
             String res = msg.getData().getString("RESPONSE");
             if(op != null && op.equals("actualizar")){
                 try {
-                    dbCuenta.rellenarTabla(new JSONArray(res));
+                    JSONArray datos = new JSONArray(res);
+                    if (datos.length() > 0) {
+                        dbCuenta.actualizarMesa(datos, mesa.getString("ID"));
+                    }else{
+                        DBMesas db = (DBMesas) myServicio.getDb("mesas");
+                        db.cerrarMesa(mesa.getString("ID"));
+                        finish();
+                    }
                     rellenarTicket();
                 } catch (JSONException e) {
                     e.printStackTrace();

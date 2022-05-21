@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.valleapp.comandas.R;
 import com.valleapp.comandas.db.DBCuenta;
+import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.utilidades.ActivityBase;
 import com.valleapp.comandas.utilidades.HTTPRequest;
 
@@ -101,6 +102,8 @@ public class MostrarPedidos extends ActivityBase {
                     ll.addView(v, params);
                 }
             }else {
+                DBMesas db = new DBMesas(cx);
+                db.cerrarMesa(mesa.getString("ID"));
                 finish();
             }
 
@@ -131,7 +134,7 @@ public class MostrarPedidos extends ActivityBase {
     protected void onResume() {
         try{
             rellenarPedido();
-            String idm = mesa.getString("ID");
+            /*String idm = mesa.getString("ID");
             if(!pause) {
                 Timer t = new Timer();
                 t.schedule(new TimerTask() {
@@ -143,7 +146,7 @@ public class MostrarPedidos extends ActivityBase {
                     }
                 }, 1000);
             }
-            pause = false;
+            pause = false;*/
         } catch (Exception e) {
             e.printStackTrace();
         }

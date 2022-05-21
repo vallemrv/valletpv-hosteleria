@@ -16,6 +16,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,8 +84,17 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     break;
                 case "pedidos":
                     try {
-                        dbCuenta.atualizarDatos(new JSONArray(res));
-                        rellenarPedido();
+                        JSONArray inst = new JSONArray(res);
+                        if (inst.length()> 0) {
+                            for (int i = 0; i < inst.length(); i++) {
+                                JSONObject o = inst.getJSONObject(i);
+                                String op_aux = o.getString("op");
+                                if (op_aux.equals("insert")) dbCuenta.insert(o.getJSONObject("reg"));
+                                if (op_aux.equals("md")) dbCuenta.update(o.getJSONObject("reg"));
+                                if (op_aux.equals("rm")) dbCuenta.rm(o.getJSONObject("reg"));
+                            }
+                            rellenarPedido();
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -168,7 +178,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         try{
 
             JSONArray lineas = dbCuenta.filterByPedidos("IDZona = "+ zn.getString("ID") +
-                     "  AND servido = 0");
+                     "  AND servido = 0  AND Estado != 'A' AND Estado != 'C'");
 
             pedidos.vaciarPanel();
 
@@ -344,10 +354,10 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             try {
                 if (zn != null) {
                     ContentValues p = new ContentValues();
-                    JSONArray lineas = dbCuenta.filterByPedidos("IDZona = "+ zn.getString("ID") +
-                            "  AND servido = 0 estado != 'A'");
+                    dbCuenta.showDatos(null);
+                    JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta ");
                     p.put("idz", zn.getString("ID"));
-
+                    p.put("lineas", lineas.toString());
                     myServicio.addColaInstrucciones(new Instruccion(p,
                             "/pedidos/getpendientes",
                             handlerOperaciones, "pedidos"));

@@ -7,6 +7,7 @@
 
 from api_android.tools import (send_mensaje_devices, send_imprimir_ticket, send_mensaje_impresora)
 from tokenapi.http import  JsonResponse
+from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Pedidos, Teclas, Receptores,
                             Mesasabiertas, Camareros, Sync)
 from django.http import HttpResponse
@@ -48,12 +49,7 @@ def preimprimir(request):
       }
 
     if infmesa.numcopias <= 1:
-        update = {
-           "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
-           "receptor": "comandas",
-        }
-        send_mensaje_devices(update)
+        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize())
 
     send_mensaje_impresora(obj)
     return JsonResponse({})

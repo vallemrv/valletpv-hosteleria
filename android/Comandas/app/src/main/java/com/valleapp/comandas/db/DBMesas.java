@@ -63,17 +63,7 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
         for (int i= 0 ; i<datos.length();i++){
             // Create a new map of values, where column names are the keys
             try {
-                String abierta = datos.getJSONObject(i).getString("abierta").toLowerCase(Locale.ROOT);
-                if (abierta.equals("true")) abierta = "1";
-                else if (abierta.equals("false")) abierta = "0";
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("ID"));
-                values.put("Nombre", datos.getJSONObject(i).getString("Nombre"));
-                values.put("IDZona", datos.getJSONObject(i).getInt("IDZona"));
-                values.put("RGB", datos.getJSONObject(i).getString("RGB"));
-                values.put("abierta",abierta);
-                values.put("num", datos.getJSONObject(i).getInt("num"));
-                values.put("Orden", datos.getJSONObject(i).getInt("Orden"));
+                ContentValues values = cargarValues(datos.getJSONObject(i));
                 db.insert("mesas", null, values);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -89,7 +79,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
         this.onCreate(db);
     }
 
-    @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
         return filter("IDZona = "+id);
@@ -106,10 +95,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE mesas SET abierta='0', num=0 WHERE ID="+idm);
         db.close();
-    }
-
-    public JSONArray getAllMenosUna(String id, String idm) {
-        return filter("IDZona = "+id+" AND ID !=  "+idm);
     }
 
 
@@ -131,7 +116,7 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
                 int num = res.getInt(res.getColumnIndex("num"));
                 String RGB = res.getString(res.getColumnIndex("RGB"));
                 obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("IDZoma", res.getString(res.getColumnIndex("IDZona")));
+                obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
                 obj.put("RGB", num<=0 ? RGB : "255,0,0");
                 obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
                 obj.put("ID", res.getString(res.getColumnIndex("ID")));
@@ -168,17 +153,7 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
     public void insert(JSONObject o) {
         try {
             SQLiteDatabase db = getWritableDatabase();
-            String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
-            if (abierta.equals("true")) abierta = "1";
-            else if (abierta.equals("false")) abierta = "0";
-            ContentValues values = new ContentValues();
-            values.put("ID", o.getInt("ID"));
-            values.put("Nombre", o.getString("Nombre"));
-            values.put("IDZona", o.getInt("IDZona"));
-            values.put("RGB", o.getString("RGB"));
-            values.put("abierta", abierta);
-            values.put("num", o.getInt("num"));
-            values.put("Orden", o.getInt("Orden"));
+            ContentValues values = cargarValues(o);
             db.insert("mesas", null, values);
         }catch (Exception ignored){}
     }
@@ -187,10 +162,17 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
     public void update(JSONObject o) {
         try {
             SQLiteDatabase db = getWritableDatabase();
+            ContentValues values = cargarValues(o);
+            db.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
+
+    private  ContentValues cargarValues(JSONObject o){
+        ContentValues values = new ContentValues();
+        try {
             String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
             if (abierta.equals("true")) abierta = "1";
             else if (abierta.equals("false")) abierta = "0";
-            ContentValues values = new ContentValues();
             values.put("ID", o.getInt("ID"));
             values.put("Nombre", o.getString("Nombre"));
             values.put("IDZona", o.getInt("IDZona"));
@@ -198,7 +180,10 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
             values.put("abierta", abierta);
             values.put("num", o.getInt("num"));
             values.put("Orden", o.getInt("Orden"));
-            db.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return  values;
     }
 }

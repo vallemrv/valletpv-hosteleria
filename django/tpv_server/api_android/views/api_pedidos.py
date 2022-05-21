@@ -11,16 +11,36 @@ from django.views.decorators.csrf import csrf_exempt
 from gestion.models import  Lineaspedido, Mesasabiertas, Servidos
 import json
 
+
+def find(id, lineas):
+    for l in lineas:
+        if int(l["ID"]) == int(id):
+            lineas.remove(l)
+            return l
+    return None
+
 @csrf_exempt
 def  get_pendientes(request):
     idz = request.POST["idz"]
-    mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz)
-    lineas = []
+    lineas = json.loads(request.POST["lineas"])
+    mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz).distinct()
+    result = []
+    lineas_server = []
+    
     for m in mesas:
-        lineas = [*lineas, *m.get_lineaspedido()]
-          
+        lineas_server = [*lineas_server, *m.get_lineaspedido()]
+    for l in lineas_server:
+        linea = find(l["ID"], lineas)
+        if linea:
+            if not Lineaspedido.is_equals(l, linea):
+                result.append({'op':'md', 'reg': l})
+        else:
+            result.append({'op':'insert', 'reg': l})
+            
+    for l in lineas:
+         result.append({'op':'rm', 'reg': {"ID":l["ID"]}})   
 
-    return JsonResponse(lineas)
+    return JsonResponse(result)
 
 @csrf_exempt
 def servido(request):
@@ -42,8 +62,6 @@ def servido(request):
        "receptor": "comandas",
     }
     send_mensaje_devices(update)
-
-
     return get_pendientes(request)
 
 
