@@ -22,6 +22,7 @@ import com.valleapp.comandas.db.DBTeclas;
 import com.valleapp.comandas.db.DBZonas;
 import com.valleapp.comandas.db.DbTbUpdates;
 import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.interfaces.IBaseSocket;
 import com.valleapp.comandas.tareas.TareaManejarAutorias;
 import com.valleapp.comandas.tareas.TareaManejarInstrucciones;
 import com.valleapp.comandas.tareas.TareaUpdateForDevices;
@@ -34,10 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.Framedata;
-import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -83,7 +80,7 @@ public class ServicioCom extends Service {
         super.onCreate();
         try {
             client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
-                    "/comunicacion/sync_devices")) {
+                    "/comunicacion/devices")) {
 
                 @Override
                 public void onWebsocketPong(WebSocket conn, Framedata f) {
@@ -94,36 +91,26 @@ public class ServicioCom extends Service {
                 public void onOpen(ServerHandshake serverHandshake) {
                     // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
-                    timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 1000), 1000);
-                    timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 1000), 5000);
-                }
+                    ContentValues p = new ContentValues();
+                    p.put("tb", "mesasabiertas");
+                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+                 }
 
 
                 @Override
                 public void onMessage(String message) {
                     try {
-                        if (message.contains("sync_actualizar")) {
-                            Timer t = new Timer();
-                            t.schedule(new TimerTask(){
-                                @Override
-                                public void run() {
-                                    delegadoHandleCheckUpdates(message);
-                                }
-                            }, 2000);
-
-                        } else if (message.contains("mensajes")) {
-                            JSONObject res = new JSONObject(message);
-                            String id = res.getString("idreceptor");
-                            if (id.equals(cam.getString("ID")) || id.equals("all") ){
-                                Handler menHandler = exHandler.get("menHandler");
-
-                                if (menHandler != null ) {
-                                    ContentValues p = new ContentValues();
-                                    p.put("idautorizado", cam.getString("ID"));
-                                    new HTTPRequest(server + "/autorizaciones/get_lista_autorizaciones",
-                                            p, "autorias", menHandler);
-                                }
-                            }
+                        JSONObject o = new JSONObject(message);
+                        String tb = o.getString("tb");
+                        String op = o.getString("op");
+                        IBaseSocket db = (IBaseSocket) getDb(tb);
+                        Log.i("MENSAJE", message+ "db "+db);
+                        if (db != null) {
+                            if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
+                            if (op.equals("md")) db.update(o.getJSONObject("obj"));
+                            if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
+                            Handler h = exHandler.get(tb);
+                            if (h != null) h.sendEmptyMessage(0);
                         }
                     }catch (Exception e){}
                 }
@@ -230,6 +217,7 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
+            timerUpdateLow.schedule(new TareaUpdateForDevices(this.tbNameUpdateLow, server, controller_http, timerUpdateLow, 2000), 1000);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
@@ -253,7 +241,6 @@ public class ServicioCom extends Service {
     @Override
     public void onDestroy() {
         try {
-            timerUpdateFast.cancel();
             timerUpdateLow.cancel();
             timerAurotias.cancel();
             client.close();
@@ -320,17 +307,12 @@ public class ServicioCom extends Service {
             dbs.put("sugerencias", new DBSugerencias(getApplicationContext()));
             dbs.put("mesasabiertas", new DBMesasAbiertas(dbMesas));
             dbs.put("receptores", new DBReceptores(getApplicationContext()));
+            for (IBaseDatos db: dbs.values()){
+                db.inicializar();
+            }
         }
 
-
-        if(dbTbUpdates==null){
-            dbTbUpdates = new DbTbUpdates(getApplicationContext());
-            dbTbUpdates.inicializar();
-        }
-
-        for(IBaseDatos db: dbs.values()){
-            db.inicializar();
-        }
+        if(dbTbUpdates==null)  dbTbUpdates = new DbTbUpdates(getApplicationContext());
     }
 
     public IBaseDatos getDb(String nombre){

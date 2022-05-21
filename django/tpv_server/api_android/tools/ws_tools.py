@@ -27,7 +27,6 @@ def send_mensaje_impresora(v):
     except Exception as e:
         print("[ERROR  impresoras ]"+ str(e))
 
-
 def send_mensaje_devices(v):
     try:
         channel_name = settings.EMPRESA + "_comunicaciones_" + v["receptor"]

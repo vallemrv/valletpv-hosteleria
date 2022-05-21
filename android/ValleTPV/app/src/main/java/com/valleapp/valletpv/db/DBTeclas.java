@@ -19,14 +19,13 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
-
-    public DbTeclas(Context context) {
+    public DBTeclas(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -134,10 +133,6 @@ public class DbTeclas extends SQLiteOpenHelper implements IBaseDatos {
     }
 
 
-    @Override //En esta clase no son necesarios pero hay que implementarlos
-    public void resetFlag(int id) {
-
-    }
 
     @Override
     public JSONArray filter(String cWhere) {

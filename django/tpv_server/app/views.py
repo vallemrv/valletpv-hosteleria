@@ -11,6 +11,7 @@ from django.conf import settings
 from gestion.models import Secciones, Teclas, Teclaseccion
 from datetime import datetime
 from django.core.management import call_command
+from api_android.tools import send_mensaje_devices
 
 def inicio(request):
     return render(request, "index.html")
@@ -146,6 +147,15 @@ def add_reg_handler(app_name, tb_name, reg):
         obj = obj.serialize()
     else:
         obj = model_to_dict(obj)
+    
+    update = {
+        "op": "insert",
+        "device": "",
+        "tb": tb_name,
+        "obj": obj,
+        "receptor": "devices",
+    }
+    send_mensaje_devices(update) 
 
     return {"reg":json.dumps(obj)}
 
@@ -179,6 +189,14 @@ def modifcar_reg(inst):
             
 
         obj.save()
+        update = {
+            "op": "md",
+            "device": "",
+            "tb": tb_name,
+            "obj": obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj),
+            "receptor": "devices",
+            }
+        send_mensaje_devices(update) 
 
 def delete_reg(inst):
     app_name = inst["app"] if "app" in inst else "gestion"
@@ -188,6 +206,14 @@ def delete_reg(inst):
 
     obj = model.objects.filter(**filter).first()
     if (obj):
+        update = {
+            "op": "rm",
+            "device": "",
+            "tb": tb_name,
+            "obj": {'id': obj.pk},
+            "receptor": "devices",
+            }
+        send_mensaje_devices(update) 
         obj.delete()
 
 

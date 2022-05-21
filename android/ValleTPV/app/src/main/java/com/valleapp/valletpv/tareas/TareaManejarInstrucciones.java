@@ -52,7 +52,7 @@ public class TareaManejarInstrucciones extends TimerTask {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            procesado = true;
+            procesado = true;count=0;
             super.handleMessage(msg);
 
         }
@@ -79,7 +79,7 @@ public class TareaManejarInstrucciones extends TimerTask {
             }else{
                 count ++;
             }
-            if (count > 5) {
+            if (count > 20) {
                 count = 0;
                 procesado = true;
             }

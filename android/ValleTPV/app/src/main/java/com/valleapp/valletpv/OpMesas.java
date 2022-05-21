@@ -17,9 +17,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.db.DBCuenta;
+import com.valleapp.valletpv.db.DBMesas;
+import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONArray;
@@ -29,9 +29,9 @@ import org.json.JSONObject;
 
 public class OpMesas extends Activity {
 
-    DbMesas dbMesas=new DbMesas(this);
-    DbZonas dbZonas= new DbZonas(this);
-    DbCuenta dbCuenta = new DbCuenta(this);
+    DBMesas dbMesas=new DBMesas(this);
+    DBZonas dbZonas= new DBZonas(this);
+    DBCuenta dbCuenta = new DBCuenta(this);
 
     ServicioCom servicioCom;
 

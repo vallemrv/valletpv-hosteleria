@@ -32,31 +32,11 @@ def get_cuenta(request):
 @csrf_exempt
 def juntarmesas(request):
     Mesasabiertas.juntar_mesas_abiertas( request.POST["idp"], request.POST["ids"])
-
-
-    #enviar notficacion de update
-    update = {
-       "OP": "UPDATE",
-       "Tabla": "mesasabiertas",
-       "receptor": "comandas",
-    }
-    send_mensaje_devices(update)
-
-
     return HttpResponse('success')
 
 @csrf_exempt
 def cambiarmesas(request):
     Mesasabiertas.cambiar_mesas_abiertas(request.POST["idp"], request.POST["ids"])
-
-    #enviar notficacion de update
-    update = {
-       "OP": "UPDATE",
-       "Tabla": "mesasabiertas",
-       "receptor": "comandas",
-    }
-    send_mensaje_devices(update)
-
     return HttpResponse('success')
 
 @csrf_exempt
@@ -96,15 +76,7 @@ def mvlinea(request):
          if numart<=0:
             Mesasabiertas.objects.filter(infmesa__uid=uid).delete()
             Sync.actualizar(Mesasabiertas._meta.db_table)
-            
 
-        #enviar notficacion de update
-         update = {
-           "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
-           "receptor": "comandas",
-         }
-         send_mensaje_devices(update)
 
     return HttpResponse('success')
 
@@ -114,19 +86,7 @@ def cuenta_add(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     lineas = json.loads(request.POST["pedido"])
-    is_updatable = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
-    
-    if is_updatable:
-        #enviar notficacion de update
-        update = {
-           "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
-           "receptor": "comandas",
-        }
-        send_mensaje_devices(update)
-
-    
-    
+    Pedidos.agregar_nuevas_lineas(idm, idc, lineas)
     return HttpResponse('success')
 
 @csrf_exempt
@@ -136,16 +96,8 @@ def cuenta_cobrar(request):
     entrega = request.POST["entrega"]
     
     art = json.loads(request.POST["art"])
-    numart, total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
+    total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
     
-    if (numart <= 0):
-        #enviar notficacion de update
-        update = {
-            "OP": "UPDATE",
-            "Tabla": "mesasabiertas",
-            "receptor": "comandas",
-        }
-        send_mensaje_devices(update)
             
     if (id > 0):
         send_imprimir_ticket(request, id)
@@ -158,15 +110,6 @@ def cuenta_rm(request):
     motivo = request.POST["motivo"]
     idc = request.POST["idc"]
     Mesasabiertas.borrar_mesa_abierta(idm,idc,motivo)
-
-    #enviar notficacion de update
-    update = {
-       "OP": "UPDATE",
-       "Tabla": "mesasabiertas",
-       "receptor": "comandas",
-    }
-    send_mensaje_devices(update)
-
     return HttpResponse('success')
 
 @csrf_exempt
@@ -178,20 +121,11 @@ def cuenta_rm_linea(request):
     idc = request.POST["idc"]
     motivo = request.POST["motivo"]
     s = request.POST["Estado"]
-    n = request.POST["Nombre"]
+    n = request.POST["Descripcion"]
     
     
-    numart = Lineaspedido.borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n)
+    Lineaspedido.borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n)
 
-    if (numart <= 0):
-        #enviar notficacion de update
-        update = {
-           "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
-           "receptor": "comandas",
-        }
-        send_mensaje_devices(update)
-        
 
     return HttpResponse('success')
 

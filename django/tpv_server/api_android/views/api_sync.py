@@ -10,7 +10,7 @@ from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from gestion.models import *
 from django.apps import apps
-
+from api_android.tools import send_mensaje_devices
 
 from datetime import datetime
 
@@ -26,6 +26,7 @@ def get_tb_up_last(request):
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()
 
+    
     return JsonResponse({"nombre": t, "last": tb_sync.last})
 
 @csrf_exempt
@@ -54,7 +55,8 @@ def update_for_devices(request):
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()
 
-    
+   
+
     return JsonResponse(
         {"nombre": t, 
         "last": tb_sync.last, 
@@ -63,6 +65,7 @@ def update_for_devices(request):
 
 @csrf_exempt
 def update_from_devices(request):
+    device = request.POST["device"] if "device" in request.POST else ""
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
     
@@ -71,6 +74,14 @@ def update_from_devices(request):
     if hasattr(model, "update_from_device"):
         for row in rows:
             model.update_from_device(row)
+            update = {
+                "op": "md",
+                "device": device,
+                "tb": "camareros",
+                "obj": row,
+                "receptor": "devices",
+            }
+            send_mensaje_devices(update)       
     
     return JsonResponse(
          {"tb": tb, 

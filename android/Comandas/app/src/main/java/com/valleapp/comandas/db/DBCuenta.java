@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 
+import com.valleapp.comandas.interfaces.IBaseSocket;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +22,7 @@ import java.util.List;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBCuenta extends DBBase {
+public class DBCuenta extends DBBase implements IBaseSocket {
 
 
     public DBCuenta(Context context) {
@@ -119,7 +121,7 @@ public class DBCuenta extends DBBase {
         double s = 0.0;
         try {
             Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
-                    "FROM cuenta WHERE IDMesa=" + id, null);
+                    "FROM cuenta WHERE IDMesa=" + id+ " AND (estado = 'N' or estado ='P')", null);
             cursor.moveToFirst();
             if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
                 s = cursor.getDouble(0);
@@ -231,14 +233,16 @@ public class DBCuenta extends DBBase {
     }
 
     public void atualizarDatos(JSONArray jsonArray) {
+        Log.i("ACUTALIDAR_CUENTA", jsonArray.toString());
         SQLiteDatabase db = getWritableDatabase();
         insertarRegistros(db, jsonArray);
     }
 
     public JSONArray filterByPedidos(String cWhere) {
+
         String strWhere = "";
         if (cWhere != null){
-            strWhere = " WHERE "+cWhere;
+            strWhere = " WHERE "+ cWhere;
         }
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
@@ -362,6 +366,55 @@ public class DBCuenta extends DBBase {
         res.close();
         db.close();
         return  ls;
+    }
+    
+    @Override
+    public void rm(JSONObject o) {
+        try{
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+      try{
+          SQLiteDatabase db = getWritableDatabase();
+          int idMesa = o.getInt("IDMesa");
+          ContentValues values = new ContentValues();
+          String id = o.getString("ID");
+          values.put("ID", id);
+          values.put("IDArt", o.getInt("IDArt"));
+          values.put("Descripcion", o.getString("Descripcion"));
+          values.put("descripcion_t", o.getString("descripcion_t"));
+          values.put("Precio", o.getDouble("Precio"));
+          values.put("IDMesa", idMesa);
+          values.put("Estado",o.getString("Estado"));
+          Cursor mCount= db.rawQuery("select count(*) from cuenta where ID="+id, null);
+          mCount.moveToFirst();
+          int count= mCount.getInt(0);
+          if (count <= 0) db.insert("cuenta", null, values);
+          db.close();
+      }catch (Exception ignored){}
+
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        try{
+            SQLiteDatabase db = getWritableDatabase();
+            int idMesa = o.getInt("IDMesa");
+            ContentValues values = new ContentValues();
+            String id = o.getString("ID");
+            values.put("ID", id);
+            values.put("IDArt", o.getInt("IDArt"));
+            values.put("Descripcion", o.getString("Descripcion"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+            values.put("Precio", o.getDouble("Precio"));
+            values.put("IDMesa", idMesa);
+            values.put("Estado",o.getString("Estado"));
+            db.update("cuenta", values, "ID=?", new String[]{id});
+        }catch (Exception ignored){}
     }
 }
 

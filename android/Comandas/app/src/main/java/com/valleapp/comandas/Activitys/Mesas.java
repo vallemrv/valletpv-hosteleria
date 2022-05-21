@@ -16,7 +16,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,6 @@ import android.widget.TextView;
 
 import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorMesas;
-import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBZonas;
@@ -45,7 +43,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -340,14 +337,17 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     public void getPendientes(){
         rellenarPedido();
-        /*Timer t = new Timer();
+        Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
             try {
                 if (zn != null) {
                     ContentValues p = new ContentValues();
+                    JSONArray lineas = dbCuenta.filterByPedidos("IDZona = "+ zn.getString("ID") +
+                            "  AND servido = 0 estado != 'A'");
                     p.put("idz", zn.getString("ID"));
+
                     myServicio.addColaInstrucciones(new Instruccion(p,
                             "/pedidos/getpendientes",
                             handlerOperaciones, "pedidos"));
@@ -356,8 +356,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 e.printStackTrace();
             }
             }
-        }, 5000);
-       */
+        }, 1000);
     }
 
     public void clickServido(View v){
@@ -448,6 +447,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         if (requestCode == 400) {
             if(resultCode == RESULT_OK){
                 try{
+                    assert data != null;
                     peticiones = new JSONArray(data.getStringExtra("mensajes"));
                     manejarAurotias();
                 } catch (JSONException e) {

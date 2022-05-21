@@ -6,14 +6,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
 import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
-public class DBBase extends SQLiteOpenHelper implements IBaseDatos {
+public class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
 
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
     public DBBase(@Nullable Context context) {
@@ -35,10 +37,6 @@ public class DBBase extends SQLiteOpenHelper implements IBaseDatos {
         onCreate(getWritableDatabase());
     }
 
-    @Override
-    public void resetFlag(int id) {
-
-    }
 
     @Override
     public JSONArray filter(String cWhere) {
@@ -51,4 +49,18 @@ public class DBBase extends SQLiteOpenHelper implements IBaseDatos {
     }
 
 
+    @Override
+    public void rm(JSONObject o) {
+
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+
+    }
+
+    @Override
+    public void update(JSONObject o) {
+
+    }
 }

@@ -6,6 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,22 +21,24 @@ import java.util.Locale;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBMesas extends DBBase {
+public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
+
+    // If you change the database schema, you must increment the database version.
+    public static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "valletpv";
 
 
     public DBMesas(Context context) {
-        super(context);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS mesas " +
                 "(ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, " +
                 "abierta TEXT,  IDZona INTEGER, " +
-                "num INTEGER, flag TEXT default '', Orden INTEGER)");
+                "num INTEGER, Orden INTEGER)");
     }
 
-    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -40,44 +46,8 @@ public class DBMesas extends DBBase {
         onCreate(db);
     }
 
-    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
-    }
-
-    @SuppressLint("Range")
-    @Override
-    public JSONArray filter(String cWhere) {
-        JSONArray lista = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+cWhere;
-        }
-
-        Cursor res =  db.rawQuery( "SELECT * FROM mesas "+strWhere+" ORDER BY Orden DESC", null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                int num = res.getInt(res.getColumnIndex("num"));
-                String RGB = res.getString(res.getColumnIndex("RGB"));
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
-                obj.put("RGB", num<=0 ? RGB : "255,0,0");
-                obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("num", num);
-                lista.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-        res.close();db.close();
-        return lista;
     }
 
     @Override
@@ -113,6 +83,12 @@ public class DBMesas extends DBBase {
         db.close();
     }
 
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
+    }
+
     @SuppressLint("Range")
     public JSONArray getAll(String id)
     {
@@ -132,6 +108,45 @@ public class DBMesas extends DBBase {
         db.close();
     }
 
+    public JSONArray getAllMenosUna(String id, String idm) {
+        return filter("IDZona = "+id+" AND ID !=  "+idm);
+    }
+
+
+    @SuppressLint("Range")
+    @Override
+    public JSONArray filter(String cWhere) {
+        JSONArray lista = new JSONArray();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String strWhere = "";
+        if (cWhere != null){
+            strWhere = " WHERE "+cWhere;
+        }
+
+        Cursor res =  db.rawQuery( "SELECT * FROM mesas "+strWhere+" ORDER BY Orden DESC", null );
+        res.moveToFirst();
+        while(!res.isAfterLast()){
+            try{
+                JSONObject obj = new JSONObject();
+                int num = res.getInt(res.getColumnIndex("num"));
+                String RGB = res.getString(res.getColumnIndex("RGB"));
+                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+                obj.put("IDZoma", res.getString(res.getColumnIndex("IDZona")));
+                obj.put("RGB", num<=0 ? RGB : "255,0,0");
+                obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
+                obj.put("ID", res.getString(res.getColumnIndex("ID")));
+                obj.put("num", num);
+                lista.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            res.moveToNext();
+
+        }
+        res.close();db.close();
+        return lista;
+    }
 
     public void marcarRojo(String id) {
         SQLiteDatabase db = getWritableDatabase();
@@ -139,5 +154,51 @@ public class DBMesas extends DBBase {
         v.put("num", "1");
         db.update("mesas", v, "ID = ?", new String[]{id});
         db.close();
+    }
+
+    @Override
+    public void rm(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete("mesas", "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
+            if (abierta.equals("true")) abierta = "1";
+            else if (abierta.equals("false")) abierta = "0";
+            ContentValues values = new ContentValues();
+            values.put("ID", o.getInt("ID"));
+            values.put("Nombre", o.getString("Nombre"));
+            values.put("IDZona", o.getInt("IDZona"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("abierta", abierta);
+            values.put("num", o.getInt("num"));
+            values.put("Orden", o.getInt("Orden"));
+            db.insert("mesas", null, values);
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
+            if (abierta.equals("true")) abierta = "1";
+            else if (abierta.equals("false")) abierta = "0";
+            ContentValues values = new ContentValues();
+            values.put("ID", o.getInt("ID"));
+            values.put("Nombre", o.getString("Nombre"));
+            values.put("IDZona", o.getInt("IDZona"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("abierta", abierta);
+            values.put("num", o.getInt("num"));
+            values.put("Orden", o.getInt("Orden"));
+            db.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
     }
 }

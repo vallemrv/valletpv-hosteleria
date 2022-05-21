@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +27,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.db.DbCamareros;
+import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.tools.ServicioCom;
 import com.valleapp.valletpv.tools.ToastShowInfoCuenta;
 
@@ -44,7 +45,7 @@ public class Camareros extends Activity {
     JSONObject cam_sel = null;
     ServicioCom myServicio;
 
-    DbCamareros dbCamareros;
+    DBCamareros dbCamareros;
 
     int presBack = 0;
 
@@ -180,7 +181,7 @@ public class Camareros extends Activity {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if(myServicio!=null){
                 myServicio.setExHandler("camareros", handleHttp);
-                dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+                dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 rellenarCamareros();
             }
 

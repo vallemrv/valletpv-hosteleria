@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,14 +24,14 @@ import java.util.List;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
+public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSocket {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbCuenta(Context context) {
+    public DBCuenta(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -78,7 +80,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
+            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa + " AND Estado != 'N'");
         }catch (SQLiteException e){
             Log.i("ValleTPV", "Creando base de datos para pedidos");
 
@@ -231,15 +233,6 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
         db.close();
     }
 
-    @Override
-    public void resetFlag(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("flag", "");
-        db.update("cuenta",  cv, "ID="+id, null);
-        db.close();
-    }
-
 
     @Override
     public JSONArray filter(String cWhere) {
@@ -340,5 +333,57 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
     }
 
 
+
+    @Override
+    public void rm(JSONObject o) {
+        try{
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+      try{
+          SQLiteDatabase db = getWritableDatabase();
+
+          int idMesa = o.getInt("IDMesa");
+          ContentValues values = new ContentValues();
+          String id = o.getString("ID");
+          Cursor mCount= db.rawQuery("select count(*) from cuenta where ID="+id, null);
+          mCount.moveToFirst();
+          int count= mCount.getInt(0);
+          if (count <= 0) {
+              values.put("ID", id);
+              values.put("IDArt", o.getInt("IDArt"));
+              values.put("Descripcion", o.getString("Descripcion"));
+              values.put("descripcion_t", o.getString("descripcion_t"));
+              values.put("Precio", o.getDouble("Precio"));
+              values.put("IDMesa", idMesa);
+              values.put("Estado", o.getString("Estado"));
+              db.insert("cuenta", null, values);
+          }
+          db.close();
+      }catch (Exception ignored){}
+
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        try{
+            SQLiteDatabase db = getWritableDatabase();
+            int idMesa = o.getInt("IDMesa");
+            ContentValues values = new ContentValues();
+            String id = o.getString("ID");
+            values.put("ID", id);
+            values.put("IDArt", o.getInt("IDArt"));
+            values.put("Descripcion", o.getString("Descripcion"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+            values.put("Precio", o.getDouble("Precio"));
+            values.put("IDMesa", idMesa);
+            values.put("Estado",o.getString("Estado"));
+            db.update("cuenta", values, "ID=?", new String[]{id});
+        }catch (Exception ignored){}
+    }
 }
 

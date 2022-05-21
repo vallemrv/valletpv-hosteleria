@@ -6,6 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.valleapp.comandas.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,18 +18,21 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBZonas extends DBBase{
+public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
+
+    // If you change the database schema, you must increment the database version.
+    public static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "valletpv";
+
 
     public DBZonas(Context context) {
-        super(context);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS  zonas (ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, Tarifa INTEGER)");
     }
 
-    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
@@ -34,18 +40,25 @@ public class DBZonas extends DBBase{
         onCreate(db);
     }
 
-    @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    @SuppressLint("Range")
     public JSONArray getAll()
     {
+       return filter(null);
+    }
+
+    @Override
+    @SuppressLint("Range")
+    public JSONArray filter(String cWhere) {
+        String w = "";
+        if (cWhere != null){
+            w = " WHERE "+cWhere;
+        }
         JSONArray lista = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from zonas", null );
+        Cursor res =  db.rawQuery( "select * from zonas"+w, null );
         res.moveToFirst();
         while(!res.isAfterLast()){
             try{
@@ -93,5 +106,11 @@ public class DBZonas extends DBBase{
 
         }
         db.close();
+    }
+
+    @Override
+    public void inicializar() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        this.onCreate(db);
     }
 }

@@ -10,15 +10,15 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
-import com.valleapp.valletpv.db.DbCamareros;
+import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
 import com.valleapp.valletpv.tools.JSON;
-import com.valleapp.valletpv.tools.RowsUpdatables;
 import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONException;
@@ -31,7 +31,7 @@ public class ValleTPV extends Activity {
     private String server = "";
 
     ServicioCom myServicio;
-    DbCamareros dbCamareros = new DbCamareros(cx);
+    DBCamareros dbCamareros;
 
     ListView lsnoautorizados;
     ListView lstautorizados;
@@ -53,12 +53,7 @@ public class ValleTPV extends Activity {
         lstautorizados = findViewById(R.id.lstautorizados);
         lsnoautorizados = findViewById(R.id.lstnoautorizados);
 
-        s.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        s.setOnClickListener(view -> finish());
 
         ImageButton btnok = findViewById(R.id.aceptar);
         btnok.setOnClickListener(view -> {
@@ -71,7 +66,7 @@ public class ValleTPV extends Activity {
             try {
                 dbCamareros.setAutorizado(obj.getInt("ID"), true);
                 obj.put("autorizado", "1");
-                myServicio.addTbCola(new RowsUpdatables("camareros", obj));
+                myServicio.autorizarCam(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -89,7 +84,7 @@ public class ValleTPV extends Activity {
             try {
                 obj.put("autorizado", "0");
                 dbCamareros.setAutorizado(obj.getInt("ID"), false);
-                myServicio.addTbCola(new RowsUpdatables("camareros", obj));
+                myServicio.autorizarCam(obj);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -133,7 +128,6 @@ public class ValleTPV extends Activity {
                 startActivity(intent);
             }else{
                 server = pref.getString("URL");
-                rellenarListas();
             }
 
         } catch (Exception e) {
@@ -146,7 +140,12 @@ public class ValleTPV extends Activity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null) myServicio.setExHandler("camareros", handleHttp);
+            if(myServicio!=null){
+                myServicio.setExHandler("camareros", handleHttp);
+                dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+                rellenarListas();
+            }
+
         }
 
         @Override

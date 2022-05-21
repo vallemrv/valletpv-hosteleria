@@ -9,9 +9,8 @@ from api_android.tools import send_mensaje_devices, imprimir_pedido
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import  Count
 from gestion.models import (Mesasabiertas, Sync,
-                            Teclas, Pedidos,  Camareros)
+                             Pedidos)
 
 
 import json
@@ -27,9 +26,11 @@ def marcar_rojo(request):
     Sync.actualizar("mesasabiertas")
     if infmesa.numcopias <= 1:
         update = {
-           "OP": "UPDATE",
-           "Tabla": "mesasabiertas",
+           "op": "md",
+           "tb": "mesasabiertas",
            "receptor": "comandas",
+           "obj":mesa_abierta.serialize(),
+           "device":""
         }
         send_mensaje_devices(update)
     return JsonResponse({})
@@ -41,57 +42,8 @@ def pedir(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     lineas = json.loads(request.POST["pedido"])
-    is_updatable, pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
-    
-    if is_updatable:
-        #enviar notficacion de update
-        update = {
-           "OP": "UPDATE",
-           "Tabla": ["mesasabiertas"],
-           "receptor": "comandas",
-        }
-        send_mensaje_devices(update)
-
-
-    
+    pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
     imprimir_pedido(pedido.id)
     return HttpResponse("success")
 
-@csrf_exempt
-def get_ultimas(request):
-    args = json.loads(request.POST['args'])
-    c = args['o']
-    lista = args['r']
-    pedidos = Pedidos.objects.all().order_by('-id')[c:c+5]
-    send = []
-    for p in pedidos:
-        camareo = Camareros.objects.get(pk=p.camarero_id)
-        mesa = p.infmesa.mesasabiertas_set.first()
-        if mesa:
-            mesa = mesa.mesa
-            lineas = p.lineaspedido_set.values("idart",
-                                               "descripcion",
-                                               "descripcion_t"
-                                               "precio",
-                                               "pedido_id").annotate(can=Count('idart'))
-            receptores = {}
-            for l in lineas:
-                receptor = Teclas.objects.get(id=l['idart']).familia.receptor
-                if receptor.nomimp in lista:
-                    if  receptor.nombre not in receptores:
-                        receptores[receptor.nombre] = {
-                            "op": "pedido",
-                            "hora": p.hora,
-                            "receptor": receptor.nomimp,
-                            "receptor_activo": receptor.activo,
-                            "camarero": camareo.nombre + " " + camareo.apellidos,
-                            "mesa": mesa.nombre,
-                            "lineas": []
-                        }
-                    l["precio"] = float(l["precio"])
-                    receptores[receptor.nombre]['lineas'].append(l)
 
-            send.append(receptores)
-
-
-    return JsonResponse(send)

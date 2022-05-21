@@ -30,10 +30,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
-import com.valleapp.valletpv.db.DbCamareros;
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.db.DBCamareros;
+import com.valleapp.valletpv.db.DBCuenta;
+import com.valleapp.valletpv.db.DBMesas;
+import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.dlg.DlgMensajes;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSelCamareros;
@@ -63,9 +63,9 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     boolean reset = false;
 
 
-    DbZonas dbZonas;
-    DbMesas dbMesas;
-    DbCuenta dbCuenta;
+    DBZonas dbZonas;
+    DBMesas dbMesas;
+    DBCuenta dbCuenta;
 
     JSONObject cam = null;
     JSONObject zn = null;
@@ -86,9 +86,9 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             if(myServicio!=null){
                 myServicio.setExHandler("mesas", handleHttp);
                 myServicio.setExHandler("mesasabiertas", handleHttp);
-                dbMesas = (DbMesas) myServicio.getDb("mesas");
-                dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
-                dbZonas = (DbZonas) myServicio.getDb("zonas");
+                dbMesas = (DBMesas) myServicio.getDb("mesas");
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                dbZonas = (DBZonas) myServicio.getDb("zonas");
                 rellenarZonas();
             }
         }
@@ -107,6 +107,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             try {
                 String op = msg.getData().getString("op");
                 if (op == null) {
+                    Log.i("mesas", "rellenar zonas");
                     rellenarZonas();
                 }
                 else  {
@@ -278,7 +279,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
             stop = true; //paramos contador
             final DlgSelCamareros sel_cam = new DlgSelCamareros(cx, myServicio, this);
-            DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+            DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
             sel_cam.setNoautorizados(dbCamareros.getAutorizados(false));
             sel_cam.setAutorizados(dbCamareros.getAutorizados(true));
             sel_cam.setTitle("Elegir camareros");
@@ -365,7 +366,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 setEstadoAutoFinish(true, false);
             });
             dlg.show();
-            DbCamareros db = new DbCamareros(cx);
+            DBCamareros db = new DBCamareros(cx);
             List<JSONObject> lista = db.getAutorizados(true);
             JSONObject o = new JSONObject();
             o.put("ID", -1);
@@ -485,7 +486,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
     public void clickAbrirCaja(View v){
         setEstadoAutoFinish(true,false);
-        DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+        DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
         if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
             try {
                 JSONObject p = new JSONObject();
@@ -681,7 +682,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
 
             if (myServicio != null){
-                DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+                DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 if(dbCamareros.getConPermiso("borrar_mesa").size() > 0) {
                     JSONObject p = new JSONObject();
                     p.put("motivo", motivo);

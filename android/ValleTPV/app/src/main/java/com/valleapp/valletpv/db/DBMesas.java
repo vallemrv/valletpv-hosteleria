@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,14 +21,14 @@ import java.util.Locale;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbMesas(Context context) {
+    public DBMesas(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -35,7 +36,7 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
         db.execSQL("CREATE TABLE IF NOT EXISTS mesas " +
                 "(ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, " +
                 "abierta TEXT,  IDZona INTEGER, " +
-                "num INTEGER, flag TEXT default '', Orden INTEGER)");
+                "num INTEGER, Orden INTEGER)");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -111,13 +112,6 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
         return filter("IDZona = "+id+" AND ID !=  "+idm);
     }
 
-    @Override
-    public void resetFlag(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues v = new ContentValues();
-        v.put("flag", "");
-        db.update("mesas", v, "ID=?", new String[]{String.valueOf(id)});
-    }
 
     @SuppressLint("Range")
     @Override
@@ -162,4 +156,49 @@ public class DbMesas extends SQLiteOpenHelper implements IBaseDatos {
         db.close();
     }
 
+    @Override
+    public void rm(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            db.delete("mesas", "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
+            if (abierta.equals("true")) abierta = "1";
+            else if (abierta.equals("false")) abierta = "0";
+            ContentValues values = new ContentValues();
+            values.put("ID", o.getInt("ID"));
+            values.put("Nombre", o.getString("Nombre"));
+            values.put("IDZona", o.getInt("IDZona"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("abierta", abierta);
+            values.put("num", o.getInt("num"));
+            values.put("Orden", o.getInt("Orden"));
+            db.insert("mesas", null, values);
+        }catch (Exception ignored){}
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            String abierta = o.getString("abierta").toLowerCase(Locale.ROOT);
+            if (abierta.equals("true")) abierta = "1";
+            else if (abierta.equals("false")) abierta = "0";
+            ContentValues values = new ContentValues();
+            values.put("ID", o.getInt("ID"));
+            values.put("Nombre", o.getString("Nombre"));
+            values.put("IDZona", o.getInt("IDZona"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("abierta", abierta);
+            values.put("num", o.getInt("num"));
+            values.put("Orden", o.getInt("Orden"));
+            db.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
+        }catch (Exception ignored){}
+    }
 }

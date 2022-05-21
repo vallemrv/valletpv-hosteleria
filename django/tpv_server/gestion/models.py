@@ -15,6 +15,8 @@ from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.db.models import Q
 from app.utility import rgbToHex
+from comunicacion.tools import comunicar_cambios_devices, send_mensaje_impresora
+
 
 
 
@@ -25,7 +27,6 @@ class HistorialMensajes(models.Model):
 
     @staticmethod
     def update_from_device(row):
-        from api_android.tools.ws_tools import send_mensaje_impresora
         c = None
         if "ID" in row:
             c = HistorialMensajes.objects.filter(id=row["ID"]).first()
@@ -52,9 +53,7 @@ class HistorialMensajes(models.Model):
         for r in rows:
             tb.append(model_to_dict(r))
         return tb
-    
-    
-
+       
 class PeticionesAutoria(models.Model):
     idautorizado = models.ForeignKey("Camareros", on_delete=models.CASCADE)
     accion = models.CharField(max_length=150)
@@ -86,22 +85,13 @@ class Sync(models.Model):
 
     @staticmethod
     def actualizar(tb_name):
-        from api_android.tools import send_mensaje_devices
         sync = Sync.objects.filter(nombre=tb_name).first()
         if not sync:
             sync = Sync()
         sync.nombre = tb_name.lower()
         sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         sync.save()
-
-        update = {
-           "op": "sync_actualizar",
-           "nombre": sync.nombre,
-           "last": sync.last,
-           "receptor": "sync_devices",
-        }
-        send_mensaje_devices(update)
-        
+      
 class Arqueocaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre')  # Field name made lowercase.
@@ -463,6 +453,7 @@ class Infmesa(models.Model):
                         a.precio = 0
                         a.estado = "M"
                         a.save()
+                        comunicar_cambios_devices("md", "lineaspedido", a.serialize())
                         lComp = LineasCompuestas()
                         lComp.linea_principal = gr
                         lComp.linea_compuesta = a.id
@@ -496,6 +487,7 @@ class Infmesa(models.Model):
                                 a.precio = 0
                                 a.estado = "R"
                                 a.save()
+                                comunicar_cambios_devices("md", "lineaspedido", a.serialize())
                                 obj_comp.append(a.id)
                                 cantidad = cantidad - 1
                                 l.cantidad = l.cantidad + 1
@@ -546,6 +538,25 @@ class Lineaspedido(models.Model):
             lineas = [*lineas, *m.get_lineaspedido()]
                 
         return lineas
+
+    def serialize(self):
+        l = self
+        m = Mesasabiertas.objects.filter(infmesa=self.infmesa).first()
+        obj = {
+            'ID': l.pk,
+            'IDPedido': l.pedido_id,
+            'UID': m.infmesa.pk,
+            'IDArt': l.idart,
+            'Estado': l.estado,
+            'Precio': float(l.precio),
+            'Descripcion': l.descripcion,
+            'IDMesa': m.mesa.pk,
+            'nomMesa': m.mesa.nombre,
+            'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
+            'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
+            'descripcion_t': l.descripcion_t,
+            }
+        return obj
    
     def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
         num = -1
@@ -564,6 +575,7 @@ class Lineaspedido(models.Model):
                     h.save()
                     r.estado = 'A'
                     r.save()
+                    comunicar_cambios_devices("md", "lineaspedido", r.serialize())
                 else:
                     r.delete()
 
@@ -667,11 +679,7 @@ class Mesasabiertas(models.Model):
         mesas = Mesasabiertas.objects.all()
         objs = []
         for m in mesas:
-            obj = {
-                "ID": m.mesa_id,
-                "num": m.infmesa.numcopias
-            }
-            objs.append(obj)
+            objs.append(m.serialize())
         return objs
 
 
@@ -690,7 +698,12 @@ class Mesasabiertas(models.Model):
                 historial.save()
                 r.estado = 'A'
                 r.save()
+                comunicar_cambios_devices("md", "lineaspedido", r.serialize())
 
+
+            obj = mesa.serialize()
+            obj["abierta"] = 0
+            comunicar_cambios_devices("md", "mesasabiertas", obj)
             mesa.delete()
 
 
@@ -708,8 +721,12 @@ class Mesasabiertas(models.Model):
             elif mesaP:
                 mesaP.mesa_id = ids
                 mesaP.save()
+                comunicar_cambios_devices("md", "mesasabiertas", {"ID":ids,"num":0, "abierta":1})
+                comunicar_cambios_devices("md", "mesasabiertas", {"ID":idp,"num":0, "abierta":0})
             else:
                 Sync.actualizar("mesasabiertas")
+
+            print("holaa")
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):
@@ -725,27 +742,26 @@ class Mesasabiertas(models.Model):
                     for l in pedido.lineaspedido_set.all():
                         l.infmesa_id = mesaP.infmesa.pk
                         l.save()
+                        comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+                        
+                
+                obj = mesaS.serialize()
+                obj["abierta"] = 0
+                comunicar_cambios_devices("md", "mesasabiertas", obj)
                 infmesa.delete()
+    
+    def serialize(self):
+        return {
+            "ID": self.mesa_id,
+            "num": self.infmesa.numcopias,
+            "abierta": 1
+        }
 
     def get_lineaspedido(self):
         lineas = []
         m = self
         for l in Lineaspedido.objects.filter(Q(infmesa__pk=m.infmesa.pk) & (Q(estado='P') | Q(estado="R"))):
-            obj = {
-                'ID': l.pk,
-                'IDPedido': l.pedido_id,
-                'UID': m.infmesa.pk,
-                'IDArt': l.idart,
-                'Estado': l.estado,
-                'Precio': l.precio,
-                'Descripcion': l.descripcion,
-                'IDMesa': m.mesa.pk,
-                'nomMesa': m.mesa.nombre,
-                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-                'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
-                'descripcion_t': l.descripcion_t,
-            }
-            lineas.append(obj)
+            lineas.append(l.serialize())
         return lineas
 
     def save(self, *args, **kwargs):
@@ -791,7 +807,6 @@ class Pedidos(models.Model):
    
     @staticmethod
     def agregar_nuevas_lineas(idm, idc, lineas):
-        is_mesa_nueva = False
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
         if not mesa:
@@ -802,12 +817,12 @@ class Pedidos(models.Model):
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
             
-
             mesa = Mesasabiertas()
             mesa.mesa_id = idm
             mesa.infmesa_id = infmesa.pk
             mesa.save()
-            is_mesa_nueva = True
+            comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
+            Sync.actualizar("mesasabiertas")
 
         pedido = Pedidos()
         pedido.infmesa_id = mesa.infmesa.pk
@@ -825,16 +840,18 @@ class Pedidos(models.Model):
                 linea.descripcion = pd["Descripcion"]
                 linea.descripcion_t = pd["descripcion_t"]
                 linea.precio = pd["Precio"]
-                linea.estado =  'P' #'R' if pd['Precio'] == 0 else 'P'
+                linea.estado =  'P'
                 linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
                 linea.save()
+                comunicar_cambios_devices("insert", "lineaspedido", linea.serialize())
 
         pedido.infmesa.numcopias = 0
         pedido.infmesa.save()   
-        Sync.actualizar("mesasabiertas")     
+        
+
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
-        return is_mesa_nueva, pedido
+        return pedido
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -1114,7 +1131,7 @@ class Teclas(models.Model):
         r = self
         teclasseccion = r.teclaseccion_set.all()
         row = model_to_dict(r)
-        row["Precio"] = r.p1 
+        row["Precio"] = float(r.p1) 
         row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
         row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
         row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
@@ -1271,13 +1288,18 @@ class Ticket(models.Model):
                     linea.save()
                     r.estado = 'C'
                     r.save()
+                    comunicar_cambios_devices("md", "lineaspedido", r.serialize())
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if numart <= 0:
-                Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+                for l in Mesasabiertas.objects.filter(infmesa__pk=uid):
+                    s = l.serialize()
+                    s["abierta"] = 0
+                    comunicar_cambios_devices("md", "mesasabiertas", s)
+                    l.delete()
                 Sync.actualizar(Mesasabiertas._meta.db_table)
 
-        return (numart, total, id)
+        return (total, id)
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -1330,7 +1352,6 @@ class Zonas(models.Model):
         return self.nombre
 
     
-
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)

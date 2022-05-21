@@ -5,24 +5,21 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-
 import com.valleapp.comandas.interfaces.IBaseDatos;
+import com.valleapp.comandas.interfaces.IBaseSocket;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class DBMesasAbiertas implements IBaseDatos {
+public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
-    DBMesas db;
+     DBMesas db;
 
     public DBMesasAbiertas(DBMesas db){
         this.db = db;
     }
 
-    @Override
-    public void resetFlag(int id) {
-        db.resetFlag(id);
-    }
 
     @Override
     public JSONArray filter(String cWhere) {
@@ -51,11 +48,34 @@ public class DBMesasAbiertas implements IBaseDatos {
         } catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+        sqlDb.close();
     }
 
     @Override
-    public void inicializar() {
-        db.inicializar();
+    public void inicializar() {}
+
+    @Override
+    public void rm(JSONObject o) {
+       db.rm(o);
+    }
+
+    @Override
+    public void insert(JSONObject o) {
+        try{
+        }catch (Exception e){}
+    }
+
+    @Override
+    public void update(JSONObject o) {
+        try{
+            SQLiteDatabase dbsql = db.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("abierta", o.getString("abierta"));
+            values.put("num", o.getInt("num"));
+            dbsql.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
+            dbsql.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

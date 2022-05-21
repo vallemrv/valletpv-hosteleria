@@ -33,31 +33,16 @@ public class DlgCobrar extends Dialog{
         super(context);
         this.controlador = controlador;
         setContentView(R.layout.cobros);
-        lbltotal = (TextView) findViewById(R.id.lblPrecio);
-        lblEntrega = (TextView) findViewById(R.id.lblEntrega);
-        lblCambio = (TextView) findViewById(R.id.lblCambio);
+        lbltotal = findViewById(R.id.lblPrecio);
+        lblEntrega =  findViewById(R.id.lblEntrega);
+        lblCambio = findViewById(R.id.lblCambio);
         ImageButton tj = findViewById(R.id.btnTarjeta);
-        ImageButton ef = (ImageButton)findViewById(R.id.btnEfectivo);
-        ImageButton s = (ImageButton)findViewById(R.id.btn_salir_monedas);
-        s.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickSalir(view);
-            }
-        });
-        ef.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickEfectivo(view);
-            }
-        });
+        ImageButton ef = findViewById(R.id.btnEfectivo);
+        ImageButton s = findViewById(R.id.btn_salir_monedas);
+        s.setOnClickListener(view -> clickSalir(view));
+        ef.setOnClickListener(view -> clickEfectivo(view));
 
-        tj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickTarjeta(view);
-            }
-        });
+        tj.setOnClickListener(view -> clickTarjeta(view));
     }
 
     public void setDatos(JSONArray lineas, Double totalCobro){
@@ -67,17 +52,12 @@ public class DlgCobrar extends Dialog{
         this.totalCobro = totalCobro;
         this.entrega = totalCobro;
         this.strEntrega = "";
-        LinearLayout pne = (LinearLayout)findViewById(R.id.pneBotonera);
+        LinearLayout pne = findViewById(R.id.pneBotonera);
         ArrayList<View> touchables = pne.getTouchables();
 
         for (View v : touchables){
             if (v instanceof Button){
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        clickEntrega(view);
-                    }
-                });
+                v.setOnClickListener(view -> clickEntrega(view));
             }
         }
     }

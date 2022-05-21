@@ -30,11 +30,11 @@ import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DbCamareros;
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbSecciones;
-import com.valleapp.valletpv.db.DbTeclas;
+import com.valleapp.valletpv.db.DBCamareros;
+import com.valleapp.valletpv.db.DBCuenta;
+import com.valleapp.valletpv.db.DBMesas;
+import com.valleapp.valletpv.db.DBSecciones;
+import com.valleapp.valletpv.db.DBTeclas;
 import com.valleapp.valletpv.dlg.DlgCobrar;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSepararTicket;
@@ -58,10 +58,10 @@ import java.util.TimerTask;
 public class Cuenta extends Activity implements TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
 
     private String server = "";
-    DbSecciones dbSecciones;
-    DbTeclas dbTeclas;
-    DbCuenta dbCuenta;
-    DbMesas dbMesas;
+    DBSecciones dbSecciones;
+    DBTeclas dbTeclas;
+    DBCuenta dbCuenta;
+    DBMesas dbMesas;
     DBSubTeclas dbSubteclas;
 
     JSONObject cam = null;
@@ -93,10 +93,10 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             try {
                 myServicio = ((ServicioCom.MyBinder) iBinder).getService();
                 myServicio.setExHandler("lineaspedido", handlerHttp);
-                dbCuenta = (DbCuenta) myServicio.getDb("lineaspedido");
-                dbMesas = (DbMesas) myServicio.getDb("mesas");
-                dbSecciones = (DbSecciones) myServicio.getDb("secciones");
-                dbTeclas = (DbTeclas) myServicio.getDb("teclas");
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                dbMesas = (DBMesas) myServicio.getDb("mesas");
+                dbSecciones = (DBSecciones) myServicio.getDb("secciones");
+                dbTeclas = (DBTeclas) myServicio.getDb("teclas");
                 dbSubteclas = (DBSubTeclas) myServicio.getDb("subteclas");
                 rellenarSecciones();
                 rellenarTicket();
@@ -132,16 +132,16 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             try {
-                setEstadoAutoFinish(true, true);
+                setEstadoAutoFinish(true, false);
                 String res = msg.getData().getString("RESPONSE");
                 if (res != null) {
                     JSONArray datos = new JSONArray(res);
-                    synchronized (dbCuenta) {
-                        dbCuenta.replaceMesa(datos, mesa.getString("ID"));
-                        rellenarTicket();
-                    }
+                   synchronized (dbCuenta) {
+                       dbCuenta.replaceMesa(datos, mesa.getString("ID"));
+                       rellenarTicket();
+                   }
                 }else{
-                    get_cuenta();
+                    //get_cuenta();
                 }
 
             } catch (JSONException e) {
@@ -186,7 +186,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
 
                     btn.setOnClickListener(view -> {
-                        setEstadoAutoFinish(true, true);
+                        setEstadoAutoFinish(true, false);
                         sec =  view.getTag().toString();
                         try {
                             JSONArray  lsart = dbTeclas.getAll(sec, mesa.getInt("Tarifa"));
@@ -422,7 +422,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     //Acciones con el servidor
     public void preImprimir(View v){
         try{
-            setEstadoAutoFinish(false, false);
+            setEstadoAutoFinish(true, false);
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
             lineas = dbCuenta.getAll(mesa.getString("ID"));
             if(totalMesa>0) {
@@ -438,7 +438,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     public void abrirCajon(View v){
         setEstadoAutoFinish(true,false);
-        DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+        DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
         if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
             try {
                 JSONObject p = new JSONObject();
@@ -457,7 +457,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     public void cobrarMesa(View v){
         try {
-            setEstadoAutoFinish(true, true);
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
             JSONArray l = dbCuenta.filter("IDMesa="+mesa.getString("ID"));
             mostarCobrar(l, totalMesa);
@@ -631,7 +630,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
         try {
             setEstadoAutoFinish(true, true);
-            DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+            DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
             if(dbCamareros.getConPermiso("cobrar_ticket").size() > 0) {
                 JSONObject p = new JSONObject();
                 p.put("idm", mesa.getString("ID"));
@@ -787,7 +786,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try{
 
             if (myServicio != null){
-                DbCamareros dbCamareros = (DbCamareros) myServicio.getDb("camareros");
+                DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 if(dbCamareros.getConPermiso("borrar_linea").size() > 0) {
                     JSONObject p = new JSONObject();
                     p.put("idm",  mesa.getString("ID"));

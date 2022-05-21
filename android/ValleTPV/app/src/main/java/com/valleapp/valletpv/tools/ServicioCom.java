@@ -11,18 +11,19 @@ import android.os.Message;
 import android.util.Log;
 
 import com.valleapp.valletpv.db.DBSubTeclas;
+import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
-import com.valleapp.valletpv.db.DbCamareros;
-import com.valleapp.valletpv.db.DbCuenta;
-import com.valleapp.valletpv.db.DbMesas;
-import com.valleapp.valletpv.db.DbMesasAbiertas;
-import com.valleapp.valletpv.db.DbSecciones;
-import com.valleapp.valletpv.db.DbTbUpdates;
-import com.valleapp.valletpv.db.DbTeclas;
-import com.valleapp.valletpv.db.DbZonas;
+import com.valleapp.valletpv.db.DBCamareros;
+import com.valleapp.valletpv.db.DBCuenta;
+import com.valleapp.valletpv.db.DBMesas;
+import com.valleapp.valletpv.db.DBMesasAbiertas;
+import com.valleapp.valletpv.db.DBSecciones;
+import com.valleapp.valletpv.db.DBTbUpdates;
+import com.valleapp.valletpv.db.DBTeclas;
+
+import com.valleapp.valletpv.interfaces.IBaseSocket;
 import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
 import com.valleapp.valletpv.tareas.TareaUpdateForDevices;
-import com.valleapp.valletpv.tareas.TareaUpdateFromDevices;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -49,9 +50,7 @@ public class ServicioCom extends Service {
 
     String server = null;
 
-    Timer timerUpdateFast = new Timer();
     Timer timerUpdateLow = new Timer();
-    Timer timerUpdateFromDevices = new Timer();
     Timer timerManejarInstrucciones = new Timer();
     Timer checkWebsocket = new Timer();
 
@@ -59,12 +58,11 @@ public class ServicioCom extends Service {
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
 
-    DbTbUpdates dbTbUpdates;
+    DBTbUpdates dbTbUpdates;
 
-    Queue<RowsUpdatables> colaUpdate = new LinkedList<>();
     Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
 
-    String[] tbNameUpdateFast;
+
     String[] tbNameUpdateLow;
 
 
@@ -97,7 +95,7 @@ public class ServicioCom extends Service {
         super.onCreate();
         try {
             client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
-                    "/comunicacion/sync_devices")) {
+                    "/comunicacion/devices")) {
 
                 @Override
                 public void onWebsocketPong(WebSocket conn, Framedata f) {
@@ -108,25 +106,29 @@ public class ServicioCom extends Service {
                 public void onOpen(ServerHandshake serverHandshake) {
                     // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
-                    timerUpdateFast.schedule(new TareaUpdateForDevices(tbNameUpdateFast, server, controller_http, timerUpdateFast, 1000), 1000);
-                    timerUpdateLow.schedule(new TareaUpdateForDevices(tbNameUpdateLow, server, controller_http, timerUpdateLow, 1000), 5000);
+                    ContentValues p = new ContentValues();
+                    p.put("tb", "mesasabiertas");
+                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
                 }
 
 
                 @Override
                 public void onMessage(String message) {
                     try {
-                        if (message.contains("sync_actualizar")) {
-                            Timer t = new Timer();
-                            t.schedule(new TimerTask(){
-                                @Override
-                                public void run() {
-                                    delegadoHandleCheckUpdates(message);
-                                }
-                            }, 2000);
-
+                        JSONObject o = new JSONObject(message);
+                        String tb = o.getString("tb");
+                        String op = o.getString("op");
+                        IBaseSocket db = (IBaseSocket) getDb(tb);
+                        Log.i("MENSAJE", message+ "db "+db);
+                        if (db != null) {
+                            if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
+                            if (op.equals("md")) db.update(o.getJSONObject("obj"));
+                            if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
+                            Handler h = getExHandler(tb);
+                            if (h != null) h.sendEmptyMessage(0);
                         }
-                    }catch (Exception ignored){}
+
+                    }catch (Exception ignored){ }
                 }
 
                 @Override
@@ -195,13 +197,12 @@ public class ServicioCom extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
-        Log.d("TEST", "Servicio startcommand");
         String url = intent.getStringExtra("url");
         if (url != null){
             server = url;
             IniciarDB();
             crearWebsocket();
-            timerUpdateFromDevices.schedule(new TareaUpdateFromDevices(dbs, timerUpdateFromDevices, colaUpdate, server, dbTbUpdates), 5000, 1);
+            timerUpdateLow.schedule(new TareaUpdateForDevices(this.tbNameUpdateLow, server, controller_http, timerUpdateLow, 2000), 1000);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
@@ -224,9 +225,7 @@ public class ServicioCom extends Service {
 
     @Override
     public void onDestroy() {
-        timerUpdateFast.cancel();
         timerUpdateLow.cancel();
-        timerUpdateFromDevices.cancel();
         super.onDestroy();
     }
 
@@ -249,18 +248,11 @@ public class ServicioCom extends Service {
         return  null;
     }
 
-    public void addTbCola(RowsUpdatables r){
-        colaUpdate.add(r);
-    }
 
     private void IniciarDB() {
-        if (tbNameUpdateFast == null){
-            tbNameUpdateFast = new String[]{
-                    "camareros",
-                    "mesasabiertas",
-                    "lineaspedido"
-            };
+        if (tbNameUpdateLow == null){
             tbNameUpdateLow = new String[]{
+                    "camareros",
                     "zonas",
                     "mesas",
                     "teclas",
@@ -270,20 +262,23 @@ public class ServicioCom extends Service {
 
         }
         if (dbs == null){
-            DbMesas dbMesas = new DbMesas(getApplicationContext());
+            DBMesas dbMesas = new DBMesas(getApplicationContext());
             dbs = new HashMap<>();
-            dbs.put("camareros", new DbCamareros(getApplicationContext()));
+            dbs.put("camareros", new DBCamareros(getApplicationContext()));
             dbs.put("mesas", dbMesas);
-            dbs.put("zonas", new DbZonas(getApplicationContext()));
-            dbs.put("secciones", new DbSecciones(getApplicationContext()));
-            dbs.put("teclas", new DbTeclas(getApplicationContext()));
-            dbs.put("lineaspedido", new DbCuenta(getApplicationContext()));
-            dbs.put("mesasabiertas", new DbMesasAbiertas(dbMesas));
+            dbs.put("zonas", new DBZonas(getApplicationContext()));
+            dbs.put("secciones", new DBSecciones(getApplicationContext()));
+            dbs.put("teclas", new DBTeclas(getApplicationContext()));
+            dbs.put("lineaspedido", new DBCuenta(getApplicationContext()));
+            dbs.put("mesasabiertas", new DBMesasAbiertas(dbMesas));
             dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
+            for (IBaseDatos db: dbs.values()){
+                db.inicializar();
+            }
         }
 
 
-        if(dbTbUpdates==null)  dbTbUpdates = new DbTbUpdates(getApplicationContext());
+        if(dbTbUpdates==null)  dbTbUpdates = new DBTbUpdates(getApplicationContext());
     }
 
     public IBaseDatos getDb(String nombre){
@@ -376,6 +371,17 @@ public class ServicioCom extends Service {
         p.put("apellido", a);
         synchronized (colaInstrucciones){
             colaInstrucciones.add(new Instrucciones(p, server+"/camareros/camarero_add"));
+        }
+    }
+
+    public void autorizarCam(JSONObject obj){
+        ContentValues p = new ContentValues();
+        JSONArray o = new JSONArray();
+        o.put(obj);
+        p.put("rows", o.toString());
+        p.put("tb", "camareros");
+        synchronized (colaInstrucciones){
+            colaInstrucciones.add(new Instrucciones(p, server+"/sync/update_from_devices"));
         }
     }
 

@@ -17,7 +17,7 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public  class DbTbUpdates extends SQLiteOpenHelper  {
+public  class DBTbUpdates extends SQLiteOpenHelper  {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -26,7 +26,7 @@ public  class DbTbUpdates extends SQLiteOpenHelper  {
     public String tb_name = "sync";
 
 
-    public DbTbUpdates(Context context) {
+    public DBTbUpdates(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         onCreate(this.getWritableDatabase());
     }

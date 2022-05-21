@@ -6,13 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorCamNotificaciones;
-import com.valleapp.valletpv.db.DbCamareros;
+import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
@@ -26,7 +25,7 @@ public class DlgPedirAutorizacion extends Dialog implements IControladorAutoriza
 
     private final IAutoFinish controladorAutofinish;
     private final IControladorAutorizaciones controladorAutorizaciones;
-    private final DbCamareros dbCamareros;
+    private final DBCamareros dbCamareros;
     private final JSONObject params;
     private final String accion;
 
@@ -38,7 +37,7 @@ public class DlgPedirAutorizacion extends Dialog implements IControladorAutoriza
         super(context);
         this.controladorAutofinish = controladorAutofinish;
         this.controladorAutorizaciones = controladorAutorizaciones;
-        this.dbCamareros = (DbCamareros) dbCamareros;
+        this.dbCamareros = (DBCamareros) dbCamareros;
         this.params = params;
         this.accion = accion;
     }

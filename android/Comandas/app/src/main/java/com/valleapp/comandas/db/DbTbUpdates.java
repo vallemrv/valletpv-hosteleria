@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 
@@ -16,14 +17,17 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTbUpdates extends DBBase{
+public class DbTbUpdates extends SQLiteOpenHelper {
+
+    public static final int DATABASE_VERSION = 1;
+    public static final String DATABASE_NAME = "valletpv";
 
 
     public String tb_name = "sync";
 
 
     public DbTbUpdates(Context context) {
-        super(context);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         onCreate(this.getWritableDatabase());
     }
 
@@ -46,10 +50,6 @@ public class DbTbUpdates extends DBBase{
     }
 
 
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
-    }
 
     public void rellenarTabla(JSONArray tb){
         // Gets the data repository in write mode
