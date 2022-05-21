@@ -46,12 +46,24 @@ public class DbSecciones extends SQLiteOpenHelper implements IBaseDatos {
 
 
 
-    @SuppressLint("Range")
+
     public JSONArray getAll()
     {
+        return filter(null);
+    }
+
+
+    @Override
+    @SuppressLint("Range")
+    public JSONArray filter(String cWhere) {
+        String strWhere = "";
+        if (cWhere != null){
+            strWhere = " WHERE "+cWhere;
+        }
+
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM secciones ORDER BY Orden DESC" , null );
+        Cursor res =  db.rawQuery( "SELECT * FROM secciones "+strWhere+" ORDER BY Orden DESC" , null );
         res.moveToFirst();
         while(!res.isAfterLast()){
             try{
@@ -69,17 +81,8 @@ public class DbSecciones extends SQLiteOpenHelper implements IBaseDatos {
         }
         res.close();db.close();
         return ls;
-    }
 
 
-    @Override
-    public void resetFlag(int id) {
-
-    }
-
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
     }
 
     @Override

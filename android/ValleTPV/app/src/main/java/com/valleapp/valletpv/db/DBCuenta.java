@@ -37,7 +37,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
         db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
                 "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, " +
-                "IDMesa INTEGER, flag TEXT default ''," +
+                "IDMesa INTEGER, " +
                 "IDArt INTEGER )");
     }
 
@@ -116,17 +116,7 @@ public class DbCuenta extends SQLiteOpenHelper  implements IBaseDatos {
         return s;
     }
 
-    public int getCount(String id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int s = 0;
-        Cursor cursor = db.rawQuery("SELECT count(*) FROM cuenta WHERE IDMesa="+id, null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
-            s= cursor.getInt(0);
-          }
-        cursor.close();db.close();
-        return s;
-    }
+
 
     public void addArt(int IDMesa,  JSONObject art){
         // Gets the data repository in write mode

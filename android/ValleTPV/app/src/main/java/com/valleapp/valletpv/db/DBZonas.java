@@ -18,14 +18,14 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
 
 
-    public DbZonas(Context context) {
+    public DBZonas(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -44,13 +44,21 @@ public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-
-    @SuppressLint("Range")
     public JSONArray getAll()
     {
+       return filter(null);
+    }
+
+    @Override
+    @SuppressLint("Range")
+    public JSONArray filter(String cWhere) {
+        String w = "";
+        if (cWhere != null){
+            w = " WHERE "+cWhere;
+        }
         JSONArray lista = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from zonas", null );
+        Cursor res =  db.rawQuery( "select * from zonas"+w, null );
         res.moveToFirst();
         while(!res.isAfterLast()){
             try{
@@ -69,17 +77,6 @@ public class DbZonas extends SQLiteOpenHelper implements IBaseDatos {
         }
         res.close();db.close();
         return lista;
-    }
-
-
-    @Override
-    public void resetFlag(int id) {
-
-    }
-
-    @Override
-    public JSONArray filter(String cWhere) {
-        return null;
     }
 
     @Override

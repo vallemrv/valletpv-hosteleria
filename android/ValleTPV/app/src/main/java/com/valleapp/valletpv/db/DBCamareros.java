@@ -127,18 +127,11 @@ public class DbCamareros  extends SQLiteOpenHelper implements IBaseDatos {
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("autorizado", autorizado);
-        cv.put("flag", "modificado");
         db.update("camareros",  cv, "ID="+id, null);
         db.close();
     }
 
-    public void resetFlag(int id){
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("flag", "");
-        db.update("camareros",  cv, "ID="+id, null);
-        db.close();
-    }
+
 
 
     public ArrayList<JSONObject> getAutorizados(Boolean a)
