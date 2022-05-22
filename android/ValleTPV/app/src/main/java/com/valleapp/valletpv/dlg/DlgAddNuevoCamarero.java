@@ -47,6 +47,8 @@ public class DlgAddNuevoCamarero extends Dialog {
                     Toast.makeText(cx, "Datos del camarero incorrectos", Toast.LENGTH_LONG).show();
                 }else {
                     servicio.addCamNuevo(n, a);
+                    DBCamareros db = (DBCamareros) servicio.getDb("camareros");
+                    db.addCamNuevo(n, a);
                     Toast.makeText(cx, "Camarero agregado con exito", Toast.LENGTH_LONG).show();
                     servicio.getExHandler("camareros").sendEmptyMessage(0);
                     cancel();

@@ -48,7 +48,7 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
         } catch (Exception e){
             e.printStackTrace();
         }
-        sqlDb.close();
+
     }
 
     @Override
@@ -73,7 +73,7 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
             values.put("abierta", o.getString("abierta"));
             values.put("num", o.getInt("num"));
             dbsql.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
-            dbsql.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }

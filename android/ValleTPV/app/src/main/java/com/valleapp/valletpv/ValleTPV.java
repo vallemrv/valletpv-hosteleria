@@ -145,7 +145,6 @@ public class ValleTPV extends Activity {
                 dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 rellenarListas();
             }
-
         }
 
         @Override

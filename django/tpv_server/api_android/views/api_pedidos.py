@@ -5,7 +5,7 @@
 # @Last modified time: 2019-04-26T14:53:11+02:00
 # @License: Apache License v2.0
 
-from api_android.tools import send_mensaje_devices
+from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from gestion.models import  Lineaspedido, Mesasabiertas, Servidos
@@ -29,16 +29,18 @@ def  get_pendientes(request):
     
     for m in mesas:
         lineas_server = [*lineas_server, *m.get_lineaspedido()]
-    for l in lineas_server:
-        linea = find(l["ID"], lineas)
-        if linea:
-            if not Lineaspedido.is_equals(l, linea):
-                result.append({'op':'md', 'reg': l})
-        else:
-            result.append({'op':'insert', 'reg': l})
-            
-    for l in lineas:
-         result.append({'op':'rm', 'reg': {"ID":l["ID"]}})   
+
+    if len(lineas_server) > 0:
+        for l in lineas_server:
+            linea = find(l["ID"], lineas)
+            if linea:
+                if not Lineaspedido.is_equals(l, linea):
+                    result.append({'op':'md', 'reg': l})
+            else:
+                result.append({'op':'insert', 'reg': l})
+                
+        for l in lineas:
+            result.append({'op':'rm', 'reg': {"ID":l["ID"]}})   
 
     return JsonResponse(result)
 
@@ -54,15 +56,9 @@ def servido(request):
         serv = Servidos()
         serv.linea_id = l.pk
         serv.save()
-
-    #enviar notficacion de update
-    update = {
-       "OP": "UPDATE",
-       "Tabla": "pendientes",
-       "receptor": "comandas",
-    }
-    send_mensaje_devices(update)
-    return get_pendientes(request)
+        comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+    
+    return JsonResponse({})
 
 
 def get_pedidos_by_receptor(request):

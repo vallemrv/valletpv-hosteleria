@@ -93,9 +93,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
                 lista.add(cargarRegistro(res));
                 res.moveToNext();
             }
-            res.close();
 
-            db.close();
         }catch (SQLiteException e){
             e.printStackTrace();
         }
@@ -137,13 +135,12 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
                 s = cursor.getDouble(0);
             }
-            cursor.close();
 
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
-        db.close();
+
         return s;
     }
 
@@ -156,7 +153,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (SQLiteException e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     @SuppressLint("Range")
@@ -197,7 +194,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             res.moveToNext();
         }
 
-        db.close();
         return  ls;
     }
 
@@ -227,8 +223,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             Log.i("SHOWDATA", dta);
             res.moveToNext();
         }
-        res.close();
-        db.close();
+
     }
 
     @Override
@@ -238,15 +233,17 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             String id = o.getString("ID");
             int count = count(db, "ID="+id);
             ContentValues values = caragarValues(o);
-            if (count <= 0) {
-                db.insert("cuenta", null, values);
-            }else{
-                db.update("cuenta", values, "ID=?", new String[]{id});
+            synchronized (db) {
+                if (count == 0) {
+                    db.insert("cuenta", null, values);
+                } else {
+                    db.update("cuenta", values, "ID=?", new String[]{id});
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     @Override
@@ -256,10 +253,9 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             String id = o.getString("ID");
             ContentValues values = caragarValues(o);
             db.update("cuenta", values, "ID=?", new String[]{id});
-        }catch (Exception e){
+        }catch (Exception e) {
             e.printStackTrace();
         }
-        db.close();
     }
 
     @Override
@@ -270,7 +266,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
     }
 
     public void rellenarTabla(JSONArray datos){
@@ -284,7 +279,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
 
     }
 
@@ -305,7 +300,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     public void addArt(int IDMesa,  JSONObject art){
@@ -327,7 +322,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (JSONException e){
             e.printStackTrace();
         }
-        db.close();
     }
 
     public void eliminar(String IDMesa, JSONArray lsart){
@@ -345,7 +339,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
     }
 
     public void eliminar(String IDMesa){
@@ -355,7 +348,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (SQLiteException e) {
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     public void aparcar(String id){
@@ -365,7 +358,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (SQLiteException e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     @SuppressLint("Range")
@@ -394,13 +387,11 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
                 res.moveToNext();
 
             }
-            res.close();
+
         }catch (SQLiteException e){
-            db.close();
-            db = this.getWritableDatabase();
-            this.onCreate(db);
+           e.printStackTrace();
         }
-        db.close();
+
         return lista;
     }
 

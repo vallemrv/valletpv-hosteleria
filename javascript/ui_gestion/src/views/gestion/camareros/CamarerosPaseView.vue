@@ -53,7 +53,7 @@ export default {
     items() {
       if (!this.camareros) return [];
       return Object.values(this.camareros).filter((e) => {
-        return (e.activo = 1);
+        return e.activo == 1;
       });
     },
   },

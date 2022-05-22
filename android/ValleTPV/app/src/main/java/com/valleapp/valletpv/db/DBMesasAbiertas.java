@@ -46,7 +46,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
         } catch (Exception e){
             e.printStackTrace();
         }
-        sqlDb.close();
     }
 
     @Override
@@ -73,6 +72,5 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
         }catch (Exception e){
             e.printStackTrace();
         }
-        dbsql.close();
     }
 }

@@ -73,7 +73,6 @@ public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
             res.moveToNext();
 
         }
-        res.close();db.close();
         return ls;
 
     }
@@ -123,7 +122,6 @@ public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
             }
 
         }
-        db.close();
     }
 
     @Override

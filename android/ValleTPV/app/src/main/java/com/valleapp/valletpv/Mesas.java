@@ -107,8 +107,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             try {
                 String op = msg.getData().getString("op");
                 if (op == null) {
-                    Log.i("mesas", "rellenar zonas");
-                    rellenarZonas();
+                     rellenarZonas();
                 }
                 else  {
                     String res = msg.getData().getString("RESPONSE");

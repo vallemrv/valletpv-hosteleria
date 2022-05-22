@@ -65,8 +65,7 @@ public class DBSugerencias extends DBBase {
             res.moveToNext();
 
         }
-        res.close();
-        db.close();
+
         return ls;
     }
 
@@ -93,7 +92,7 @@ public class DBSugerencias extends DBBase {
             }
 
         }
-        db.close();
+
     }
 
     public JSONArray getAll()

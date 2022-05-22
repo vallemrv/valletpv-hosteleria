@@ -75,7 +75,7 @@ public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
             res.moveToNext();
 
         }
-        res.close();db.close();
+
         return lista;
     }
 
@@ -105,7 +105,6 @@ public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
             }
 
         }
-        db.close();
     }
 
     @Override

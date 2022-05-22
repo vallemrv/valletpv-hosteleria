@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -55,10 +56,8 @@ public class ServicioCom extends Service {
 
     String server = null;
 
-    Timer timerUpdateFast = new Timer();
-    Timer timerUpdateLow = new Timer();
+    Timer timerUpdate = new Timer();
     Timer timerManejarInstrucciones = new Timer();
-    Timer timerAurotias = new Timer();
     Timer checkWebsocket = new Timer();
 
     Map<String, Handler> exHandler = new HashMap<>();
@@ -68,8 +67,7 @@ public class ServicioCom extends Service {
 
     Queue<Instruccion> colaInstrucciones = new LinkedList<>();
 
-    String[] tbNameUpdateFast;
-    String[] tbNameUpdateLow;
+    String[] tbNameUpdate;
 
     private JSONObject cam;
     WebSocketClient client;
@@ -94,6 +92,7 @@ public class ServicioCom extends Service {
                     ContentValues p = new ContentValues();
                     p.put("tb", "mesasabiertas");
                     new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+                    comprobarMensajes();
                  }
 
 
@@ -104,13 +103,22 @@ public class ServicioCom extends Service {
                         String tb = o.getString("tb");
                         String op = o.getString("op");
                         IBaseSocket db = (IBaseSocket) getDb(tb);
-                        Log.i("MENSAJE", message);
+                        //Log.i("MENSAJE", message);
                         if (db != null) {
                             if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
                             if (op.equals("md")) db.update(o.getJSONObject("obj"));
                             if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
                             Handler h = exHandler.get(tb);
                             if (h != null) h.sendEmptyMessage(0);
+                        }else if (op.equals("men")){
+                            Handler h = exHandler.get(tb);
+                            if (h != null){
+                                new HTTPRequest().sendMessage(h, "men_once", o.getJSONObject("obj").toString());
+                            }
+                        }
+                        DBCamareros db_cam = (DBCamareros) getDb("camareros");
+                        if (cam != null && !db_cam.is_autorizado(cam)){
+                            System.exit(0);
                         }
                     }catch (Exception e){}
                 }
@@ -142,6 +150,18 @@ public class ServicioCom extends Service {
         }
     }
 
+    private void comprobarMensajes() {
+        try {
+            Handler h = exHandler.get("mensajes");
+            if(cam != null && h != null) {
+                ContentValues p = new ContentValues();
+                p.put("idautorizado", cam.getString("ID"));
+                new HTTPRequest(server + "/autorizaciones/get_lista_autorizaciones", p, "men_lista", h);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
@@ -217,7 +237,8 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
-            timerUpdateLow.schedule(new TareaUpdateForDevices(this.tbNameUpdateLow, server, controller_http, timerUpdateLow, 2000), 1000);
+            Log.i("CREAR SERVICIO", "creadooooo");
+            timerUpdate.schedule(new TareaUpdateForDevices(this.tbNameUpdate, server, controller_http, timerUpdate, 2000), 1000);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
@@ -241,8 +262,7 @@ public class ServicioCom extends Service {
     @Override
     public void onDestroy() {
         try {
-            timerUpdateLow.cancel();
-            timerAurotias.cancel();
+            timerUpdate.cancel();
             client.close();
         }catch (Exception ignored){
 
@@ -265,25 +285,18 @@ public class ServicioCom extends Service {
         if (exHandler.containsKey(handlerName))   exHandler.remove(exHandler.get(handlerName));
     }
 
-    public void initTimerAutorias(Handler mainHandler, String idautoria){
-       exHandler.put("menHandler", mainHandler);
-       timerAurotias.schedule(new TareaManejarAutorias(mainHandler, idautoria, 1000, server+"/autorizaciones/get_lista_autorizaciones"), 2000);
-    }
 
     public void addColaInstrucciones(Instruccion inst) {
+        Log.i("Ecolor instrucuion", inst.url);
         synchronized (colaInstrucciones) {
             colaInstrucciones.add(inst);
         }
     }
 
     private void IniciarDB() {
-        if (tbNameUpdateFast == null){
-            tbNameUpdateFast = new String[]{
+        if (tbNameUpdate == null){
+            tbNameUpdate = new String[]{
                     "camareros",
-                    "mesasabiertas",
-                    "lineaspedido"
-            };
-            tbNameUpdateLow = new String[]{
                     "zonas",
                     "mesas",
                     "teclas",
@@ -321,6 +334,7 @@ public class ServicioCom extends Service {
 
     public void setCamarero(JSONObject cam) {
         this.cam = cam;
+        comprobarMensajes();
     }
 
     public class MyBinder extends Binder{

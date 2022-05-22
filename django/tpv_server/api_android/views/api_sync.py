@@ -65,7 +65,6 @@ def update_for_devices(request):
 
 @csrf_exempt
 def update_from_devices(request):
-    device = request.POST["device"] if "device" in request.POST else ""
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
     
@@ -74,14 +73,7 @@ def update_from_devices(request):
     if hasattr(model, "update_from_device"):
         for row in rows:
             model.update_from_device(row)
-            update = {
-                "op": "md",
-                "device": device,
-                "tb": "camareros",
-                "obj": row,
-                "receptor": "devices",
-            }
-            send_mensaje_devices(update)       
+                   
     
     return JsonResponse(
          {"tb": tb, 

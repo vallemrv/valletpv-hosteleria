@@ -70,7 +70,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
             }
 
         }
-        db.close();
     }
 
     @Override
@@ -88,13 +87,12 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
     public void abrirMesa(String idm, String num) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE mesas SET abierta='1', num="+num+" WHERE ID="+idm);
-        db.close();
+
     }
 
     public void cerrarMesa(String idm) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE mesas SET abierta='0', num=0 WHERE ID="+idm);
-        db.close();
     }
 
 
@@ -129,7 +127,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
             res.moveToNext();
 
         }
-        res.close();db.close();
         return lista;
     }
 
@@ -138,7 +135,6 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
         ContentValues v = new ContentValues();
         v.put("num", "1");
         db.update("mesas", v, "ID = ?", new String[]{id});
-        db.close();
     }
 
     @Override
@@ -146,7 +142,9 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
         try {
             SQLiteDatabase db = getWritableDatabase();
             db.delete("mesas", "ID=?", new String[]{o.getString("ID")});
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -155,7 +153,9 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
             SQLiteDatabase db = getWritableDatabase();
             ContentValues values = cargarValues(o);
             db.insert("mesas", null, values);
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -164,7 +164,9 @@ public class DBMesas extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket
             SQLiteDatabase db = getWritableDatabase();
             ContentValues values = cargarValues(o);
             db.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private  ContentValues cargarValues(JSONObject o){

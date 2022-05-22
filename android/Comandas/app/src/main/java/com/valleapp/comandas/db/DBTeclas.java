@@ -73,7 +73,7 @@ public class DBTeclas extends DBBase {
             res.moveToNext();
 
         }
-        res.close();db.close();
+     ;
         return ls;
 
     }
@@ -125,7 +125,7 @@ public class DBTeclas extends DBBase {
             }
 
         }
-        db.close();
+;
     }
 
 }

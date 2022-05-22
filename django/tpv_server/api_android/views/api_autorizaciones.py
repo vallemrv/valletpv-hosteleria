@@ -1,9 +1,9 @@
-
-from datetime import datetime
 import json
+from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from tokenapi.http import JsonResponse
-from gestion.models import (Camareros, Lineaspedido, Mesas, Receptores,
+from comunicacion.tools import comunicar_cambios_devices
+from gestion.models import (Camareros, Lineaspedido,  Receptores,
                             Mesasabiertas, PeticionesAutoria, Ticket)
 from api_android.tools import (send_imprimir_ticket, send_mensaje_devices, send_mensaje_impresora)
 
@@ -27,11 +27,7 @@ def send_informacion(request):
         peticion.idautorizado = Camareros.objects.get(id=i)
         peticion.save()
 
-    send_mensaje_devices({
-        "OP": "mensajes",
-        "receptor": "sync_devices",
-        "idreceptor": idreceptor if int(idreceptor) > 0 else 'all'
-    })
+    comunicar_cambios_devices("men", "mensajes", peticion.serialize())
 
     return JsonResponse("success")
 
@@ -47,11 +43,7 @@ def pedir_autorizacion(request):
     
     peticion.save()
     
-    send_mensaje_devices({
-        "OP": "mensajes",
-        "receptor": "sync_devices",
-        "idreceptor": id
-    })
+    comunicar_cambios_devices("men", "mensajes", peticion.serialize())
    
     return JsonResponse("success")
 
@@ -61,38 +53,11 @@ def get_lista_autorizaciones(request):
     return JsonResponse(get_lista_men(request.POST["idautorizado"]))
 
 def get_lista_men(id):   
-
     peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
     mensajes = []
     for p in peticiones:
-        inst = json.loads(p.instrucciones)
-        if p.accion == "borrar_mesa":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            motivo = inst["motivo"]
-            mensajes.append({"tipo": "peticion", "idpeticion": p.pk, "mensaje":camarero.nombre+ " "
-            + camarero.apellidos+" solicita permiso para borrar la mesa completa "
-            + mesa.nombre +" por el motivo:  "+ motivo})
-        elif p.accion == "borrar_linea":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            nombre = inst["Descripcion"]
-            can = inst["can"]
-            motivo = inst["motivo"]
-            mensajes.append({"tipo": "peticion", "idpeticion": p.pk, "mensaje":camarero.nombre+ " "
-            + camarero.apellidos+" solicita permiso para borrar " + can +" "+nombre + " de la mesa "
-            + mesa.nombre +" por el motivo:  "+ motivo})
-        elif p.accion == "informacion":
-            mensajes.append({"tipo": "informacion", "idpeticion": p.pk, "mensaje": "Mensaje de "+inst["autor"]+": \n "+ inst["mensaje"]})
-        elif p.accion == "cobrar_ticket":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            mensajes.append({"tipo":"peticion", "idpeticion": p.pk, "mensaje": camarero.nombre + " "
-            + camarero.apellidos+" solicita permiso para cobrar "+ mesa.nombre})
-        elif p.accion == "abrir_cajon":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mensajes.append({"tipo":"peticion", "idpeticion": p.pk, "mensaje": camarero.nombre + " "
-            + camarero.apellidos+" solicita permiso para abrir cajon" })
+        mensajes.append(p.serialize())
+    
     return mensajes
 
 

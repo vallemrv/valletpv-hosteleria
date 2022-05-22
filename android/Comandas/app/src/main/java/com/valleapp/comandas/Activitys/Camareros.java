@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -73,6 +74,9 @@ public class Camareros extends ActivityBase {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+            }else{
+                Log.i("cargado", "carga de camarero");
+                mostrarListado();
             }
         }
     };
@@ -88,7 +92,7 @@ public class Camareros extends ActivityBase {
     @Override
     protected void onResume() {
         cargarPreferencias();
-        if (server != null) {
+        if (server != null && myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
             startService(intent);
@@ -213,7 +217,6 @@ public class Camareros extends ActivityBase {
     public void reloadCamareros(View v){
         mostrarToast("Refrescando camareros", Gravity.BOTTOM, 0, 80);
         descargarCamarerosActivos();
-
     }
 
     protected void entrarEnMesas(String cam){

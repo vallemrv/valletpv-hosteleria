@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorMesas;
+import com.valleapp.comandas.db.DBCamareros;
 import com.valleapp.comandas.db.DBCuenta;
 import com.valleapp.comandas.db.DBMesas;
 import com.valleapp.comandas.db.DBZonas;
@@ -36,6 +37,7 @@ import com.valleapp.comandas.interfaces.IPedidos;
 import com.valleapp.comandas.pestañas.ListaMesas;
 import com.valleapp.comandas.pestañas.Pedidos;
 import com.valleapp.comandas.utilidades.ActivityBase;
+import com.valleapp.comandas.utilidades.HTTPRequest;
 import com.valleapp.comandas.utilidades.Instruccion;
 import com.valleapp.comandas.utilidades.JSON;
 import com.valleapp.comandas.utilidades.ServicioCom;
@@ -52,7 +54,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     private ListaMesas listaMesas = null;
     private Pedidos pedidos = null;
-
 
     int presBack = 0;
 
@@ -74,6 +75,32 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         }
     };
 
+    private final Handler handlerMensajes = new Handler(Looper.getMainLooper()){
+        public void handleMessage(Message msg) {
+            String op = msg.getData().getString("op");
+            String res = msg.getData().getString("RESPONSE");
+            try {
+                if (op.equals("men_once")){
+                    JSONObject o = new JSONObject(res);
+                    String idautorizado = o.getString("idautorizado");
+                    String self_id = cam.getString("ID");
+                    if (idautorizado.equals(self_id)) {
+                        peticiones.put(o);
+                    }
+                }else {
+                    peticiones = new JSONArray(res);
+                }
+                if(!viendo_mensajes && peticiones.length() > 0) {
+                    MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
+                    m.start();
+                }
+                manejarAurotias();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    };
+
     private final Handler handlerOperaciones = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
@@ -84,16 +111,20 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     break;
                 case "pedidos":
                     try {
-                        JSONArray inst = new JSONArray(res);
-                        if (inst.length()> 0) {
-                            for (int i = 0; i < inst.length(); i++) {
-                                JSONObject o = inst.getJSONObject(i);
-                                String op_aux = o.getString("op");
-                                if (op_aux.equals("insert")) dbCuenta.insert(o.getJSONObject("reg"));
-                                if (op_aux.equals("md")) dbCuenta.update(o.getJSONObject("reg"));
-                                if (op_aux.equals("rm")) dbCuenta.rm(o.getJSONObject("reg"));
+                        if (!res.equals("success")) {
+                            JSONArray inst = new JSONArray(res);
+                            if (inst.length() > 0) {
+                                for (int i = 0; i < inst.length(); i++) {
+                                    JSONObject o = inst.getJSONObject(i);
+                                    String op_aux = o.getString("op");
+                                    if (op_aux.equals("insert"))
+                                        dbCuenta.insert(o.getJSONObject("reg"));
+                                    if (op_aux.equals("md"))
+                                        dbCuenta.update(o.getJSONObject("reg"));
+                                    if (op_aux.equals("rm")) dbCuenta.rm(o.getJSONObject("reg"));
+                                }
+                                rellenarPedido();
                             }
-                            rellenarPedido();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -108,18 +139,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 case "mostrarmesas":
                     rellenarZonas();
                     findViewById(R.id.loading).setVisibility(View.GONE);
-                    break;
-                case "autorias":
-                    try {
-                        peticiones = new JSONArray(res);
-                        if(!viendo_mensajes && peticiones.length() > 0) {
-                            MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
-                            m.start();
-                        }
-                        manejarAurotias();
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
                     break;
             }
         }
@@ -147,7 +166,8 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
-                myServicio.setCamarero(cam);
+                myServicio.setExHandler("mensajes", handlerMensajes);
+                myServicio.setCamarero(cam); //debe de ir despues de setExHandler....
                 Timer t = new Timer();
                 t.schedule(new TimerTask() {
                     @Override
@@ -160,11 +180,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     handlerOperaciones.sendMessage(msg);
                     }
                 },1000);
-                try {
-                    myServicio.initTimerAutorias(handlerOperaciones, cam.getString("ID"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
         }
 
@@ -354,13 +369,11 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             try {
                 if (zn != null) {
                     ContentValues p = new ContentValues();
-                    dbCuenta.showDatos(null);
-                    JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta ");
-                    p.put("idz", zn.getString("ID"));
+                    String idz = zn.getString("ID");
+                    JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta WHERE IDZona="+idz);
+                    p.put("idz", idz);
                     p.put("lineas", lineas.toString());
-                    myServicio.addColaInstrucciones(new Instruccion(p,
-                            "/pedidos/getpendientes",
-                            handlerOperaciones, "pedidos"));
+                    new HTTPRequest(server+"/pedidos/getpendientes", p, "pedidos", handlerOperaciones);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

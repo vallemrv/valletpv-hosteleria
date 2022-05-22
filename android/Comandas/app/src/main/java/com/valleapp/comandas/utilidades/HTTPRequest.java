@@ -41,7 +41,7 @@ public class HTTPRequest {
         return sbParams.toString();
     }
 
-
+    public HTTPRequest(){} // esto es solo para utiliazar la funcion sendMessage()
     public HTTPRequest(String strUrl, final ContentValues params, final String op, final Handler handlerExternal){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;

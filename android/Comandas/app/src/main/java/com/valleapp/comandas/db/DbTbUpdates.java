@@ -72,7 +72,7 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             }
 
         }
-        db.close();
+
     }
 
     @SuppressLint("Range")
@@ -95,8 +95,7 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             res.moveToNext();
 
         }
-        res.close();
-        db.close();
+
         return ls;
     }
 
@@ -107,7 +106,7 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             res.moveToFirst();
             int count = res.getInt(0);
             hay = count > 0;
-            res.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -121,19 +120,17 @@ public class DbTbUpdates extends SQLiteOpenHelper {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        db.close();
     }
 
 
     public boolean is_updatable(JSONObject obj) {
         boolean isUp = true;
-        SQLiteDatabase db = null;
         try {
 
             String date = obj.getString("last");
             if (date.equals("")) return true;
             String tb = obj.getString("nombre");
-            db = this.getReadableDatabase();
+            SQLiteDatabase db = this.getReadableDatabase();
             isUp = !hayRegistros(tb, db);
 
             if (!isUp) {
@@ -141,20 +138,19 @@ public class DbTbUpdates extends SQLiteOpenHelper {
                 res.moveToFirst();
                 int count = res.getInt(0);
                 isUp = count > 0;
-                res.close();
+
             }
 
         } catch (Exception e) {
              e.printStackTrace();
         }
-        if (db != null) db.close();
+
         return  isUp;
     }
 
     public void upTabla(String tb, String last) {
-        SQLiteDatabase db = null;
         try {
-            db =  this.getWritableDatabase();
+            SQLiteDatabase db =  this.getWritableDatabase();
             boolean hay = hayRegistros(tb, db);
             ContentValues v = new ContentValues();
             v.put("nombre", tb);
@@ -169,7 +165,7 @@ public class DbTbUpdates extends SQLiteOpenHelper {
         }catch (Exception e){
             e.printStackTrace();
         }
-        if (db != null) db.close();
+
     }
 
     public void setLast(String tb, String last) {

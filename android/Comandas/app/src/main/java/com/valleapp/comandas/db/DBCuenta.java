@@ -86,9 +86,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
                 lista.add(cargarRegistro(res));
                 res.moveToNext();
             }
-            res.close();
 
-            db.close();
         }catch (SQLiteException e){
             e.printStackTrace();
         }
@@ -132,7 +130,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
         try{
             SQLiteDatabase db = this.getWritableDatabase();
             db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
-            db.close();
+
             for (int i=0;i < datos.length(); i++) {
                 insert(datos.getJSONObject(i));
             }
@@ -155,13 +153,13 @@ public class DBCuenta extends DBBase implements IBaseSocket {
             if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
                 s = cursor.getDouble(0);
             }
-            cursor.close();
+
 
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
 
-        db.close();
+
         return s;
     }
 
@@ -174,7 +172,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
          }catch (SQLiteException e){
             e.printStackTrace();
          }
-        db.close();
+
     }
 
 
@@ -216,7 +214,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
             res.moveToNext();
         }
 
-        db.close();
+
         return  ls;
     }
 
@@ -256,7 +254,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
                 db.update("mesas", p, "ID = ?", new String[]{idm2});
             }
 
-            db.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -273,7 +271,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
         }catch (Exception e){
            e.printStackTrace();
         }
-        db.close();
+
     }
 
     @SuppressLint("Range")
@@ -322,8 +320,7 @@ public class DBCuenta extends DBBase implements IBaseSocket {
         }catch (Exception e){
             e.printStackTrace();
         }
-        res.close();
-        db.close();
+
         return  ls;
     }
 
@@ -353,39 +350,44 @@ public class DBCuenta extends DBBase implements IBaseSocket {
             Log.i("SHOWDATA", dta);
             res.moveToNext();
         }
-        res.close();
-        db.close();
+
     }
 
     @Override
     public void insert(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-            String id = o.getString("ID");
-            int count = count(db, "ID="+id);
-            ContentValues values = caragarValues(o);
-            if (count <= 0) {
-                db.insert("cuenta", null, values);
-            }else{
-                db.update("cuenta", values, "ID=?", new String[]{id});
+            synchronized (db) {
+                String id = o.getString("ID");
+                int count = count(db, "ID=" + id);
+                ContentValues values = caragarValues(o);
+                synchronized (db) {
+                    if (count == 0) {
+                        db.insert("cuenta", null, values);
+                    } else {
+                        db.update("cuenta", values, "ID=?", new String[]{id});
+                    }
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
     @Override
     public void update(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-            String id = o.getString("ID");
-            ContentValues values = caragarValues(o);
-            db.update("cuenta", values, "ID=?", new String[]{id});
+            synchronized (db) {
+                String id = o.getString("ID");
+                ContentValues values = caragarValues(o);
+                db.update("cuenta", values, "ID=?", new String[]{id});
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
 
@@ -394,11 +396,13 @@ public class DBCuenta extends DBBase implements IBaseSocket {
     public void rm(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
+            synchronized (db){
+                db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
-        db.close();
+
     }
 
 }

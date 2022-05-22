@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 import com.valleapp.comandas.interfaces.IBaseDatos;
@@ -32,10 +33,10 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, activo TEXT," +
+         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, activo TEXT," +
                                                           "pass_field TEXT, " +
                                                           "autorizado TEXT, " +
-                                                          "permisos TEXT, flag TEXT default '' )");
+                                                          "permisos TEXT)");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -74,7 +75,7 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
                 e.printStackTrace();
             }
         }
-        db.close();
+
     }
 
     @Override
@@ -114,23 +115,9 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
             res.moveToNext();
 
         }
-        res.close();
-        db.close();
+
         return lscam;
     }
-
-
-
-    public void setAutorizado(int id, Boolean a){
-        String autorizado = a ? "1" : "0";
-        SQLiteDatabase db = this.getReadableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("autorizado", autorizado);
-        db.update("camareros",  cv, "ID="+id, null);
-        db.close();
-    }
-
-
 
 
     public ArrayList<JSONObject> getAutorizados(Boolean a)
@@ -139,7 +126,7 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from camareros WHERE activo='1' and autorizado = '"+ autorizado + "'", null );
         ArrayList<JSONObject>  lscam = cargarRegistros(res);
-        db.close();
+
         return lscam;
     }
 
@@ -165,23 +152,14 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
             res.moveToNext();
 
         }
-        res.close();
-        return lscam;
-    }
 
-
-    public ArrayList<JSONObject> getConPermiso(String permiso) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from camareros where activo='1' and permisos  LIKE '%"+permiso+"%' ", null );
-        ArrayList<JSONObject>  lscam = cargarRegistros(res);
-        db.close();
         return lscam;
     }
 
 
     public void insert(JSONObject obj) {
+        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            SQLiteDatabase db = this.getWritableDatabase();
             ContentValues v = new ContentValues();
             v.put("ID", obj.getInt("id"));
             v.put("activo", obj.getString("activo"));
@@ -190,29 +168,67 @@ public class DBCamareros extends SQLiteOpenHelper implements IBaseDatos, IBaseSo
             v.put("nombre", obj.getString("nombre") + " " + obj.getString("apellidos"));
             v.put("permisos", obj.getString("permisos"));
             db.insert("camareros", null, v);
-            db.close();
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public void update(JSONObject obj) {
+        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            SQLiteDatabase db = this.getWritableDatabase();
             ContentValues v = new ContentValues();
-            v.put("activo", obj.getString("activo"));
             v.put("pass_field", obj.getString("pass_field"));
             v.put("autorizado", obj.getString("autorizado"));
             v.put("nombre", obj.getString("nombre") + " " + obj.getString("apellidos"));
             v.put("permisos", obj.getString("permisos"));
             db.update("camareros", v, "ID=?", new String[]{obj.getString("id")});
-            db.close();
-        }catch (Exception ignored){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public void rm(JSONObject obj) {
+        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("camareros", "ID=?", new String[]{obj.getString("id")});
-            db.close();
-        }catch (Exception ignored){}
+           db.delete("camareros", "ID=?", new String[]{obj.getString("id")});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public boolean is_autorizado(JSONObject cam) throws JSONException {
+        SQLiteDatabase db = getReadableDatabase();
+        int count = 0;
+        try {
+            Cursor mCount = db.rawQuery("select count(*) from camareros WHERE ID=" + cam.getString("ID") + " AND autorizado = '1'", null);
+            mCount.moveToFirst();
+            count = mCount.getInt(0);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return count > 0;
+    }
+
+    public void showDatos(String cWhere){
+        SQLiteDatabase db = getReadableDatabase();
+        String w = "";
+        if (cWhere != null){
+            w = " WHERE "+cWhere;
+        }
+        Cursor res= db.rawQuery("select * from camareros "+ w, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()){
+            String dta = "";
+            for (int i=0; i< res.getColumnCount(); i++) {
+                dta += res.getColumnName(i)+ "="+ res.getString(i) + " - ";
+            }
+            Log.i("SHOWDATA", dta);
+            res.moveToNext();
+        }
+
     }
 }

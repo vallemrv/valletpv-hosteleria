@@ -69,7 +69,7 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
             }
 
         }
-        db.close();
+
     }
 
     @SuppressLint("Range")
@@ -92,8 +92,7 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
             res.moveToNext();
 
         }
-        res.close();
-        db.close();
+
         return ls;
     }
 
@@ -104,7 +103,6 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
             res.moveToFirst();
             int count = res.getInt(0);
             hay = count > 0;
-            res.close();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -119,7 +117,6 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        db.close();
     }
 
     public boolean is_updatable(JSONObject obj) {
@@ -136,14 +133,13 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
                 Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
                 res.moveToFirst();
                 int count = res.getInt(0);
-                isUp = count > 0;
-                res.close();
+                isUp = count > 0;;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (db != null) db.close();
+
         return  isUp;
     }
 
@@ -165,7 +161,6 @@ public  class DBTbUpdates extends SQLiteOpenHelper  {
         }catch (Exception e){
             e.printStackTrace();
         }
-        if (db != null) db.close();
     }
 
     public void setLast(String tb, String last) {

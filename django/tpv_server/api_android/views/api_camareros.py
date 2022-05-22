@@ -1,4 +1,5 @@
 from django.forms import model_to_dict
+from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import Camareros
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -23,14 +24,7 @@ def camarero_add(request):
     c.nombre = nombre
     c.apellidos = apellido
     c.save()
-    update = {
-        "op": "insert",
-        "tb": "camareros",
-        "obj": model_to_dict(c),
-        "receptor": "devices",
-        "device": ""
-    }
-    send_mensaje_devices(update)
+    comunicar_cambios_devices("md", "camareros", c.serialize())
    
 
     return JsonResponse("success")
@@ -42,10 +36,11 @@ def crear_password(request):
     password = request.POST["password"]
     cam = json.loads(cam)
     id = cam["ID"]
-    cam["Pass"] = password
+    
     
     camarero =  Camareros.objects.get(pk=id)
     camarero.pass_field = password
     camarero.save()
+    comunicar_cambios_devices("md", "camareros", camarero.serialize())
 
     return JsonResponse("success")

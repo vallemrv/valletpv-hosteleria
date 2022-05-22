@@ -63,7 +63,7 @@ public class DBReceptores extends DBBase {
             }
 
         }
-        db.close();
+
     }
 
 
@@ -87,7 +87,7 @@ public class DBReceptores extends DBBase {
             }
             res.moveToNext();
         }
-        res.close();
+     ;
         return ls;
     }
 

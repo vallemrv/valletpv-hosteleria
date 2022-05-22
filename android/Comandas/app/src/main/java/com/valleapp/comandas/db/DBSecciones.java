@@ -74,7 +74,7 @@ public class DBSecciones extends DBBase {
             res.moveToNext();
 
         }
-        res.close();db.close();
+
         return ls;
     }
 
@@ -103,6 +103,6 @@ public class DBSecciones extends DBBase {
             }
 
         }
-        db.close();
+
     }
 }

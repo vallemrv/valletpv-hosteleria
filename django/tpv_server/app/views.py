@@ -82,7 +82,12 @@ def getlistado(request):
     objs = model.objects.filter(**filter)
     regs = []
     for obj in objs:
-        regs.append(model_to_dict(obj))
+        if hasattr(obj, "serialize"):
+            regs.append(obj.serialize())
+        else:
+            regs.append(model_to_dict(obj))
+    
+    
 
     return JsonResponse({'tb':tb_name, "regs": regs})
 
