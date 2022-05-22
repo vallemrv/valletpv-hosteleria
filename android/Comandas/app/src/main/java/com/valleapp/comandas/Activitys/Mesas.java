@@ -340,7 +340,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     }
 
                 }
-
                 rellenarPedido();
                 getPendientes();
             }
