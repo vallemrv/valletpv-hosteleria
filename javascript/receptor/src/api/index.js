@@ -12,7 +12,7 @@ export default {
         return post("/api/get_datos_empresa")
     },
     get_pedidos(params){
-        return post("/api/pedidos/get_pedidos_by_receptor", params)
+        return post("/api/get_pedidos_by_receptor", params)
     },
     get_listado(){
         return post("/api/receptores/get_lista")

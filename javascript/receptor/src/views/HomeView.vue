@@ -145,11 +145,6 @@ export default {
         this.connect();
       }
     },
-    items(v) {
-      if (!v) {
-        this.$notification.playAudio();
-      }
-    },
   },
   mounted() {
     if (localStorage.server) {

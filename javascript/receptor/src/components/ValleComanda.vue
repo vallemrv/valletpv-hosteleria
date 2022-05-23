@@ -60,7 +60,6 @@ export default {
   props: ["pedido"],
   methods: {
     get_color(op) {
-      console.log(op);
       if (op == "urgente") {
         return "#C70039";
       } else if (op == "urgente") {
@@ -84,6 +83,9 @@ export default {
         e.servido = true;
       });
     },
+  },
+  mounted() {
+    this.$notification.playAudio();
   },
 };
 </script>

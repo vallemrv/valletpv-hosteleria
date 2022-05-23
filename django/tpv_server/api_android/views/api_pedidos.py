@@ -60,7 +60,7 @@ def servido(request):
     
     return JsonResponse({})
 
-
+@csrf_exempt
 def get_pedidos_by_receptor(request):
     rec = json.loads(request.POST["receptores"])
     for r in rec:
