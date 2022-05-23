@@ -27,9 +27,12 @@ public class Autorias extends ActivityBase {
 
     public  void mostrarLista(){
         try {
-
-            ListView ls = findViewById(R.id.lista_peticiones);
-            ls.setAdapter(new AdaptadorAutorias(this, lsObj));
+            if (lsObj.size()>0) {
+                ListView ls = findViewById(R.id.lista_peticiones);
+                ls.setAdapter(new AdaptadorAutorias(this, lsObj));
+            }else{
+                salirAutorias(null);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

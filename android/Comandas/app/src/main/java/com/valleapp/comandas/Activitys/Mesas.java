@@ -80,7 +80,9 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
             try {
+
                 if (op.equals("men_once")){
+                    Log.i("mensajito", res);
                     JSONObject o = new JSONObject(res);
                     String idautorizado = o.getString("idautorizado");
                     String self_id = cam.getString("ID");
@@ -93,6 +95,8 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 if(!viendo_mensajes && peticiones.length() > 0) {
                     MediaPlayer m = MediaPlayer.create(cx, R.raw.mail);
                     m.start();
+                }else{
+                    mostrarAutorias(null);
                 }
                 manejarAurotias();
             }catch (Exception e){
@@ -450,6 +454,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         Intent i = new Intent(cx, Autorias.class);
         i.putExtra("url", server);
         i.putExtra("peticiones", peticiones.toString());
+        peticiones = new JSONArray();
         startActivityForResult(i, 400);
     }
 
@@ -470,8 +475,10 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             if(resultCode == RESULT_OK){
                 try{
                     assert data != null;
-                    peticiones = new JSONArray(data.getStringExtra("mensajes"));
-                    manejarAurotias();
+                    JSONArray p = new JSONArray(data.getStringExtra("mensajes"));
+                    for(int i = 0; i < p.length(); i++) {
+                        peticiones.put(p.getJSONObject(i));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -551,13 +558,15 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     @Override
     protected void onResume() {
-        viendo_mensajes = false;
         presBack = 0;
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         cargarPreferencias();
-        if (myServicio != null){
+        if(myServicio == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else {
+            viendo_mensajes = false;
             rellenarZonas();
+            manejarAurotias();
         }
         super.onResume();
     }

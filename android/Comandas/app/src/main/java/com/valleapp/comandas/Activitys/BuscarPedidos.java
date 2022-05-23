@@ -14,8 +14,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
+
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,13 +23,9 @@ import android.widget.TextView;
 import com.valleapp.comandas.R;
 import com.valleapp.comandas.adaptadores.AdaptadorBuscarPedidos;
 import com.valleapp.comandas.db.DBCuenta;
-import com.valleapp.comandas.utilidades.HTTPRequest;
 import com.valleapp.comandas.utilidades.Instruccion;
 import com.valleapp.comandas.utilidades.ServicioCom;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -101,9 +97,11 @@ public class BuscarPedidos extends Activity implements TextWatcher {
 
     @Override
     protected void onResume() {
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        intent.putExtra("url", server);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if (myServicio == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            intent.putExtra("url", server);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }
         super.onResume();
     }
 

@@ -170,7 +170,7 @@ class DocPrint():
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
-    def imprimirPedido(self, camarero, mesa, hora, lineas):
+    def imprimirPedido(self, camarero, mesa, hora, lineas, is_urgente=False):
         
         try:
             if self.tipo == "Network":
@@ -184,6 +184,8 @@ class DocPrint():
                 p.printer.codepage = 'cp858'
                
                 p.printer.set(align='center')
+                if (is_urgente):
+                    p.writelines('URGENTE!!', height=2, width=2, font='a', align='center')    
                 p.writelines("")
                 p.writelines('------------------------------------------', align='center')
                 p.writelines('HORA: %s' % hora, height=2, width=2, font='b', align='center')
@@ -202,38 +204,7 @@ class DocPrint():
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
-    def imprimirUrgente(self, camarero, mesa, hora, lineas):
-        try:
-            if self.tipo == "Network":
-                printer = Network(self.params, timeout=1)
-            if self.tipo == "Usb":
-                printer = Usb(*self.params)
-            if self.tipo == "File":
-                printer = File(self.params)
 
-
-            with EscposIO(printer) as p:
-                p.printer.codepage = 'cp858'
-                
-                p.printer.set(align='center')
-                p.writelines("")
-                p.writelines('URGENTE!!', height=2, width=2, font='a', align='center')
-                p.writelines('------------------------------------------', align='center')
-                p.writelines('HORA: %s' % hora, height=2, width=2, font='b', align='center')
-                p.writelines("Mesa: %s" % mesa, height=2, width=2, font='a', align='center')
-                p.writelines(camarero, height=2, width=2, font='a', align='center')
-                p.writelines('------------------------------------------', align='center')
-
-                p.writelines("")
-                for ln in lineas:
-                    p.writelines("{0: >3} {1: <25} {2}".format(ln['can'], ln['descripcion'],
-                                  ln["estado"]), height=2, align='center' )
-
-
-                p.writelines("")
-                p.writelines("")
-        except Exception as e:
-            print("[ERROR  ] %s" % e)
 
     def imprimirPreTicket(self, camarero, numcopias, fecha, mesa, lineas, total):
         

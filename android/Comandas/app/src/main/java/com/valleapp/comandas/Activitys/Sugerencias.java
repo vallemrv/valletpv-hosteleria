@@ -15,8 +15,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,7 +123,7 @@ public class Sugerencias extends Activity implements TextWatcher {
                   txtSug.setVisibility(View.GONE);
                   aceptarSug(sug);
               } else if (!charSequence.toString().contains("\n")) {
-                  String cWhere = "IDTecla = "+art.getString("ID")+" AND sugerencia LIKE '%"+ charSequence.toString() +"%'";
+                  String cWhere = "IDTecla = "+art.getString("ID")+" AND sugerencia LIKE '%"+ charSequence +"%'";
                   new Thread(() -> {
                       try {
                           Thread.sleep(1000);

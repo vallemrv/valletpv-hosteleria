@@ -47,7 +47,7 @@ class receptor_manager():
         elif op == "pedido" and str(message["receptor_activo"]).strip() == "True":
             ws.doc.imprimirPedido(message["camarero"], message["mesa"], message["hora"], message["lineas"])
         elif op == "urgente" and str(message["receptor_activo"]).strip() == "True":
-            ws.doc.imprimirUrgente(message["camarero"], message["mesa"], message["hora"], message["lineas"])
+            ws.doc.imprimirPedido(message["camarero"], message["mesa"], message["hora"], message["lineas"], True)
         elif op == "preticket":
             ws.doc.imprimirPreTicket(message["camarero"], message['numcopias'], message['fecha'],
                                   message["mesa"], message['lineas'], message['total'])
@@ -84,10 +84,6 @@ def run_websocket(url, args):
     
 if __name__ == "__main__":
 
-    #print_caja = {'usb':(0x1504,0x002b,0,0x81,0x02)}
-    #print_cocina = {"usb":(0x20d1,0x7007,0,0x81,0x02)}
-    #threading.Thread(target=run_websoker, args=("ws://localhost:8000/ws/impresion/caja/", print_caja)).start()
-    #threading.Thread(target=run_websoker, args=("ws://localhost:8000/ws/impresion/cocina/", print_cocina)).start()
   
     base_path = os.path.dirname(__file__)
     f = open(os.path.join(base_path, file_config), "r")

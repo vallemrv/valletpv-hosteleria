@@ -459,10 +459,11 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent(getBaseContext(), ServicioCom.class);
-        intent.putExtra("server",server);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
-        if (myServicio != null){
+        if (myServicio == null) {
+            Intent intent = new Intent(getBaseContext(), ServicioCom.class);
+            intent.putExtra("server", server);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else {
             cargarPreferencias();
         }
     }

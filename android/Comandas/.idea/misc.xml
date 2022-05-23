@@ -26,6 +26,7 @@
         <entry key="app/src/main/res/layout/dialog_crear_empresa.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/dialog_create_pass.xml" value="0.24230072463768115" />
         <entry key="app/src/main/res/layout/dialog_enter_pass.xml" value="0.18177083333333333" />
+        <entry key="app/src/main/res/layout/dialog_mensaje.xml" value="0.1734375" />
         <entry key="app/src/main/res/layout/item_empresa.xml" value="0.46405228758169936" />
         <entry key="app/src/main/res/layout/item_pedido.xml" value="0.33" />
         <entry key="app/src/main/res/layout/linea_art.xml" value="0.67" />

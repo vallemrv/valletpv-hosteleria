@@ -51,13 +51,11 @@ public class Cuenta extends Activity {
                 myServicio.setExHandler("lineaspedido", handlerHttp);
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 dbmesa = (DBMesas) myServicio.getDb("mesas");
-
-                /*//Atualizar cuenta.
+                rellenarTicket();
+                /*  //Atualizar cuenta.
                 ContentValues p = new ContentValues();
                 p.put("mesa_id",mesa.getString("ID"));
                 new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);*/
-                rellenarTicket();
-
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -129,9 +127,13 @@ public class Cuenta extends Activity {
 
     @Override
     protected void onResume() {
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        intent.putExtra("url", server);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if(myServicio == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            intent.putExtra("url", server);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else{
+            rellenarTicket();
+        }
         super.onResume();
     }
 

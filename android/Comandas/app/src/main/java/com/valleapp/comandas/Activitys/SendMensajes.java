@@ -104,8 +104,12 @@ public class SendMensajes extends ActivityBase {
     @Override
     protected void onResume() {
         super.onResume();
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if (myServicio == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else{
+            mostrarLista();
+        }
 
     }
 

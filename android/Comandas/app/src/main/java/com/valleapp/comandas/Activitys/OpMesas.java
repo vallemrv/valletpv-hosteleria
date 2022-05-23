@@ -269,9 +269,13 @@ public class OpMesas extends Activity {
 
     @Override
     protected void onResume() {
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-        intent.putExtra("url", server);
-        bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        if (servicioCom == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            intent.putExtra("url", server);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else{
+            rellenarZonas();
+        }
         super.onResume();
     }
 

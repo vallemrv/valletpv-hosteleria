@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
-        android:padding="10sp" />
+        android:padding="10sp"
+        android:textSize="25sp" />
 
     <FrameLayout
         android:layout_width="match_parent"

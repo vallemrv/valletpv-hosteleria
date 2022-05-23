@@ -237,7 +237,6 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
-            Log.i("CREAR SERVICIO", "creadooooo");
             timerUpdate.schedule(new TareaUpdateForDevices(this.tbNameUpdate, server, controller_http, timerUpdate, 2000), 1000);
             timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {

@@ -115,7 +115,7 @@ public class ServicioCom extends Service {
                         String tb = o.getString("tb");
                         String op = o.getString("op");
                         IBaseSocket db = (IBaseSocket) getDb(tb);
-                        //Log.i("MENSAJE", message+ " db: "+tb);
+                        Log.i("MENSAJE", message+ " db: "+tb);
                         if (db != null) {
                             if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
                             if (op.equals("md")) db.update(o.getJSONObject("obj"));
