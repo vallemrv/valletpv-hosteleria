@@ -5,7 +5,10 @@
 # @Last modified time: 2019-10-10T15:51:11+02:00
 # @License: Apache License v2.0
 
+from unicodedata import name
 from django.urls import path, include
+
+from api_android import views
 
 urlpatterns = [
     path("camareros/", include('api_android.set_urls.camareros'), name="api_android_camareros"),
@@ -18,6 +21,7 @@ urlpatterns = [
     path('sugerencias/', include("api_android.set_urls.sugerencias"), name="api_android_sugerencias"),
     path('receptores/', include("api_android.set_urls.receptores"), name="api_android_receptores"),
     path("autorizaciones/", include("api_android.set_urls.autorizaciones"), name="api_android_autorizaciones"),
-    path("tests/", include("api_android.tests.tests_urls"), name="tests")
+    path("tests/", include("api_android.tests.tests_urls"), name="tests"),
+    path("get_datos_empresa", views.get_datos_empresa, name="get_datos_empresa")
     
 ] 

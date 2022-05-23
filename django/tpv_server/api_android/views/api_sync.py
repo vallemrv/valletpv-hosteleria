@@ -68,7 +68,6 @@ def update_from_devices(request):
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
     
-
     model = apps.get_model("gestion", tb)
     if hasattr(model, "update_from_device"):
         for row in rows:

@@ -12,6 +12,14 @@ import json
 
 
 @csrf_exempt
+def get_lista(request):
+    lista = []
+    for l in Receptores.objects.all().exclude(nombre__icontains="nulo"):
+        lista.append({"Nombre": l.nombre, "Activo": l.activo, "ID":l.id, "nomimp": l.nomimp})
+
+    return JsonResponse(lista)
+
+@csrf_exempt
 def set_settings(request):
     lista = json.loads(request.POST["lista"])
     for l in lista:

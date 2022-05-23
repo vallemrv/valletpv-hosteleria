@@ -1,3 +1,4 @@
+import  notification  from "@/plugins/notificacion"
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -11,4 +12,5 @@ createApp(App)
   .use(router)
   .use(store)
   .use(vuetify)
+  .use(notification)
   .mount('#app')

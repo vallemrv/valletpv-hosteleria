@@ -82,17 +82,7 @@ def gestionar_peticion(request):
             }
             send_mensaje_impresora(obj)
         elif p.accion == "cobrar_ticket":
-            numart, total, id = Ticket.cerrar_cuenta(inst["idm"], inst["idc"], inst["entrega"], json.loads(inst["art"]))
-    
-            if (numart <= 0):
-                #enviar notficacion de update
-                update = {
-                    "OP": "UPDATE",
-                    "Tabla": "mesasabiertas",
-                    "receptor": "comandas",
-                }
-                send_mensaje_devices(update)
-                    
+            total, id = Ticket.cerrar_cuenta(inst["idm"], inst["idc"], inst["entrega"], json.loads(inst["art"]))                    
             if (id > 0):
                 send_imprimir_ticket(request, id)
 

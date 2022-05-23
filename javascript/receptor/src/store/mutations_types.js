@@ -1,7 +1,9 @@
-export const RECEPCION_PEDIDO = "recepcion_pedido"
-export const ON_DISCONECT = "desconectado"
-export const ON_CONNECT = "conectado"
+export const RECEPCION_PEDIDO = "RECEPCION_PEDIDO"
+export const ON_DISCONECT = "ON_DISCONECT"
+export const ON_CONNECT = "ON_CONNECT"
 export const GET_REQUEST = 'GET_REQUEST'
 export const REQUEST_SUCCESS = 'REQUEST_SUCCESS'
 export const ERROR_REQUEST = 'ERROR_REQUEST'
-export const GET_LISTADOS = "get_listados"
+export const GET_PEDIDOS = "GET_PEDIDOS"
+export const SET_DATOS_EMPRESA = "SET_DATOS_EMPRESA"
+export const GET_LISTADO = "GET_LISTADO"

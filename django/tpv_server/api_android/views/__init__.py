@@ -16,6 +16,9 @@ from .api_arqueos import *
 from .api_receptores import *
 from .api_nulos import *
 from .api_autorizaciones import *
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
-
-        
+@csrf_exempt
+def get_datos_empresa(request):
+    return JsonResponse({'nombre':settings.BRAND, "email": settings.MAIL})

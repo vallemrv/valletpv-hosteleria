@@ -2,11 +2,9 @@
   <v-sheet elevation="4">
     <v-card>
       <v-card-title class="pa-0">
-        <v-sheet
-          class="w-100 pa-3"
-          :color="pedido.op == 'urgente' ? '#C70039' : '#B3E8E4'"
-        >
-          <div class="float-right">Mesa: {{ pedido.mesa }}</div>
+        <v-sheet class="w-100 pa-3" :color="get_color(pedido.op)">
+          <div v-if="pedido.mesa" class="float-right">Mesa: {{ pedido.mesa }}</div>
+          <div v-else class="float-right">Mensajitooo</div>
           <div>{{ pedido.camarero }}</div>
           hora: {{ pedido.hora }}
         </v-sheet>
@@ -14,6 +12,16 @@
       <v-divider></v-divider>
       <v-card-text class="content">
         <v-row>
+          <v-col v-if="pedido.msg" cols="12">
+            <v-card
+              @click="change_linea(pedido)"
+              :color="pedido.servido ? 'primary' : ''"
+            >
+              <v-card-text>
+                {{ pedido.msg }}
+              </v-card-text>
+            </v-card>
+          </v-col>
           <v-col
             cols="12"
             class="pa-0 ma-0 mb-1"
@@ -51,6 +59,17 @@
 export default {
   props: ["pedido"],
   methods: {
+    get_color(op) {
+      console.log(op);
+      if (op == "urgente") {
+        return "#C70039";
+      } else if (op == "urgente") {
+        return "#B3E8E4";
+      } else if (op == "mensaje") {
+        return "#ABEBC6";
+      }
+      return "primary";
+    },
     change_linea(l) {
       l.servido = l.servido ? false : true;
     },

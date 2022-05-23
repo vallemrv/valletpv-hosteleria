@@ -1,6 +1,8 @@
 <template>
   <v-toolbar color="#cfb6d4">
-    <v-toolbar-title> Receptor </v-toolbar-title>
+    <v-toolbar-title>
+      Receptor <span v-if="empresa">{{ empresa.nombre }}</span>
+    </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-btn icon @click="() => (showSelDialog = true)">
       <v-icon>mdi-list-status</v-icon></v-btn
@@ -23,7 +25,7 @@
     </v-row>
   </v-container>
   <v-dialog v-model="showDialog">
-    <v-card title="Configuracion" width="300">
+    <v-card title="Configuracion" width="250">
       <v-card-text>
         <v-text-field v-model="server" label="Direccion servidor" hide-details="auto">
         </v-text-field>
@@ -41,7 +43,7 @@
       <v-card-text>
         <v-row class="pa-4">
           <v-col class="pa-0" cols="12" v-for="(r, i) in receptores_mod" :key="i">
-            {{ r.nombre }}
+            {{ r.Nombre }}
             <v-switch
               v-model="r.is_sel"
               @change="on_change(r)"
@@ -78,33 +80,33 @@ export default {
     };
   },
   computed: {
-    ...mapState(["items", "isConnected", "receptores"]),
+    ...mapState(["items", "isConnected", "receptores", "empresa"]),
     receptores_mod() {
       this.receptores.forEach((e) => {
-        e.is_sel = this.is_sel(e.id);
+        e.is_sel = this.is_sel(e.ID);
       });
       return this.receptores;
     },
   },
   methods: {
-    ...mapActions(["getListado", "getPendientes"]),
+    ...mapActions(["getListado", "getDatosEmpresa", "getPendientes"]),
     is_sel(id) {
       return Object.values(this.receptores_sel).includes(id);
     },
     getReceptores() {
       if (this.receptores_sel.length > 0) {
         return Object.values(this.receptores).filter((r) => {
-          return this.receptores_sel.includes(r.id);
+          return this.receptores_sel.includes(r.ID);
         });
       }
       return [];
     },
     on_change(r) {
       if (r.is_sel) {
-        this.receptores_sel.push(r.id);
+        this.receptores_sel.push(r.ID);
       } else {
         this.receptores_sel = Object.values(this.receptores_sel).filter((e) => {
-          return e != r.id;
+          return e != r.ID;
         });
       }
     },
@@ -121,13 +123,14 @@ export default {
       }
       this.receptores_sel = [];
       localStorage.receptores = JSON.stringify(this.receptores_sel);
+      this.getDatosEmpresa();
     },
     connect() {
       this.ws.forEach((w) => {
         w.disconnect();
       });
       this.getReceptores().forEach((r) => {
-        var ws_aux = new VWebsocket(this.server, r.nomimp, r.nombre, this.$store.commit);
+        var ws_aux = new VWebsocket(this.server, r.nomimp, r.Nombre, this.$store.commit);
         this.ws.push(ws_aux);
         ws_aux.connect();
       });
@@ -142,15 +145,21 @@ export default {
         this.connect();
       }
     },
+    items(v) {
+      if (!v) {
+        this.$notification.playAudio();
+      }
+    },
   },
   mounted() {
     if (localStorage.server) {
       this.server = localStorage.server;
+      if (this.empresa == null) this.getDatosEmpresa();
       if (localStorage.receptores) {
         this.receptores_sel = JSON.parse(localStorage.receptores);
       }
       if (!this.receptores || this.receptores.length <= 0) {
-        this.getListado({ server: this.server, tabla: "receptores" });
+        this.getListado({ tabla: "receptores" });
       } else {
         this.connect();
       }

@@ -22,6 +22,9 @@ class HistorialMensajes(models.Model):
     camarero = models.ForeignKey("Camareros", on_delete=models.CASCADE)
     mensaje = models.CharField(max_length=300)
     receptor = models.ForeignKey("Receptores", on_delete=models.CASCADE)
+    hora = models.CharField(max_length=4)
+    fecha = models.CharField( max_length=9)
+
 
     @staticmethod
     def update_from_device(row):
@@ -34,12 +37,15 @@ class HistorialMensajes(models.Model):
         c.camarero_id = row["camarero"]
         c.receptor_id = row["receptor"]
         c.mensaje = row["mensaje"]
+        c.hora = datetime.now().strftime("%H:%M:%S")
+        c.fecha = datetime.now().strftime("%Y-%m-%d")
         c.save()
         mensaje = {
             "op": "mensaje",
             "camarero": c.camarero.nombre + " " + c.camarero.apellidos,
             "msg": c.mensaje,
             "receptor": c.receptor.nomimp,
+            "hora": c.hora,
             "nom_receptor": c.receptor.nombre
         }
         send_mensaje_impresora(mensaje)

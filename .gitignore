@@ -8,7 +8,8 @@ node_*/
 ignore*
 test_vue/
 gsui_dist/
-
+platforms/
+www/
 
 
 

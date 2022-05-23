@@ -1,7 +1,6 @@
 import json
 import os
 from sys import stdout
-from xml.etree.ElementInclude import include
 from django.shortcuts import render
 from tokenapi.http import JsonResponse
 from django.apps import apps
@@ -12,9 +11,15 @@ from gestion.models import Secciones, Teclas, Teclaseccion
 from datetime import datetime
 from django.core.management import call_command
 from api_android.tools import send_mensaje_devices
+from django.conf import settings
 
 def inicio(request):
-    return render(request, "index.html")
+    return render(request, "app/index.html")
+
+
+@token_required
+def get_datos_empresa(request):
+    return JsonResponse({'nombre':settings.BRAND, "email": settings.MAIL})
 
 @token_required
 def reset_db(request):
