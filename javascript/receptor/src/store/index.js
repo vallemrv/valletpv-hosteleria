@@ -7,7 +7,8 @@ export default createStore({
   state: {
     items:[],
     receptores: [],
-    isConnected: false,
+    isWsConnected: false,
+    isHttpConnected: false,
     error: null,
     ocupado: false,
     empresa: null,

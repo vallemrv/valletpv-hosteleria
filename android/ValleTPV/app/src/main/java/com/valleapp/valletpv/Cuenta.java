@@ -141,7 +141,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                        rellenarTicket();
                    }
                 }else{
-                    //get_cuenta();
+                    rellenarTicket();
                 }
 
             } catch (JSONException e) {

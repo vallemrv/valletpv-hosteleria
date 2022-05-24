@@ -14,8 +14,13 @@
       </v-btn>
     </template>
   </v-toolbar>
-  <div class="v-100 text-center pa-5" v-show="!isConnected">
-    <v-sheet elevation="3">no hay conexion con el servidor</v-sheet>
+  <div class="v-100 text-center pa-5" v-show="!isWsConnected">
+    <v-alert color="warning" elevation="3"
+      >Sin comunicación. Elige receptor o comprueba la conexión</v-alert
+    >
+  </div>
+  <div class="v-100 text-center pa-5" v-show="!isHttpConneted">
+    <v-alert color="warning" elevation="3">Configura servidor.</v-alert>
   </div>
   <v-container fluid>
     <v-row>
@@ -80,7 +85,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(["items", "isConnected", "receptores", "empresa"]),
+    ...mapState(["items", "isWsConnected", "isHttpConneted", "receptores", "empresa"]),
     receptores_mod() {
       this.receptores.forEach((e) => {
         e.is_sel = this.is_sel(e.ID);

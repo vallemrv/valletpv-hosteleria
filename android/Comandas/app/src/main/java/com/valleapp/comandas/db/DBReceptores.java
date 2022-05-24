@@ -46,7 +46,7 @@ public class DBReceptores extends DBBase {
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-            db.execSQL("DELETE FROM camareros");
+            db.execSQL("DELETE FROM receptores");
         }catch (SQLiteException e){
             this.onCreate(db);
         }

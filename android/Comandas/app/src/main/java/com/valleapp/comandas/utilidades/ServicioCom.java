@@ -126,7 +126,7 @@ public class ServicioCom extends Service {
                 @Override
                 public void onError(Exception ex) {
                     // devolución de llamada por error de conexión
-                    Log.i("Websocket", "Error de conexion .....");
+                    Log.i("Websockets", "Error de conexion .....");
                     isWebsocketClose = true;
                 }
 

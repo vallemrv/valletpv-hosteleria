@@ -524,7 +524,6 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
 
     @Override
     protected void onPause() {
-        if(!pause) finish();
         super.onPause();
     }
 }

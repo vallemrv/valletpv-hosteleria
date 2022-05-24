@@ -6,10 +6,10 @@ export default {
         state.items.push(pedido)
      },
      [types.ON_CONNECT] (state){
-        state.isConnected = true
+        state.isWsConnected = true
      },
      [types.ON_DISCONECT] (state){
-       state.isConnected = false;
+       state.isWsConnected = false;
      },
      [types.GET_REQUEST] (state){
        state.ocupado= true;
@@ -25,11 +25,13 @@ export default {
      },
      [types.SET_DATOS_EMPRESA] (state, {result}){
         state.ocupado = false;
+        state.isHttpConneted = true;
         state.error = null
         state.empresa = result;
     },
     [types.GET_LISTADO] (state, {result}){
       state.ocupado = false;
+      state.isHttpConneted = true;
       state.error = null
       state.receptores = Object.values(result).filter( (e)=>{
           return !e.Nombre.toLowerCase().includes("nulo")
