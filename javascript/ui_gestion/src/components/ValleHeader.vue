@@ -1,7 +1,8 @@
 <template>
   <v-app-bar app>
     <router-link to="/">
-      <v-toolbar-title> ValleTPV </v-toolbar-title>
+      <v-toolbar-title v-if="empresa"> {{ empresa.nombre }} </v-toolbar-title>
+      <v-toolbar-title v-else>Empresa de prueba</v-toolbar-title>
     </router-link>
     <v-spacer></v-spacer>
 
@@ -44,7 +45,7 @@ export default {
     menu: false,
   }),
   computed: {
-    ...mapState(["user", "token", "error", "instrucciones"]),
+    ...mapState(["user", "empresa", "token", "error", "instrucciones"]),
     num_inst() {
       return this.instrucciones ? this.instrucciones.length : 0;
     },
@@ -70,7 +71,7 @@ export default {
     salir() {
       this.$tools.salir(this.$store);
     },
-    ...mapActions(["getListado"]),
+    ...mapActions(["getListado", "getEmpresa"]),
   },
   watch: {
     user(v) {
@@ -88,6 +89,9 @@ export default {
   },
   created() {
     this.mostrarUser();
+    if (!this.empresa) {
+      this.getEmpresa();
+    }
   },
 };
 </script>

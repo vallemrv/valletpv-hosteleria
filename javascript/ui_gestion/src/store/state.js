@@ -4,5 +4,6 @@ export default {
     user: null,
     token: null,
     instrucciones: null,
-    itemsFiltrados: []
+    itemsFiltrados: [],
+    empresa: null,
 }

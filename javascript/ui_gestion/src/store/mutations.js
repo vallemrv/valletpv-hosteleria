@@ -44,6 +44,11 @@ export default {
             state[e.tb] = e.regs
         });
     },
+    [types.GET_EMPRESA] (state, {result}){
+        state.ocupado = false;
+        state.error = null;
+        state.empresa = result;
+    },
     [types.GET_TOKEN] (state, {token}){
         state.ocupado = false;
         state.error = null;

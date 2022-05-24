@@ -204,8 +204,6 @@ class DocPrint():
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
-
-
     def imprimirPreTicket(self, camarero, numcopias, fecha, mesa, lineas, total):
         
         if type(fecha) is datetime:

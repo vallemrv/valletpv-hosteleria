@@ -22,8 +22,8 @@ class HistorialMensajes(models.Model):
     camarero = models.ForeignKey("Camareros", on_delete=models.CASCADE)
     mensaje = models.CharField(max_length=300)
     receptor = models.ForeignKey("Receptores", on_delete=models.CASCADE)
-    hora = models.CharField(max_length=4)
-    fecha = models.CharField( max_length=9)
+    hora = models.CharField(max_length=10)
+    fecha = models.CharField( max_length=10)
 
 
     @staticmethod
@@ -1221,7 +1221,7 @@ class Teclas(models.Model):
 class ComposicionTeclas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tecla = models.ForeignKey(Teclas,  on_delete=models.CASCADE, db_column='IDTecla')  # Field name made lowercase.
-    composicion = models.CharField(max_length=12)  # Field name made lowercase.
+    composicion = models.CharField(max_length=300)  # Field name made lowercase.
     cantidad = models.IntegerField()  # Field name made lowercase.
 
     @staticmethod

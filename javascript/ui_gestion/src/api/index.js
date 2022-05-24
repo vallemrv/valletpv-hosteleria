@@ -8,6 +8,9 @@ const post = (path, params) => {
 }
 
 export default {
+    get_datos_empresa(params){
+        return post("app/get_datos_empresa", params)
+    },
     borrar_ventas(params){
         return post("app/reset_db", params)
     },

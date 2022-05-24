@@ -28,6 +28,7 @@ class receptor_manager():
     def on_message(self, ws, msg):
         message = json.loads(msg)
         message = json.loads(message["message"])
+        print(message)
         op = message["op"]
         if op == "open":
             ws.doc.abrir_cajon()
