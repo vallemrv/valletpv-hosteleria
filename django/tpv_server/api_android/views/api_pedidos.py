@@ -5,10 +5,12 @@
 # @Last modified time: 2019-04-26T14:53:11+02:00
 # @License: Apache License v2.0
 
+from cmath import inf
+from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import  Lineaspedido, Mesasabiertas, Servidos
+from gestion.models import  Camareros, Lineaspedido, Mesasabiertas, Pedidos, Receptores, Servidos
 import json
 
 
@@ -63,8 +65,57 @@ def servido(request):
 @csrf_exempt
 def get_pedidos_by_receptor(request):
     rec = json.loads(request.POST["receptores"])
+    result = []
     for r in rec:
-        lineas = Lineaspedido.objects.filter(tecla__familia__receptor__pk=rec.id).values("pedido","descripcion", "estado")
+        partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=int(r)) 
+                                          & (Q(estado='P') | Q(estado="R") | Q(estado="M"))).order_by("-pedido_id")
+        lineas = partial.values("pedido").distinct()
         for l in lineas:
-            print(l.descripcion)
+            p = Pedidos.objects.get(pk=l["pedido"])
+            infmesa = p.infmesa
+            camarero = Camareros.objects.get(pk=p.camarero_id)
+            mesa = infmesa.mesasabiertas_set.first().mesa
+            result.append({
+               "hora": infmesa.hora,
+               "camarero": camarero.nombre+" "+camarero.apellidos,
+               "mesa": mesa.nombre,
+               "id": p.pk,
+               "idReceptor": r
+            })
+
+
+    return JsonResponse(result)
+
+
+@csrf_exempt
+def recuperar_pedido(request):
+    p = json.loads(request.POST["pedido"])
+    partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=p["idReceptor"])  &
+                                           Q(pedido_id=p["id"]) &
+                                          (Q(estado='P') | Q(estado="R") | Q(estado="M")))
+    lineas = partial.values("idart",
+                            "descripcion",
+                            "estado",
+                            "pedido_id").annotate(can=Count('idart'))
+    receptor = Receptores.objects.get(pk=p["idReceptor"])
+    
+    pedido = Pedidos.objects.get(pk=p["id"])
+    mesa = pedido.infmesa.mesasabiertas_set.first().mesa
+
+    camarero = Camareros.objects.get(pk=pedido.camarero_id)
+    result = {
+        "op": "pedido",
+        "hora": pedido.hora,
+        "receptor": receptor.nomimp,
+        "nom_receptor": receptor.nombre,
+        "receptor_activo": receptor.activo,
+        "camarero": camarero.nombre + " " + camarero.apellidos,
+        "mesa": mesa.nombre,
+        "lineas": []
+    }
+
+    for l in lineas:
+        result["lineas"].append(l)
+
+    return JsonResponse(result)
 

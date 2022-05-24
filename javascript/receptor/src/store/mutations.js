@@ -29,6 +29,18 @@ export default {
         state.error = null
         state.empresa = result;
     },
+    [types.GET_PEDIDOS] (state, {result}){
+      state.ocupado = false;
+      state.isHttpConneted = true;
+      state.error = null
+      state.pedidos = result;
+    },
+    [types.RECUPERAR_PEDIDO] (state, {result}){
+      state.ocupado = false;
+      state.isHttpConneted = true;
+      state.error = null
+      state.items.push(result);
+    },
     [types.GET_LISTADO] (state, {result}){
       state.ocupado = false;
       state.isHttpConneted = true;

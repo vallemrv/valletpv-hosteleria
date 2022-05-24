@@ -66,15 +66,18 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <valle-pedidos @close="() => (showPedidos = false)" :show="showPedidos"></valle-pedidos>
 </template>
 
 <script>
 import VWebsocket from "@/websocket";
 import { mapState, mapActions } from "vuex";
 import ValleComanda from "@/components/ValleComanda.vue";
+import VallePedidos from "@/components/VallePedidos.vue";
 
 export default {
-  components: { ValleComanda },
+  components: { ValleComanda, VallePedidos },
   data() {
     return {
       showSelDialog: false,
@@ -82,6 +85,7 @@ export default {
       server: "",
       ws: [],
       receptores_sel: [],
+      showPedidos: false,
     };
   },
   computed: {
@@ -141,6 +145,7 @@ export default {
       });
     },
     reload() {
+      this.showPedidos = true;
       this.getPendientes({ receptores: JSON.stringify(this.receptores_sel) });
     },
   },

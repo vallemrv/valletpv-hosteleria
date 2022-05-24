@@ -23,6 +23,7 @@ urlpatterns = [
     path("autorizaciones/", include("api_android.set_urls.autorizaciones"), name="api_android_autorizaciones"),
     path("tests/", include("api_android.tests.tests_urls"), name="tests"),
     path("get_datos_empresa", views.get_datos_empresa, name="get_datos_empresa"),
-    path("get_pedidos_by_receptor", views.get_pedidos_by_receptor, name="get_pedidos_by_receptor")
+    path("get_pedidos_by_receptor", views.get_pedidos_by_receptor, name="get_pedidos_by_receptor"),
+    path("recuperar_pedido", views.recuperar_pedido, name="recuperar_pedido")
     
 ] 

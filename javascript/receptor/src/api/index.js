@@ -8,6 +8,9 @@ const post = (path, params) => {
 }
 
 export default {
+    recuperar_pedido(params){
+        return post("/api/recuperar_pedido", params)
+    },
     get_datos_empresa(){
         return post("/api/get_datos_empresa")
     },
