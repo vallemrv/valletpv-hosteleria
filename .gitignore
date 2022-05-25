@@ -10,7 +10,8 @@ test_vue/
 gsui_dist/
 platforms/
 www/
-
+.idea/
+release/
 
 
 #excepciones

@@ -30,7 +30,7 @@
     </v-row>
   </v-container>
   <v-dialog v-model="showDialog">
-    <v-card title="Configuracion" width="250">
+    <v-card title="Configuracion" width="400">
       <v-card-text>
         <v-text-field v-model="server" label="Direccion servidor" hide-details="auto">
         </v-text-field>

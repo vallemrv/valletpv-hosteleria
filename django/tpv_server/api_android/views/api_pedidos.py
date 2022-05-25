@@ -68,20 +68,24 @@ def get_pedidos_by_receptor(request):
     result = []
     for r in rec:
         partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=int(r)) 
-                                          & (Q(estado='P') | Q(estado="R") | Q(estado="M"))).order_by("-pedido_id")
+                                          & (Q(estado='P') | 
+                                             Q(estado="R") | 
+                                             Q(estado="M"))).order_by("-pedido_id")
         lineas = partial.values("pedido").distinct()
         for l in lineas:
             p = Pedidos.objects.get(pk=l["pedido"])
             infmesa = p.infmesa
             camarero = Camareros.objects.get(pk=p.camarero_id)
-            mesa = infmesa.mesasabiertas_set.first().mesa
-            result.append({
-               "hora": infmesa.hora,
-               "camarero": camarero.nombre+" "+camarero.apellidos,
-               "mesa": mesa.nombre,
-               "id": p.pk,
-               "idReceptor": r
-            })
+            mesa_abierta = infmesa.mesasabiertas_set.first()
+            if mesa_abierta:
+                mesa = mesa_abierta.mesa
+                result.append({
+                "hora": infmesa.hora,
+                "camarero": camarero.nombre+" "+camarero.apellidos,
+                "mesa": mesa.nombre,
+                "id": p.pk,
+                "idReceptor": r
+                })
 
 
     return JsonResponse(result)

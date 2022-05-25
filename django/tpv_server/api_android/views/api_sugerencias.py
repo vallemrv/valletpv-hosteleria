@@ -5,9 +5,11 @@
 # @Last modified time: 2019-01-17T08:41:10+01:00
 # @License: Apache License v2.0
 
+from django.forms import model_to_dict
 from django.http import HttpResponse
 from gestion.models import Sugerencias
 from django.views.decorators.csrf import csrf_exempt
+from comunicacion.tools import comunicar_cambios_devices
 
 @csrf_exempt
 def sugerencia_add(request):
@@ -19,5 +21,8 @@ def sugerencia_add(request):
         sugerencia.tecla_id = idart
         sugerencia.sugerencia = sug
         sugerencia.save()
+        r = sugerencia
+        
+    comunicar_cambios_devices("insert", "subteclas", model_to_dict(r))
 
     return HttpResponse("success")
