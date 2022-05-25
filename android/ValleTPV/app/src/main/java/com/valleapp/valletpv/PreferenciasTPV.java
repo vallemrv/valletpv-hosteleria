@@ -3,15 +3,15 @@ package com.valleapp.valletpv;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.db.DBTbUpdates;
+import com.valleapp.valletpv.tools.JSON;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.valleapp.valletpv.Util.JSON;
 
 
 public class PreferenciasTPV extends Activity {
@@ -21,8 +21,8 @@ public class PreferenciasTPV extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferencias_tpv);
         final Context cx = this;
-        final EditText txt = (EditText)findViewById(R.id.txtUrl);
-        Button btn = (Button)findViewById(R.id.btnAceptar);
+        final EditText txt = findViewById(R.id.txtUrl);
+        Button btn = findViewById(R.id.btn_aceptar_monedas);
         JSONObject obj = cargarPreferencias();
 
         if(obj!=null) try {
@@ -31,23 +31,23 @@ public class PreferenciasTPV extends Activity {
             e.printStackTrace();
         }
 
-        btn.setOnClickListener(new View.OnClickListener() {
-             @Override
-             public void onClick(View view) {
-             String url = txt.getText().toString();
-             JSONObject obj = new JSONObject();
-             try {
+        btn.setOnClickListener(view -> {
+        String url = txt.getText().toString();
+        JSONObject obj1 = new JSONObject();
+        try {
 
-                 obj.put("URL", url);
-                 JSON json = new JSON();
-                 json.serializar("preferencias.dat",obj,cx);
-                 Toast.makeText(getApplicationContext(),"Datos guardados correctamente",Toast.LENGTH_SHORT).show();
+            obj1.put("URL", url);
+            JSON json = new JSON();
+            json.serializar("preferencias.dat", obj1,cx);
+            Toast.makeText(getApplicationContext(),"Datos guardados correctamente",Toast.LENGTH_SHORT).show();
+            DBTbUpdates db = new DBTbUpdates(cx);
+            db.vaciar();
+            finish();
 
-             } catch (JSONException e) {
-                e.printStackTrace();
-             }
-             }
-         });
+        } catch (JSONException e) {
+           e.printStackTrace();
+        }
+        });
     }
 
 

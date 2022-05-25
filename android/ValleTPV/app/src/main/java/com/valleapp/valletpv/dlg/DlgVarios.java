@@ -3,25 +3,24 @@ package com.valleapp.valletpv.dlg;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.valleapp.valletpv.Interfaces.IControlador;
-import com.valleapp.valletpv.R;
 
 /**
  * Created by valle on 19/10/14.
  */
 public class DlgVarios extends Dialog {
 
-    IControlador controlador;
+    IControladorCuenta controlador;
 
-    public DlgVarios(Context context, final IControlador controlador) {
+    public DlgVarios(Context context, final IControladorCuenta controlador) {
         super(context);
         this.controlador = controlador;
     }
@@ -31,41 +30,44 @@ public class DlgVarios extends Dialog {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.varios);
         this.setTitle("Varios ");
-        final TextView can = (TextView) this.findViewById(R.id.txtCan);
-        final TextView p = (TextView) this.findViewById(R.id.txtPrecio);
-        final TextView nom = (TextView) this.findViewById(R.id.txtNombre);
-        Button ok = (Button) this.findViewById(R.id.btnAceptar);
-        ImageButton s = (ImageButton) this.findViewById(R.id.salirVarios);
+        final TextView can = this.findViewById(R.id.txt_varios_can);
+        final TextView p =  this.findViewById(R.id.txt_varios_precio);
+        final TextView nom =  this.findViewById(R.id.txt_varios_nombre);
+        ImageButton ok = this.findViewById(R.id.btn_aceptar_monedas);
+        ImageButton s = this.findViewById(R.id.btn_varios_salir);
 
-        can.setText("1");p.setText("");nom.setText("");
+        can.setText("");
+        p.setText("");
+        nom.setText("");
 
-        s.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancel();
-                controlador.salir();
-            }
+        s.setOnClickListener(view -> {
+            cancel();
         });
 
-        ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(p.getText().length()>0) {
-                    try {
-                        JSONObject art = new JSONObject();
-                        String nombre = nom.getText().toString().length()>0 ? nom.getText().toString() : "Varios";
-                        art.put("ID", "0");
-                        art.put("Precio", p.getText().toString().replace(",", "."));
-                        art.put("Can", can.getText().toString());
-                        art.put("Nombre", nombre);
-                        controlador.pedirArt(art, can.getText().toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    cancel();
+        ok.setOnClickListener(view -> {
+            if(p.getText().length()>0) {
+                try {
+                    String strCan = can.getText().toString().isEmpty() ? "1" : can.getText().toString();
+                    JSONObject art = new JSONObject();
+                    String nombre = nom.getText().toString().length()>0 ? nom.getText().toString() : "Varios";
+                    art.put("ID", "0");
+                    art.put("Precio", p.getText().toString().replace(",", "."));
+                    art.put("Can", strCan);
+                    art.put("Descripcion", nombre);
+                    art.put("descripcion_t", nombre);
+                    controlador.pedirArt(art);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+                cancel();
             }
         });
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        controlador.setEstadoAutoFinish(true, false);
     }
 }

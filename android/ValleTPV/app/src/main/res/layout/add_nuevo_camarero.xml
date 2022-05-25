@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/txt_add_cam_nombre"
+        android:layout_width="0dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="36dp"
+        android:autofillHints=""
+        android:hint="@string/nombre"
+        android:inputType="textPersonName"
+        android:textColorHint="#4E4340"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/txt_add_cam_apellido"
+        android:layout_width="0dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="124dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="212dp"
+        android:autofillHints=""
+        android:hint="@string/primer_apellido"
+        android:inputType="textPersonName"
+        android:textColorHint="#3A3838"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_add_cam_aceptar"
+        android:layout_width="118dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="172dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/fondo_btn_xml"
+        android:text="@string/ok"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btn_add_cam_salir"
+        android:layout_width="118dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="36dp"
+        android:layout_marginBottom="48dp"
+        android:background="@drawable/fondo_btn_xml"
+        android:text="@android:string/cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</android.support.constraint.ConstraintLayout>

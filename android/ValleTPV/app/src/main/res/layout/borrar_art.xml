@@ -1,80 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="560sp"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="10dp">
 
+    <TextView
+        android:id="@+id/txt_info_borrar"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="0.2"
+        android:textSize="25sp" />
+
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="570dp"
-        android:layout_height="106dp">
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="0.4"
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="fill_parent"
-        android:text="Invitacion"
-        android:id="@+id/btnInv"
-        android:background="@drawable/blancoxml"
-        android:layout_margin="5dp"/>
+        <Button
+            android:id="@+id/btnInv"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_btn_xml"
+            android:text="@string/borrar_invitacion" />
 
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="fill_parent"
-        android:text="Simpa"
-        android:id="@+id/btnSimpa"
-        android:background="@drawable/blancoxml"
-        android:layout_margin="5dp"/>
+        <Button
+            android:id="@+id/btnSimpa"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_btn_xml"
+            android:text="@string/simpa" />
 
-    <Button
-        android:layout_width="100dp"
-        android:layout_height="fill_parent"
-        android:text="Error\npedido"
-        android:id="@+id/btnError"
-        android:singleLine="false"
-        android:background="@drawable/blancoxml"
-        android:layout_margin="5dp"/>
+        <Button
+            android:id="@+id/btnError"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_btn_xml"
+            android:singleLine="false"
+            android:text="@string/error_pedido" />
 
-    <ImageButton
-            android:layout_width="100dp"
-            android:layout_height="fill_parent"
+        <ImageButton
             android:id="@+id/btnEdit"
-            android:background="@drawable/editarxml"
-            android:layout_margin="5dp"/>
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/borrar_editar"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/editar" />
 
-    <ImageButton
-            android:layout_width="100dp"
-            android:layout_height="fill_parent"
-            android:id="@+id/btnSalir"
-            android:background="@drawable/salirxml"
-            android:layout_margin="5dp" />
+        <ImageButton
+            android:id="@+id/btn_salir_monedas"
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/borrar_salir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/salir" />
 
 
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="550dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/pneEditarMotivo">
+        android:id="@+id/pneEditarMotivo"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="0.4"
+        android:orientation="horizontal">
 
         <EditText
-            android:layout_width="450dp"
-            android:layout_height="100dp"
             android:id="@+id/txtMotivo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
-            android:hint="Editar motivo"
-            android:textSize="35sp"/>
+            android:layout_weight="1"
+            android:autofillHints="Motivo"
+            android:hint="@string/editar_motivo"
+            android:inputType="text"
+            android:textSize="35sp" />
 
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:text="Ok"
-            android:id="@+id/btnOk"
-            android:layout_gravity="right"
-            android:background="@drawable/blancoxml"
-            android:layout_margin="5dp"/>
+        <ImageButton
+            android:id="@+id/btn_ok"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_margin="5dp"
+            android:layout_weight="4"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/ok"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/check"
+            android:text="@string/ok" />
 
     </LinearLayout>
 

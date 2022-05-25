@@ -5,40 +5,29 @@
 # @Last modified time: 2019-10-01T01:10:16+02:00
 # @License: Apache License v2.0
 
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
 import json
 
-def send_pedidos_ws(request, datos):
-    for k, v in datos.items():
-        try:
-            channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
+
+def send_mensaje_impresora(v):
+    try:
+        if 'op' in v:
+            v = {v["receptor"]: v}
+        for o in v:
+            r = v[o]
+            channel_name = settings.EMPRESA + "_impresion_" + r["receptor"]
             layer = get_channel_layer()
             async_to_sync(layer.group_send)(channel_name, {
                 'type': 'send_message',
-                'content': json.dumps(v, cls=DjangoJSONEncoder)
+                'content': json.dumps(r, cls=DjangoJSONEncoder)
             })
-        except Exception as e:
-            print(e)
-
-def send_ticket_ws(request, v):
-    try:
-        
-        channel_name = settings.EMPRESA + "_impresion_" + v["receptor"]
-        layer = get_channel_layer()
-        async_to_sync(layer.group_send)(channel_name, {
-            'type': 'send_message',
-            'content': json.dumps(v, cls=DjangoJSONEncoder)
-         })
     except Exception as e:
-        print(e)
+        print("[ERROR  impresoras ]"+ str(e))
 
-
-def send_update_ws(request, v):
+def send_mensaje_devices(v):
     try:
         channel_name = settings.EMPRESA + "_comunicaciones_" + v["receptor"]
         layer = get_channel_layer()
@@ -47,7 +36,7 @@ def send_update_ws(request, v):
         'content': json.dumps(v)
         })
     except Exception as e:
-        print(e)
+        print("[ERROR  devices ]"+ str(e))
 
 
     

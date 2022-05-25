@@ -21,44 +21,22 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-try:
-    from django.conf.urls import url, include
-except :
-    from django.urls import re_path as url, include
-    
-from api_android import views as api_views
+from django.urls import  include, path, re_path
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 
 
 
 urlpatterns = [
-    url(r'^articulos/listado', api_views.art_listado, name="articulos_listado"),
-    url(r'^secciones/listado', api_views.sec_listado, name="secciones_listado"),
-    url(r'^cuenta/add', api_views.cuenta_add, name="cuenta_add"),
-    url(r'^almacen/', include("almacen.urls"), name="almacen"),
-    url(r'^contabilidad/', include("contabilidad.urls"), name="conta"),
-    url(r'^gestion/', include("gestion.urls"), name="gestion"),
-    url(r'^ventas/', include("ventas.urls"), name="ventas"),
-    url(r'^sync/', include("api_android.urls"), name="api_android_sync"),
-    url(r'^pedidos/', include("api_android.urls"), name="api_android_pedidos"),
-    url(r'^camareros/', include("api_android.urls"), name="api_android_camareros"),
-    url(r'^cuenta/', include("api_android.urls"), name="api_android_cuenta"),
-    url(r'^mesas/', include("api_android.urls"), name="api_android_mesas"),
-    url(r'^comandas/', include("api_android.urls"), name="api_android_comandas"),
-    url(r'^arqueos/', include("api_android.urls"), name="api_android_arqueos"),
-    url(r'^impresion/', include("api_android.urls"), name="api_android_impresion"),
-    url(r'^secciones/', include("api_android.urls"), name="api_android_secciones"),
-    url(r'^articulos/', include("api_android.urls"), name="api_android_articulos"),
-    url(r'^sugerencias/', include("api_android.urls"), name="api_android_sugerencias"),
-    url(r'^receptores/', include("api_android.urls"), name="api_android_receptores"),
-    url(r'^favicon.ico$',
+    path('api/', include('api_android.urls'), name="api"),
+    path('token/', include('tokenapi.urls')),
+    path('favicon.ico',
             RedirectView.as_view( # the redirecting function
-                url=staticfiles_storage.url('favicon.ico'), # converts the static directory + our favicon into a URL
-                # in my case, the result would be http://www.tumblingprogrammer.com/static/img/favicon.ico
+                url=staticfiles_storage.url('favicon.ico'), 
             ),
             name="favicon" # name of our view
         ),
-    url(r'', include("inicio.urls")),
+    path("app/", include("app.urls"), name="app"),
+    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"))
 
 ]

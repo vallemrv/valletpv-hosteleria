@@ -5,9 +5,6 @@
 # @Last modified time: 2019-01-30T14:33:08+01:00
 # @License: Apache License v2.0
 
-
-from tokenapi.http import JsonResponse, HttpResponse
-from gestion.models import HorarioUsr
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
@@ -55,15 +52,17 @@ def  send_cierre(user, desglose):
                                                              v["Nombre"],
                                                              "{0:01.2f}".format(v["Total"]))
 
-    mensaje += '</body> </html> '
-    hora = now.strftime('%H:%M')
-    send_mail(
-    titulo,
-    strip_tags(mensaje),
-    '{2} - {0}  <{1}>'.format(getFranja(hora), settings.MAIL, getDiaSemana(now)),
-    [user.email],
-    html_message=mensaje
-    )
+    
+    if settings.MAIL != "" and user.email and user.email != "":
+        mensaje += '</body> </html> '
+        hora = now.strftime('%H:%M')
+        send_mail(
+            titulo,
+            strip_tags(mensaje),
+            '{2} - {0}  <{1}>'.format(getFranja(hora), settings.MAIL, getDiaSemana(now)),
+            [user.email],
+            html_message=mensaje
+        )
 
 
 def getFranja(hora):

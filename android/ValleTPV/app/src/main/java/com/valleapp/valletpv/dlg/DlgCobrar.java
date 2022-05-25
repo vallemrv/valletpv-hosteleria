@@ -8,7 +8,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.valleapp.valletpv.Interfaces.IControlador;
+import com.valleapp.valletpv.interfaces.IControladorCuenta;
 import com.valleapp.valletpv.R;
 
 import org.json.JSONArray;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class DlgCobrar extends Dialog{
 
     JSONArray lineas;
-    IControlador controlador;
+    IControladorCuenta controlador;
     String strEntrega = "";
     Double totalCobro = 0.00;
     Double entrega = 0.00;
@@ -29,35 +29,20 @@ public class DlgCobrar extends Dialog{
     TextView lblCambio;
     TextView lbltotal;
 
-    public DlgCobrar(Context context, IControlador controlador) {
+    public DlgCobrar(Context context, IControladorCuenta controlador) {
         super(context);
         this.controlador = controlador;
         setContentView(R.layout.cobros);
-        lbltotal = (TextView) findViewById(R.id.lblPrecio);
-        lblEntrega = (TextView) findViewById(R.id.lblEntrega);
-        lblCambio = (TextView) findViewById(R.id.lblCambio);
-        Button tj = (Button)findViewById(R.id.btnTarjeta);
-        ImageButton ef = (ImageButton)findViewById(R.id.btnEfectivo);
-        ImageButton s = (ImageButton)findViewById(R.id.btnSalir);
-        s.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickSalir(view);
-            }
-        });
-        ef.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickEfectivo(view);
-            }
-        });
+        lbltotal = findViewById(R.id.lblPrecio);
+        lblEntrega =  findViewById(R.id.lblEntrega);
+        lblCambio = findViewById(R.id.lblCambio);
+        ImageButton tj = findViewById(R.id.btnTarjeta);
+        ImageButton ef = findViewById(R.id.btnEfectivo);
+        ImageButton s = findViewById(R.id.btn_salir_monedas);
+        s.setOnClickListener(view -> clickSalir(view));
+        ef.setOnClickListener(view -> clickEfectivo(view));
 
-        tj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickTarjeta(view);
-            }
-        });
+        tj.setOnClickListener(view -> clickTarjeta(view));
     }
 
     public void setDatos(JSONArray lineas, Double totalCobro){
@@ -67,17 +52,12 @@ public class DlgCobrar extends Dialog{
         this.totalCobro = totalCobro;
         this.entrega = totalCobro;
         this.strEntrega = "";
-        LinearLayout pne = (LinearLayout)findViewById(R.id.pneBotonera);
+        LinearLayout pne = findViewById(R.id.pneBotonera);
         ArrayList<View> touchables = pne.getTouchables();
 
         for (View v : touchables){
             if (v instanceof Button){
-                v.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        clickEntrega(view);
-                    }
-                });
+                v.setOnClickListener(view -> clickEntrega(view));
             }
         }
     }
@@ -91,12 +71,14 @@ public class DlgCobrar extends Dialog{
     }
 
     public void clickTarjeta(View v){
-        controlador.cobrar(lineas,totalCobro,0.00);
-        this.cancel();
+        if (entrega == totalCobro) {
+            controlador.cobrar(lineas, totalCobro, 0.00);
+            this.cancel();
+        }
     }
 
     public void clickSalir(View v){
-        controlador.salir();cancel();
+        cancel();
     }
 
     public void clickEntrega(View v){
@@ -120,4 +102,9 @@ public class DlgCobrar extends Dialog{
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        controlador.setEstadoAutoFinish(true, false);
+    }
 }

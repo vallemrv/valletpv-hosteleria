@@ -1,49 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
-    android:orientation="horizontal"
-    >
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal">
 
 
-    <ListView
-        android:id="@+id/lstnoautorizados"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="0sp"
         android:layout_height="match_parent"
-        android:layout_weight=".4"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10sp"
+        android:layout_weight="0.45"
+        android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/lstautorizados"
-        android:layout_width="0dp"
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:background="@drawable/fondo_btn_press">
+
+            <TextView
+                android:id="@+id/editTextTextPersonName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/camareros_libre"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/lstnoautorizados"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0sp"
         android:layout_height="match_parent"
-        android:layout_weight="0.4"
-        android:layout_margin="10dp"/>
+        android:layout_margin="10sp"
+        android:layout_weight="0.45"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:background="@drawable/fondo_btn_press">
+
+            <TextView
+                android:id="@+id/editTextTextPersonName2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/carmareros_pase"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/lstautorizados"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="match_parent"
+        android:layout_margin="10sp"
         android:layout_weight="0.1">
 
         <ImageButton
             android:id="@+id/salir"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="150sp"
             android:layout_alignParentTop="true"
-            android:background="@drawable/blanco"
-            android:src="@drawable/salir"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginTop="-3dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/fondo_btn"
+            android:contentDescription="@string/salir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/salir" />
 
-        <Button
+        <ImageButton
             android:id="@+id/aceptar"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="150sp"
             android:layout_below="@id/salir"
-            android:background="@drawable/blanco"
-            android:text="Ok"
-            android:textSize="32dp"/>
+            android:layout_marginTop="0dp"
+            android:background="@drawable/fondo_btn"
+            android:contentDescription="@string/ok"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/check"
+            android:text="@string/ok"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="34sp"
+            tools:text="@string/ok" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_add_nuevo_camarero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="22dp"
+            android:contentDescription="@string/agregar_camarero"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/mas" />
+
+
+
     </RelativeLayout>
 
 

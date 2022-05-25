@@ -20,14 +20,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Camarero"
+            android:text="@string/op_mesas_camarero"
 
             android:id="@+id/lblTitulo"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:textSize="35dip"
-            android:layout_marginLeft="5dp" />
+            android:textSize="35sp"
+            android:layout_marginStart="5dp" />
 
 
 
@@ -41,36 +40,38 @@
         android:background="#fffff1ea">
 
         <HorizontalScrollView
+            android:id="@+id/scrollView4"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:id="@+id/scrollView4"
-            android:layout_weight="0.1"
+            android:layout_marginStart="2dp"
 
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.1"
             android:background="@android:color/white"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="5dp">
+            android:contentDescription="@string/lista_zonas">
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
+                android:id="@+id/pneZonas"
+                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:id="@+id/pneZonas"></LinearLayout>
+                android:orientation="horizontal" />
         </HorizontalScrollView>
 
         <ScrollView
+            android:id="@+id/scrollView3"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:id="@+id/scrollView3"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="2dp"
             android:layout_weight="0.9"
             android:background="@android:color/white"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="2dp">
+            android:contentDescription="@string/lista_zonas">
 
             <TableLayout
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/pneMesas"
-                android:stretchColumns="*"></TableLayout>
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*" />
 
         </ScrollView>
 

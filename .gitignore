@@ -2,10 +2,17 @@
 .vscode/
 manage*
 media*/
-test*/
-Test*/
 server_*
 *.sqlite3
+
+node_*/
+ignore*
+test_vue/
+gsui_dist/
+platforms/
+www/
+.idea/
+release/
 node*
 **/control_impresoras/test*
 dist/
@@ -15,8 +22,9 @@ dist/
 
 #excepciones
 !manage_template.py
-!test_ws/
 !management/
+!gestion_ui/
+
 
 
 # Byte-compiled / optimized / DLL files
@@ -51,3 +59,46 @@ wheels/
 .venv
 venv/
 ENV/
+
+
+# Created by https://www.gitignore.io/api/java,gradle
+
+### Java ###
+*.class
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+
+### Gradle ###
+.gradle
+/build/
+/release/
+*.apk
+*.aab
+
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
+
+# End of https://www.gitignore.io/api/java,gradle

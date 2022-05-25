@@ -1,5 +1,5 @@
 {
-    "url_server": "192.168.1.168:8000",
+    "url_server": "localhost:8000",
     "datos_empresa": {
         "nombre_empresa": "Empresa carmelo",
         "url_logo": "logo.png",
@@ -14,12 +14,12 @@
     "impresoras": [
         {
             "tipo": "Network",
-            "params": "192.168.1.138",
+            "params": "192.168.1.139",
             "ws": "caja"
         },
         {
-            "tipo": "Usb",
-            "params": ["0x1504","0x002b","0","0x81","0x02"],
+            "tipo": "Network",
+            "params": "192.168.1.139",
             "ws": "cocina"
         }
     ]

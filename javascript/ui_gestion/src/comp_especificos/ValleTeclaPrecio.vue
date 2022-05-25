@@ -1,0 +1,114 @@
+<template>
+  <v-col cols="12" class="ma-0 pa-0 mt-1 pl-3 pr-3" v-if="subteclas.length > 0">
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <v-row>
+            <v-col class="pt-5 text-left text-caption">
+              {{ tecla.nombre }}
+            </v-col>
+            <v-col>
+              <valle-float-form
+                :item="tecla"
+                column="p1"
+                app="gestion"
+                tb_name="teclas"
+                :rules="rules"
+                :value="tecla.p1"
+              ></valle-float-form>
+            </v-col>
+            <v-col>
+              <valle-float-form
+                :item="tecla"
+                column="p2"
+                app="gestion"
+                tb_name="teclas"
+                :rules="rules"
+                :value="tecla.p2"
+              ></valle-float-form>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text class="text-center">
+          <v-row v-for="(s, i) in subteclas" :key="i">
+            <v-col class="text-left" cols="4">{{ s.nombre }}</v-col>
+            <v-col cols="4">
+              <valle-float-form
+                :item="s"
+                column="incremento"
+                app="gestion"
+                tb_name="subteclas"
+                :rules="rules"
+                :value="tecla.incremento"
+                :hint="precio(s, tecla.p2)"
+              ></valle-float-form>
+            </v-col>
+            <v-col cols="4">
+              {{ precio(s, tecla.p2) }}
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </v-col>
+  <v-col cols="12" class="ma-0 mt-1" v-else>
+    <v-card elevation="3" class="mx-auto text-center">
+      <v-row class="pl-3 pr-10">
+        <v-col cols="4" class="text-left text-caption pt-5 pl-6">
+          {{ tecla.nombre }}
+        </v-col>
+        <v-col cols="4">
+          <valle-float-form
+            :item="tecla"
+            column="p1"
+            app="gestion"
+            tb_name="teclas"
+            :rules="rules"
+            :value="tecla.p1"
+          ></valle-float-form>
+        </v-col>
+        <v-col cols="4">
+          <valle-float-form
+            :item="tecla"
+            column="p2"
+            app="gestion"
+            tb_name="teclas"
+            :rules="rules"
+            :value="tecla.p2"
+          ></valle-float-form>
+        </v-col>
+      </v-row>
+    </v-card>
+  </v-col>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+import ValleFloatForm from "@/components/ValleFloatForm.vue";
+export default {
+  components: { ValleFloatForm },
+  props: ["tecla"],
+  data: () => {
+    return {
+      rules: [
+        (value) => !!value || "Requerido.",
+        (value) => !isNaN(value - parseFloat(value)) || "Tiene que ser precio",
+      ],
+    };
+  },
+  computed: {
+    ...mapGetters(["getItemsFiltered"]),
+    subteclas() {
+      var f = {
+        filters: [{ tecla: this.tecla.id }],
+      };
+      return this.tecla ? this.getItemsFiltered(f, "subteclas") : [];
+    },
+  },
+  methods: {
+    precio(s, p) {
+      return (parseFloat(s.incremento) + parseFloat(p)).toFixed(2);
+    },
+  },
+};
+</script>

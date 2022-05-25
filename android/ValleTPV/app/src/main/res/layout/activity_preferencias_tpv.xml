@@ -1,31 +1,25 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="100dip"
+        android:layout_height="80dp"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/txtUrl"
-            android:layout_width="wrap_content"
+            android:layout_width="0sp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:hint="Url servidor"
+            android:layout_weight="0.9"
+            android:hint="@string/url_servidor"
             android:inputType="textUri"
-            android:textSize="48dip" />
+            android:textSize="48sp"
+            android:importantForAutofill="no" />
 
         <Button
-            android:id="@+id/btnAceptar"
-            android:layout_width="wrap_content"
+            android:id="@+id/btn_aceptar_monedas"
+            android:layout_width="0sp"
             android:layout_height="match_parent"
-            android:layout_weight="0.1
-"
-            android:text="Ok" />
+            android:layout_weight="0.1"
+            android:background="@drawable/fondo_btn_xml"
+            android:text="@string/ok" />
 
     </LinearLayout>
-</LinearLayout>

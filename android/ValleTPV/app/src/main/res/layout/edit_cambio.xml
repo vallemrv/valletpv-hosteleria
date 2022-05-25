@@ -1,42 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:ems="10"
-            android:id="@+id/cambio"
-            android:layout_gravity="center_horizontal"
-            android:hint="Cambio"
-            android:textSize="35sp"/>
+    <EditText
+        android:id="@+id/cambio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:ems="10"
+        android:hint="@string/cambio"
+        android:inputType="numberDecimal"
+        android:minHeight="48dp"
+        android:textSize="35sp"
+        android:importantForAutofill="no" />
 
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:id="@+id/salirCambio"
-            android:layout_gravity="end"
-            android:layout_below="@+id/cambio"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/salirxml"
-            android:layout_margin="5dp" />
+    <ImageButton
+        android:id="@+id/salirCambio"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/cambio"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/salir"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/salir" />
 
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:text="OK"
-            android:id="@+id/aceptarCam"
-            android:layout_toStartOf="@+id/salirCambio"
-            android:background="@drawable/blancoxml"
-            android:layout_margin="5dp"
-            android:layout_below="@+id/cambio" />
+    <ImageButton
+        android:id="@+id/aceptarCam"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/cambio"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/salirCambio"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/ok"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/check"
+        android:text="@string/ok" />
 
-    </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

@@ -25,6 +25,8 @@ BRAND_TITLE = "{{nombre_empresa}}"
 BRAND = "{{nombre_empresa}}"
 EMPRESA = "{{name_tpv}}"
 MAIL = "{{email}}"
+BASE_UI_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)),"javascript")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -50,10 +52,10 @@ INSTALLED_APPS = [
     'almacen',
     'contabilidad',
     'gestion',
-    'inicio',
     'app',
     'ventas',
     'api_android',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -64,23 +66,30 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [
      'django.contrib.auth.backends.ModelBackend',
+     'tokenapi.backends.TokenBackend',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static', 'resources'),)
+STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static', 'resources'),
+        os.path.join(BASE_DIR, 'static', 'dist'),
+    )
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'static', 'dist'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -184,3 +193,5 @@ MEDIA_URL   = '/media/'
 STATIC_URL  = '/static/'
 STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT  =  os.path.join(STATIC_ROOT, 'media_{{name_tpv}}')
+
+
