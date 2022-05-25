@@ -13,11 +13,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.valleapp.vallecom.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.valleapp.vallecom.R;
-import com.valleapp.vallecom.interfaces.IPedidos;
 
 
 /**

@@ -4,7 +4,6 @@ manage*
 media*/
 server_*
 *.sqlite3
-
 node_*/
 ignore*
 test_vue/
