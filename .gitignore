@@ -4,6 +4,7 @@ manage*
 media*/
 server_*
 *.sqlite3
+
 node_*/
 ignore*
 test_vue/
@@ -12,12 +13,18 @@ platforms/
 www/
 .idea/
 release/
-
+node*
+**/control_impresoras/test*
+dist/
+*.apk
+*.aab
+.gradle/
 
 #excepciones
 !manage_template.py
 !management/
 !gestion_ui/
+
 
 
 # Byte-compiled / optimized / DLL files
