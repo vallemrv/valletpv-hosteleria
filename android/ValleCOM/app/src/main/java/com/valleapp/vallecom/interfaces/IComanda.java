@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.interfaces;
+package com.valleapp.vallecom.interfaces;
 
 /**
  * Created by valle on 18/09/14.

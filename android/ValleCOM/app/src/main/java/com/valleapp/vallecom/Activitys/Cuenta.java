@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,12 +16,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorTicket;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.db.DBMesas;
-import com.valleapp.valleCOM.utilidades.Instruccion;
-import com.valleapp.valleCOM.utilidades.ServicioCom;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorTicket;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.utilidades.Instruccion;
+import com.valleapp.vallecom.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

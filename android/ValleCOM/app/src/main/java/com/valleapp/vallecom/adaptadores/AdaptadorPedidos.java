@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.adaptadores;
+package com.valleapp.vallecom.adaptadores;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import com.valleapp.valleCOM.R;
+import com.valleapp.vallecom.R;
 
 /**
  * Created by valle on 14/09/14.

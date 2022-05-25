@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.pestañas;
+package com.valleapp.vallecom.pestañas;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.valleapp.valleCOM.interfaces.ITeclados;
-import com.valleapp.valleCOM.R;
+import com.valleapp.vallecom.interfaces.ITeclados;
+import com.valleapp.vallecom.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

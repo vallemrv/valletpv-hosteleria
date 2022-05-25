@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.adaptadores;
+package com.valleapp.vallecom.adaptadores;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.interfaces;
+package com.valleapp.vallecom.interfaces;
 
 import org.json.JSONObject;
 

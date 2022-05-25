@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.utilidades;
+package com.valleapp.vallecom.utilidades;
 
 import android.content.ContentValues;
 import android.os.Bundle;

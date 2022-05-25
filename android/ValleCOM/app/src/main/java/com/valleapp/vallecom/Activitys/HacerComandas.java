@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -17,24 +17,24 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorComanda;
-import com.valleapp.valleCOM.adaptadores.AdaptadorPedidos;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.db.DBMesas;
-import com.valleapp.valleCOM.db.DBSecciones;
-import com.valleapp.valleCOM.db.DBSubTeclas;
-import com.valleapp.valleCOM.db.DBTeclas;
-import com.valleapp.valleCOM.interfaces.IComanda;
-import com.valleapp.valleCOM.interfaces.INota;
-import com.valleapp.valleCOM.interfaces.ITeclados;
-import com.valleapp.valleCOM.pestañas.Comanda;
-import com.valleapp.valleCOM.pestañas.SeccionesCom;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
-import com.valleapp.valleCOM.utilidades.Instruccion;
-import com.valleapp.valleCOM.utilidades.JSON;
-import com.valleapp.valleCOM.utilidades.Nota;
-import com.valleapp.valleCOM.utilidades.ServicioCom;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorComanda;
+import com.valleapp.vallecom.adaptadores.AdaptadorPedidos;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.db.DBSecciones;
+import com.valleapp.vallecom.db.DBSubTeclas;
+import com.valleapp.vallecom.db.DBTeclas;
+import com.valleapp.vallecom.interfaces.IComanda;
+import com.valleapp.vallecom.interfaces.INota;
+import com.valleapp.vallecom.interfaces.ITeclados;
+import com.valleapp.vallecom.pestañas.Comanda;
+import com.valleapp.vallecom.pestañas.SeccionesCom;
+import com.valleapp.vallecom.utilidades.ActivityBase;
+import com.valleapp.vallecom.utilidades.Instruccion;
+import com.valleapp.vallecom.utilidades.JSON;
+import com.valleapp.vallecom.utilidades.Nota;
+import com.valleapp.vallecom.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

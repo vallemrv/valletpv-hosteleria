@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.utilidades;
+package com.valleapp.vallecom.utilidades;
 
 import android.app.Service;
 import android.content.ContentValues;
@@ -10,21 +10,21 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.valleapp.valleCOM.db.DBCamareros;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.db.DBMesas;
-import com.valleapp.valleCOM.db.DBMesasAbiertas;
-import com.valleapp.valleCOM.db.DBReceptores;
-import com.valleapp.valleCOM.db.DBSecciones;
-import com.valleapp.valleCOM.db.DBSubTeclas;
-import com.valleapp.valleCOM.db.DBSugerencias;
-import com.valleapp.valleCOM.db.DBTeclas;
-import com.valleapp.valleCOM.db.DBZonas;
-import com.valleapp.valleCOM.db.DbTbUpdates;
-import com.valleapp.valleCOM.interfaces.IBaseDatos;
-import com.valleapp.valleCOM.interfaces.IBaseSocket;
-import com.valleapp.valleCOM.tareas.TareaManejarInstrucciones;
-import com.valleapp.valleCOM.tareas.TareaUpdateForDevices;
+import com.valleapp.vallecom.db.DBCamareros;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.db.DBMesasAbiertas;
+import com.valleapp.vallecom.db.DBReceptores;
+import com.valleapp.vallecom.db.DBSecciones;
+import com.valleapp.vallecom.db.DBSubTeclas;
+import com.valleapp.vallecom.db.DBSugerencias;
+import com.valleapp.vallecom.db.DBTeclas;
+import com.valleapp.vallecom.db.DBZonas;
+import com.valleapp.vallecom.db.DbTbUpdates;
+import com.valleapp.vallecom.interfaces.IBaseDatos;
+import com.valleapp.vallecom.interfaces.IBaseSocket;
+import com.valleapp.vallecom.tareas.TareaManejarInstrucciones;
+import com.valleapp.vallecom.tareas.TareaUpdateForDevices;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;

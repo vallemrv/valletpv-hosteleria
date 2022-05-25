@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.utilidades;
+package com.valleapp.vallecom.utilidades;
 
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.db.DBCamareros;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.db.DBCamareros;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

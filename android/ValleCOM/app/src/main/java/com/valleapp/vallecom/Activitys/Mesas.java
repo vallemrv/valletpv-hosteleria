@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
@@ -27,19 +27,19 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorMesas;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.db.DBMesas;
-import com.valleapp.valleCOM.db.DBZonas;
-import com.valleapp.valleCOM.interfaces.IPedidos;
-import com.valleapp.valleCOM.pestañas.ListaMesas;
-import com.valleapp.valleCOM.pestañas.Pedidos;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
-import com.valleapp.valleCOM.utilidades.Instruccion;
-import com.valleapp.valleCOM.utilidades.JSON;
-import com.valleapp.valleCOM.utilidades.ServicioCom;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorMesas;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.db.DBZonas;
+import com.valleapp.vallecom.interfaces.IPedidos;
+import com.valleapp.vallecom.pestañas.ListaMesas;
+import com.valleapp.vallecom.pestañas.Pedidos;
+import com.valleapp.vallecom.utilidades.ActivityBase;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.Instruccion;
+import com.valleapp.vallecom.utilidades.JSON;
+import com.valleapp.vallecom.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

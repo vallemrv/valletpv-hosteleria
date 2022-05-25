@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.pestañas;
+package com.valleapp.vallecom.pestañas;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,8 +16,9 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.valleapp.valleCOM.interfaces.IPedidos;
-import com.valleapp.valleCOM.R;
+import com.valleapp.comandas.R;
+import com.valleapp.vallecom.interfaces.IPedidos;
+
 
 /**
  * Created by valle on 28/10/14.

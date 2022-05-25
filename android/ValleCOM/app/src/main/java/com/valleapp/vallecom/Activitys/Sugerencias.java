@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -22,10 +22,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorSugerencias;
-import com.valleapp.valleCOM.db.DBSugerencias;
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorSugerencias;
+import com.valleapp.vallecom.db.DBSugerencias;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 
 
 public class Sugerencias extends Activity implements TextWatcher {

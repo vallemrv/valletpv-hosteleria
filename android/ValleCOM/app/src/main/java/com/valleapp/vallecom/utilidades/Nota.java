@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.utilidades;
+package com.valleapp.vallecom.utilidades;
 
 import android.content.Context;
 
@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.valleCOM.interfaces.INota;
+import com.valleapp.vallecom.interfaces.INota;
 
 /**
  * Created by valle on 18/09/14.

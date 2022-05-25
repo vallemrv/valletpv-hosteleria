@@ -1,14 +1,14 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ListView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorRefill;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorRefill;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.utilidades.ActivityBase;
 
 import org.json.JSONObject;
 

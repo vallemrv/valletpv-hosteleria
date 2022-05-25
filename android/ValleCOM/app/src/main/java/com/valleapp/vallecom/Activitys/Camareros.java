@@ -1,8 +1,8 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
-import static com.valleapp.valleCOM.R.drawable;
-import static com.valleapp.valleCOM.R.id;
-import static com.valleapp.valleCOM.R.layout;
+import static com.valleapp.vallecom.R.drawable;
+import static com.valleapp.vallecom.R.id;
+import static com.valleapp.vallecom.R.layout;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -26,12 +26,12 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.db.DBCamareros;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
-import com.valleapp.valleCOM.utilidades.Instruccion;
-import com.valleapp.valleCOM.utilidades.JSON;
-import com.valleapp.valleCOM.utilidades.ServicioCom;
+import com.valleapp.vallecom.db.DBCamareros;
+import com.valleapp.vallecom.utilidades.ActivityBase;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.Instruccion;
+import com.valleapp.vallecom.utilidades.JSON;
+import com.valleapp.vallecom.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

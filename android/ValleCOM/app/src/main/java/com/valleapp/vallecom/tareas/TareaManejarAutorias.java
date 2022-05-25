@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.tareas;
+package com.valleapp.vallecom.tareas;
 
 import android.content.ContentValues;
 import android.os.Handler;
@@ -7,7 +7,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 
 import org.json.JSONArray;
 import java.util.TimerTask;

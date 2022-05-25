@@ -15,7 +15,7 @@
            <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
            <activity
-            android:name="com.valleapp.valleCOM.Activitys.Camareros"
+            android:name="com.valleapp.vallecom.Activitys.Camareros"
             android:label="@string/app_name"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.Preferencias"
+            android:name="com.valleapp.vallecom.Activitys.Preferencias"
             android:label="PreferenciasTpv"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
@@ -39,73 +39,73 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.Mesas"
+            android:name="com.valleapp.vallecom.Activitys.Mesas"
             android:label="Elegir Mesa"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.HacerComandas"
+            android:name="com.valleapp.vallecom.Activitys.HacerComandas"
             android:label="@string/title_activity_comanda"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.BuscadorTeclas"
+            android:name="com.valleapp.vallecom.Activitys.BuscadorTeclas"
             android:label="@string/title_activity_buscador"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.OpMesas"
+            android:name="com.valleapp.vallecom.Activitys.OpMesas"
             android:label="@string/title_activity_op_mesas"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.BuscarPedidos"
+            android:name="com.valleapp.vallecom.Activitys.BuscarPedidos"
             android:label="Buscar pedidos"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.Cuenta"
+            android:name="com.valleapp.vallecom.Activitys.Cuenta"
             android:label="@string/title_activity_cuenta"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.MostrarPedidos"
+            android:name="com.valleapp.vallecom.Activitys.MostrarPedidos"
             android:label="@string/title_activity_mostrar_pedidos"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.valleapp.valleCOM.Activitys.Sugerencias"
+            android:name="com.valleapp.vallecom.Activitys.Sugerencias"
             android:label="@string/title_activity_sugerencias"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
            <activity
-               android:name="com.valleapp.valleCOM.Activitys.Autorias"
+               android:name="com.valleapp.vallecom.Activitys.Autorias"
                android:label="@string/title_activity_autorias"
                android:configChanges="orientation"
                android:screenOrientation="portrait">
            </activity>
            <activity
-               android:name="com.valleapp.valleCOM.Activitys.Refill"
+               android:name="com.valleapp.vallecom.Activitys.Refill"
                android:label="@string/title_activity_refill"
                android:configChanges="orientation"
                android:screenOrientation="portrait">
            </activity>
            <activity
-               android:name="com.valleapp.valleCOM.Activitys.SendMensajes"
+               android:name="com.valleapp.vallecom.Activitys.SendMensajes"
                android:label="@string/title_activity_sendmensajes"
                android:configChanges="orientation"
                android:screenOrientation="portrait">
            </activity>
        <service
-           android:name="com.valleapp.valleCOM.utilidades.ServicioCom"
+           android:name="com.valleapp.vallecom.utilidades.ServicioCom"
            android:enabled="true"
            android:exported="false" />
 

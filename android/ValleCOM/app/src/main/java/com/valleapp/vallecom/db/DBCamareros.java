@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.db;
+package com.valleapp.vallecom.db;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 
-import com.valleapp.valleCOM.interfaces.IBaseDatos;
-import com.valleapp.valleCOM.interfaces.IBaseSocket;
+import com.valleapp.vallecom.interfaces.IBaseDatos;
+import com.valleapp.vallecom.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;

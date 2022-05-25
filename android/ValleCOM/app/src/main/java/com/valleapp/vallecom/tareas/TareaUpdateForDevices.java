@@ -1,10 +1,10 @@
-package com.valleapp.valleCOM.tareas;
+package com.valleapp.vallecom.tareas;
 
 import android.content.ContentValues;
 import android.os.Handler;
 
 
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 
 import java.util.Timer;
 import java.util.TimerTask;

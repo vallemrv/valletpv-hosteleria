@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.adaptadores;
+package com.valleapp.vallecom.adaptadores;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
+import com.valleapp.vallecom.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

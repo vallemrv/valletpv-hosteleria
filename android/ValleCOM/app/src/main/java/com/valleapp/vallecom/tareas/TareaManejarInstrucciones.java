@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.tareas;
+package com.valleapp.vallecom.tareas;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,8 +7,8 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
-import com.valleapp.valleCOM.utilidades.Instruccion;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.Instruccion;
 
 
 import java.util.Queue;

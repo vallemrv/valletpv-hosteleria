@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.pestañas;
+package com.valleapp.vallecom.pestañas;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.interfaces.IComanda;
-import com.valleapp.valleCOM.R;
+import com.valleapp.vallecom.interfaces.IComanda;
+import com.valleapp.vallecom.R;
 
 /**
  * Created by valle on 12/09/14.

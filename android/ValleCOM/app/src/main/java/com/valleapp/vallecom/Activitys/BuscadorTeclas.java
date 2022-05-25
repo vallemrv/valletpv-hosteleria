@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,9 +19,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.db.DBSubTeclas;
-import com.valleapp.valleCOM.db.DBTeclas;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.db.DBSubTeclas;
+import com.valleapp.vallecom.db.DBTeclas;
 
 import org.json.JSONArray;
 import org.json.JSONException;

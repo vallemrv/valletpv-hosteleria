@@ -1,12 +1,12 @@
-package com.valleapp.valleCOM.db;
+package com.valleapp.vallecom.db;
 
 import android.content.ContentValues;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.valleapp.valleCOM.interfaces.IBaseDatos;
-import com.valleapp.valleCOM.interfaces.IBaseSocket;
+import com.valleapp.vallecom.interfaces.IBaseDatos;
+import com.valleapp.vallecom.interfaces.IBaseSocket;
 
 
 import org.json.JSONArray;

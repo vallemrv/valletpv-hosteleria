@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -16,11 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.db.DBCuenta;
-import com.valleapp.valleCOM.db.DBMesas;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.db.DBCuenta;
+import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.utilidades.ActivityBase;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;

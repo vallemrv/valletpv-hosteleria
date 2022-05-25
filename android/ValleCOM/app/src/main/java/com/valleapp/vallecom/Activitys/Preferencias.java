@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -19,10 +19,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.db.DbTbUpdates;
-import com.valleapp.valleCOM.utilidades.JSON;
-import com.valleapp.valleCOM.adaptadores.AdaptadorEmpresas;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.db.DbTbUpdates;
+import com.valleapp.vallecom.utilidades.JSON;
+import com.valleapp.vallecom.adaptadores.AdaptadorEmpresas;
 
 
 public class Preferencias extends Activity {

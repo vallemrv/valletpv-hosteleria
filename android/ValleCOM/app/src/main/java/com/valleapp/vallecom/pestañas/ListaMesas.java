@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.pestañas;
+package com.valleapp.vallecom.pestañas;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 
-import com.valleapp.valleCOM.R;
+import com.valleapp.vallecom.R;
 
 /**
  * Created by valle on 28/10/14.

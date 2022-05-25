@@ -1,4 +1,4 @@
-package com.valleapp.valleCOM.Activitys;
+package com.valleapp.vallecom.Activitys;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -7,10 +7,10 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ListView;
 
-import com.valleapp.valleCOM.R;
-import com.valleapp.valleCOM.adaptadores.AdaptadorAutorias;
-import com.valleapp.valleCOM.utilidades.ActivityBase;
-import com.valleapp.valleCOM.utilidades.HTTPRequest;
+import com.valleapp.vallecom.R;
+import com.valleapp.vallecom.adaptadores.AdaptadorAutorias;
+import com.valleapp.vallecom.utilidades.ActivityBase;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
