@@ -16,7 +16,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.valleapp.comandas.R;
+import com.valleapp.vallecom.R;
 import com.valleapp.vallecom.interfaces.IPedidos;
 
 
