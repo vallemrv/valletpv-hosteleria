@@ -21,11 +21,9 @@ import java.util.List;
  */
 public class DBCuenta extends DBBase{
 
-
     public DBCuenta(Context context) {
         super(context, "cuenta");
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {

@@ -631,9 +631,13 @@ class Lineaspedido(models.Model):
                     r.delete()
 
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
-           
             if num <= 0:
-                Mesasabiertas.objects.filter(infmesa__pk=uid).delete()
+                for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
+                    obj = m.serialize()
+                    obj["abierta"] = 0
+                    obj["num"] = 0
+                    comunicar_cambios_devices("md", "mesasabiertas", obj)
+                    m.delete()
                 Sync.actualizar(Mesasabiertas._meta.db_table)
 
         return num
@@ -1183,6 +1187,8 @@ class Teclas(models.Model):
         r = self
         teclasseccion = r.teclaseccion_set.all()
         row = model_to_dict(r)
+        row["p1"] = float(r.p1)
+        row["p2"] = float(r.p2)
         row["Precio"] = float(r.p1) 
         row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
         row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1

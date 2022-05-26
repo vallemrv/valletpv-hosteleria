@@ -7,6 +7,7 @@ from django.apps import apps
 from django.forms.models import model_to_dict
 from tokenapi.decorators import token_required
 from django.conf import settings
+from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import Secciones, Teclas, Teclaseccion
 from datetime import datetime
 from django.core.management import call_command
@@ -73,8 +74,10 @@ def mod_sec(request):
         sec.tecla = tecla
         sec.seccion = secundary_sec
         sec.save()
-
-    return JsonResponse(tecla.serialize())
+        
+    obj = tecla.serialize()
+    comunicar_cambios_devices("md", "teclas", obj)
+    return JsonResponse(obj)
 
 
 
