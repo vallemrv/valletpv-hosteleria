@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -19,7 +18,7 @@ public class DBSecciones extends DBBase {
 
 
     public DBSecciones(Context context) {
-        super(context);
+        super(context, "secciones");
     }
 
     @Override
@@ -29,18 +28,24 @@ public class DBSecciones extends DBBase {
                 "icono TEXT, es_promocion TEXT, descuento TEXT)");
     }
 
+
+    @SuppressLint("Range")
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS secciones");
-        onCreate(db);
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("icono", res.getString(res.getColumnIndex("icono")));
+            obj.put("es_promocion", res.getString(res.getColumnIndex("es_promocion")));
+            obj.put("descuento", res.getString(res.getColumnIndex("descuento")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
+
 
     public JSONArray getAll()
     {
@@ -48,35 +53,6 @@ public class DBSecciones extends DBBase {
     }
 
 
-    @SuppressLint("Range")
-    @Override
-    public JSONArray filter(String cWhere) {
-        JSONArray ls = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        if (cWhere != null){
-            cWhere = " WHERE "+ cWhere;
-        }else cWhere = "";
-        Cursor res =  db.rawQuery( "SELECT * FROM secciones " + cWhere , null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("nombre", res.getString(res.getColumnIndex("nombre")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("icono", res.getString(res.getColumnIndex("icono")));
-                obj.put("es_promocion", res.getString(res.getColumnIndex("es_promocion")));
-                obj.put("descuento", res.getString(res.getColumnIndex("descuento")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-
-        return ls;
-    }
 
     @Override
     public void rellenarTabla(JSONArray datos) {
@@ -87,22 +63,20 @@ public class DBSecciones extends DBBase {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("nombre", datos.getJSONObject(i).getString("nombre"));
-                values.put("icono", datos.getJSONObject(i).getString("icono"));
-                values.put("es_promocion", datos.getJSONObject(i).getString("es_promocion"));
-                values.put("descuento", datos.getJSONObject(i).getString("descuento"));
-                db.insert("secciones", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+       super.rellenarTabla(datos);
+    }
 
+    protected ContentValues caragarValues (JSONObject o){
+       ContentValues values = new ContentValues();
+        try{
+            values.put("ID", o.getInt("id"));
+            values.put("nombre", o.getString("nombre"));
+            values.put("icono", o.getString("icono"));
+            values.put("es_promocion", o.getString("es_promocion"));
+            values.put("descuento", o.getString("descuento"));
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
+        return  values;
     }
 }

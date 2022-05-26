@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 import org.json.JSONArray;
@@ -16,18 +17,12 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DbTbUpdates extends SQLiteOpenHelper {
-
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+public class DBTbUpdates extends DBBase {
 
 
-    public String tb_name = "sync";
+    public DBTbUpdates(Context context) {
+        super(context, "sync");
 
-
-    public DbTbUpdates(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        onCreate(this.getWritableDatabase());
     }
 
     @Override
@@ -35,19 +30,31 @@ public class DbTbUpdates extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ tb_name +" (nombre TEXT PRIMARY KEY, last TEXT)");
     }
 
+
+    @SuppressLint("Range")
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS " + tb_name);
-        onCreate(db);
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            obj.put("last", res.getString(res.getColumnIndex("last")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
     }
 
     @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("nombre", o.getString("nombre"));
+            values.put("last", o.getString("last"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  values;
     }
-
 
 
     public void rellenarTabla(JSONArray tb){
@@ -55,57 +62,23 @@ public class DbTbUpdates extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         try{
           db.execSQL("DELETE FROM "+ tb_name);
+          super.rellenarTabla(tb);
         }catch (SQLiteException e){
-            this.onCreate(db);
+            e.printStackTrace();
         }
-       // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i < tb.length(); i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                 ContentValues values = new ContentValues();
-                 values.put("nombre", tb.getJSONObject(i).getInt("nombre"));
-                 values.put("last", tb.getJSONObject(i).getString("last"));
-                 db.insert(tb_name, null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
     }
 
     @SuppressLint("Range")
     public JSONArray getAll()
     {
-        JSONArray ls = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from "+ tb_name, null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("nombre", res.getString(res.getColumnIndex("nombre")));
-                obj.put("last", res.getString(res.getColumnIndex("last")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-
-        return ls;
+        return filter(null);
     }
 
     private boolean hayRegistros(String tb, SQLiteDatabase db){
         boolean hay = false;
        try {
-            Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? ", new String[]{tb});
-            res.moveToFirst();
-            int count = res.getInt(0);
+            int count = count(db, "nombre='"+tb+"'");
             hay = count > 0;
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -123,23 +96,17 @@ public class DbTbUpdates extends SQLiteOpenHelper {
 
 
     public boolean is_updatable(JSONObject obj) {
+        SQLiteDatabase db = this.getReadableDatabase();
         boolean isUp = true;
         try {
-
             String date = obj.getString("last");
             if (date.equals("")) return true;
             String tb = obj.getString("nombre");
-            SQLiteDatabase db = this.getReadableDatabase();
             isUp = !hayRegistros(tb, db);
-
             if (!isUp) {
-                Cursor res = db.rawQuery("select count(*) from " + tb_name + " WHERE nombre = ? AND last < ?", new String[]{tb, date});
-                res.moveToFirst();
-                int count = res.getInt(0);
+                int count = count(db, String.format("nombre='%s' and last < '%s'", tb, date));
                 isUp = count > 0;
-
             }
-
         } catch (Exception e) {
              e.printStackTrace();
         }
@@ -159,23 +126,9 @@ public class DbTbUpdates extends SQLiteOpenHelper {
             }else{
                 db.update(tb_name, v, "nombre = ?",  new String[]{tb});
             }
-
-
         }catch (Exception e){
             e.printStackTrace();
         }
 
-    }
-
-    public void setLast(String tb, String last) {
-        SQLiteDatabase db;
-        try{
-            db = getWritableDatabase();
-            ContentValues v = new ContentValues();
-            v.put("last", last);
-            db.update(tb_name, v, "nombre = ? ", new String[]{tb});
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 }

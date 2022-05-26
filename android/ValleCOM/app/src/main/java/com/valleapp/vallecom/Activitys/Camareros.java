@@ -75,8 +75,7 @@ public class Camareros extends ActivityBase {
                     e.printStackTrace();
                 }
             }else{
-                Log.i("cargado", "carga de camarero");
-                mostrarListado();
+                 mostrarListado();
             }
         }
     };
@@ -116,7 +115,6 @@ public class Camareros extends ActivityBase {
             lscam = dbCamareros.getAutorizados(true);
             TableLayout ll = findViewById(id.pneCamareros);
             ll.removeAllViews();
-
             if(lscam.size()>0){
                 TableLayout.LayoutParams params = new TableLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,

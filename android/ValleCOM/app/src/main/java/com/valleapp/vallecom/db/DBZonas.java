@@ -18,15 +18,10 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
-
+public class DBZonas extends DBBase {
 
     public DBZonas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, "zonas");
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -49,35 +44,6 @@ public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
        return filter(null);
     }
 
-    @Override
-    @SuppressLint("Range")
-    public JSONArray filter(String cWhere) {
-        String w = "";
-        if (cWhere != null){
-            w = " WHERE "+cWhere;
-        }
-        JSONArray lista = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from zonas"+w, null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject cam = new JSONObject();
-                cam.put("Nombre",res.getString(res.getColumnIndex("Nombre")));
-                cam.put("ID", res.getString(res.getColumnIndex("ID")));
-                cam.put("Tarifa", res.getString(res.getColumnIndex("Tarifa")));
-                cam.put("RGB", res.getString(res.getColumnIndex("RGB")));
-                lista.put(cam);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-
-        return lista;
-    }
 
     @Override
     public void rellenarTabla(JSONArray objs) {
@@ -90,26 +56,35 @@ public class DBZonas extends SQLiteOpenHelper implements IBaseDatos {
             this.onCreate(db);
         }
 
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<objs.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", objs.getJSONObject(i).getInt("id"));
-                values.put("Nombre", objs.getJSONObject(i).getString("nombre"));
-                values.put("RGB", objs.getJSONObject(i).getString("rgb"));
-                values.put("Tarifa", objs.getJSONObject(i).getString("tarifa"));
-                db.insert("zonas", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
+        super.rellenarTabla(objs);
     }
 
     @Override
-    public void inicializar() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        this.onCreate(db);
+    @SuppressLint("Range")
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject o = new JSONObject();
+        try {
+            o.put("Nombre",res.getString(res.getColumnIndex("Nombre")));
+            o.put("ID", res.getString(res.getColumnIndex("ID")));
+            o.put("Tarifa", res.getString(res.getColumnIndex("Tarifa")));
+            o.put("RGB", res.getString(res.getColumnIndex("RGB")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return o;
+    }
+
+    @Override
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("Nombre", o.getString("nombre"));
+            values.put("RGB", o.getString("rgb"));
+            values.put("Tarifa", o.getString("tarifa"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  values;
     }
 }

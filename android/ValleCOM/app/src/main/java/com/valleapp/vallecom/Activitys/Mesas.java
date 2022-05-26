@@ -66,11 +66,16 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     JSONArray peticiones = new JSONArray();
     boolean viendo_mensajes = false;
 
-
-
     private final Handler handlerMesas = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-           rellenarZonas();
+            findViewById(R.id.loading).setVisibility(View.GONE);
+            rellenarZonas();
+        }
+    };
+
+    private final Handler handlerPedidos = new Handler(Looper.getMainLooper()) {
+        public void handleMessage(Message msg) {
+            rellenarPedido();
         }
     };
 
@@ -139,10 +144,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 case "reenviar":
                     mostrarToast("Peticion enviadaaa");
                     break;
-                case "mostrarmesas":
-                    rellenarZonas();
-                    findViewById(R.id.loading).setVisibility(View.GONE);
-                    break;
             }
         }
     };
@@ -165,24 +166,15 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if (myServicio != null){
-                myServicio.setExHandler("mesasabiertas", handlerMesas );
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                myServicio.setExHandler("mesasabiertas", handlerMesas );
+                myServicio.setExHandler("zonas", handlerMesas );
+                myServicio.setExHandler("mesas", handlerMesas );
                 myServicio.setExHandler("mensajes", handlerMensajes);
+                myServicio.setExHandler("lineaspedido", handlerPedidos);
                 myServicio.setCamarero(cam); //debe de ir despues de setExHandler....
-                Timer t = new Timer();
-                t.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                    Message msg = handlerOperaciones.obtainMessage();
-                    Bundle b = msg.getData();
-                    if (b == null) b = new Bundle();
-                    b.putString("op", "mostrarmesas");
-                    msg.setData(b);
-                    handlerOperaciones.sendMessage(msg);
-                    }
-                },1000);
             }
         }
 
@@ -344,7 +336,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
                 }
                 rellenarPedido();
-                getPendientes();
             }
 
         }catch (Exception e){
@@ -362,27 +353,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     }
 
-    public void getPendientes(){
-        rellenarPedido();
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-            try {
-                if (zn != null) {
-                    ContentValues p = new ContentValues();
-                    String idz = zn.getString("ID");
-                    JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta WHERE IDZona="+idz);
-                    p.put("idz", idz);
-                    p.put("lineas", lineas.toString());
-                    new HTTPRequest(server+"/pedidos/getpendientes", p, "pedidos", handlerOperaciones);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            }
-        }, 1000);
-    }
 
     public void clickServido(View v){
         try {

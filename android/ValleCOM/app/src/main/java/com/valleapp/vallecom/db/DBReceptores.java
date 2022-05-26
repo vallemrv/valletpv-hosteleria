@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class DBReceptores extends DBBase {
 
     public DBReceptores(Context context) {
-        super(context);
+        super(context, "receptores");
     }
 
     @Override
@@ -27,17 +27,30 @@ public class DBReceptores extends DBBase {
         db.execSQL("CREATE TABLE IF NOT EXISTS receptores (ID INTEGER PRIMARY KEY, nombre TEXT)");
     }
 
+    @SuppressLint("Range")
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS receptores");
-        onCreate(db);
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject receptor = new JSONObject();
+        try {
+            receptor.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            receptor.put("ID", res.getString(res.getColumnIndex("ID")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return receptor;
     }
 
     @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues v = new ContentValues();
+        try {
+            v.put("nombre", o.getString("nombre"));
+            v.put("ID", o.getString("ID"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  v;
     }
 
 
@@ -50,44 +63,21 @@ public class DBReceptores extends DBBase {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i < datos.length(); i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("nombre", datos.getJSONObject(i).getString("nombre"));
-                db.insert("receptores", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
+        super.rellenarTabla(datos);
     }
 
 
 
-    @SuppressLint("Range")
     public ArrayList<JSONObject> getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from receptores WHERE nombre NOT LIKE '%Nulo%' ", null );
         res.moveToFirst();
         ArrayList<JSONObject>  ls = new ArrayList<>();
         res.moveToFirst();
-
         while(!res.isAfterLast()){
-            try{
-                JSONObject receptor = new JSONObject();
-                receptor.put("nombre", res.getString(res.getColumnIndex("nombre")));
-                receptor.put("ID", res.getString(res.getColumnIndex("ID")));
-                ls.add(receptor);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            ls.add(cursorToJSON(res));
             res.moveToNext();
         }
-     ;
         return ls;
     }
 

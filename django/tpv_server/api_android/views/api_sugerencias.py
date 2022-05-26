@@ -23,6 +23,6 @@ def sugerencia_add(request):
         sugerencia.save()
         r = sugerencia
         
-    comunicar_cambios_devices("insert", "subteclas", model_to_dict(r))
+    comunicar_cambios_devices("insert", "sugerencias", model_to_dict(r))
 
     return HttpResponse("success")

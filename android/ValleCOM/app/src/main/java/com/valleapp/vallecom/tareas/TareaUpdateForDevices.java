@@ -46,5 +46,6 @@ public class TareaUpdateForDevices extends TimerTask {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
     }
 }

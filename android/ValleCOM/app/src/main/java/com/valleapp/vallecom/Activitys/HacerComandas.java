@@ -81,7 +81,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if (myServicio != null){
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
-                dbSecciones = (DBSecciones) myServicio.getDb("secciones_com");
+                dbSecciones = (DBSecciones) myServicio.getDb("seccionescom");
                 dbTeclas = (DBTeclas) myServicio.getDb("teclas");
                 dbSubTeclas = (DBSubTeclas) myServicio.getDb("subteclas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");

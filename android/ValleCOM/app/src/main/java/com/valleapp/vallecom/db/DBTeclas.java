@@ -18,9 +18,9 @@ import org.json.JSONObject;
  */
 public class DBTeclas extends DBBase {
 
-
+    int tarifa= 1;
     public DBTeclas(Context context) {
-        super(context);
+        super(context, "teclas");
     }
 
     @Override
@@ -32,61 +32,75 @@ public class DBTeclas extends DBBase {
                 " descripcion_t TEXT, descripcion_r TEXT, tipo TEXT )");
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS teclas");
-        onCreate(db);
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
     @SuppressLint("Range")
-    private JSONArray cargarRegistros(String sql, int tarifa){
+    @Override
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
 
+            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+            obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
+            obj.put("tipo", res.getString(res.getColumnIndex("tipo")));
+            if (tarifa == 2) obj.put("Precio", res.getString(res.getColumnIndex("P2")));
+            else obj.put("Precio", res.getString(res.getColumnIndex("P1")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+
+    @Override
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("IDSeccion", o.getInt("IDSeccion"));
+            values.put("Nombre", o.getString("nombre"));
+            values.put("P1", o.getDouble("p1"));
+            values.put("P2", o.getDouble("p2"));
+            values.put("Precio", o.getDouble("Precio"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("Tag", o.getString("tag"));
+            values.put("IDSec2", o.getString("IDSec2"));
+            values.put("Orden", o.getString("orden"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+            values.put("descripcion_r", o.getString("descripcion_r"));
+            values.put("tipo", o.getString("tipo"));
+            values.put("IDSeccionCom", o.getString("IDSeccionCom"));
+            values.put("OrdenCom", o.getString("OrdenCom"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return values;
+    }
+
+
+
+    private JSONArray cargarRegistros(String sql, int tarifa){
+        this.tarifa = tarifa;
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( sql, null );
         res.moveToFirst();
         while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
-                obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
-                obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
-                obj.put("tipo", res.getString(res.getColumnIndex("tipo")));
-                if (tarifa == 2)   obj.put("Precio", res.getString(res.getColumnIndex("P2")));
-                else  obj.put("Precio", res.getString(res.getColumnIndex("P1")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            ls.put(cursorToJSON(res));
             res.moveToNext();
-
         }
-     ;
         return ls;
-
     }
 
 
-    public JSONArray getAll(String id, int tarifa)
-    {
+    public JSONArray getAll(String id, int tarifa) {
         return cargarRegistros("SELECT * FROM teclas WHERE IDSeccionCom="+id+" ORDER BY OrdenCom DESC", tarifa);
     }
-
 
     public JSONArray findLike(String str, String t) {
         return cargarRegistros("SELECT DISTINCT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
     }
-
 
     @Override
     public void rellenarTabla(JSONArray datos) {
@@ -97,32 +111,7 @@ public class DBTeclas extends DBBase {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("IDSeccion", datos.getJSONObject(i).getInt("IDSeccion"));
-                values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
-                values.put("P1", datos.getJSONObject(i).getDouble("p1"));
-                values.put("P2", datos.getJSONObject(i).getDouble("p2"));
-                values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));
-                values.put("RGB", datos.getJSONObject(i).getString("RGB"));
-                values.put("Tag", datos.getJSONObject(i).getString("tag"));
-                values.put("IDSec2", datos.getJSONObject(i).getString("IDSec2"));
-                values.put("Orden", datos.getJSONObject(i).getString("orden"));
-                values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
-                values.put("descripcion_r", datos.getJSONObject(i).getString("descripcion_r"));
-                values.put("tipo", datos.getJSONObject(i).getString("tipo"));
-                values.put("IDSeccionCom", datos.getJSONObject(i).getString("IDSeccionCom"));
-                values.put("OrdenCom", datos.getJSONObject(i).getString("OrdenCom"));
-                db.insert("teclas", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
+        super.rellenarTabla(datos);
 ;
     }
 

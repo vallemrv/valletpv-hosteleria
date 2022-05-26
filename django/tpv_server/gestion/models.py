@@ -127,6 +127,7 @@ class Sync(models.Model):
         sync.nombre = tb_name.lower()
         sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         sync.save()
+       
       
 class Arqueocaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -1404,11 +1405,13 @@ class Zonas(models.Model):
     
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
+        Sync.actualizar("mesas")
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
+        Sync.actualizar("mesas")
         return super().delete(*args, **kwargs)
 
 

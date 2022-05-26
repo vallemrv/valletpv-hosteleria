@@ -5,7 +5,6 @@
 # @Last modified time: 2019-04-26T14:53:11+02:00
 # @License: Apache License v2.0
 
-from cmath import inf
 from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
@@ -24,26 +23,51 @@ def find(id, lineas):
 @csrf_exempt
 def  get_pendientes(request):
     idz = request.POST["idz"]
-    lineas = json.loads(request.POST["lineas"])
     mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz).distinct()
+    lineas = json.loads(request.POST["lineas"])
     result = []
     lineas_server = []
     
     for m in mesas:
         lineas_server = [*lineas_server, *m.get_lineaspedido()]
 
-    if len(lineas_server) > 0:
-        for l in lineas_server:
-            linea = find(l["ID"], lineas)
-            if linea:
-                if not Lineaspedido.is_equals(l, linea):
-                    result.append({'op':'md', 'reg': l})
-            else:
-                result.append({'op':'insert', 'reg': l})
-                
-        for l in lineas:
-            result.append({'op':'rm', 'reg': {"ID":l["ID"]}})   
+    
+    for l in lineas_server:
+        linea = find(l["ID"], lineas)
+        if linea:
+            if not Lineaspedido.is_equals(l, linea):
+                result.append({'op':'md', 'tb':"lineaspedido", 'reg': l})
+        else:
+            result.append({'op':'insert', 'tb':"lineaspedido", 'reg': l})
+            
+    for l in lineas:
+        result.append({'op':'rm', 'tb':"lineaspedido", 'reg': {"ID":l["ID"]}})   
+    
+    return JsonResponse(result)    
 
+@csrf_exempt
+def  comparar_lineaspedido(request):
+    mesas = Mesasabiertas.objects.all()
+    lineas = json.loads(request.POST["lineas"])
+    result = []
+    lineas_server = []
+    
+    for m in mesas:
+        lineas_server = [*lineas_server, *m.get_lineaspedido()]
+
+    #if len(lineas_server) > 0:
+    for l in lineas_server:
+        linea = find(l["ID"], lineas)
+        if linea:
+            if not Lineaspedido.is_equals(l, linea):
+                result.append({'op':'md', 'tb':"lineaspedido", 'obj': l})
+        else:
+            result.append({'op':'insert', 'tb':"lineaspedido", 'obj': l})
+            
+    for l in lineas:
+        result.append({'op':'rm', 'tb':"lineaspedido", 'obj': {"ID":l["ID"]}})   
+
+    
     return JsonResponse(result)
 
 @csrf_exempt

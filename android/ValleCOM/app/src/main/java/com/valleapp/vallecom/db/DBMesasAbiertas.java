@@ -14,12 +14,10 @@ import org.json.JSONObject;
 
 public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
-     DBMesas db;
-
+    DBMesas db;
     public DBMesasAbiertas(DBMesas db){
         this.db = db;
     }
-
 
     @Override
     public JSONArray filter(String cWhere) {
@@ -48,7 +46,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -61,8 +58,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
     @Override
     public void insert(JSONObject o) {
-        try{
-        }catch (Exception e){}
     }
 
     @Override
@@ -73,7 +68,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
             values.put("abierta", o.getString("abierta"));
             values.put("num", o.getInt("num"));
             dbsql.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
-
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -21,7 +21,7 @@ public class DBSugerencias extends DBBase {
 
 
     public DBSugerencias(Context context) {
-        super(context);
+        super(context, "sugerencias");
     }
 
     @Override
@@ -29,70 +29,42 @@ public class DBSugerencias extends DBBase {
         db.execSQL("CREATE TABLE IF NOT EXISTS "+ tb_name +" (ID TEXT PRIMARY KEY, IDTecla TEXT, sugerencia TEXT )");
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS " + tb_name);
-        onCreate(db);
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
-
     @SuppressLint("Range")
     @Override
-    public JSONArray filter(String cWhere){
-        JSONArray ls = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        if (cWhere != null) cWhere = " WHERE "+ cWhere;
-        else cWhere = "";
-        Cursor res =  db.rawQuery( "select * from "+ tb_name + cWhere, null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("sugerencia", res.getString(res.getColumnIndex("sugerencia")));
-                obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            res.moveToNext();
-
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("sugerencia", res.getString(res.getColumnIndex("sugerencia")));
+            obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
-        return ls;
+        return obj;
     }
 
     @Override
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("IDTecla",o.getString("tecla"));
+            values.put("sugerencia",o.getString("sugerencia"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  values;
+    }
+    
+    @Override
     public void rellenarTabla(JSONArray tb){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
         try{
-          db.execSQL("DELETE FROM "+ tb_name);
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.execSQL("DELETE FROM "+ tb_name);
+            super.rellenarTabla(tb);
         }catch (SQLiteException e){
-            this.onCreate(db);
+           e.printStackTrace();
         }
-       // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i < tb.length(); i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", tb.getJSONObject(i).getInt("id"));
-                values.put("IDTecla", tb.getJSONObject(i).getString("tecla"));
-                values.put("sugerencia", tb.getJSONObject(i).getString("sugerencia"));
-                 db.insert(tb_name, null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
     }
 
     public JSONArray getAll()
