@@ -44,11 +44,12 @@ def cambiarmesas(request):
 def mvlinea(request):
     idm = request.POST["idm"];
     idLinea = request.POST["idLinea"];
-    linea = Lineaspedido.objects.get(pk=idLinea)
+    linea = Lineaspedido.objects.filter(pk=idLinea).first()
     if linea:
          pedido = Pedidos.objects.get(pk=linea.pedido_id)
          idc = pedido.camarero_id;
          uid = linea.infmesa.uid;
+         linea.infmesa.modifiar_composicion(linea)
          mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
          if not mesa:
              infmesa = Infmesa()
@@ -73,6 +74,8 @@ def mvlinea(request):
          linea.infmesa_id =  mesa.infmesa.pk
          linea.pedido_id = pedido.pk
          linea.save()
+         mesa.infmesa.unir_en_grupos()
+         mesa.infmesa.componer_articulos()
          comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
 
          numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__uid=uid)).count()
@@ -84,7 +87,7 @@ def mvlinea(request):
                 comunicar_cambios_devices("md", "mesasabiertas", obj)
                 m.delete()
             Sync.actualizar(Mesasabiertas._meta.db_table)
-
+         
 
     return HttpResponse('success')
 

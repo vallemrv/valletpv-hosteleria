@@ -472,6 +472,35 @@ class Infmesa(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase.
 
+    def modifiar_composicion(self, linea):
+        if linea.es_compuesta:
+            familia = linea.tecla.familia
+            try:
+                composicion = json.loads(familia.composicion.replace("'", '"'))
+            except:
+                composicion = []
+            if (len(composicion) > 0):
+                for a in self.lineaspedido_set.filter(estado="R", tecla__familia__nombre__in=composicion).order_by("-id"):
+                    print(a.tecla.nombre, "modificar composicion")
+                    if linea.cantidad == 0:
+                        break;
+                    mesa_a = Mesasabiertas.objects.filter(infmesa=self).first()
+                    tarifa = 1
+                    if mesa_a:
+                        mz = Mesaszona.objects.filter(mesa__pk=mesa_a.mesa_id).first()
+                        if mz:
+                            tarifa = mz.zona.tarifa
+                        
+                    a.precio = a.tecla.p1 if tarifa == 1 else a.tecla.p2
+                    a.estado = "P"
+                    a.save()
+                    comunicar_cambios_devices("insert", "lineaspedido", a.serialize())
+                    linea.cantidad -= 1
+
+                linea.es_compuesta = False
+                linea.save()
+
+
     def unir_en_grupos(self):
         grupos = self.lineaspedido_set.filter(tecla_id__in=ComposicionTeclas.objects.values_list("tecla_id"))
         for gr in grupos:
@@ -510,6 +539,7 @@ class Infmesa(models.Model):
         lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
         for l in lineas:
+            print(l.tecla.nombre, "crear composicion")
             if hasattr(l.tecla, "familia"):
                 familia = l.tecla.familia
                 try:
@@ -528,6 +558,7 @@ class Infmesa(models.Model):
                                 a.precio = 0
                                 a.estado = "R"
                                 a.save()
+                                print(a.tecla.nombre, a.estado)
                                 comunicar_cambios_devices("md", "lineaspedido", a.serialize())
                                 obj_comp.append(a.id)
                                 cantidad = cantidad - 1
@@ -630,6 +661,7 @@ class Lineaspedido(models.Model):
                 else:
                     r.delete()
 
+            mesa.infmesa.comprobar_grupos()
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if num <= 0:
                 for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
@@ -741,7 +773,7 @@ class Mesasabiertas(models.Model):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if mesa:
             uid = mesa.infmesa.pk
-            reg = Lineaspedido.objects.filter(estado="P", infmesa__pk=uid)
+            reg = Lineaspedido.objects.filter((Q(estado="P") | Q(estado="M") | Q(estado="R")) & Q(infmesa__pk=uid))
             for r in reg:
                 historial = Historialnulos()
                 historial.lineapedido_id = r.pk
@@ -751,7 +783,7 @@ class Mesasabiertas(models.Model):
                 historial.save()
                 r.estado = 'A'
                 r.save()
-                comunicar_cambios_devices("md", "lineaspedido", r.serialize())
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
 
 
             obj = mesa.serialize()
@@ -778,8 +810,6 @@ class Mesasabiertas(models.Model):
                 comunicar_cambios_devices("md", "mesasabiertas", {"ID":idp,"num":0, "abierta":0})
             else:
                 Sync.actualizar("mesasabiertas")
-
-            
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):

@@ -46,9 +46,12 @@ public class DBCuenta extends DBBase  {
             obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
             int index_can = res.getColumnIndex("Can");
             if (index_can >=  0) {
-                obj.put("Can", res.getString(res.getColumnIndex("Can")));
+                obj.put("Can", res.getString(index_can));
+            }
+            int index_total = res.getColumnIndex("Total");
+            if (index_total >= 0){
+                obj.put("Total", res.getString(index_total));
                 obj.put("CanCobro", 0);
-                obj.put("Total", res.getString(res.getColumnIndex("Total")));
             }
             obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
             obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
