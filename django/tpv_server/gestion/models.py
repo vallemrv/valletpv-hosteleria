@@ -967,11 +967,13 @@ class Secciones(models.Model):
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
+        Sync.actualizar("teclas")
         return super().save(*args, **kwargs)
         
 
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
+        Sync.actualizar("teclas")
         return super().delete(*args, **kwargs)
 
 

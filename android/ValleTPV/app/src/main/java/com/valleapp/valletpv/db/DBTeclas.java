@@ -6,27 +6,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
 /**
  * Created by valle on 13/10/14.
  */
-public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
+public class DBTeclas extends DBBase {
 
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
+    private int tarifa;
 
     public DBTeclas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, "teclas");
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -36,56 +29,31 @@ public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
                 " descripcion_t TEXT, descripcion_r TEXT )");
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS teclas");
-        onCreate(db);
-    }
 
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
-    @SuppressLint("Range")
-    private JSONArray cargarRegistros(String sql, int tarifa){
+    private JSONArray cargarRegistros(String sql){
 
         JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( sql, null );
         res.moveToFirst();
         while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
-                obj.put("tipo", res.getString(res.getColumnIndex("tipo")));
-                obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
-                obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
-                if (tarifa == 2)   obj.put("Precio", res.getString(res.getColumnIndex("P2")));
-                else  obj.put("Precio", res.getString(res.getColumnIndex("P1")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            ls.put(cursorToJSON(res));
             res.moveToNext();
-
         }
         return ls;
-
     }
 
 
     public JSONArray getAll(String id, int tarifa)
     {
-        return cargarRegistros("SELECT * FROM teclas WHERE IDSeccion="+id +" OR IDSec2="+id+" ORDER BY Orden DESC", tarifa);
+        this.tarifa = tarifa;
+        return cargarRegistros("SELECT * FROM teclas WHERE IDSeccion="+id +" OR IDSec2="+id+" ORDER BY Orden DESC");
     }
 
 
     public JSONArray findLike(String str, String t) {
-        return cargarRegistros("SELECT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ", Integer.parseInt(t));
+        this.tarifa = Integer.parseInt(t);
+        return cargarRegistros("SELECT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ");
     }
 
 
@@ -98,30 +66,7 @@ public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("IDSeccion", datos.getJSONObject(i).getInt("IDSeccion"));
-                values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
-                values.put("P1", datos.getJSONObject(i).getDouble("p1"));
-                values.put("P2", datos.getJSONObject(i).getDouble("p2"));
-                values.put("Precio", datos.getJSONObject(i).getDouble("Precio"));
-                values.put("RGB", datos.getJSONObject(i).getString("RGB"));
-                values.put("Tag", datos.getJSONObject(i).getString("tag"));
-                values.put("IDSec2", datos.getJSONObject(i).getString("IDSec2"));
-                values.put("Orden", datos.getJSONObject(i).getString("orden"));
-                values.put("tipo", datos.getJSONObject(i).getString("tipo"));
-                values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
-                values.put("descripcion_r", datos.getJSONObject(i).getString("descripcion_r"));
-                db.insert("teclas", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
+        super.rellenarTabla(datos);
     }
 
     @Override
@@ -130,11 +75,46 @@ public class DBTeclas extends SQLiteOpenHelper implements IBaseDatos {
         this.onCreate(db);
     }
 
-
+    @SuppressLint("Range")
+    @Override
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
+            obj.put("tipo", res.getString(res.getColumnIndex("tipo")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+            obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
+            if (tarifa == 2) obj.put("Precio", res.getString(res.getColumnIndex("P2")));
+            else obj.put("Precio", res.getString(res.getColumnIndex("P1")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  obj;
+    }
 
     @Override
-    public JSONArray filter(String cWhere) {
-        return null;
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("IDSeccion", o.getInt("IDSeccion"));
+            values.put("Nombre", o.getString("nombre"));
+            values.put("P1", o.getDouble("p1"));
+            values.put("P2", o.getDouble("p2"));
+            values.put("Precio", o.getDouble("Precio"));
+            values.put("RGB", o.getString("RGB"));
+            values.put("Tag", o.getString("tag"));
+            values.put("IDSec2", o.getString("IDSec2"));
+            values.put("Orden", o.getString("orden"));
+            values.put("tipo", o.getString("tipo"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+            values.put("descripcion_r", o.getString("descripcion_r"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return values;
     }
 
 }

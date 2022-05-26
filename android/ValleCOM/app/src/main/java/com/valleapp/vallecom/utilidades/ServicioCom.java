@@ -85,7 +85,6 @@ public class ServicioCom extends Service {
 
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
-                    // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
                     //comprobamos los datos cada vez que se conecte.
                     actualizarCamareros();

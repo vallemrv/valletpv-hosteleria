@@ -4,14 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import com.valleapp.valletpv.interfaces.IBaseDatos;
-import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,14 +19,11 @@ import java.util.List;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSocket {
+public class DBCuenta extends DBBase{
 
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
 
     public DBCuenta(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, "cuenta");
     }
 
 
@@ -39,42 +31,23 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
     public void onCreate(SQLiteDatabase db) {
          db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
-                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, IDPedido INTEGER, " +
+                "Descripcion TEXT, descripcion_t TEXT, " +
+                "Precio DOUBLE, IDPedido INTEGER, " +
                 "IDMesa INTEGER," +
                 "IDArt INTEGER," +
                 "nomMesa TEXT, IDZona TEXT," +
                 "servido INTEGER )");
-
     }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE  IF EXISTS cuenta");
-        onCreate(db);
-    }
-
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
 
     @Override
     public JSONArray filter(String cWhere) {
-
         String strWhere = "";
         if (cWhere != null){
             strWhere = " WHERE "+ cWhere;
         }
-
-        JSONArray lista  = execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
+        return execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
                 " FROM cuenta " + strWhere +
                 " GROUP BY  IDArt,  Descripcion, Precio, Estado ORDER BY ID DESC");
-
-
-        return lista;
     }
 
     public List<JSONObject> filterList(String cWhere) {
@@ -90,7 +63,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
                     " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
-                lista.add(cargarRegistro(res));
+                lista.add(cursorToJSON(res));
                 res.moveToNext();
             }
 
@@ -101,7 +74,7 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
     }
 
 
-    private ContentValues caragarValues(JSONObject o){
+    protected ContentValues caragarValues(JSONObject o){
         ContentValues values = new ContentValues();
         try {
             values.put("ID", o.getString("ID"));
@@ -129,18 +102,15 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         SQLiteDatabase db = this.getReadableDatabase();
         double s = 0.0;
         try {
-            Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
+            @SuppressLint("Recycle") Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
                     "FROM cuenta WHERE IDMesa=" + id+ " AND (estado = 'N' or estado ='P')", null);
             cursor.moveToFirst();
             if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
                 s = cursor.getDouble(0);
             }
-
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
-
-
         return s;
     }
 
@@ -149,15 +119,14 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         try{
             ContentValues values = new ContentValues();
             values.put("IDMesa", id1);
-            db.update("cuenta", values, "IDMesa="+id, null);
+            db.update("cuenta", values, "IDMesa="+id +" AND estado != 'N'", null);
         }catch (SQLiteException e){
             e.printStackTrace();
         }
-
     }
 
     @SuppressLint("Range")
-    JSONObject cargarRegistro(Cursor res){
+    protected JSONObject cursorToJSON(Cursor res){
 
         JSONObject obj = new JSONObject();
         try{
@@ -166,9 +135,12 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
             obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
             int index_can = res.getColumnIndex("Can");
             if (index_can >=  0) {
-                obj.put("Can", res.getString(res.getColumnIndex("Can")));
+                obj.put("Can", res.getString(index_can));
+            }
+            int index_total = res.getColumnIndex("Total");
+            if (index_total >= 0){
+                obj.put("Total", res.getString(index_total));
                 obj.put("CanCobro", 0);
-                obj.put("Total", res.getString(res.getColumnIndex("Total")));
             }
             obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
             obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
@@ -190,82 +162,10 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         JSONArray ls = new JSONArray();
         res.moveToFirst();
         while (!res.isAfterLast()){
-            ls.put(cargarRegistro(res));
+            ls.put(cursorToJSON(res));
             res.moveToNext();
         }
-
         return  ls;
-    }
-
-    private int count(SQLiteDatabase db, String cWhere){
-        String w = "";
-        if (cWhere != null){
-            w = " WHERE "+cWhere;
-        }
-        Cursor mCount= db.rawQuery("select count(*) from cuenta "+ w, null);
-        mCount.moveToFirst();
-        return  mCount.getInt(0);
-    }
-
-    public void showDatos(String cWhere){
-        SQLiteDatabase db = getReadableDatabase();
-        String w = "";
-        if (cWhere != null){
-            w = " WHERE "+cWhere;
-        }
-        Cursor res= db.rawQuery("select * from cuenta "+ w, null);
-        res.moveToFirst();
-        while (!res.isAfterLast()){
-            String dta = "";
-            for (int i=0; i< res.getColumnCount(); i++) {
-                dta += res.getColumnName(i)+ "="+ res.getString(i) + " - ";
-            }
-            Log.i("SHOWDATA", dta);
-            res.moveToNext();
-        }
-
-    }
-
-    @Override
-    public void insert(JSONObject o) {
-        SQLiteDatabase db = getWritableDatabase();
-        try{
-            String id = o.getString("ID");
-            int count = count(db, "ID="+id);
-            ContentValues values = caragarValues(o);
-            synchronized (db) {
-                if (count == 0) {
-                    db.insert("cuenta", null, values);
-                } else {
-                    db.update("cuenta", values, "ID=?", new String[]{id});
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void update(JSONObject o) {
-        SQLiteDatabase db = getWritableDatabase();
-        try{
-            String id = o.getString("ID");
-            ContentValues values = caragarValues(o);
-            db.update("cuenta", values, "ID=?", new String[]{id});
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void rm(JSONObject o) {
-        SQLiteDatabase db = getWritableDatabase();
-        try{
-            db.delete("cuenta", "ID=?", new String[]{o.getString("ID")});
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     public void rellenarTabla(JSONArray datos){
@@ -279,15 +179,8 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
 
-    @Override
-    public void inicializar() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        this.onCreate(db);
-    }
 
     public void replaceMesa(JSONArray datos, String IDMesa){
         // Gets the data repository in write mode
@@ -300,7 +193,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     public void addArt(int IDMesa,  JSONObject art){
@@ -348,7 +240,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (SQLiteException e) {
             e.printStackTrace();
         }
-
     }
 
     public void aparcar(String id){
@@ -358,7 +249,6 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
         }catch (SQLiteException e){
             e.printStackTrace();
         }
-
     }
 
     @SuppressLint("Range")
@@ -372,30 +262,13 @@ public class DBCuenta extends SQLiteOpenHelper  implements IBaseDatos, IBaseSock
                     " Group by IDArt, Descripcion, Precio, Estado", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("Descripcion", res.getString(res.getColumnIndex("Descripcion")));
-                    obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
-                    obj.put("Can", res.getString(res.getColumnIndex("Can")));
-                    obj.put("Precio", res.getString(res.getColumnIndex("Precio")));
-                    obj.put("IDArt", res.getString(res.getColumnIndex("IDArt")));
-                    lista.put(obj);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                lista.put(cursorToJSON(res));
                 res.moveToNext();
-
             }
-
         }catch (SQLiteException e){
            e.printStackTrace();
         }
-
         return lista;
     }
-
-
-
 }
 

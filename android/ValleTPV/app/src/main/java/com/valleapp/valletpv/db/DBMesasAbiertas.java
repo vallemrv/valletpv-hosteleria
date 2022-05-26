@@ -1,17 +1,13 @@
 package com.valleapp.valletpv.db;
 
 import android.content.ContentValues;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.Console;
 
 public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
@@ -20,7 +16,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
     public DBMesasAbiertas(DBMesas db){
         this.db = db;
     }
-
 
     @Override
     public JSONArray filter(String cWhere) {

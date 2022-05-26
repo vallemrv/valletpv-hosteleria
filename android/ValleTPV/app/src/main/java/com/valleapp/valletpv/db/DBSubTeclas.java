@@ -6,27 +6,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-
-import com.valleapp.valletpv.interfaces.IBaseDatos;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
 /**
  * Created by valle on 13/10/14.
  */
-public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
-
+public class DBSubTeclas extends DBBase {
 
     public DBSubTeclas(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, "subteclas");
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -35,45 +26,6 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
                 " descripcion_t TEXT, descripcion_r TEXT)");
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS subteclas");
-        onCreate(db);
-    }
-
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
-    @Override
-    @SuppressLint("Range")
-    public JSONArray filter(String cWhere) {
-        String w = "";
-        if (cWhere != null){
-            w = " WHERE "+cWhere;
-        }
-        JSONArray ls = new JSONArray();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM subteclas "+w, null );
-        res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("Incremento", res.getString(res.getColumnIndex("Incremento")));
-                obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
-                obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
-                ls.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            res.moveToNext();
-
-        }
-        return ls;
-    }
 
     @Override
     public void rellenarTabla(JSONArray datos){
@@ -84,26 +36,8 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-       // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                 ContentValues values = new ContentValues();
-                 values.put("ID", datos.getJSONObject(i).getInt("id"));
-                 values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
-                 values.put("Incremento", datos.getJSONObject(i).getString("incremento"));
-                 values.put("IDTecla", datos.getJSONObject(i).getString("tecla"));
-                 values.put("descripcion_r", datos.getJSONObject(i).getString("descripcion_r"));
-                 values.put("descripcion_t", datos.getJSONObject(i).getString("descripcion_t"));
-                 db.insert("subteclas", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
+       super.rellenarTabla(datos);
     }
-
 
     public JSONArray getAll(String id)
     {
@@ -114,5 +48,38 @@ public class DBSubTeclas extends SQLiteOpenHelper implements IBaseDatos {
     public void inicializar() {
         SQLiteDatabase db = this.getWritableDatabase();
         this.onCreate(db);
+    }
+
+    @SuppressLint("Range")
+    @Override
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
+            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("Incremento", res.getString(res.getColumnIndex("Incremento")));
+            obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
+            obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    @Override
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("Nombre", o.getString("nombre"));
+            values.put("Incremento", o.getString("incremento"));
+            values.put("IDTecla", o.getString("tecla"));
+            values.put("descripcion_r", o.getString("descripcion_r"));
+            values.put("descripcion_t", o.getString("descripcion_t"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return values;
     }
 }

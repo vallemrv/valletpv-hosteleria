@@ -6,12 +6,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -22,7 +18,6 @@ public class DBTbUpdates extends DBBase {
 
     public DBTbUpdates(Context context) {
         super(context, "sync");
-
     }
 
     @Override

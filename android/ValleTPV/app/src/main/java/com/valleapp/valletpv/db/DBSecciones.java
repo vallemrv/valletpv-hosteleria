@@ -18,71 +18,40 @@ import org.json.JSONObject;
 /**
  * Created by valle on 13/10/14.
  */
-public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
-
-    // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "valletpv";
-
+public class DBSecciones extends DBBase {
 
     public DBSecciones(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, "secciones");
     }
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS secciones (ID INTEGER PRIMARY KEY, Nombre TEXT,Orden INTEGER, RGB TEXT)");
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS secciones");
-        onCreate(db);
-    }
-
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        onUpgrade(db, oldVersion, newVersion);
-    }
-
-
-
-
     public JSONArray getAll()
     {
         return filter(null);
     }
 
-
     @Override
-    @SuppressLint("Range")
     public JSONArray filter(String cWhere) {
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+cWhere;
-        }
-
-        JSONArray ls = new JSONArray();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM secciones "+strWhere+" ORDER BY Orden DESC" , null );
+        String w = "";
+        if (cWhere != null) {
+            w = " WHERE " + cWhere;
+        }
+        Cursor res = db.rawQuery("select * from " + tb_name + " " + w +" ORDER BY orden DESC", null);
         res.moveToFirst();
-        while(!res.isAfterLast()){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
-                obj.put("ID", res.getString(res.getColumnIndex("ID")));
-                obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
-                ls.put(obj);
-            } catch (JSONException e) {
+        JSONArray list = new JSONArray();
+        while (!res.isAfterLast()) {
+            try {
+                list.put(cursorToJSON(res));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
             res.moveToNext();
-
         }
-
-        return ls;
-
-
+        return  list;
     }
 
     @Override
@@ -94,27 +63,40 @@ public class DBSecciones extends SQLiteOpenHelper implements IBaseDatos {
         }catch (SQLiteException e){
             this.onCreate(db);
         }
-        // Insert the new row, returning the primary key value of the new row
-        for (int i= 0 ; i<datos.length();i++){
-            // Create a new map of values, where column names are the keys
-            try {
-                ContentValues values = new ContentValues();
-                values.put("ID", datos.getJSONObject(i).getInt("id"));
-                values.put("Nombre", datos.getJSONObject(i).getString("nombre"));
-                values.put("RGB", datos.getJSONObject(i).getString("rgb"));
-                values.put("Orden", datos.getJSONObject(i).getString("orden"));
-                db.insert("secciones", null, values);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
+       super.rellenarTabla(datos);
     }
 
     @Override
     public void inicializar() {
         SQLiteDatabase db = this.getWritableDatabase();
         this.onCreate(db);
+    }
+
+    @SuppressLint("Range")
+    @Override
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("RGB", res.getString(res.getColumnIndex("RGB")));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    @Override
+    protected ContentValues caragarValues(JSONObject o) {
+        ContentValues values = new ContentValues();
+        try {
+            values.put("ID", o.getInt("id"));
+            values.put("Nombre", o.getString("nombre"));
+            values.put("RGB", o.getString("rgb"));
+            values.put("Orden", o.getString("orden"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  values;
     }
 }

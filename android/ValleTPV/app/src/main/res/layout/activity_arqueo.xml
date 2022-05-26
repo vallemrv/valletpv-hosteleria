@@ -7,38 +7,75 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <ScrollView
-        android:id="@+id/scrollView2"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="0sp"
         android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="20dp"
         android:layout_weight="0.35"
-        android:contentDescription="@string/lista_efectivo">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/pneEfectivo"
+        <TextView
+            android:id="@+id/textView6"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="70sp"
+            android:layout_margin="10sp"
+            android:background="@drawable/bg_pink"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Conteo monedas"
+            android:textSize="25sp" />
 
-        </LinearLayout>
-    </ScrollView>
+        <ScrollView
+            android:id="@+id/scrollView2"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="20dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/lista_efectivo">
 
-    <ScrollView
-        android:id="@+id/scrollView3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:layout_weight="0.35">
+            <LinearLayout
+                android:id="@+id/pneEfectivo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/pneGastos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:orientation="vertical"></LinearLayout>
-    </ScrollView>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.35"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="70sp"
+            android:layout_margin="10sp"
+            android:background="@drawable/bg_pink"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Gastos"
+            android:textSize="25sp" />
+
+        <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="20dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/lista_efectivo">
+
+            <LinearLayout
+                android:id="@+id/pneGastos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:orientation="vertical"></LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"

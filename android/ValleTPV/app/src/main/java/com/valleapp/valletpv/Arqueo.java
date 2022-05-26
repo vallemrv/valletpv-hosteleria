@@ -44,6 +44,7 @@ public class Arqueo extends Activity {
 
     @SuppressLint("HandlerLeak")
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
+        @SuppressLint("DefaultLocale")
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
@@ -73,7 +74,7 @@ public class Arqueo extends Activity {
 
     private void mostrarMensaje(String men){
         Toast toast = new Toast(cx);
-        View toast_view = LayoutInflater.from(cx).inflate(R.layout.texto_toast_simple, null);
+        @SuppressLint("InflateParams") View toast_view = LayoutInflater.from(cx).inflate(R.layout.texto_toast_simple, null);
         TextView textView = toast_view.findViewById(R.id.txt_label);
         textView.setTextSize(33);
         textView.setText(men);
@@ -83,6 +84,7 @@ public class Arqueo extends Activity {
         toast.show();
     }
 
+    @SuppressLint("DefaultLocale")
     private void rellenarGastos() {
         gastos=0.0;
         pneGastos.removeAllViews();
@@ -94,14 +96,14 @@ public class Arqueo extends Activity {
 
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.item_gastos, null);
+            @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_gastos, null);
             TextView can = v.findViewById(R.id.cantidad);
             TextView des = v.findViewById(R.id.Descripcion);
             ImageButton rm = v.findViewById(R.id.btn_borrar);
             rm.setTag(gasto);
 
             try {
-            Double cantidad = gasto.getDouble("Importe");
+            double cantidad = gasto.getDouble("Importe");
             String descrip = gasto.getString("Des");
 
             if (cantidad > 0 && descrip.length() > 0) {
@@ -118,6 +120,7 @@ public class Arqueo extends Activity {
 
     }
 
+    @SuppressLint("DefaultLocale")
     private void rellenarEfectivo(){
 
         efectivo = 0.0;
@@ -126,11 +129,11 @@ public class Arqueo extends Activity {
         for(JSONObject e : objEfectivo) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams.MATCH_PARENT);
 
             LayoutInflater inflater = (LayoutInflater) cx.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.item_efectivo, null);
+            @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.item_efectivo, null);
             TextView mon =  v.findViewById(R.id.txt_moneda);
             TextView can = v.findViewById(R.id.txt_cantidad);
             TextView tot = v.findViewById(R.id.Total);
@@ -138,7 +141,7 @@ public class Arqueo extends Activity {
             rm.setTag(e);
 
             try {
-                Double moneda = e.getDouble("Moneda");
+                double moneda = e.getDouble("Moneda");
                 int cantidad = e.getInt("Can");
                 mon.setText(String.format("%01.2f €", moneda));
                 can.setText(String.format("%s", cantidad));
@@ -237,24 +240,15 @@ public class Arqueo extends Activity {
           ImageButton s = dlg.findViewById(R.id.salirCambio);
           ImageButton ok =  dlg.findViewById(R.id.aceptarCam);
           final TextView txtDes = (TextView) dlg.findViewById(R.id.cambio);
-          s.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                  dlg.cancel();
-              }
-          });
-          ok.setOnClickListener(new View.OnClickListener() {
-              @Override
-              public void onClick(View view) {
-                try{
-                  cambio = Double.parseDouble(txtDes.getText().toString());
-                  txtCambio.setText(String.format("%s €", cambio));
-                  dlg.cancel();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-              }
-
+          s.setOnClickListener(view -> dlg.cancel());
+          ok.setOnClickListener(view -> {
+            try{
+              cambio = Double.parseDouble(txtDes.getText().toString());
+              txtCambio.setText(String.format("%s €", cambio));
+              dlg.cancel();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
           });
          dlg.show();
       }

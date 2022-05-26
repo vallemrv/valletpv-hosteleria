@@ -8,8 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.valleapp.vallecom.interfaces.IBaseDatos;
-import com.valleapp.vallecom.interfaces.IBaseSocket;
+
+import com.valleapp.valletpv.interfaces.IBaseDatos;
+import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONException;

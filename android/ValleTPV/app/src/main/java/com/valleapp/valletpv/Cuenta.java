@@ -17,6 +17,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -93,6 +94,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             try {
                 myServicio = ((ServicioCom.MyBinder) iBinder).getService();
                 myServicio.setExHandler("lineaspedido", handlerHttp);
+                myServicio.setExHandler("teclas", handlerSeccionesTeclas);
+                myServicio.setExHandler("secciones", handlerSeccionesTeclas);
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbSecciones = (DBSecciones) myServicio.getDb("secciones");
@@ -125,6 +128,18 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             rellenarArticulos(lsartresul);
         }
     };
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handlerSeccionesTeclas= new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+
+            super.handleMessage(msg);
+            rellenarSecciones();
+        }
+    };
+    
+    
 
     @SuppressLint("HandlerLeak")
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
@@ -310,7 +325,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                                 JSONObject sub = (JSONObject) view.getTag();
                                 Intent it = getIntent();
                                 String des = sub.getString("descripcion_r");
-                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                if (!des.equals("null") && !des.equals("")){
                                     artSel.put("Descripcion", des);
                                 }else{
                                     String nom = artSel.getString("Descripcion");
@@ -319,9 +334,9 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
                                 }
                                 des = sub.getString("descripcion_t");
-                                if (des != null && !des.equals("null") && !des.equals("") ){
+                                if (!des.equals("null") && !des.equals("")){
                                     artSel.put("descripcion_t", des);
-                                }else if(artSel.getString("descripcion_t") == artSel.getString("Nombre")){
+                                }else if(artSel.getString("descripcion_t").equals(artSel.getString("Nombre"))){
                                     String nom = artSel.getString("descripcion_t");
                                     String subnom = sub.getString("Nombre");
                                     artSel.put("descripcion_t", nom+" "+subnom);
@@ -357,9 +372,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     private String componerDescripcion(JSONObject o, String descipcion){
         String aux = "";
         try {
-            JSONObject s  = new JSONObject();
             String des = o.getString(descipcion);
-            if (des != null && !des.equals("null") && !des.equals("")) {
+            if (!des.equals("null") && !des.equals("")) {
                 aux = des;
             }else{
                 aux = o.getString("Nombre");
