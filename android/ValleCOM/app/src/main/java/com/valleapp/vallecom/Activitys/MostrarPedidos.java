@@ -57,7 +57,7 @@ public class MostrarPedidos extends ActivityBase {
     private void rellenarPedido() {
 
         try{
-            JSONArray lineas = dbCuenta.filterByPedidos("IDMesa = "+mesa.getString("ID"));
+            JSONArray lineas = dbCuenta.filterByPedidos("Estado != 'A' and Estado != 'C' and IDMesa = "+mesa.getString("ID"));
 
             LinearLayout ll = findViewById(R.id.pneListado);
             ll.removeAllViews();

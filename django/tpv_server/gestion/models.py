@@ -387,6 +387,12 @@ class Familias(models.Model):
         return objs
 
 
+    def compToList(self):
+        try:
+            return json.loads(self.composicion.replace("'", '"'))
+        except:
+            return []
+
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
@@ -473,27 +479,25 @@ class Infmesa(models.Model):
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase.
 
     def modifiar_composicion(self, linea):
-        if linea.es_compuesta:
-            familia = linea.tecla.familia
-            try:
-                composicion = json.loads(familia.composicion.replace("'", '"'))
-            except:
-                composicion = []
+        mesa_a = Mesasabiertas.objects.filter(infmesa=self).first()
+        if linea.estado == "R":
+            linea.lrToP(mesa_a)
+            for l in self.lineaspedido_set.filter(es_compuesta=True):
+                composicion = l.tecla.familia.compToList()
+                if linea.tecla.familia.nombre in composicion:
+                    l.es_compuesta = False
+                    l.cantidad -= 1
+                    l.save()
+                    break;
+
+        elif linea.es_compuesta:
+            composicion = linea.tecla.familia.compToList()
             if (len(composicion) > 0):
                 for a in self.lineaspedido_set.filter(estado="R", tecla__familia__nombre__in=composicion).order_by("-id"):
-                    print(a.tecla.nombre, "modificar composicion")
                     if linea.cantidad == 0:
                         break;
-                    mesa_a = Mesasabiertas.objects.filter(infmesa=self).first()
-                    tarifa = 1
-                    if mesa_a:
-                        mz = Mesaszona.objects.filter(mesa__pk=mesa_a.mesa_id).first()
-                        if mz:
-                            tarifa = mz.zona.tarifa
-                        
-                    a.precio = a.tecla.p1 if tarifa == 1 else a.tecla.p2
-                    a.estado = "P"
-                    a.save()
+                    
+                    a.lrToP(mesa_a)
                     comunicar_cambios_devices("insert", "lineaspedido", a.serialize())
                     linea.cantidad -= 1
 
@@ -514,10 +518,7 @@ class Infmesa(models.Model):
                     obj = comp_realizadas.filter(linea_compuesta=a.id).first()
                     if obj:
                         continue
-                    try:
-                        composicion = json.loads(comp.composicion.replace("'", '"'))
-                    except:
-                        composicion = []
+                    composicion = comp.compToList()
                     
                     if a.tecla.familia.nombre in composicion:
                         a.precio = 0
@@ -539,13 +540,9 @@ class Infmesa(models.Model):
         lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
         for l in lineas:
-            print(l.tecla.nombre, "crear composicion")
             if hasattr(l.tecla, "familia"):
                 familia = l.tecla.familia
-                try:
-                    composicion = json.loads(familia.composicion.replace("'", '"'))
-                except:
-                    composicion = []
+                composicion = familia.compToList()
                 if (len(composicion) > 0):
                     cantidad = familia.cantidad - l.cantidad
                     
@@ -558,7 +555,6 @@ class Infmesa(models.Model):
                                 a.precio = 0
                                 a.estado = "R"
                                 a.save()
-                                print(a.tecla.nombre, a.estado)
                                 comunicar_cambios_devices("md", "lineaspedido", a.serialize())
                                 obj_comp.append(a.id)
                                 cantidad = cantidad - 1
@@ -621,6 +617,18 @@ class Lineaspedido(models.Model):
          
         return equal
 
+    def lrToP(self, mesa_a):
+        tarifa = 1
+        if mesa_a:
+            mz = Mesaszona.objects.filter(mesa__pk=mesa_a.mesa_id).first()
+            if mz:
+                tarifa = mz.zona.tarifa
+            
+        self.precio = self.tecla.p1 if tarifa == 1 else self.tecla.p2
+        self.estado = "P"
+        self.save()
+
+
     def serialize(self):
         l = self
         m = Mesasabiertas.objects.filter(infmesa=self.infmesa).first()
@@ -657,11 +665,11 @@ class Lineaspedido(models.Model):
                     h.save()
                     r.estado = 'A'
                     r.save()
-                    comunicar_cambios_devices("md", "lineaspedido", r.serialize())
                 else:
                     r.delete()
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
+                mesa.infmesa.modifiar_composicion(r)
 
-            mesa.infmesa.comprobar_grupos()
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if num <= 0:
                 for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
@@ -827,7 +835,8 @@ class Mesasabiertas(models.Model):
                         l.save()
                         comunicar_cambios_devices("md", "lineaspedido", l.serialize())
                         
-                
+                mesaP.infmesa.componer_articulos()
+                mesaP.infmesa.unir_en_grupos()
                 obj = mesaS.serialize()
                 obj["abierta"] = 0
                 obj["num"] = 0
@@ -1272,6 +1281,12 @@ class ComposicionTeclas(models.Model):
         return objs
 
 
+    def compToList(self):
+        try:
+            return json.loads(self.composicion.replace("'", '"'))
+        except:
+            return []
+
     def serialize(self):
         r = self
         aux = model_to_dict(r)
@@ -1376,7 +1391,7 @@ class Ticket(models.Model):
                     linea.save()
                     r.estado = 'C'
                     r.save()
-                    comunicar_cambios_devices("md", "lineaspedido", r.serialize())
+                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if numart <= 0:

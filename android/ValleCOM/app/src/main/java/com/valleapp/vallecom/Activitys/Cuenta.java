@@ -20,6 +20,7 @@ import com.valleapp.vallecom.R;
 import com.valleapp.vallecom.adaptadores.AdaptadorTicket;
 import com.valleapp.vallecom.db.DBCuenta;
 import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.utilidades.HTTPRequest;
 import com.valleapp.vallecom.utilidades.Instruccion;
 import com.valleapp.vallecom.utilidades.ServicioCom;
 
@@ -51,10 +52,10 @@ public class Cuenta extends Activity {
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 dbmesa = (DBMesas) myServicio.getDb("mesas");
                 rellenarTicket();
-                /*  //Atualizar cuenta.
+                //Atualizar cuenta.
                 ContentValues p = new ContentValues();
                 p.put("mesa_id",mesa.getString("ID"));
-                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);*/
+                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);
             }catch (Exception e){
                 e.printStackTrace();
             }

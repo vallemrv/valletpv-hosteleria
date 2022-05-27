@@ -16,7 +16,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +35,6 @@ import com.valleapp.vallecom.interfaces.IPedidos;
 import com.valleapp.vallecom.pestañas.ListaMesas;
 import com.valleapp.vallecom.pestañas.Pedidos;
 import com.valleapp.vallecom.utilidades.ActivityBase;
-import com.valleapp.vallecom.utilidades.HTTPRequest;
 import com.valleapp.vallecom.utilidades.Instruccion;
 import com.valleapp.vallecom.utilidades.JSON;
 import com.valleapp.vallecom.utilidades.ServicioCom;
@@ -68,7 +66,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     private final Handler handlerMesas = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-            findViewById(R.id.loading).setVisibility(View.GONE);
             rellenarZonas();
         }
     };
@@ -76,6 +73,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     private final Handler handlerPedidos = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             rellenarPedido();
+
         }
     };
 
@@ -86,7 +84,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             try {
 
                 if (op.equals("men_once")){
-                    Log.i("mensajito", res);
+
                     JSONObject o = new JSONObject(res);
                     String idautorizado = o.getString("idautorizado");
                     String self_id = cam.getString("ID");
@@ -112,31 +110,10 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     private final Handler handlerOperaciones = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
-            String res = msg.getData().getString("RESPONSE");
+            if (op == null) op = "";
             switch (op) {
                 case "exit":
                     finish();
-                    break;
-                case "pedidos":
-                    try {
-                        if (!res.equals("success")) {
-                            JSONArray inst = new JSONArray(res);
-                            if (inst.length() > 0) {
-                                for (int i = 0; i < inst.length(); i++) {
-                                    JSONObject o = inst.getJSONObject(i);
-                                    String op_aux = o.getString("op");
-                                    if (op_aux.equals("insert"))
-                                        dbCuenta.insert(o.getJSONObject("reg"));
-                                    if (op_aux.equals("md"))
-                                        dbCuenta.update(o.getJSONObject("reg"));
-                                    if (op_aux.equals("rm")) dbCuenta.rm(o.getJSONObject("reg"));
-                                }
-                                rellenarPedido();
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case "servido":
                     mostrarToast("Articulos servidos");
@@ -144,6 +121,8 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 case "reenviar":
                     mostrarToast("Peticion enviadaaa");
                     break;
+                default:
+                    findViewById(R.id.loading).setVisibility(View.GONE);
             }
         }
     };
@@ -466,7 +445,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         listaMesas = new ListaMesas();
         AdaptadorMesas adaptadorMesas = new AdaptadorMesas(getSupportFragmentManager(), listaMesas, pedidos);
 
-
         ViewPager vpPager = findViewById(R.id.pager);
 
         vpPager.setAdapter(adaptadorMesas);
@@ -528,6 +506,13 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     @Override
     protected void onResume() {
         presBack = 0;
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handlerOperaciones.sendEmptyMessage(0);
+            }
+        }, 3000);
         cargarPreferencias();
         if(myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);

@@ -18,6 +18,7 @@ dist/
 *.apk
 *.aab
 .gradle/
+.buildozer/
 
 #excepciones
 !manage_template.py
