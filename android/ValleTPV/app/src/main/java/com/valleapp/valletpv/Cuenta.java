@@ -566,10 +566,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     @Override
     protected void onPause() {
-        if(timerAutoCancel!=null){
-            timerAutoCancel.cancel();
-            timerAutoCancel = null;
-        }
+        stop = true;
         try{
             String idm = mesa.getString("ID");
             aparcar(idm, dbCuenta.getNuevos(idm));
@@ -592,7 +589,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     @Override
     protected void onResume() {
         try {
-
+            stop = false;
              if(timerAutoCancel==null) timerAutoCancel = new Timer();
              timerAutoCancel.schedule(new TimerTask()
             {
@@ -600,6 +597,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 public void run() {
                     if(!stop) {
                         if (!reset){
+                            Log.i("STOP", "cuenta");
                             finish();
                         }
                         else reset = false;
