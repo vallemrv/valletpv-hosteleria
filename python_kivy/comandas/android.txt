@@ -1,3 +1,0 @@
-title=ValleCom
-orientation=portriat
-author=ValleApp

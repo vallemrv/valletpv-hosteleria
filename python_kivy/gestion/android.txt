@@ -1,3 +1,0 @@
-title=Historial nulos
-orientation=portrait
-author=ValleApp
