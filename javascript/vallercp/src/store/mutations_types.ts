@@ -1,0 +1,3 @@
+export const SET_EMPRESA= "SET_EMPRESA";
+export const ERROR_REQUEST= "ERROR_REQUEST";
+export const GET_REQUEST= "GET_REQUEST";
