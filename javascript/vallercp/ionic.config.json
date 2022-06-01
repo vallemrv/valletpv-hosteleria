@@ -1,7 +1,0 @@
-{
-  "name": "vallercp",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue"
-}
