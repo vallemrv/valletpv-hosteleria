@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@capacitor/android": "^3.5.1",
     "@capacitor/cli": "^3.5.1",
     "@capacitor/core": "^3.5.1",
     "@mdi/font": "5.9.55",
@@ -26,7 +27,7 @@
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "axios": "^0.18.0",
+    "axios": "^0.27.2",
     "sass": "^1.38.0",
     "sass-loader": "^10.0.0",
     "vue-cli-plugin-axios": "~0.0.4",

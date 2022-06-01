@@ -5,9 +5,14 @@ import mutations from "./mutations";
 
 export default  createStore({
     state:{
-        empresa: null,
+        items:[],
+        receptores: [],
+        receptores_sel: [],
+        isWsConnected: false,
+        isHttpConnected: false,
         error: null,
-        ocupado: false
+        ocupado: false,
+        empresa: null,
     },
     actions,
     mutations

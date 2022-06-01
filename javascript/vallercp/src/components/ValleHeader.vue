@@ -1,14 +1,15 @@
 <template>
   <ion-header>
       <ion-toolbar color="pink">
-        <ion-title>ValleRCP 
+        <ion-title>
             <span v-if="empresa"> {{empresa.nombre}} </span>
+            <span v-else>ValleRCP</span>
            </ion-title>
         <ion-buttons slot="end">
-            <ion-button>
+            <ion-button @click="on_click_tools('settings')">
                 <ion-icon slot="icon-only" :icon="listOutline"></ion-icon>
             </ion-button>
-            <ion-button>
+            <ion-button  @click="on_click_tools('server')">
                 <ion-icon slot="icon-only" :icon="settingsOutline"></ion-icon>
             </ion-button>
         </ion-buttons>
@@ -19,11 +20,10 @@
 <script lang="ts">
 import { IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from '@ionic/vue'
 import { settingsOutline, listOutline } from 'ionicons/icons'
-import { mapState, mapActions } from 'vuex';
+import { mapState } from 'vuex';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name:"ValleHeader",
     components:{IonHeader, IonToolbar, IonTitle, IonButton, IonButtons, IonIcon},
     data(){
         return {
@@ -31,16 +31,14 @@ export default defineComponent({
             listOutline,
         }
     },
+    methods:{
+        on_click_tools(op){
+            this.$emit("clickTools", op);
+        }
+    },
     computed:{
         ...mapState(["empresa"]),
     },
-    methods:{
-        ...mapActions(["getEmpresa"])
-
-    },
-    mounted(){
-        localStorage.server = "192.168.1.168:8000"
-        this.getEmpresa()
-    }
+   
 });
 </script>
