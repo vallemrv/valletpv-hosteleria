@@ -272,7 +272,6 @@ public class ServicioCom extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
         String url = intent.getStringExtra("url");
-        Log.i("CAGADAGORDA", "start command service");
         if (url != null){
             server = url;
             IniciarDB();

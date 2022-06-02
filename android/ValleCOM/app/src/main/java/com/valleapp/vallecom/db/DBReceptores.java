@@ -54,20 +54,6 @@ public class DBReceptores extends DBBase {
     }
 
 
-    @Override
-    public void rellenarTabla(JSONArray datos){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-            db.execSQL("DELETE FROM receptores");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        super.rellenarTabla(datos);
-    }
-
-
-
     public ArrayList<JSONObject> getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from receptores WHERE nombre NOT LIKE '%Nulo%' ", null );

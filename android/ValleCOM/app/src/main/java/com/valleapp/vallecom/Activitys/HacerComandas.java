@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -331,6 +332,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 artSel.put("descripcion_t", nom+" "+subnom);
             }
             mostrarToast(artSel.getString("Descripcion"));
+            double d = artSel.getDouble("Precio");
+            double inc = sub.getDouble("Incremento");
+            artSel.put("Precio", d+inc);
             nota.addArt(artSel, can);
             rellenarBotonera();
 

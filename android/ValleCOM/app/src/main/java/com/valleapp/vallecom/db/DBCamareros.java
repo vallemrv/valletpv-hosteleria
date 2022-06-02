@@ -60,13 +60,10 @@ public class DBCamareros extends DBBase {
         return v;
     }
 
-
-
     public JSONArray getAll()
     {
         return filter("activo=1");
     }
-
 
 
     public ArrayList<JSONObject> getAutorizados(Boolean a)

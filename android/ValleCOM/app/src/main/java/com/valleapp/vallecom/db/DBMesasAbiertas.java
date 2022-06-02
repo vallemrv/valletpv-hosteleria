@@ -41,8 +41,6 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
                 initialValues.put("num", o.getString("num"));
                 sqlDb.update("mesas", initialValues,"ID=?", new String[]{id});
             }
-        } catch (SQLException sql){
-            Log.i("ValleTPV", "Creando base de datos para mesas abiertas");
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -58,6 +56,7 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
 
     @Override
     public void insert(JSONObject o) {
+        db.insert(o);
     }
 
     @Override

@@ -29,20 +29,6 @@ public class DBMesas extends DBBase {
                 "num INTEGER, Orden INTEGER)");
     }
 
-
-    @Override
-    public void rellenarTabla(JSONArray datos) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            db.execSQL("DELETE FROM mesas");
-            super.rellenarTabla(datos);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public JSONArray getAll(String id) {
         return filter("IDZona = " + id);
     }

@@ -52,17 +52,6 @@ public class DBTbUpdates extends DBBase {
     }
 
 
-    public void rellenarTabla(JSONArray tb){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM "+ tb_name);
-          super.rellenarTabla(tb);
-        }catch (SQLiteException e){
-            e.printStackTrace();
-        }
-    }
-
     @SuppressLint("Range")
     public JSONArray getAll()
     {

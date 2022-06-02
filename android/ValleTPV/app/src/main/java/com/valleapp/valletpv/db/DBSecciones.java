@@ -55,18 +55,6 @@ public class DBSecciones extends DBBase {
     }
 
     @Override
-    public void rellenarTabla(JSONArray datos) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            db.execSQL("DELETE FROM secciones");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-       super.rellenarTabla(datos);
-    }
-
-    @Override
     public void inicializar() {
         SQLiteDatabase db = this.getWritableDatabase();
         this.onCreate(db);

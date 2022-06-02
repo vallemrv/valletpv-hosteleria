@@ -27,17 +27,6 @@ public class DBSubTeclas extends DBBase {
     }
 
 
-    @Override
-    public void rellenarTabla(JSONArray datos){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-           db.execSQL("DELETE FROM subteclas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-       super.rellenarTabla(datos);
-    }
 
     public JSONArray getAll(String id)
     {

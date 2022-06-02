@@ -56,19 +56,6 @@ public class DBTeclas extends DBBase {
         return cargarRegistros("SELECT * FROM teclas WHERE Nombre LIKE '%"+str+"%' OR Tag LIKE '%"+str+"%' ORDER BY Orden DESC LIMIT 15 ");
     }
 
-
-    @Override
-    public void rellenarTabla(JSONArray datos) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-            db.execSQL("DELETE FROM teclas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-        super.rellenarTabla(datos);
-    }
-
     @Override
     public void inicializar() {
         SQLiteDatabase db = this.getWritableDatabase();

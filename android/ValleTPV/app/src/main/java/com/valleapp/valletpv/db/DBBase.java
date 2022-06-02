@@ -73,6 +73,8 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
 
     @Override
     public void rellenarTabla(JSONArray objs) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM "+tb_name);
         for (int i= 0 ; i < objs.length(); i++){
             // Create a new map of values, where column names are the keys
             try {
@@ -124,7 +126,11 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         SQLiteDatabase db = getWritableDatabase();
         try{
             synchronized (db){
-                db.delete(tb_name, "ID=?", new String[]{o.getString("ID")});
+                if(o.has("ID")) {
+                    db.delete(tb_name, "ID=?", new String[]{o.getString("ID")});
+                }else{
+                    db.delete(tb_name, "ID=?", new String[]{o.getString("id")});
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -166,18 +166,7 @@ public class DBCuenta extends DBBase{
         return  ls;
     }
 
-    public void rellenarTabla(JSONArray datos){
-        // Gets the data repository in write mode
-       SQLiteDatabase db = this.getWritableDatabase();
-        try{
-            db.execSQL("DELETE FROM cuenta");
-            for(int i= 0; i < datos.length(); i++){
-                insert(datos.getJSONObject(i));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+
 
 
     public void replaceMesa(JSONArray datos, String IDMesa){

@@ -24,26 +24,9 @@ public class DBZonas extends DBBase {
         db.execSQL("CREATE TABLE IF NOT EXISTS  zonas (ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, Tarifa INTEGER)");
     }
 
-
     public JSONArray getAll()
     {
        return filter(null);
-    }
-
-
-    @Override
-    public void rellenarTabla(JSONArray objs) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            db.execSQL("DELETE FROM zonas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-
-        super.rellenarTabla(objs);
-
     }
 
     @SuppressLint("Range")

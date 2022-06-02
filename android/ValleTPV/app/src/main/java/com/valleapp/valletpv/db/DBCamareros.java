@@ -30,16 +30,6 @@ public class DBCamareros extends DBBase{
 
     }
 
-    public void rellenarTabla(JSONArray camareros){
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-          db.execSQL("DELETE FROM camareros");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-       super.rellenarTabla(camareros);
-    }
 
     @Override
     public void inicializar() {

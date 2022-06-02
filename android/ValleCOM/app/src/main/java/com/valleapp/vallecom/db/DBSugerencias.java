@@ -56,16 +56,7 @@ public class DBSugerencias extends DBBase {
         return  values;
     }
     
-    @Override
-    public void rellenarTabla(JSONArray tb){
-        try{
-            SQLiteDatabase db = this.getWritableDatabase();
-            db.execSQL("DELETE FROM "+ tb_name);
-            super.rellenarTabla(tb);
-        }catch (SQLiteException e){
-           e.printStackTrace();
-        }
-    }
+
 
     public JSONArray getAll()
     {

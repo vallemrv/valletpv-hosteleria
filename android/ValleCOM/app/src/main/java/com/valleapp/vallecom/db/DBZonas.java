@@ -46,20 +46,6 @@ public class DBZonas extends DBBase {
 
 
     @Override
-    public void rellenarTabla(JSONArray objs) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            db.execSQL("DELETE FROM zonas");
-        }catch (SQLiteException e){
-            this.onCreate(db);
-        }
-
-        super.rellenarTabla(objs);
-    }
-
-    @Override
     @SuppressLint("Range")
     protected JSONObject cursorToJSON(Cursor res) {
         JSONObject o = new JSONObject();
