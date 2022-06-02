@@ -1,21 +1,40 @@
 import json
 import os
 from sys import stdout
-from django.shortcuts import render
+from datetime import datetime
+from tokenapi.decorators import token_required
 from tokenapi.http import JsonResponse
+
+from django.shortcuts import render
 from django.apps import apps
 from django.forms.models import model_to_dict
-from tokenapi.decorators import token_required
 from django.conf import settings
-from comunicacion.tools import comunicar_cambios_devices
-from gestion.models import Secciones, Teclas, Teclaseccion
-from datetime import datetime
 from django.core.management import call_command
+
+from comunicacion.tools import comunicar_cambios_devices
 from api_android.tools import send_mensaje_devices
-from django.conf import settings
+from api_android.tools.mails import getUsuariosMail, send_cierre
+from gestion.models import Secciones, Teclas, Teclaseccion, Arqueocaja
 
 def inicio(request):
     return render(request, "app/index.html")
+
+
+@token_required
+def send_cierre_by_id(request):
+    if ("id" in request.POST):
+        arqueo = Arqueocaja.objects.filter(pk=request.POST["id"]).order_by('-id').first()
+    else:
+        arqueo = Arqueocaja.objects.all().order_by('-id').first()
+
+    if arqueo:
+        users = getUsuariosMail()
+        for us in users:
+            send_cierre(us, arqueo.get_desglose_cierre())
+        return JsonResponse({'res':"success"})
+    else:
+        return JsonResponse({'res':"No hay arqueos"})
+
 
 
 @token_required
@@ -30,6 +49,7 @@ def reset_db(request):
         "gastos",
         "arqueocaja",
         "cierrecaja",
+        "mesasabiertas",
         "lineaspedido",
         "pedidos",
         "infmesa",
@@ -94,8 +114,6 @@ def getlistado(request):
             regs.append(obj.serialize())
         else:
             regs.append(model_to_dict(obj))
-    
-    
 
     return JsonResponse({'tb':tb_name, "regs": regs})
 

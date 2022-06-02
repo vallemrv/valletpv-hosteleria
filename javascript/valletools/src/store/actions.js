@@ -1,23 +1,25 @@
 import * as types  from './mutations_types'
 import API from '@/api'
 export default {
-    selEmpresa({commit, state}, index){
+    selEmpresa({ commit, state }, index){
         state.empresa = state.empresas[index];
     },
-    cargarEmpresas({commit, state}){
+    cargarEmpresas({ commit, state }){
         state.empresas = JSON.parse(localStorage.empresas);
         state.empresa = state.empresas[0];
     },
-    addEmpresa({ commit, state}, empresa){
+    addEmpresa({ commit, state }, empresa){
         commit(types.GET_REQUEST)
         let params = new FormData();
         params.append("username", empresa.user);
         params.append("password", empresa.pass);
         API.login(empresa.url, params).then( r => {
-            const obj = {nombre:empresa.nombre,
-                        url:empresa.url,
-                        user:r.user,
-                        token:r.token }
+            const obj = {
+                    nombre:empresa.nombre,
+                    url:empresa.url,
+                    user:r.user,
+                    token:r.token
+                }
             params = new FormData()
             params.append("user", r.user)
             params.append("token", r.token)

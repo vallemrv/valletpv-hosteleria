@@ -14,7 +14,6 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.db.models import Q
-from app.utility import rgbToHex
 from comunicacion.tools import comunicar_cambios_devices, send_mensaje_impresora
 
 
@@ -733,13 +732,6 @@ class Mesas(models.Model):
             obj["abierta"] = True;
         return obj
 
-    def get_color(self, hex=False):
-        s = self.mesaszona_set.all().first()
-        color = "244,155,123"
-        if s:
-           color = s.zona.rgb
-
-        return color if not hex else rgbToHex(color)
 
 
     def save(self, *args, **kwargs):
@@ -1239,12 +1231,6 @@ class Teclas(models.Model):
         
         return row
    
-    def get_color(self, hex=False):
-        s = self.teclaseccion_set.all().first()
-        color = "244,155,123"
-        if s:
-           color = s.seccion.rgb
-        return color if not hex else rgbToHex(color)
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)

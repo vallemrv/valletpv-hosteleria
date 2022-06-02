@@ -6,13 +6,19 @@ from api_android.tools.mails import getUsuariosMail, send_cierre
 
 @csrf_exempt
 def send_last_cierre(request):
-    arqueo = Arqueocaja.objects.all().order_by('-id').first()
+    if ("id" in request.POST):
+        arqueo = Arqueocaja.objects.filter(pk=request.POST["id"]).order_by('-id').first()
+    else:
+        arqueo = Arqueocaja.objects.all().order_by('-id').first()
+        
+    if arqueo:
+        users = getUsuariosMail()
+        for us in users:
+            send_cierre(us, arqueo.get_desglose_cierre())
 
-    users = getUsuariosMail()
-    for us in users:
-        send_cierre(us, arqueo.get_desglose_cierre())
-
-    return HttpResponse("success")
+        return HttpResponse("success")
+    else:
+        return HttpResponse("No hay arqueos")
 
 
 def actualiza_sync(request, tb_name):
