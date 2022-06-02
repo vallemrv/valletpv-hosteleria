@@ -1,5 +1,6 @@
 package com.valleapp.vallecom.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -142,7 +143,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         if (cWhere != null){
             w = " WHERE "+cWhere;
         }
-        Cursor mCount= db.rawQuery("select count(*) from  "+ tb_name +" "+ w, null);
+        @SuppressLint("Recycle") Cursor mCount= db.rawQuery("select count(*) from  "+ tb_name +" "+ w, null);
         mCount.moveToFirst();
         return  mCount.getInt(0);
     }
@@ -153,14 +154,14 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         if (cWhere != null){
             w = " WHERE "+cWhere;
         }
-        Cursor res= db.rawQuery("select * from  "+ tb_name +" "+ w, null);
+        @SuppressLint("Recycle") Cursor res= db.rawQuery("select * from  "+ tb_name +" "+ w, null);
         res.moveToFirst();
         while (!res.isAfterLast()){
-            String dta = "";
+            StringBuilder dta = new StringBuilder();
             for (int i=0; i< res.getColumnCount(); i++) {
-                dta += res.getColumnName(i)+ "="+ res.getString(i) + " - ";
+                dta.append(res.getColumnName(i)).append("=").append(res.getString(i)).append(" - ");
             }
-            Log.i("SHOWDATA", dta);
+            Log.i("SHOWDATA", dta.toString());
             res.moveToNext();
         }
 
