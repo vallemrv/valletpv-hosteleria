@@ -60,30 +60,7 @@ export default {
         .catch(error => {
            commit(types.ERROR_REQUEST, {error: error})
         })
-    },    
-    borrarVentas( {commit, state}){
-        commit(types.GET_REQUEST)
-        let params = new FormData()
-        params.append("user", state.token.user)
-        params.append("token", state.token.token) 
-        API.borrar_ventas(params)
-        .then(r => commit(types.REQUEST_SUCCESS))
-        .catch(error => {
-            commit(types.ERROR_REQUEST, {error: error})
-        })
-    },    
-    modificarSecciones( {commit, state}, {item}){
-        commit(types.GET_REQUEST)
-        let params = new FormData()
-        params.append("user", state.token.user)
-        params.append("token", state.token.token) 
-        params.append("item", JSON.stringify(item))
-        API.modificarSecciones(params)
-        .then(r => commit(types.MOD_SEC, {item: r}))
-        .catch(error => {
-            commit(types.ERROR_REQUEST, {error: error})
-        })
-    },
+    },        
     actualizar( {commit, state}){
         commit(types.GET_REQUEST)
         let params = new FormData()
@@ -99,26 +76,27 @@ export default {
     addInstruccion( {commit }, {inst}) {
         commit(types.ADD_INSTRUCTIONS, {inst:inst})
     },
-    getListadoCompuesto({ commit, state }, { tablas }){
+    getListadoCompuesto({ commit, state }, tablas ){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("tbs", JSON.stringify(tablas))
-        params.append("user", state.token.user)
-        params.append("token", state.token.token)
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
         API.getListadoCompuesto(params)
-        .then( r => commit(types.GET_LISTADOS_COMPUESTOS, {result: r}))
+        .then( r => commit(types.GET_LISTADOS, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getListado({ commit, state }, { tabla=null, params=null }){
+    getListado({ commit, state },  tabla=null, filter=null ){
         commit(types.GET_REQUEST)
-        if (!params) params = new FormData();
+        let params = new FormData();
         if (tabla) params.append("tb", tabla);
-        params.append("user", state.token.user)
-        params.append("token", state.token.token)
+        if (filter) params.append("filter", filter);
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
         API.getListado(params)
-        .then( r => commit(types.GET_LISTADOS, {result: r}))
+        .then( r => commit(types.GET_LISTADO, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
         })

@@ -667,7 +667,7 @@ class Lineaspedido(models.Model):
                     r.save()
                 else:
                     r.delete()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "rm_linea"})
                 mesa.infmesa.modifiar_composicion(r)
 
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
@@ -784,7 +784,7 @@ class Mesasabiertas(models.Model):
                 historial.save()
                 r.estado = 'A'
                 r.save()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "rm_linea"})
 
 
             obj = mesa.serialize()
@@ -1378,7 +1378,7 @@ class Ticket(models.Model):
                     linea.save()
                     r.estado = 'C'
                     r.save()
-                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id})
+                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "c_linea"})
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if numart <= 0:

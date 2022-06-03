@@ -84,7 +84,7 @@ def mvlinea(request):
                 obj = m.serialize()
                 obj["abierta"] = 0
                 obj["num"] = 0
-                comunicar_cambios_devices("md", "mesasabiertas", obj)
+                comunicar_cambios_devices("md", "mesasabiertas", obj, {"op": "mv_linea"})
                 m.delete()
             Sync.actualizar(Mesasabiertas._meta.db_table)
          

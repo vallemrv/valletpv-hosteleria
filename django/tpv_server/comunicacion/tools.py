@@ -1,8 +1,8 @@
-def comunicar_cambios_devices(op, tb, obj, device = "" ):
+def comunicar_cambios_devices(op, tb, obj, extras = {} ):
     from api_android.tools import send_mensaje_devices
     update = {
         "op": op,
-        "device": device,
+        "extras": extras,
         "tb": tb,
         "obj": obj,
         "receptor": "devices",

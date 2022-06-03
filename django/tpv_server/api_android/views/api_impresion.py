@@ -49,7 +49,7 @@ def preimprimir(request):
       }
 
     if infmesa.numcopias <= 1:
-        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize())
+        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize(), {"op": "preimprimir"})
 
     send_mensaje_impresora(obj)
     return JsonResponse({})
