@@ -19,7 +19,16 @@ const contains_func = (instrucciones, inst, reg) => {
     return contains;
 }   
 
-export default {  
+export default { 
+    [types.ON_MENSAJE] (state, mensaje){
+        console.log(mensaje)
+    },
+    [types.ON_CONNECT] (state){
+        state.isWSConnected = true;
+    },
+    [types.ON_DISCONECT] (state){
+        state.isWSConnected = false;
+    },
     [types.GET_REQUEST] (state){
         state.ocupado= true;
         state.error = null;
@@ -43,17 +52,6 @@ export default {
         result.forEach(e => {
             state[e.tb] = e.regs
         });
-    },
-    [types.GET_EMPRESA] (state, {result}){
-        state.ocupado = false;
-        state.error = null;
-        state.empresa = result;
-    },
-    [types.GET_TOKEN] (state, {token}){
-        state.ocupado = false;
-        state.error = null;
-        state.token = token;
-        localStorage.token = JSON.stringify(state.token)
     },
     [types.ADD_INSTRUCTIONS] (state, {inst}){
         if (!state.instrucciones) state.instrucciones = []

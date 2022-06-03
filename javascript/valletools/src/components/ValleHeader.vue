@@ -26,7 +26,7 @@
         </v-menu>
       </v-btn>
   </v-app-bar>
-  <valle-menu :drawer="drawer"></valle-menu>
+  <valle-menu :drawer="drawer" :items="items"  @click="on_click_menu"></valle-menu>
   <valle-dialogo-form 
       @close="on_close_form" 
       title="Agregar empresa"
@@ -51,7 +51,10 @@ export default {
           {col:"user", label:"Usuario", tp:"text"},
           {col:"pass", label:"Contraseña", tp:"password"},
       ],
-      itemEmpresa:{}
+      itemEmpresa:{},
+      items: [
+              {label: "Arqueos", icon: "mdi-cash-fast",  value:"arqueos"}
+            ],
   }),
   computed: {
     ...mapState(["empresa", "empresas", "ocupado"]),
@@ -64,6 +67,10 @@ export default {
         this.addEmpresa(item)
         this.itemEmpresa = {}
       }
+    },
+    on_click_menu(url){
+      this.drawer = false;
+      this.$router.push({name:url})
     }
   },
   mounted(){

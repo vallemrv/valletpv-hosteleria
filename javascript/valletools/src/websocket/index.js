@@ -23,11 +23,11 @@ class Timer {
   }
 
 export default class  {
-    constructor(server, nomimp, receptor, commit){
-        this.socketUrl = "ws://"+server+"/ws/impresion/"+nomimp+"/";
+    constructor(server, ws_name, commit){
+        this.socketUrl = "ws://"+server+"/ws/comunicacion/"+ws_name;
         this.customSocket = null;
         this.commit = commit;
-        this.receptor = receptor;
+        this.ws_name = ws_name;
         this.reconnectTimer = new Timer(() => {
             this.disconnect()
             this.connect()
@@ -45,33 +45,34 @@ export default class  {
 
         // onopen - called when connection is open and ready to send and receive data.
         this.customSocket.onopen = (event) => {
-            this.commit(types.ON_CONNECT)
+          this.reconnectTimer.reset();
+          this.commit(types.ON_CONNECT)
+          //console.log(event)
         }
 
         // onclsoe - called when the connection's closes.
         this.customSocket.onclose = (event) => {
             this.commit(types.ON_DISCONECT)
             this.reconnectTimer.scheduleTimeout()
-            console.log(event)
+            //console.log(event)
 
         }
 
         // onerror - called when an error occurs.
         this.customSocket.onerror = (event) => {
             this.commit(types.ON_DISCONECT)
-            console.log(event)
+            //console.log(event)
         }
 
         // onmessage - called when a message is received from the server.
         this.customSocket.onmessage = (event) => {
-            var pedido = JSON.parse(JSON.parse(event.data).message)
-            if (pedido.nom_receptor==this.receptor)
-              this.commit(types.RECEPCION_PEDIDO, {pedido:pedido});
-            }
+          this.commit(types.onmessage, event.data);
+        }
            
     }
 
     disconnect(){
+      console.log("chaito")
         this.customSocket.onclose = function(){}
         this.customSocket.close()
     }

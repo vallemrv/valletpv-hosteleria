@@ -1,12 +1,29 @@
 import * as types  from './mutations_types'
 import API from '@/api'
+import WS from '@/websocket'
+
+const connet_ws = (commit, state) => {
+    state.ws.forEach(w =>{
+        w.disconnect();
+    });
+    state.ws = [];
+    state.ws.push(new WS(state.empresa.url, "devices", commit));
+    state.ws[0].connect();
+}
+
+
 export default {
     selEmpresa({ commit, state }, index){
         state.empresa = state.empresas[index];
+        localStorage.empresa_index = index;
+        connet_ws(commit, state);
     },
     cargarEmpresas({ commit, state }){
         state.empresas = JSON.parse(localStorage.empresas);
-        state.empresa = state.empresas[0];
+        let index = localStorage.empresa_index;
+        if (index) state.empresa = state.empresas[index];
+        else state.empresa = state.empresas[0];
+        connet_ws(commit, state);
     },
     addEmpresa({ commit, state }, empresa){
         commit(types.GET_REQUEST)
@@ -91,7 +108,6 @@ export default {
         API.getListadoCompuesto(params)
         .then( r => commit(types.GET_LISTADOS_COMPUESTOS, {result: r}))
         .catch(error => {
-            console.log(error)
             commit(types.ERROR_REQUEST, {error: error})
         })
     },

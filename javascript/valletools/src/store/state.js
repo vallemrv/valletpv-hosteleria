@@ -6,5 +6,7 @@ export default {
     instrucciones: null,
     itemsFiltrados: [],
     empresa: null,
-    empresas: []
+    empresas: [],
+    ws:[],
+    isWSConnected: false,
 }

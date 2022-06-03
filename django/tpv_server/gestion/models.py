@@ -4,17 +4,18 @@
 # @Last modified by:   valle
 # @Last modified time: 2019-04-22T00:11:47+02:00
 # @License: Apache license vesion 2.0
-
 from __future__ import unicode_literals
-from datetime import datetime
+
 import json
+from datetime import datetime
 from uuid import uuid4
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 from django.db.models import Q
-from comunicacion.tools import comunicar_cambios_devices, send_mensaje_impresora
+from comunicacion.tools import (comunicar_cambios_devices, 
+                                send_mensaje_impresora)
 
 
 class HistorialMensajes(models.Model):

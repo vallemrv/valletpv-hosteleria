@@ -90,9 +90,6 @@ export default {
       if (!v) {
         this.$emit("close", null);
       }
-    },
-    item(v){
-      console.log(v)
     }
   },
 };
