@@ -39,6 +39,7 @@ export default class  {
     }
 
     connect(){
+      console.log("holaa ws")
         // Create new socket
         if (this.customSocket) this.disconnect();
         this.customSocket = new WebSocket(this.socketUrl)
@@ -72,6 +73,7 @@ export default class  {
     }
 
     disconnect(){
+      console.log("adios ws")
       this.customSocket.onclose = function(){}
       this.customSocket.close()
     }

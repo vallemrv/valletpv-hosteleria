@@ -46,7 +46,7 @@ export default {
         state.error = null
         state[result.tb] = result.regs
     },
-    [types.GET_LISTADOS_COMPUESTOS] (state, {result}){
+    [types.GET_LISTADOS] (state, {result}){
         state.ocupado = false;
         state.error = null
         result.forEach(e => {
@@ -93,7 +93,6 @@ export default {
             }
         })
         state.teclas = result
-        
     }
         
 }

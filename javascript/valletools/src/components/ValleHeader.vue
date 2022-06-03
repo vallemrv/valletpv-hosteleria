@@ -26,7 +26,7 @@
         </v-menu>
       </v-btn>
   </v-app-bar>
-  <valle-menu :drawer="drawer" :items="items"  @click="on_click_menu"></valle-menu>
+  <valle-menu :drawer="drawer" :items="items"  @click_item="on_click_menu"></valle-menu>
   <valle-dialogo-form 
       @close="on_close_form" 
       title="Agregar empresa"
@@ -60,7 +60,7 @@ export default {
     ...mapState(["empresa", "empresas", "ocupado"]),
   },
   methods: {
-    ...mapActions(["addEmpresa", "cargarEmpresas", "selEmpresa"]),
+    ...mapActions(["addEmpresa",  "selEmpresa"]),
     on_close_form(item){
       this.showDialog = false;
       if(item){
@@ -68,14 +68,8 @@ export default {
         this.itemEmpresa = {}
       }
     },
-    on_click_menu(url){
-      this.drawer = false;
-      this.$router.push({name:url})
-    }
-  },
-  mounted(){
-    if (localStorage.empresas){
-      this.cargarEmpresas();
+    on_click_menu(name){
+      this.$router.push({name:name})
     }
   }
  

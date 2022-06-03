@@ -438,6 +438,13 @@ class Historialnulos(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     motivo = models.CharField(db_column='Motivo', max_length=200)  # Field name made lowercase.
 
+    @staticmethod
+    def update_for_devices():
+        a = []
+        for obj in Historialnulos.objects.all():
+            a.append(model_to_dict(obj))
+        return a
+
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)

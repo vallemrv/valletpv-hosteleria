@@ -28,7 +28,7 @@ export default {
     },
     methods: {
       on_click_item(v){
-       this.$emit("click", v);
+       this.$emit("click_item", v);
       }
     },
 }

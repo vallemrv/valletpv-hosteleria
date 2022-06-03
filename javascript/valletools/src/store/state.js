@@ -6,4 +6,5 @@ export default {
     empresas: [],
     ws:[],
     isWSConnected: false,
+    chartSet:{ }
 }

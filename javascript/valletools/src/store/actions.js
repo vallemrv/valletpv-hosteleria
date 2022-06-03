@@ -76,13 +76,13 @@ export default {
     addInstruccion( {commit }, {inst}) {
         commit(types.ADD_INSTRUCTIONS, {inst:inst})
     },
-    getListadoCompuesto({ commit, state }, tablas ){
+    getListados({ commit, state }, tablas ){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("tbs", JSON.stringify(tablas))
         params.append("user", state.empresa.user)
         params.append("token", state.empresa.token)
-        API.getListadoCompuesto(params)
+        API.getListadoCompuesto(state.empresa.url, params)
         .then( r => commit(types.GET_LISTADOS, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})

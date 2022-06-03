@@ -7,7 +7,7 @@
             >
                 <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
-        <v-title>{{title}}</v-title>
+        <v-toolbar-title>{{title}}</v-toolbar-title>
    </v-toolbar>
 </template>
 
