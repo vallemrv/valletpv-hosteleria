@@ -35,7 +35,7 @@ export default {
         state.total = 0;
         state.chartSet = {
             labels: ["borrado", "cobrado", "pedido"],
-            datasets: [{backgroundColor:[], data:[] }]
+            datasets: [{backgroundColor:["#D6EAF8", "#F6D6F8", "#ABEBC6"], data:[0,0,0] }]
         }
         let chartSet = state.chartSet;
         data.forEach((d) => {

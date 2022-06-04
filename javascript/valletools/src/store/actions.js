@@ -22,7 +22,7 @@ export default {
             commit(types.REQUEST_SUCCESS)
             state.mensajes = state.mensajes.filter(e =>{
                 return e.idpeticion != idpeticion
-            })
+            });
         })
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
