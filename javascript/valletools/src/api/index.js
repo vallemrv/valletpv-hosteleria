@@ -5,6 +5,9 @@ const post = (server, path, params) => {
 }
 
 export default {
+    gestionar_peticion(server, params){
+        return post(server, "api/autorizaciones/gestionar_peticion", params)
+    },
     get_lista_autorizaciones(server){
         return post(server, "api/autorizaciones/get_lista_autorizaciones", new FormData())
     },

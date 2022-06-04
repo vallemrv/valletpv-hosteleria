@@ -1,5 +1,6 @@
 import * as types from "./mutations_types"
 
+
 const contains_func = (instrucciones, inst, reg) => {
     let contains = false;
     instrucciones.forEach( (obj) => {
@@ -33,18 +34,20 @@ export default {
         state.error = null;
         state.total = 0;
         state.chartSet = {
-            labels: [],
+            labels: ["borrado", "cobrado", "pedido"],
             datasets: [{backgroundColor:[], data:[] }]
         }
         let chartSet = state.chartSet;
-        data.forEach((d, i) => {
-            let estado = d.estado;
-            chartSet.labels.push(estadoToStr(estado))
-            chartSet.datasets[0].backgroundColor.push(color[i])
-            chartSet.datasets[0].data.push(d.total)
-            if (estado == "P" || estado == "C"){
-                state.total += d.total;
+        data.forEach((d) => {
+            if (d.estado != "R"){
+                let estado = d.estado;
+                let i = chartSet.labels.indexOf(estadoToStr(estado))
+                chartSet.datasets[0].backgroundColor[i] = (color[i])
+                chartSet.datasets[0].data[i] = (d.total)
+                if (estado == "P" || estado == "C"){
+                    state.total += d.total;
             }
+          }
         })
     },
     [types.ON_MENSAJE] (state, mensaje){
@@ -59,7 +62,9 @@ export default {
             } else if ( op == "rm") {
                 let op_ex = mensaje.extras.op
                 let precio = mensaje.extras.precio;
-                if (op_ex == "borrado") state.total -= precio;
+                if (op_ex == "borrado"){
+                     state.total -= precio;
+                }
                 let index = state.chartSet.labels.indexOf("pedido");
                 state.chartSet.datasets[0].data[index] -= precio;
                 index = state.chartSet.labels.indexOf(op_ex);
@@ -74,8 +79,8 @@ export default {
             }
         }else if (tb == "mensajes"){
               state.last_accion = mensaje.obj.mensaje
-              state.mensajes.push(mensaje);
-              this.$notificacion.playAudio();
+              state.mensajes.push(mensaje.obj);
+              state.new_men = true;
         }else{
             console.log(mensaje)
         }

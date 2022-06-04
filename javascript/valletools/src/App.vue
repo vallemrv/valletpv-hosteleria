@@ -3,6 +3,7 @@
     <v-main>
       <router-view></router-view>
       <valle-footer></valle-footer>
+      <audio src="" id="eventAudio"></audio>
     </v-main>
   </v-app>
 </template>
@@ -17,7 +18,7 @@ export default {
     //
   }),
   computed:{
-    ...mapState(["empresa", "isWSConnected"])
+    ...mapState(["empresa", "isWSConnected", "new_men"])
   },
   methods:{
     ...mapActions(["cargarEmpresas", "getListado", "getDatasets", "getAlertas"])
@@ -28,6 +29,12 @@ export default {
          this.getDatasets();
          this.getAlertas();
          this.getListado("mesasabiertas");
+      }
+    },
+    new_men(v){
+      if (v){
+        this.$notification.playAudio();
+        this.$store.state.new_men = null;
       }
     }
   },

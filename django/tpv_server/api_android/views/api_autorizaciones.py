@@ -67,7 +67,7 @@ def get_lista_men(id):
 
 @csrf_exempt
 def gestionar_peticion(request):
-    aceptada = request.POST["aceptada"]
+    aceptada = str(request.POST["aceptada"])
     idpeticion = request.POST["idpeticion"]
     p = PeticionesAutoria.objects.filter(id=idpeticion).first()
     if p and aceptada == "1":

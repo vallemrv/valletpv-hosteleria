@@ -1407,11 +1407,13 @@ class Ticket(models.Model):
         if (cierre):
             last_ticket = cierre.ticketfinal
 
-        
+
         t = Ticketlineas.objects.filter(ticket__id__lt=last_ticket).order_by("-linea_id").first()
         last_id = 0
         if  (t):
             last_id = t.linea.id 
+
+        print(last_id, Lineaspedido.objects.last().id)    
         return last_id  
 
     def save(self, *args, **kwargs):

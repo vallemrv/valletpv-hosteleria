@@ -1,8 +1,6 @@
 
 // Importar archivos de audio
 import audio from '@/assets/mario.mp3'
-
-
  
  // Método 2: agregar atributos personalizados
 document.body.addEventListener('click',function( e ){

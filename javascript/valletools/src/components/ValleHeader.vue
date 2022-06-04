@@ -9,11 +9,13 @@
           color="primary"
           v-if="ocupado"
          ></v-progress-circular>
-         <v-btn icon v-if="mensajes.length > 0">
-           <v-badge color="info" :content="mensajes.length">
-          <v-icon icon="mdi-inbox-arrow-down"></v-icon>
-        </v-badge>
-      </v-btn>
+         <router-link  v-if="mensajes.length > 0" to="/mensajes">
+            <v-btn icon>
+              <v-badge color="info" :content="mensajes.length">
+              <v-icon icon="mdi-inbox-arrow-down"></v-icon>
+            </v-badge>
+          </v-btn>
+       </router-link>
       <v-btn icon @click="showDialog=true"><v-icon>mdi-home-plus</v-icon></v-btn>
       <v-btn icon v-if="empresas.length > 1">
       <v-icon>mdi-dots-vertical</v-icon>
@@ -76,8 +78,7 @@ export default {
     on_click_menu(name){
       this.$router.push({name:name})
     }
-  }
- 
+  },
 };
 </script>
 

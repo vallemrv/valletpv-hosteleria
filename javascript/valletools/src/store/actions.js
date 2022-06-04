@@ -13,11 +13,26 @@ const connet_ws = (commit, state) => {
 
 
 export default {
+    gestionarAlertas( {commit, state}, {idpeticion, aceptada}){
+        commit(types.GET_REQUEST)
+        let params = new FormData();
+        params.append("idpeticion", idpeticion);
+        params.append("aceptada", aceptada)
+        API.gestionar_peticion(state.empresa.url, params).then( r=>{
+            commit(types.REQUEST_SUCCESS)
+            state.mensajes = state.mensajes.filter(e =>{
+                return e.idpeticion != idpeticion
+            })
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
     getAlertas( {commit, state}){
        commit(types.GET_REQUEST)
        API.get_lista_autorizaciones(state.empresa.url).then( r =>{
            state.mensajes = r
-            commit(types.REQUEST_SUCCESS)
+           commit(types.REQUEST_SUCCESS)
         })
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})

@@ -10,5 +10,6 @@ export default {
     total: 0,
     mensajes:[],
     last_accion: "",
-    mesasabiertas: []
+    mesasabiertas: [],
+    new_men: null,
 }
