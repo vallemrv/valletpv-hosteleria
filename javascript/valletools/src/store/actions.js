@@ -13,6 +13,16 @@ const connet_ws = (commit, state) => {
 
 
 export default {
+    getAlertas( {commit, state}){
+       commit(types.GET_REQUEST)
+       API.get_lista_autorizaciones(state.empresa.url).then( r =>{
+           state.mensajes = r
+            commit(types.REQUEST_SUCCESS)
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
     selEmpresa({ commit, state }, index){
         state.empresa = state.empresas[index];
         localStorage.empresa_index = index;
@@ -24,6 +34,18 @@ export default {
         if (index) state.empresa = state.empresas[index];
         else state.empresa = state.empresas[0];
         connet_ws(commit, state);
+    },
+    getDatasets({ commit, state }){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        API.dataset(state.empresa.url, params).then( r=>{
+            commit(types.SET_DATASETS, r)
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
     },
     addEmpresa({ commit, state }, empresa){
         commit(types.GET_REQUEST)
@@ -95,7 +117,7 @@ export default {
         if (filter) params.append("filter", filter);
         params.append("user", state.empresa.user)
         params.append("token", state.empresa.token)
-        API.getListado(params)
+        API.getListado(state.empresa.url, params)
         .then( r => commit(types.GET_LISTADO, {result: r}))
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})

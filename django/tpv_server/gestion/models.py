@@ -674,7 +674,7 @@ class Lineaspedido(models.Model):
                     r.save()
                 else:
                     r.delete()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "rm_linea"})
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "borrado", "precio": float(r.precio)})
                 mesa.infmesa.modifiar_composicion(r)
 
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
@@ -791,7 +791,7 @@ class Mesasabiertas(models.Model):
                 historial.save()
                 r.estado = 'A'
                 r.save()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "rm_linea"})
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "borrado", "precio": float(r.precio)})
 
 
             obj = mesa.serialize()
@@ -1385,7 +1385,7 @@ class Ticket(models.Model):
                     linea.save()
                     r.estado = 'C'
                     r.save()
-                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "c_linea"})
+                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "cobrado", "precio": float(r.precio)})
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if numart <= 0:
@@ -1398,6 +1398,21 @@ class Ticket(models.Model):
                 Sync.actualizar(Mesasabiertas._meta.db_table)
 
         return (total, id)
+
+
+    @staticmethod
+    def get_last_id_linea():
+        cierre = Cierrecaja.objects.first()
+        last_ticket = 0
+        if (cierre):
+            last_ticket = cierre.ticketfinal
+
+        
+        t = Ticketlineas.objects.filter(ticket__id__lt=last_ticket).order_by("-linea_id").first()
+        last_id = 0
+        if  (t):
+            last_id = t.linea.id 
+        return last_id  
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)

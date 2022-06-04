@@ -6,5 +6,9 @@ export default {
     empresas: [],
     ws:[],
     isWSConnected: false,
-    chartSet:{ }
+    chartSet:{ },
+    total: 0,
+    mensajes:[],
+    last_accion: "",
+    mesasabiertas: []
 }

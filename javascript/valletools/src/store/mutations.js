@@ -19,9 +19,68 @@ const contains_func = (instrucciones, inst, reg) => {
     return contains;
 }   
 
+const estadoToStr = (estado)=>{
+    if (estado=="P") return "pedido";
+    else if (estado == "C") return "cobrado";
+    else if (estado == "A") return "borrado";
+}
+
+const color = ["#D6EAF8", "#F6D6F8", "#ABEBC6"]
+
 export default { 
+    [types.SET_DATASETS] (state, data){
+        state.ocupado= false;
+        state.error = null;
+        state.total = 0;
+        state.chartSet = {
+            labels: [],
+            datasets: [{backgroundColor:[], data:[] }]
+        }
+        let chartSet = state.chartSet;
+        data.forEach((d, i) => {
+            let estado = d.estado;
+            chartSet.labels.push(estadoToStr(estado))
+            chartSet.datasets[0].backgroundColor.push(color[i])
+            chartSet.datasets[0].data.push(d.total)
+            if (estado == "P" || estado == "C"){
+                state.total += d.total;
+            }
+        })
+    },
     [types.ON_MENSAJE] (state, mensaje){
-        console.log(mensaje)
+        let op = mensaje.op;
+        let tb = mensaje.tb;
+        if (tb == "lineaspedido"){
+            if ( op == "insert" ){
+                let precio = mensaje.obj.Precio;
+                state.total += precio;
+                let index = state.chartSet.labels.indexOf("pedido");
+                state.chartSet.datasets[0].data[index] += precio;
+            } else if ( op == "rm") {
+                let op_ex = mensaje.extras.op
+                let precio = mensaje.extras.precio;
+                if (op_ex == "borrado") state.total -= precio;
+                let index = state.chartSet.labels.indexOf("pedido");
+                state.chartSet.datasets[0].data[index] -= precio;
+                index = state.chartSet.labels.indexOf(op_ex);
+                state.chartSet.datasets[0].data[index] += precio;
+            } 
+        }
+        else if (tb == "mesasabiertas" && op == "md"){
+            let obj = mensaje.obj;
+            if (obj.abierta == 1 && obj.num == 0) state.mesasabiertas.push(obj);
+            else if (obj.abierta == 0) {
+                state.mesasabiertas = Object.values(state.mesasabiertas).filter( e => e.ID != obj.ID)
+            }
+        }else if (tb == "mensajes"){
+              state.last_accion = mensaje.obj.mensaje
+              state.mensajes.push(mensaje);
+              this.$notificacion.playAudio();
+        }else{
+            console.log(mensaje)
+        }
+
+
     },
     [types.ON_CONNECT] (state){
         state.isWSConnected = true;
@@ -41,7 +100,7 @@ export default {
         state.ocupado= false;
         state.error = error;
     },
-    [types.GET_LISTADOS] (state, {result}){
+    [types.GET_LISTADO] (state, {result}){
         state.ocupado = false;
         state.error = null
         state[result.tb] = result.regs

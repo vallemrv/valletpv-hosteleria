@@ -1,22 +1,22 @@
 <script>
 import { defineComponent, h} from 'vue'
-import { Bar } from 'vue-chartjs'
+import { Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  BarElement,
+  ArcElement,
   CategoryScale,
   LinearScale,
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale)
 
 export default defineComponent({
   name: 'ReactiveChart',
   components: {
-    Bar
+    Doughnut
   },
   props: {
          chartData:{
@@ -29,7 +29,7 @@ export default defineComponent({
             maintainAspectRatio: false
             }
 
-        return ()  => h(Bar, 
+        return ()  => h(Doughnut, 
                   { chartData: props.chartData,
                     chartOptions: chartOptions})
   } 

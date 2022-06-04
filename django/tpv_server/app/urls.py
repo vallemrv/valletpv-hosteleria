@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = "app"
@@ -11,5 +11,6 @@ urlpatterns = [
     path("mod_sec", views.mod_sec, name="mod_sec"),
     path("reset_db", views.reset_db, name="reset_db"),
     path("get_datos_empresa", views.get_datos_empresa, name="get_datos_empresa"),
-    path("send_cierre", views.send_cierre_by_id, name="send_cierre_by_id" )
+    path("send_cierre", views.send_cierre_by_id, name="send_cierre_by_id" ),
+    path("ventas/", include("app.ventas.urls"), name="ventas")
 ]

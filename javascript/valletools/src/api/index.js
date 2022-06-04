@@ -5,14 +5,14 @@ const post = (server, path, params) => {
 }
 
 export default {
+    get_lista_autorizaciones(server){
+        return post(server, "api/autorizaciones/get_lista_autorizaciones", new FormData())
+    },
+    dataset(server, params){
+        return post(server, "app/ventas/datasets", params)
+    },
     get_datos_empresa(server, params){
         return post(server, "app/get_datos_empresa", params)
-    },
-    borrar_ventas(server, params){
-        return post("app/reset_db", params)
-    },
-    modificarSecciones(server, params){
-        return post(server, "app/mod_sec", params)
     },
     addItem(server, params){
         return post(server, "app/add_reg", params)

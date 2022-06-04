@@ -9,6 +9,11 @@
           color="primary"
           v-if="ocupado"
          ></v-progress-circular>
+         <v-btn icon v-if="mensajes.length > 0">
+           <v-badge color="info" :content="mensajes.length">
+          <v-icon icon="mdi-inbox-arrow-down"></v-icon>
+        </v-badge>
+      </v-btn>
       <v-btn icon @click="showDialog=true"><v-icon>mdi-home-plus</v-icon></v-btn>
       <v-btn icon v-if="empresas.length > 1">
       <v-icon>mdi-dots-vertical</v-icon>
@@ -57,7 +62,7 @@ export default {
             ],
   }),
   computed: {
-    ...mapState(["empresa", "empresas", "ocupado"]),
+    ...mapState(["empresa", "empresas", "ocupado", "mensajes"]),
   },
   methods: {
     ...mapActions(["addEmpresa",  "selEmpresa"]),

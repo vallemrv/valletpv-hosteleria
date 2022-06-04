@@ -5,7 +5,7 @@ from tokenapi.http import JsonResponse
 from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Camareros, Lineaspedido,  Receptores,
                             Mesasabiertas, PeticionesAutoria, Ticket)
-from api_android.tools import (send_imprimir_ticket, send_mensaje_devices, send_mensaje_impresora)
+from api_android.tools import (send_imprimir_ticket, send_mensaje_impresora)
 
 @csrf_exempt
 def send_informacion(request):
@@ -50,10 +50,14 @@ def pedir_autorizacion(request):
 
 @csrf_exempt
 def get_lista_autorizaciones(request):
-    return JsonResponse(get_lista_men(request.POST["idautorizado"]))
+    id = -1 if "idautorizado" not in request.POST else request.POST["idautorizado"]
+    return JsonResponse(get_lista_men(id))
 
-def get_lista_men(id):   
-    peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
+def get_lista_men(id): 
+    if id > 0:  
+        peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
+    else:
+        peticiones = PeticionesAutoria.objects.all()
     mensajes = []
     for p in peticiones:
         mensajes.append(p.serialize())

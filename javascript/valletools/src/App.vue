@@ -17,16 +17,17 @@ export default {
     //
   }),
   computed:{
-    ...mapState(["empresa"])
+    ...mapState(["empresa", "isWSConnected"])
   },
   methods:{
-    ...mapActions(["cargarEmpresas", "getListados", "getListado"])
+    ...mapActions(["cargarEmpresas", "getListado", "getDatasets", "getAlertas"])
   },
   watch:{
-    empresa(v){
+    isWSConnected(v){
       if (v){
-        this.getListados(["lineaspedido", "mesasabiertas"])
-        this.getListado("")
+         this.getDatasets();
+         this.getAlertas();
+         this.getListado("mesasabiertas");
       }
     }
   },

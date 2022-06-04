@@ -67,7 +67,7 @@ export default class  {
 
         // onmessage - called when a message is received from the server.
         this.customSocket.onmessage = (event) => {
-          this.commit(types.ON_MENSAJE, event.data);
+          this.commit(types.ON_MENSAJE, JSON.parse(event.data));
         }
            
     }
