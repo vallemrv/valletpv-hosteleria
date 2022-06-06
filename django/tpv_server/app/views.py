@@ -220,11 +220,12 @@ def modifcar_reg(inst):
             
 
         obj.save()
+        obj = obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj)
         update = {
             "op": "md",
             "device": "",
             "tb": tb_name,
-            "obj": obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj),
+            "obj":obj,
             "receptor": "devices",
             }
         send_mensaje_devices(update) 

@@ -77,7 +77,7 @@ export default {
     ...mapActions(["addItem", "addInstruccion"]),
     close_dialogo() {
       this.textAlert = null;
-      this.$emit("close");
+      this.$emit("close", null);
     },
     enviar() {
       this.textAlert = this.$tools.valid_form(this.item, this.form);
@@ -102,6 +102,8 @@ export default {
             filter: this.item.filter,
           };
           this.addInstruccion({ inst: inst });
+        } else if (this.tipo == "add_empresa"){
+           this.$emit("close", this.item);
         }
         this.close_dialogo();
       }

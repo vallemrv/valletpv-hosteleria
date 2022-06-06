@@ -1,97 +1,40 @@
 <template>
-  <v-app-bar app>
-    <router-link to="/">
-      <v-toolbar-title v-if="empresa"> {{ empresa.nombre }} </v-toolbar-title>
-      <v-toolbar-title v-else>Empresa de prueba</v-toolbar-title>
-    </router-link>
+  <v-app-bar color="#cfb6d4" class="w-100" dense fixed>
+     <v-btn icon @click="$router.go(-1)"> <v-icon>mdi-arrow-left</v-icon></v-btn>
+     <v-toolbar-title >
+        <v-row class="pa-2 pl-3">
+          <v-col cols="12" class="pa-0 ma-0 text-uppercase">{{ title }}</v-col>
+          <v-col cols="12" class="pa-0 ma-0 text-caption">{{ empresa.nombre }} </v-col>
+        </v-row>
+     </v-toolbar-title>
+     <v-progress-circular
+            indeterminate
+            color="primary"
+            v-if="ocupado"
+          ></v-progress-circular>
     <v-spacer></v-spacer>
-
     <valle-inbox :num_inst="num_inst" v-if="num_inst > 0"></valle-inbox>
-
-    <v-menu v-model="menu" anchor="bottom end" origin="auto">
-      <template v-slot:activator="{ props }">
-        <v-btn icon v-bind="props">
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
-      </template>
-
-      <v-list>
-        <v-list-item v-for="(item, index) in items" :key="index" @click="showData(item)">
-          <v-list-item-title>
-            {{ item.title }}
-            <v-icon v-if="item.icon">{{ item.icon }}</v-icon>
-          </v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="salir()" v-if="user">
-          {{ user[0].username }}
-          <v-icon class="ml-3">mdi-location-exit</v-icon>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+     <v-btn v-for="(btn, i) in btns" :key="i" icon @click="btn.callback(btn.op)">
+     <v-icon>{{btn.icon}}</v-icon>
+     </v-btn>
   </v-app-bar>
 </template>
 
 <script>
-import router from "@/router";
 import { mapState, mapActions } from "vuex";
 import ValleInbox from "./ValleInbox.vue";
 export default {
   components: { ValleInbox },
-  data: () => ({
-    items: [
-      { title: "Gestion", link: { name: "gestion" } },
-      { title: "Ventas", link: { name: "ventas" } },
-    ],
-    menu: false,
-  }),
+  props:["title", "btns"],
+  data: () => ({ }),
   computed: {
-    ...mapState(["user", "empresa", "token", "error", "instrucciones"]),
+    ...mapState(["empresa",  "ocupado", "instrucciones"]),
     num_inst() {
       return this.instrucciones ? this.instrucciones.length : 0;
     },
   },
   methods: {
-    showData: function (item) {
-      router.push(item.link);
-      this.menu = false;
-    },
-    mostrarUser() {
-      if (this.token != null && this.token != undefined) {
-        if (localStorage.user) {
-          this.$store.state.user = JSON.parse(localStorage.user);
-        } else {
-          let params = new FormData();
-          params.append("app", "auth");
-          params.append("tb", "user");
-          params.append("filter", JSON.stringify({ id: this.token.id }));
-          this.getListado({ params: params });
-        }
-      }
-    },
-    salir() {
-      this.$tools.salir(this.$store);
-    },
-    ...mapActions(["getListado", "getEmpresa"]),
-  },
-  watch: {
-    user(v) {
-      if (v) {
-        localStorage.user = JSON.stringify(v);
-      }
-    },
-    error(v) {
-      if (v) {
-        if (v.request && v.request.status == 403) {
-          this.salir();
-        }
-      }
-    },
-  },
-  created() {
-    this.mostrarUser();
-    if (!this.empresa) {
-      this.getEmpresa();
-    }
+    ...mapActions(["getListado"]),
   },
 };
 </script>

@@ -16,7 +16,7 @@
       >
         <v-row cols="12" class="pa-0 ma-0 text-caption">
           <div class="w-100" v-if="!tipo || tipo == 'number'">
-            <v-col cols="12" color="#5868ff" class="current_val"> {{ _value }} </v-col>
+            <v-col cols="12" color="#5868ff" class="current_val"><span> {{ _value }}</span>  </v-col>
             <v-col cols="12" class="old_val" v-if="val_old"> {{ val_old }} </v-col>
           </div>
         </v-row>
@@ -126,7 +126,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+span{
+  white-space: normal;
+}
 .current_val {
   margin: 0;
   padding: 0;

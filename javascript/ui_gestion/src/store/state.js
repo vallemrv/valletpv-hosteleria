@@ -6,4 +6,5 @@ export default {
     instrucciones: null,
     itemsFiltrados: [],
     empresa: null,
+    empresas: [],
 }

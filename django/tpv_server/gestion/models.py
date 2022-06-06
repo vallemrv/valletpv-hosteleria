@@ -1152,8 +1152,13 @@ class Subteclas(models.Model):
     def update_for_devices():
         a = []
         for sub in Subteclas.objects.all():
-            a.append(model_to_dict(sub))
+            a.append(sub.serialize())
         return a
+
+    def serialize(self):
+        obj = model_to_dict(self)
+        obj["incremento"] = float(self.incremento)
+        return obj
 
         
     def save(self, *args, **kwargs):

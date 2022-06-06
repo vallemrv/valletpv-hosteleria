@@ -45,10 +45,11 @@
                     >
                       <v-item v-slot="{ isSelected, toggle }">
                         <v-btn
-                          class="w-100 text-caption"
+                         block
+                          class="text-caption pa-6"
                           :color="isSelected ? 'primary' : '#cfb6d4'"
                           @click="toggle"
-                          >{{ f }}</v-btn
+                          ><span>{{ f }}</span></v-btn
                         >
                       </v-item>
                     </v-col>
@@ -131,3 +132,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+span {
+   white-space: normal;
+}
+</style>

@@ -1,24 +1,19 @@
 <template>
   <v-app>
-    <valle-login v-if="token == null"></valle-login>
-    <div v-else>
-      <valle-header></valle-header>
       <v-main app>
-        <v-container><router-view></router-view></v-container>
+          <router-view></router-view>
       </v-main>
       <valle-footer></valle-footer>
-    </div>
   </v-app>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
 import ValleFooter from "./components/ValleFooter";
-import ValleHeader from "./components/ValleHeader";
-import ValleLogin from "./components/ValleLogin";
+import ValleMainHeader from "./components/ValleMainHeader.vue";
 
 export default {
-  components: { ValleFooter, ValleHeader, ValleLogin },
+  components: { ValleFooter, ValleMainHeader },
   name: "App",
   data() {
     const { offsetHeight } = document.documentElement;
@@ -30,16 +25,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(["ocupado", "token"]),
+    ...mapState(["ocupado", "empresa"]),
   },
-  methods: {
-    ...mapActions(["getListado"]),
+  methods:{
+    ...mapActions(["cargarEmpresas"]),
   },
-  created() {
-    if (localStorage.token) {
-      this.$store.state.token = JSON.parse(localStorage.token);
+  mounted(){
+    if (localStorage.empresas){
+      this.cargarEmpresas();
     }
-  },
+  }
 };
 </script>
 
