@@ -1,31 +1,36 @@
 <template>
-  <valle-editor-item-vue
-    title="Familias"
-    :tabla="tabla"
-    :tb_name="tb_name"
-    @click_tools="on_click_tools"
-    :form="form"
-    :tools="tools"
-  ></valle-editor-item-vue>
-  <valle-dialogo-form-vue
-    @close="() => (showDialogo = false)"
-    :show="showDialogo"
-    title="Editar"
-    :item="itemSel"
-    :form="form"
-    :tb_name="tb_name"
-    tipo="md"
-  ></valle-dialogo-form-vue>
+   <ValleHeader title="Familias" anchor="bottom end"/>
+   <v-container>
+      <valle-editor-item-vue
+        title="Familias"
+        :tabla="tabla"
+        :tb_name="tb_name"
+        @click_tools="on_click_tools"
+        :form="form"
+        :tools="tools"
+      ></valle-editor-item-vue>
+      <valle-dialogo-form-vue
+        @close="() => (showDialogo = false)"
+        :show="showDialogo"
+        title="Editar"
+        :item="itemSel"
+        :form="form"
+        :tb_name="tb_name"
+        tipo="md"
+      ></valle-dialogo-form-vue>
+  </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import ValleEditorItemVue from "@/components/ValleEditorItem.vue";
 import ValleTecladosDialogo from "@/components/ValleTeclados.vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
-  components: { ValleDialogoFormVue, ValleEditorItemVue, ValleTecladosDialogo },
+  components: { ValleDialogoFormVue, ValleEditorItemVue,
+                ValleHeader, ValleTecladosDialogo },
   computed: {
     ...mapState(["familias", "receptores", "itemsFiltrados"]),
     ...mapGetters(["getItemsFiltered", "getListValues"]),

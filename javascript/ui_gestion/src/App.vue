@@ -16,13 +16,8 @@ export default {
   components: { ValleFooter, ValleMainHeader },
   name: "App",
   data() {
-    const { offsetHeight } = document.documentElement;
     return {
-      miToken: null,
-      isOverflowing: 0,
-      myHeight: "0",
-      offsetHeight,
-    };
+   };
   },
   computed: {
     ...mapState(["ocupado", "empresa"]),

@@ -1,9 +1,7 @@
-import PreciosView from '@/views/gestion/teclados/PreciosView'
-import SeccionesView from '@/views/gestion/teclados/SeccionesView'
-import TeclasView from '@/views/gestion/teclados/TeclasView'
+import TeclasView from '@/views/gestion/teclados/TeclasView/TeclasView'
 import CamarerosView from '@/views/gestion/camareros/CamarerosView'
-import CamarerosPase from '@/views/gestion/camareros/CamarerosPaseView'
-import VistaTeclas from '@/views/gestion/teclados/VistaTeclas'
+
+import SeccionesView from '@/views/gestion/teclados/SeccionesView'
 import TecladosComanda from '@/views/gestion/teclados/TecladosComanda'
 import TecladosTPV from '@/views/gestion/teclados/TecladosTPV'
 import FamiliasView from '@/views/gestion/teclados/FamiliasView'
@@ -14,11 +12,6 @@ import MesasView from '@/views/gestion/mesas/MesasView'
 import TeclasByFamilias from '@/views/gestion/teclados/TeclasByFamilias'
 
 const camarerosRoutes = [
-    {
-        path: "/gestion/camareros/pase",
-        component: CamarerosPase,
-        name: 'camarerospase'
-    },
     {
         path: "/gestion/camareros/edicion",
         component: CamarerosView,
@@ -55,11 +48,6 @@ const tecladosRoutes = [
         name: 'familias'
     },
     {
-        path: "/gestion/teclados/precio",
-        component: PreciosView,
-        name: 'cambioprecios'
-    },
-    {
         path: "/gestion/teclados/secciones",
         component: SeccionesView,
         name: 'secciones'
@@ -69,19 +57,11 @@ const tecladosRoutes = [
         component: TeclasView,
         name: 'teclas'
     },
-    
-    {
-        path: '/gestion/teclados/vista_teclas',
-        component: VistaTeclas,
-        name: 'vista'
-    },
-     
     {
         path: '/gestion/teclados/teclados_comanda',
         component: TecladosComanda,
         name: 'tecladoscom'
     },
-    
     {
         path: '/gestion/teclados/teclados_tpv/:id?',
         component: TecladosTPV,

@@ -1,24 +1,13 @@
 <template>
-  <v-row class="pa-5">
-    <v-col cols="12" class="">
-      <v-toolbar color="#cfb6d4">
-        <v-toolbar-title>
-          {{ title }}
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            v-if="ocupado"
-          ></v-progress-circular
-        ></v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn v-if="form" stacked size="small" @click="on_click_new"
-          ><v-icon>mdi-newspaper-plus</v-icon></v-btn
-        >
-      </v-toolbar>
-    </v-col>
+  
+   
+
+    <v-row class="pa-5">  
+
     <v-col cols="12" v-if="filtro">
       <valle-filtros :filtro="filtro" @click_filter="on_click_filter"></valle-filtros>
     </v-col>
+
     <v-col cols="12" v-if="tabla">
       <valle-listados-tb
         :items="itemsFiltrados"
@@ -29,6 +18,7 @@
         :tb_name="tb_name"
       ></valle-listados-tb>
     </v-col>
+
     <valle-dialogo-form
       @close="() => (showDialog = false)"
       :show="showDialog"
@@ -39,24 +29,27 @@
       :tipo="tipo"
     >
     </valle-dialogo-form>
+    
   </v-row>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import ValleHeader from "./ValleHeader";
 import ValleListadosTb from "@/components/ValleListadosTb.vue";
 import ValleFiltros from "@/components/ValleFiltros.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 
 export default {
   props: ["title", "filtro", "tb_name", "form", "tabla", "tools"],
-  components: { ValleListadosTb, ValleFiltros, ValleDialogoForm },
+  components: { ValleListadosTb, ValleFiltros, ValleDialogoForm, ValleHeader },
   data() {
     return {
       itemSel: {},
       showDialog: false,
       titleDialogo: "Nuevo",
       tipo: "add",
+      btns:[{icon:"mdi-plus", callback: this.on_click_new, op:"new"}]
     };
   },
   computed: {

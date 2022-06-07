@@ -1,10 +1,9 @@
 <template>
+
+ <ValleHeader title="Teclas por familia" anchor="bottom end"/>
+ <v-container>
   <v-row>
-    <v-col cols="12">
-      <v-toolbar color="#cfb6d4">
-        <v-toolbar-title>Tecla por familias</v-toolbar-title>
-      </v-toolbar>
-    </v-col>
+    
     <v-col cols="12">
       <v-card class="mt-5">
         <v-card-title> Familias </v-card-title>
@@ -47,15 +46,17 @@
     tipo="md"
     tb_name="teclas"
   ></valle-dialogo-form-vue>
+  </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleSelectVue from "@/components/ValleSelect.vue";
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import { mapGetters, mapActions, mapState } from "vuex";
 
 export default {
-  components: { ValleSelectVue, ValleDialogoFormVue },
+  components: { ValleSelectVue, ValleDialogoFormVue, ValleHeader },
   data() {
     return {
       idfamilia: null,

@@ -1,4 +1,6 @@
 <template>
+   <ValleHeader title="Receptores" anchor="bottom end"/>
+   <v-container>
   <valle-editor-item-vue
     title="Receptores"
     :tabla="tabla"
@@ -16,15 +18,17 @@
     :tb_name="tb_name"
     tipo="md"
   ></valle-dialogo-form-vue>
+  </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import ValleEditorItemVue from "@/components/ValleEditorItem.vue";
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
-  components: { ValleDialogoFormVue, ValleEditorItemVue },
+  components: { ValleDialogoFormVue, ValleEditorItemVue, ValleHeader },
   computed: {
     ...mapState(["receptores", "itemsFiltrados"]),
     ...mapGetters(["getItemsFiltered"]),

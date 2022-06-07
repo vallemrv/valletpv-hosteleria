@@ -2,25 +2,25 @@
   <v-table fixed-header>
     <thead v-if="items && items.length > 0">
       <tr>
-        <th v-for="(h, i) in headers" :key="i">
+        <th class="text-center" v-for="(h, i) in headers" :key="i">
           {{ h.toUpperCase() }}
         </th>
-        <th class="text-center" v-if="tools">HERRAMIENTAS</th>
+        <th class="text-center pa-0 ma-0" v-if="tools">HERRAMIENTAS</th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(item, i) in items" :key="i">
-        <td v-for="(col, j) in columns" :key="j">
-          <valle-float-form
-            v-if="col.float"
-            :item="item"
-            :column="col.col"
-            :tipo="col.tipo"
-            :rules="col.rules"
-            :tb_name="tb_name"
-          ></valle-float-form>
-
-          <div v-else>{{ col.key ? getName(col, item) : item[col] }}</div>
+        <td class="text-center pa-0 ma-0" v-for="(col, j) in columns" :key="j">
+          <v-container v-if="col.float">
+             <valle-float-form
+                :item="item"
+                :column="col.col"
+                :tipo="col.tipo"
+                :rules="col.rules"
+                :tb_name="tb_name"
+              ></valle-float-form>
+          </v-container>
+          <v-container v-else>{{ col.key ? getName(col, item) : item[col] }}</v-container>
         </td>
         <td class="text-center" v-if="tools">
           <v-menu anchor="start bottom" origin="auto">

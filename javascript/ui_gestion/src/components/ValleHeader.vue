@@ -13,7 +13,7 @@
             v-if="ocupado"
           ></v-progress-circular>
     <v-spacer></v-spacer>
-    <valle-inbox :num_inst="num_inst" v-if="num_inst > 0"></valle-inbox>
+    <valle-inbox :anchor="anchor" :num_inst="num_inst" v-if="num_inst > 0"></valle-inbox>
      <v-btn v-for="(btn, i) in btns" :key="i" icon @click="btn.callback(btn.op)">
      <v-icon>{{btn.icon}}</v-icon>
      </v-btn>
@@ -25,7 +25,7 @@ import { mapState, mapActions } from "vuex";
 import ValleInbox from "./ValleInbox.vue";
 export default {
   components: { ValleInbox },
-  props:["title", "btns"],
+  props:["title", "btns", "anchor"],
   data: () => ({ }),
   computed: {
     ...mapState(["empresa",  "ocupado", "instrucciones"]),

@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-model="showMod" anchor="bottom end" origin="auto">
+  <v-menu v-model="showMod" :anchor="anchor" origin="auto">
     <template v-slot:activator="{ props }">
       <v-btn stacked v-bind="props">
         <v-badge color="info" :content="num_inst">
@@ -46,7 +46,7 @@
 import { mapActions } from "vuex";
 
 export default {
-  props: ["num_inst"],
+  props: ["num_inst", "anchor"],
   data() {
     return { showMod: false };
   },

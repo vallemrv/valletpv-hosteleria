@@ -42,6 +42,11 @@ import { mapState, mapActions } from 'vuex';
 import ValleDialogoForm from './ValleDialogoForm.vue';
 import ValleMenu from './ValleMenu.vue';
 export default {
+  props:{
+    items:{
+      default:[]
+    }
+  },
   components: { ValleDialogoForm, ValleMenu },
   data: () => ({
       drawer: false,
@@ -53,9 +58,7 @@ export default {
         {col:"pass", label:"Contraseña", tp:"password"},
       ],
       itemEmpresa:{},
-      items: [
-          {label: "Precios", icon: "mdi-cash",  value:"cambioprecios"}
-        ],
+      
   }),
   computed: {
     ...mapState(["empresa", "empresas", "ocupado"]),

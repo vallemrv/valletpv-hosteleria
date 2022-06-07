@@ -1,18 +1,16 @@
 <template>
+
+  <ValleHeader :title="title" anchor="bottom end"/>
+  <v-container>
   <v-row v-show="!showOrdenarTeclas && !showAgregarTeclas">
     <v-col cols="12" class="pa-2 mb-5">
       <v-toolbar class="mb-2" color="#cfb6d4">
-        <v-toolbar-title>
-          {{ title }}
-          <v-progress-circular
-            indeterminate
-            color="primary"
-            v-if="ocupado"
-          ></v-progress-circular
-        ></v-toolbar-title>
+        <v-toolbar-title v-if="secSel">
+         {{ secSel.nombre }}
+        </v-toolbar-title>
         <v-spacer></v-spacer>
         <div v-if="secSel">
-          {{ secSel.nombre }}
+          
           <v-btn icon @click="editar_sec"> <v-icon>mdi-pencil</v-icon></v-btn>
           <v-btn icon v-if="items.length < 18" @click="() => (showAgregarTeclas = true)">
             <v-icon>mdi-plus</v-icon></v-btn
@@ -123,9 +121,12 @@
     :show="showEditSec"
     @close_edit_sec="() => (showEditSec = false)"
   ></valle-secciones-tecla-vue>
+
+  </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 import ValleTeclados from "@/components/ValleTeclados.vue";
 import OrdenarTeclas from "@/comp_especificos/OrdenarTeclas.vue";
@@ -140,6 +141,7 @@ export default {
     ValleDialogoForm,
     OrdenarTeclas,
     AgregarTeclas,
+    ValleHeader,
   },
   data() {
     return {

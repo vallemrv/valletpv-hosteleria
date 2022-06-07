@@ -1,20 +1,22 @@
 <template>
   <v-menu
     transition="scale-transition"
-    anchor="top center"
-    origin="top center"
+    :anchor="location"
+    :origin="origin"
     v-model="mostrar"
   >
     <template v-slot:activator="{ props }">
       <v-btn
         block
         :elevation="elevation"
-        class="text-center"
+        class="h-100 text-center'"
         v-bind="props"
         :color="col_sel"
+        height="auto"
         @click.stop="() => {}"
       >
-        <v-row cols="12" class="pa-0 ma-0 text-caption">
+    
+        <v-row class="pa-0 ma-0 text-caption">
           <div class="w-100" v-if="!tipo || tipo == 'number'">
             <v-col cols="12" color="#5868ff" class="current_val"><span> {{ _value }}</span>  </v-col>
             <v-col cols="12" class="old_val" v-if="val_old"> {{ val_old }} </v-col>
@@ -46,7 +48,10 @@
 import { mapActions } from "vuex";
 
 export default {
-  props: ["item", "column", "rules", "hint", "app", "tb_name", "value", "tipo", "hint"],
+  props: ["item", "column", "rules", 
+          "hint", "app", "tb_name", 
+          "value", "tipo", "hint", 
+          "location", "origin"],
   data: () => {
     return {
       elevation: 3,
@@ -139,5 +144,8 @@ span{
   padding: 0;
   color: brown;
   font-size: smaller;
+}
+.v-btn{
+  min-height: 40px;
 }
 </style>

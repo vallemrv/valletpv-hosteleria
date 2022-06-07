@@ -121,6 +121,6 @@ export default {
 
 <style>
 .v-dialog--custom {
-  width: 90%;
+  width: 85%;
 }
 </style>
