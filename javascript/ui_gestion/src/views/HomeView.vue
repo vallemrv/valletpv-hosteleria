@@ -12,8 +12,11 @@
             </v-label>
         </v-col>
         <v-col cols="12" class="ma-0 pa-0 mb-5">
-            <v-label  class="text-subtitle-2 font-weight-black">
+            <v-label v-if="!empresa" class="text-subtitle-2 font-weight-black">
                 Crea empresas, o elige una.
+            </v-label>
+            <v-label else class="font-weight-black">
+                Estas gestionando {{ empresa.nombre_server }}
             </v-label>
         </v-col>
       </v-row>
@@ -22,6 +25,7 @@
 </template>
 <script>
 import ValleMainHeader from '@/components/ValleMainHeader.vue';
+import { mapState } from 'vuex';
 export default {
   components: { ValleMainHeader },
   data: () => ({
@@ -40,5 +44,8 @@ export default {
 
         ],
   }),
+  computed:{
+    ...mapState(["empresa"])
+  }
 };
 </script>

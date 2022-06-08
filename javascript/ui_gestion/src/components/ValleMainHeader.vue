@@ -18,7 +18,7 @@
               v-for="(item, index) in empresas"
               :key="index"
               :value="index"
-              @click="selEmpresa(index)"
+              @click="selEmpresa(index); co"
              >
               <v-list-item-title>{{ item.nombre }}</v-list-item-title>
             </v-list-item>
