@@ -1,31 +1,33 @@
 <template>
+<ValleHeader title="Zonas" anchor="bottom end" :btns="btns"/>
+   <v-container>
   <valle-editor-item-vue
-    title="Zonas"
     :tabla="tabla"
     :tb_name="tb_name"
     @click_tools="on_click_tools"
-    :form="form"
     :tools="tools"
   ></valle-editor-item-vue>
   <valle-dialogo-form-vue
     @close="() => (showDialogo = false)"
     :show="showDialogo"
-    title="Editar"
+    :title="titleForm"
     :item="itemSel"
     :form="form"
     :tb_name="tb_name"
-    tipo="md"
+    :tipo="tipo"
   ></valle-dialogo-form-vue>
+  </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import ValleEditorItemVue from "@/components/ValleEditorItem.vue";
 
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
-  components: { ValleDialogoFormVue, ValleEditorItemVue },
+  components: { ValleDialogoFormVue, ValleEditorItemVue, ValleHeader },
   computed: {
     ...mapState(["zonas", "itemsFiltrados"]),
     ...mapGetters(["getItemsFiltered"]),
@@ -35,6 +37,9 @@ export default {
       showDialogo: false,
       itemSel: null,
       tb_name: "zonas",
+      tipo:'md',
+      titleForm: "Editar zona",
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "rgb", label: "Color", tp: "color", default: "255,0,255" },
@@ -63,6 +68,13 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+     op_btns(op){
+        this.showDialogo = true;
+        this.tipo = "add";
+        this.itemSel = {};
+        this.titleForm = "Agregar zona"
+        this.tb_name = "zonas"
+    },
     cargarRegistro() {
       if (!this.zonas || this.zonas.length == 0) {
         this.getListadoCompuesto({ tablas: ["zonas"] });

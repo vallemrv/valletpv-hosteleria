@@ -21,6 +21,7 @@
                   :column="column"
                   :tb_name="tb_name"
                   @change="on_click_ordenar"
+                  location="bottom end"
                 ></valle-float-form-vue>
               </v-col>
             </v-row>

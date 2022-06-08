@@ -1,5 +1,5 @@
 <template>
- <ValleHeader title="Secciones" anchor="bottom end"/>
+ <ValleHeader title="Secciones" anchor="bottom end" :btns='btns'/>
    <v-container>
   <valle-editor-item-vue
     title="Secciones"
@@ -12,11 +12,11 @@
   <valle-dialogo-form-vue
     @close="() => (showDialogo = false)"
     :show="showDialogo"
-    title="Editar"
+    :title="titleDialogo"
     :item="itemSel"
     :form="form"
     :tb_name="tb_name"
-    tipo="md"
+    :tipo="tipo"
   ></valle-dialogo-form-vue>
   </v-container>
 </template>
@@ -39,6 +39,9 @@ export default {
       showDialogo: false,
       itemSel: null,
       tb_name: "secciones",
+      tipo:'md',
+      titleDialogo: "Editar mesa",
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "rgb", label: "Color", tp: "color", default: "255,0,255" },
@@ -61,6 +64,13 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    op_btns(op){
+        this.showDialogo = true;
+        this.tipo = "add";
+        this.itemSel = {};
+        this.titleDialogo = "Agregar seccion"
+        this.tb_name = "secciones"
+    },
     cargarRegistro() {
       if (!this.secciones || this.secciones.length == 0) {
         this.getListadoCompuesto({ tablas: ["secciones"] });

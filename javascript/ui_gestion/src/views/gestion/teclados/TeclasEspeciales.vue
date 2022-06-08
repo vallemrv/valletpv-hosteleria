@@ -1,4 +1,6 @@
 <template>
+ <ValleHeader title="Composiciones" anchor="bottom end" :btns="btns"/>
+ <v-container>
   <valle-editor-item
     :title="title"
     :filtro="filtro"
@@ -11,23 +13,26 @@
   >
   </valle-editor-item>
   <valle-dialogo-form
-    @close="() => (showDialog = false)"
+    @close="() => {
+        showDialog = false; }"
     :show="showDialog"
     :title="titleForm"
     :item="itemSel"
-    :form="formComp"
-    tb_name="composicionteclas"
+    :form="formSel"
+    :tb_name="tb_name_edit"
     :tipo="tipo"
   >
   </valle-dialogo-form>
+ </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleEditorItem from "@/components/ValleEditorItem.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 import { mapState, mapGetters, mapActions } from "vuex";
 export default {
-  components: { ValleEditorItem, ValleDialogoForm },
+  components: { ValleEditorItem, ValleDialogoForm, ValleHeader },
   data() {
     const colCom = ["nombre", "composicion", "cantidad"];
     const colTecla = ["nombre", "p1", "p2"];
@@ -39,6 +44,7 @@ export default {
       titleForm: "Agregar",
       tipo: "add",
       tabla: null,
+      formSel: [],
       tablaComp: {
         headers: colCom,
         keys: colCom,
@@ -59,6 +65,8 @@ export default {
         text_filters: [{ label: "Buscar teclas", fields: ["nombre", "tag"] }],
         all: [],
       },
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
+      tb_name_edit:"composicion"
     };
   },
   computed: {
@@ -107,6 +115,14 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    op_btns(op){
+        this.showDialog = true;
+        this.tipo = "add";
+        this.itemSel = {};
+        this.titleForm = "Agregar tecla"
+        this.formSel = this.form;
+        this.tb_name = "teclas"
+    },
     mostrarTeclasComp() {
       this.$store.state.itemsFiltrados = this.getItemsFiltered(null, "composicionteclas");
       this.tools = this.toolsComp;
@@ -131,6 +147,8 @@ export default {
     },
 
     on_click_tools(v, op) {
+      this.tb_name_edit = "composicionteclas";
+      this.formSel = this.formComp;
       switch (op) {
         case "add_comp":
         case "add":

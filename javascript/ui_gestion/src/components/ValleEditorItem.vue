@@ -1,35 +1,32 @@
 <template>
-  
-   
 
     <v-row class="pa-5">  
+      <v-col cols="12" v-if="filtro">
+        <valle-filtros :filtro="filtro" @click_filter="on_click_filter"></valle-filtros>
+      </v-col>
 
-    <v-col cols="12" v-if="filtro">
-      <valle-filtros :filtro="filtro" @click_filter="on_click_filter"></valle-filtros>
-    </v-col>
+      <v-col cols="12" v-if="tabla">
+        <valle-listados-tb
+          :items="itemsFiltrados"
+          :columns="tabla.keys"
+          :headers="tabla.headers"
+          :tools="tools"
+          @click_tools="on_click_tools"
+          :tb_name="tb_name"
+        ></valle-listados-tb>
+      </v-col>
 
-    <v-col cols="12" v-if="tabla">
-      <valle-listados-tb
-        :items="itemsFiltrados"
-        :columns="tabla.keys"
-        :headers="tabla.headers"
-        :tools="tools"
-        @click_tools="on_click_tools"
+      <valle-dialogo-form
+        @close="() => (showDialog = false)"
+        :show="showDialog"
+        :title="titleDialogo"
+        :item="itemSel"
+        :form="form"
         :tb_name="tb_name"
-      ></valle-listados-tb>
-    </v-col>
-
-    <valle-dialogo-form
-      @close="() => (showDialog = false)"
-      :show="showDialog"
-      :title="titleDialogo"
-      :item="itemSel"
-      :form="form"
-      :tb_name="tb_name"
-      :tipo="tipo"
-    >
-    </valle-dialogo-form>
-    
+        :tipo="tipo"
+      >
+      </valle-dialogo-form>
+      
   </v-row>
 </template>
 

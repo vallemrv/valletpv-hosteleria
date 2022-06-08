@@ -5,7 +5,7 @@
         <v-expansion-panel>
           <v-expansion-panel-title> Botonera </v-expansion-panel-title>
           <v-expansion-panel-text>
-            <v-row class="pa-2">
+            <v-row class="pt-2 pb-2">
               <v-col cols="3" class="pa-0 ma-0" v-for="(item, i) in items" :key="i">
                 <v-sheet class="pa-1">
                   <v-btn
@@ -13,6 +13,7 @@
                     class="text-caption"
                     @click="on_click(item)"
                     :color="bg_color(item)"
+                    height="50"
                   >
                     <span>{{ item.nombre }}</span>
                   </v-btn>

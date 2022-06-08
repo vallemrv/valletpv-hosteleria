@@ -31,6 +31,7 @@ export default {
            {label: "Teclas por familias", icon: "mdi-family-tree",  value:"byfamilias"},
            {label: "TecladoTPV", icon: "mdi-monitor",  value:"tecladostpv"},
            {label: "TecladoCOM", icon: "mdi-cellphone",  value:"tecladoscom"},
+           {label: "Composiciones", icon: "mdi-view-compact",  value:"composicion"},
            {label: "Secciones", icon: "",  value:"secciones"},
            {label: "Mesas", icon: "",  value:"mesas"},
            {label: "Zonas", icon: "",  value:"zonas"},

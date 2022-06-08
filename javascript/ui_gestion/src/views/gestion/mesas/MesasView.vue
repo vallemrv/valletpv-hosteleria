@@ -1,34 +1,36 @@
 <template>
-  <valle-editor-item-vue
-    title="Mesas"
-    :tabla="tabla"
-    :tb_name="tb_name"
-    @click_tools="on_click_tools"
-    :form="formMesa"
-    :tools="tools"
-    :filtro="filtro"
-    @click_filter="on_click_filter"
-  ></valle-editor-item-vue>
+  <ValleHeader title="Mesas" anchor="bottom end" :btns="btns"/>
+    <v-container>
+    <valle-editor-item-vue
+      :tabla="tabla"
+      :tb_name="tb_name"
+      @click_tools="on_click_tools"
+      :tools="tools"
+      :filtro="filtro"
+      @click_filter="on_click_filter"
+    ></valle-editor-item-vue>
 
-  <valle-dialogo-form-vue
-    @close="() => (showDialogo = false)"
-    :show="showDialogo"
-    title="Modificar"
-    :item="itemSel"
-    :form="formMZona"
-    :tb_name="tb_name"
-    :tipo="tipo"
-  ></valle-dialogo-form-vue>
+    <valle-dialogo-form-vue
+      @close="() => (showDialogo = false)"
+      :show="showDialogo"
+      :title="titleDialogo"
+      :item="itemSel"
+      :form="formSel"
+      :tb_name="tb_name"
+      :tipo="tipo"
+    ></valle-dialogo-form-vue>
+    </v-container>
 </template>
 
 <script>
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoFormVue from "@/components/ValleDialogoForm.vue";
 import ValleEditorItemVue from "@/components/ValleEditorItem.vue";
 
 import { mapActions, mapGetters, mapState } from "vuex";
 
 export default {
-  components: { ValleDialogoFormVue, ValleEditorItemVue },
+  components: { ValleDialogoFormVue, ValleEditorItemVue, ValleHeader },
   computed: {
     ...mapState(["mesas", "zonas", "itemsFiltrados"]),
     ...mapGetters(["getItemsFiltered", "getListValues", "getFilters", "getItemsOrdered"]),
@@ -57,7 +59,10 @@ export default {
       itemSel: null,
       tb_name: "mesas",
       localFilter: [],
-      tipo: "md",
+      tipo:'md',
+      titleDialogo: "Editar mesa",
+      formSel:[],
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
       tabla: {
         headers: ["Nombre", "Orden"],
         keys: [
@@ -77,6 +82,14 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    op_btns(op){
+        this.showDialogo = true;
+        this.tipo = "add";
+        this.formSel = this.formMesa;
+        this.itemSel = {};
+        this.titleForm = "Agregar mesas"
+        this.tb_name = "mesas"
+    },
     cargarRegistro() {
       var tablas = [];
       if (!this.mesas || this.mesas.length == 0) tablas.push("mesas");
@@ -99,7 +112,7 @@ export default {
           break;
         case "edit_zona":
           this.titleDialogo = "Editar";
-          this.form = this.formMZona;
+          this.formSel = this.formMZona;
           this.itemSel = {
             tb_name: "mesaszona",
             mesa: v.ID,

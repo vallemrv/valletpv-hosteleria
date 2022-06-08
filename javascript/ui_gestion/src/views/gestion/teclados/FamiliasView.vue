@@ -1,5 +1,5 @@
 <template>
-   <ValleHeader title="Familias" anchor="bottom end"/>
+   <ValleHeader title="Familias" anchor="bottom end" :btns="btns"/>
    <v-container>
       <valle-editor-item-vue
         title="Familias"
@@ -12,11 +12,11 @@
       <valle-dialogo-form-vue
         @close="() => (showDialogo = false)"
         :show="showDialogo"
-        title="Editar"
+        :title="titleDialogo"
         :item="itemSel"
         :form="form"
         :tb_name="tb_name"
-        tipo="md"
+        :tipo="tipo"
       ></valle-dialogo-form-vue>
   </v-container>
 </template>
@@ -60,7 +60,9 @@ export default {
       showDialogo: false,
       itemSel: null,
       tb_name: "familias",
-
+      tipo:'md',
+      titleDialogo: "Editar familia",
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
       tabla: {
         headers: ["Nombre", "Composicion", "Cantidad derivados", "Recetor"],
         keys: [
@@ -78,6 +80,13 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    op_btns(op){
+        this.showDialogo = true;
+        this.tipo = "add";
+        this.itemSel = {};
+        this.titleDialogo = "Agregar familia"
+        this.tb_name = "familias"
+    },
     cargarRegistro() {
       if (
         !this.receptores ||

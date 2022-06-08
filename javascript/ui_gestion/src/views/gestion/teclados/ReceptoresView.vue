@@ -1,5 +1,5 @@
 <template>
-   <ValleHeader title="Receptores" anchor="bottom end"/>
+   <ValleHeader title="Receptores" anchor="bottom end" :btns="btns"/>
    <v-container>
   <valle-editor-item-vue
     title="Receptores"
@@ -12,11 +12,11 @@
   <valle-dialogo-form-vue
     @close="() => (showDialogo = false)"
     :show="showDialogo"
-    title="Editar"
+    :title="titleDialogo"
     :item="itemSel"
     :form="form"
     :tb_name="tb_name"
-    tipo="md"
+    :tipo="tipo"
   ></valle-dialogo-form-vue>
   </v-container>
 </template>
@@ -38,6 +38,9 @@ export default {
       showDialogo: false,
       itemSel: null,
       tb_name: "receptores",
+      tipo:'md',
+      titleDialogo: "Editar receptor",
+      btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
       form: [
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "nomimp", label: "Nombre impresora", tp: "text" },
@@ -55,6 +58,13 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+     op_btns(op){
+        this.showDialogo = true;
+        this.tipo = "add";
+        this.itemSel = {};
+        this.titleDialogo = "Agregar receptor"
+        this.tb_name = "receptores"
+    },
     cargarRegistro() {
       if (!this.receptores || this.receptores.length == 0) {
         this.getListadoCompuesto({ tablas: ["receptores"] });
