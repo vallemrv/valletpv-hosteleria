@@ -20,6 +20,7 @@ dist/
 .gradle/
 .buildozer/
 test/
+android/
 
 #excepciones
 !manage_template.py

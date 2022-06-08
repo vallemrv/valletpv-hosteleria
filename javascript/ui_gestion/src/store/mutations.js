@@ -31,6 +31,17 @@ export default {
     [types.ERROR_REQUEST] (state, {error}){
         state.ocupado= false;
         state.error = error;
+        if (error.response) {
+           if (error.response.status == 401){
+               state.error = "Credenciales erroneas o usuarion no autorizado."
+           }else if (error.response.status == 500){
+             state.error = "Error en el servidor.";
+           }
+          } else if (error.request) {
+            state.error = "No se ha podido alcanzar el servidor o no hay conexion"
+          } else {
+            state.error = error.message;
+          }
     },
     [types.GET_LISTADOS] (state, {result}){
         state.ocupado = false;

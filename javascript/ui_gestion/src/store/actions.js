@@ -26,7 +26,7 @@ export default {
                  v.push(obj);
                  state.empresas = Object.values(v);
                  localStorage.empresas = JSON.stringify(v)
-                 state.empresa = empresa;
+                 state.empresa = obj;
                  commit(types.REQUEST_SUCCESS)
             })
             .catch(error => {
@@ -40,11 +40,12 @@ export default {
     selEmpresa({ commit, state }, index){
         state.empresa = state.empresas[index];
         localStorage.empresa_index = index;
+        commit(types.REQUEST_SUCCESS)
     },
     cargarEmpresas({ commit, state }){
         state.empresas = JSON.parse(localStorage.empresas);
         let index = localStorage.empresa_index;
-        if (index) state.empresa = state.empresas[index];
+        if (index >= 0 && index < state.empresas.length) state.empresa = state.empresas[index];
         else state.empresa = state.empresas[0];
         commit(types.REQUEST_SUCCESS)
     },

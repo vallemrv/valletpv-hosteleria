@@ -1,6 +1,6 @@
 {
-  "appId": "con.valleapp",
-  "appName": "vallerpc",
+  "appId": "con.valleapp.vallercp",
+  "appName": "ValleRCP",
   "webDir": "dist",
   "bundledWebRuntime": false
 }

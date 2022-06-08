@@ -15,7 +15,7 @@
             <v-label v-if="!empresa" class="text-subtitle-2 font-weight-black">
                 Crea empresas, o elige una.
             </v-label>
-            <v-label else class="font-weight-black">
+            <v-label v-else class="font-weight-black">
                 Estas gestionando {{ empresa.nombre_server }}
             </v-label>
         </v-col>
@@ -46,6 +46,6 @@ export default {
   }),
   computed:{
     ...mapState(["empresa"])
-  }
+  },
 };
 </script>

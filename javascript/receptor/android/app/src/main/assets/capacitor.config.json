@@ -1,6 +1,0 @@
-{
-	"appId": "con.valleapp",
-	"appName": "vallerpc",
-	"webDir": "dist",
-	"bundledWebRuntime": false
-}
