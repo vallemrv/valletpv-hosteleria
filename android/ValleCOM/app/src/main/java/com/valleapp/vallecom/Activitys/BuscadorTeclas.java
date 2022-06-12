@@ -154,6 +154,9 @@ public class BuscadorTeclas extends Activity implements TextWatcher{
                                     String subnom = sub.getString("Nombre");
                                     artSel.put("descripcion_t", nom+" "+subnom);
                                 }
+                                double d = artSel.getDouble("Precio");
+                                double inc = sub.getDouble("Incremento");
+                                artSel.put("Precio", d+inc);
                                 it.putExtra("art", artSel.toString());
                                 setResult(RESULT_OK, it);
                                 finish();

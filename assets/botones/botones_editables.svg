@@ -24,12 +24,12 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.25000001"
-     inkscape:cx="1608"
-     inkscape:cy="233.99999"
+     inkscape:zoom="0.70710681"
+     inkscape:cx="1195.0104"
+     inkscape:cy="396.68689"
      inkscape:window-width="1637"
      inkscape:window-height="752"
-     inkscape:window-x="398"
+     inkscape:window-x="283"
      inkscape:window-y="195"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
@@ -337,6 +337,65 @@
          d="m 327.78677,-51.417467 3.42674,8.975299 1.25275,-3.2814 -2.14254,-5.693899 z m 13.92297,0 -2.14681,5.69287 1.25114,3.282429 3.42056,-8.975299 z m -8.00865,8.975299 -1.23483,3.28154 2.17384,5.693899 h 2.75326 l 2.16957,-5.692871 -1.23775,-3.282567 -2.31448,6.137972 z"
          style="font-style:normal;font-weight:normal;font-size:327.274px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
+    <g
+       id="g1905-3"
+       transform="matrix(1.8760409,0,0,1.8760409,-363.68378,240.60936)"
+       inkscape:export-filename="/home/valle/Imágenes/iconos/ic_gestion.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       style="display:inline">
+      <text
+         id="text4186-8-6-9-6"
+         y="-34.236519"
+         x="334.228"
+         style="font-style:normal;font-weight:normal;font-size:0.532691px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="-34.236519"
+           x="334.228"
+           id="tspan4188-2-7-36-7"
+           sodipodi:role="line"
+           style="font-size:1.77564px;line-height:1.25;stroke-width:0.0443909px"> </tspan></text>
+      <text
+         id="text4450-5-0-5"
+         y="-45.862736"
+         x="335.79404"
+         style="font-style:normal;font-weight:normal;font-size:0.532691px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="-45.862736"
+           x="335.79404"
+           id="tspan4452-3-62-3"
+           sodipodi:role="line"
+           style="font-size:1.77564px;line-height:1.25;stroke-width:0.0443909px"> </tspan></text>
+      <text
+         id="text4355-5-6-5"
+         y="-43.040173"
+         x="332.71078"
+         style="font-style:normal;font-weight:normal;font-size:0.326619px;line-height:4%;font-family:sans-serif;letter-spacing:0.172266px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:#010a0a;stroke-width:0.198751;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.97411px;font-family:Phosphate;-inkscape-font-specification:'Phosphate, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:#010a0a;stroke-width:0.198751;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           y="-43.040173"
+           x="332.71078"
+           id="tspan4357-6-1-6"
+           sodipodi:role="line">VALLE</tspan></text>
+      <text
+         id="text4363-2-8-2"
+         y="-41.272369"
+         x="334.91498"
+         style="font-style:normal;font-weight:normal;font-size:0.532691px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="-41.272369"
+           x="334.91498"
+           id="tspan4365-9-7-9"
+           sodipodi:role="line"
+           style="font-size:1.22885px;line-height:1.25;stroke-width:0.0443909px">app</tspan></text>
+      <path
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:connector-curvature="0"
+         id="text4454-1-9-1"
+         d="m 327.78677,-51.417467 3.42674,8.975299 1.25275,-3.2814 -2.14254,-5.693899 z m 13.92297,0 -2.14681,5.69287 1.25114,3.282429 3.42056,-8.975299 z m -8.00865,8.975299 -1.23483,3.28154 2.17384,5.693899 h 2.75326 l 2.16957,-5.692871 -1.23775,-3.282567 -2.31448,6.137972 z"
+         style="font-style:normal;font-weight:normal;font-size:327.274px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
     <path
        style="fill:#000000;stroke-width:0.10048"
        d="m 131.23904,122.12287 c -0.17527,-0.0765 -0.36743,-0.23022 -0.42704,-0.34161 -0.0753,-0.14062 -0.1084,-2.99794 -0.1084,-9.34725 v -9.14474 l 0.22609,-0.25719 c 0.24049,-0.27359 -0.29702,-0.0723 17.45849,-6.538535 4.66983,-1.700669 9.37118,-3.413299 10.44744,-3.805835 l 1.95684,-0.713707 0.40445,-0.734015 c 0.80662,-1.463884 2.17563,-2.536161 3.74544,-2.933627 0.49784,-0.126053 0.52168,-0.238916 0.27316,-1.293182 -0.76904,-3.262379 -3.32854,-5.889718 -6.52129,-6.694156 -0.50112,-0.126259 -1.29313,-0.26271 -1.76003,-0.303227 -0.74478,-0.06463 -0.88345,-0.1082 -1.13041,-0.355152 -0.31631,-0.316312 -0.3507,-0.575014 -0.13251,-0.996933 0.22685,-0.438699 0.63952,-0.530115 1.81887,-0.402928 4.95697,0.534586 8.80337,4.166121 9.61673,9.079541 l 0.13116,0.792273 0.8044,0.262774 c 1.64665,0.537904 2.87663,1.598003 3.56481,3.072438 0.71977,1.542116 0.78085,3.044239 0.18946,4.659651 -0.11883,0.324573 -0.10862,0.35004 0.32226,0.803841 0.24474,0.257757 1.62125,1.689489 3.05893,3.181629 1.43768,1.49213 2.69014,2.82477 2.78324,2.96141 0.15567,0.22846 0.16929,0.98551 0.16929,9.41445 v 9.16601 l -0.2425,0.28192 -0.2425,0.28192 -23.04387,0.0217 c -19.43966,0.0183 -23.0937,-1e-4 -23.36251,-0.11742 z m 45.08272,-2.96889 v -1.30624 h -21.90475 -21.90476 v 1.30624 1.30626 h 21.90476 21.90475 z m -0.0229,-5.09937 c 0.015,-1.06384 0.005,-1.93426 -0.0217,-1.93426 -0.0269,0 -0.26305,0.1358 -0.52478,0.30178 -1.07931,0.68449 -2.54565,0.96582 -3.66188,0.70258 -0.73593,-0.17356 -1.6439,-0.63927 -2.25114,-1.15465 l -0.50378,-0.42758 -0.49373,0.447 c -1.81095,1.63955 -4.62335,1.63657 -6.45123,-0.007 l -0.48872,-0.4394 -0.48553,0.42725 c -1.89959,1.67155 -4.61709,1.66877 -6.50353,-0.007 l -0.51569,-0.45801 -0.40433,0.40033 c -1.05211,1.04169 -2.91086,1.55317 -4.3989,1.21046 -0.66942,-0.15418 -1.61208,-0.64961 -2.16981,-1.1404 l -0.49204,-0.43296 -0.46074,0.41416 c -1.86014,1.67211 -4.65069,1.68754 -6.47509,0.0359 l -0.48962,-0.4433 -0.58288,0.4697 c -1.79446,1.44599 -3.96136,1.59529 -5.84214,0.40253 -0.26173,-0.16598 -0.4969,-0.30179 -0.52262,-0.30179 -0.0743,0 -0.0542,3.77733 0.0205,3.85198 0.0369,0.0369 9.8828,0.0558 21.87964,0.0419 l 21.81242,-0.0254 z m -39.28552,-2.92836 c 0.61665,-0.31488 1.17605,-0.85289 1.52997,-1.47148 0.22651,-0.39589 0.39349,-0.56435 0.64007,-0.64572 0.51456,-0.16983 0.79018,-0.004 1.29926,0.78329 0.87963,1.35978 2.22768,1.90512 3.64204,1.47339 0.71115,-0.21707 1.39654,-0.76171 1.75265,-1.39269 0.39584,-0.7014 0.63545,-0.90777 1.05393,-0.90777 0.37751,0 0.69116,0.23084 0.92313,0.67944 0.25168,0.4867 0.95318,1.17484 1.45887,1.43109 1.00473,0.50914 2.31187,0.39128 3.21311,-0.28971 0.23855,-0.18025 0.62573,-0.62071 0.86041,-0.97882 0.50431,-0.76954 0.93086,-1.01346 1.36998,-0.78337 0.14425,0.0756 0.45465,0.42926 0.68977,0.78595 0.23513,0.35668 0.62267,0.79599 0.86122,0.97624 0.90124,0.68099 2.20838,0.79885 3.2131,0.28971 0.5057,-0.25625 1.2072,-0.94439 1.45887,-1.43109 0.23198,-0.4486 0.54563,-0.67944 0.92314,-0.67944 0.41759,0 0.65811,0.20641 1.05035,0.90142 0.68829,1.21957 2.19259,1.81967 3.54285,1.4133 0.73265,-0.22049 1.34686,-0.71276 1.86642,-1.49588 0.3073,-0.46319 0.56894,-0.74518 0.74533,-0.8033 0.42082,-0.13867 0.88325,0.13474 1.20872,0.71465 0.31824,0.56704 0.88901,1.11309 1.50425,1.43912 0.66175,0.35067 1.84138,0.32934 2.60803,-0.0471 0.68212,-0.33498 1.21907,-0.90256 1.57799,-1.66801 0.25662,-0.54729 0.26576,-0.63206 0.29692,-2.75015 l 0.0321,-2.18545 h -21.91178 -21.91178 v 1.99138 c 0,2.22879 0.0825,2.68735 0.62894,3.49274 0.67176,0.99023 1.64215,1.48344 2.7874,1.41671 0.40998,-0.0238 0.81379,-0.12009 1.08469,-0.25841 z m 37.99739,-8.52642 c -0.003,-0.0414 -0.9928,-1.09146 -2.20028,-2.33335 l -2.19544,-2.257972 -0.45448,0.418927 c -0.58471,0.53896 -1.72327,1.110651 -2.56894,1.289901 -1.95917,0.415284 -3.9597,-0.1808 -5.37795,-1.60242 -0.91612,-0.918297 -1.50651,-2.133698 -1.64918,-3.395097 -0.0606,-0.535789 -0.10031,-0.630845 -0.25254,-0.604691 -0.0993,0.01709 -4.4619,1.591551 -9.69458,3.498842 -5.23268,1.907296 -10.39567,3.78597 -11.47332,4.17483 -1.07765,0.38886 -2.0272,0.74599 -2.1101,0.79364 -0.0848,0.0488 8.18523,0.088 18.91546,0.0897 10.4864,0.002 19.06401,-0.0309 19.06135,-0.0723 z m -7.92907,-4.648006 c 1.16127,-0.220228 2.32334,-1.056085 2.81899,-2.027652 0.86048,-1.686675 0.58557,-3.49616 -0.73122,-4.812948 -2.29979,-2.299793 -6.29004,-0.967883 -6.79917,2.269507 -0.32107,2.041532 1.0236,4.040434 3.04942,4.533078 0.64051,0.155762 0.99799,0.163939 1.66198,0.03801 z"
@@ -468,7 +527,7 @@
        id="image49325"
        x="256.01703"
        y="144.14809"
-       inkscape:export-filename="/home/valle/proyectos/python/valletpv-hosteleria/android/ValleTPV/app/src/main/res/drawable-hdpi/editar.png"
+       inkscape:export-filename="/home/valle/Imágenes/iconos/ic_gestion.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <image

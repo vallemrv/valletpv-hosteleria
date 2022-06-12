@@ -54,7 +54,7 @@ def get_lista_autorizaciones(request):
     return JsonResponse(get_lista_men(id))
 
 def get_lista_men(id): 
-    if id > 0:  
+    if int(id) > 0:  
         peticiones = PeticionesAutoria.objects.filter(idautorizado=id)
     else:
         peticiones = PeticionesAutoria.objects.all()

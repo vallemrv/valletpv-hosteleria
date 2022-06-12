@@ -8,19 +8,18 @@
       <v-card class="pa-0">
         <v-card-text>
           <v-row>
-            <v-col class="pl-4 mt-4" cols="4">
+            <v-col class="pl-4 mt-4 text-center" cols="4">
               {{ item.nombre }}
             </v-col>
-            <v-col class="mt-4" cols="4">
+            <v-col class="mt-4 text-center" cols="4">
               {{ item.apellidos }}
             </v-col>
-            <v-col cols="4">
+            <v-col cols="4" class="text-center">
               <valle-switch
                 v-model="item.autorizado"
                 @change_value="on_change"
                 :item="item"
                 color="success"
-                label="activo"
               ></valle-switch>
             </v-col>
           </v-row>

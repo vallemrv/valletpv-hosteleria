@@ -18,12 +18,12 @@
             android:id="@+id/lista_receptores"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.9" />
+            android:layout_weight="0.8" />
 
         <EditText
             android:id="@+id/txt_mensaje"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="10"
             android:gravity="start|top"

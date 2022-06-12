@@ -501,7 +501,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
         else if (requestCode == 300) {
             if(resultCode == RESULT_OK){
                 String idpedido = data.getStringExtra("IDPedido");
-                List<JSONObject> lPedidos = dbCuenta.filterList("estado = 'P' AND IDPedido = "+idpedido);
+                List<JSONObject> lPedidos = dbCuenta.filterList("estado = 'P' AND IDPedido = "+idpedido, false);
                 for(JSONObject art: lPedidos){
                     try {
                         nota.addArt(art, art.getInt("Can"));

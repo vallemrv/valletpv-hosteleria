@@ -81,17 +81,22 @@ public class DBCuenta extends DBBase  {
                 " GROUP BY  IDArt,  Descripcion, Precio, Estado ORDER BY ID DESC");
     }
 
-    public List<JSONObject> filterList(String cWhere) {
+    public List<JSONObject> filterList(String cWhere, boolean gr) {
         List<JSONObject> lista = new ArrayList<>();
         try {
             String strWhere = "";
             if (cWhere != null){
                 strWhere = " WHERE "+ cWhere;
             }
+
+            String gr_str = "";
+            if (gr){
+                gr_str = "IDPedido, ";
+            }
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
                     " FROM cuenta " + strWhere +
-                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
+                    " GROUP BY  IDArt, Descripcion, Precio, "+gr_str+" Estado ORDER BY ID DESC", null);
             res.moveToFirst();
             while (!res.isAfterLast()) {
                 lista.add(cursorToJSON(res));
@@ -148,8 +153,8 @@ public class DBCuenta extends DBBase  {
         }
     }
 
-    public List<JSONObject> getAll(String id) {
-        return filterList("IDMesa ="+id+" AND (estado = 'N' or estado ='P')" );
+    public List<JSONObject> getAll(String id, boolean gr) {
+        return filterList("IDMesa ="+id+" AND (estado = 'N' or estado ='P')", gr);
     }
 
     public double getTotal(String id) {

@@ -21,6 +21,7 @@ dist/
 .buildozer/
 test/
 javascript/**/android/
+dist_electron/
 
 #excepciones
 !manage_template.py

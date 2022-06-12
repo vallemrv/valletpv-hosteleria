@@ -57,7 +57,8 @@ public class TareaManejarInstrucciones extends TimerTask {
                 Log.w("Instrucciones", "Error al ejecutar instruccion en el servidor");
             }
 
-            procesado = true;count=0;
+            procesado = true;
+            count=0;
             super.handleMessage(msg);
 
         }

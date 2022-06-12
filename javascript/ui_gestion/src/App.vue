@@ -48,9 +48,8 @@ export default {
     }
   },
   mounted(){
-    let empresas = JSON.parse(localStorage.empresas);
-    console.log(empresas)
-    if (empresas && (typeof empresas) == 'object'){
+    let empresas = localStorage.empresas;
+    if (empresas && empresas != "null" && empresas != ""){
       this.cargarEmpresas();
     }
   }

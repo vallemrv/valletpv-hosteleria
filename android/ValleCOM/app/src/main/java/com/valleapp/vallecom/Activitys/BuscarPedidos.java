@@ -78,10 +78,8 @@ public class BuscarPedidos extends Activity implements TextWatcher {
         setContentView(R.layout.activity_buscar_pedidos);
         txtBuscar = findViewById(R.id.textBuscador);
         txtBuscar.addTextChangedListener(this);
-
         cx = this;
         server = getIntent().getExtras().getString("url");
-
     }
 
     public void clickServido(View v) throws JSONException {
@@ -127,7 +125,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
                       e.printStackTrace();
                   }
                   String str = charSequence.toString();
-                  lPedidos = dbCuenta.filterList("Descripcion LIKE '%"+ str +"%' AND servido = 0");
+                  lPedidos = dbCuenta.filterList("Descripcion LIKE '%"+ str +"%' AND servido = 0", true);
                   handelerBusqueda.sendEmptyMessage(0);
               }).start();
 

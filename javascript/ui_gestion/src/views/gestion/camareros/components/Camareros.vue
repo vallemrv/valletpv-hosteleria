@@ -1,7 +1,5 @@
 <template>
-  
   <valle-editor-item
-    :title="title"
     :filtro="filtro"
     :tb_name="tb_name"
     :form="form"
@@ -14,11 +12,11 @@
   <valle-dialogo-form
     @close="on_close_dialogo"
     :show="showDialog"
-    title="Editar"
+    :title="titleDialogo"
     :item="itemSel"
     :form="form"
     :tb_name="tb_name"
-    tipo="md"
+    :tipo="tipo"
   >
   </valle-dialogo-form>
 </template>
@@ -54,6 +52,8 @@ export default {
       localFilter: [],
       showDialog: false,
       itemSel: null,
+      tipo: "md",
+      titleDialogo: "Editar camarero",
       filtro: {
         caption: ["borrados"],
         filters: [{ activo: 0 }],

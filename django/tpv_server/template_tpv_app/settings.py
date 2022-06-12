@@ -159,11 +159,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 #smtp config
-EMAIL_HOST_PASSWORD = 'Calamatraca'
-EMAIL_HOST_USER = 'valleapp.store@gmail.com'
-EMAIL_PORT = '587'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_PASSWORD = 'nitrogeno'
+EMAIL_HOST_USER = 'mails@valleapp.com'
+EMAIL_PORT = '465'
+EMAIL_HOST = 'dallas143.arvixeshared.com'
+EMAIL_USE_SSL = True
 
 # session expire at browser close
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
