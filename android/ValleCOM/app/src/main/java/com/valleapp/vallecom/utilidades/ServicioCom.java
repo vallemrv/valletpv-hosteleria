@@ -1,5 +1,6 @@
 package com.valleapp.vallecom.utilidades;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -71,6 +72,20 @@ public class ServicioCom extends Service {
     WebSocketClient client;
     boolean isWebsocketClose = false;
 
+    public boolean checkServiceRunning(Class<?> serviceClass){
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+        {
+
+            if (serviceClass.getName().equals(service.service.getClassName()))
+            {
+                Log.i("checkservice", serviceClass.getName()+", "+service.service.getClassName());
+                stopService(new Intent(getApplicationContext(), serviceClass));
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void crearWebsocket() {
         super.onCreate();
@@ -145,7 +160,10 @@ public class ServicioCom extends Service {
                 if (op.equals("md")) db.update(o.getJSONObject("obj"));
                 if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
                 Handler h = exHandler.get(tb);
-                if (h != null) h.sendEmptyMessage(0);
+                if (h != null){
+                    Log.d("SEND_HANDLER", tb);
+                    h.sendEmptyMessage(0);
+                }
             } else if (op.equals("men")) {
                 Handler h = exHandler.get(tb);
                 if (h != null) {
@@ -260,7 +278,7 @@ public class ServicioCom extends Service {
                     p.put("tb", t);
                     new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
                 }else{
-                    if(t.equals("mesas")) exHandler.get("mesas").sendEmptyMessage(0);
+                    if(t.equals("mesas")) Objects.requireNonNull(exHandler.get("mesas")).sendEmptyMessage(0);
                 }
             }
         } catch (JSONException e) {
@@ -270,6 +288,7 @@ public class ServicioCom extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        checkServiceRunning(ServicioCom.class);
         if (intent == null) return START_NOT_STICKY;
         String url = intent.getStringExtra("url");
         if (url != null){
@@ -288,7 +307,6 @@ public class ServicioCom extends Service {
             return START_STICKY;
         }
         return START_NOT_STICKY;
-
     }
 
     @Override

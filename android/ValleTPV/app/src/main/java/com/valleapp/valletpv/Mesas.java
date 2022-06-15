@@ -89,6 +89,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
+                zn = myServicio.getZona();
                 rellenarZonas();
             }
         }
@@ -172,6 +173,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
                     btn.setOnClickListener(view -> {
                         zn = (JSONObject)view.getTag();
+                        myServicio.setZona(zn);
                         rellenarMesas();
                     });
                     ll.addView(btn, params);
@@ -348,7 +350,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     }
 
     public  void clickVerTicket(View v){
-
         IDTicket =  v.getTag().toString();
         dlgListadoTicket.findViewById(R.id.btnImprimir).setVisibility(View.VISIBLE);
         dlgListadoTicket.findViewById(R.id.btnListado).setVisibility(View.VISIBLE);
@@ -595,14 +596,10 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mesas);
-
         try {
-
             cam = new JSONObject(getIntent().getStringExtra("cam"));
             TextView title = findViewById(R.id.lblTitulo);
             title.setText(cam.getString("Nombre"));
-
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

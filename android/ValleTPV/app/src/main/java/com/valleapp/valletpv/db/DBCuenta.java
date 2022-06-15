@@ -173,7 +173,7 @@ public class DBCuenta extends DBBase{
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
+            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa +" AND Estado != 'N'");
             for(int i= 0; i < datos.length(); i++){
                 insert(datos.getJSONObject(i));
             }
@@ -223,7 +223,7 @@ public class DBCuenta extends DBBase{
     public void eliminar(String IDMesa){
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-           db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
+           db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa+" AND Estado != 'N'");
         }catch (SQLiteException e) {
             e.printStackTrace();
         }

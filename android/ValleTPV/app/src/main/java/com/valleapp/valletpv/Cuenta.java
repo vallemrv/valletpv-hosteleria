@@ -79,7 +79,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     int cantidad = 1;
     Boolean reset = true;
     Boolean stop = false;
-    Timer timerAutoCancel = new Timer();
+    Timer timerAutoCancel = null;
 
     final long autoCancel = 10000;
 
@@ -147,7 +147,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             try {
-                setEstadoAutoFinish(true, false);
+                reset=true;
                 String res = msg.getData().getString("RESPONSE");
                 if (res != null) {
                     JSONArray datos = new JSONArray(res);
@@ -197,9 +197,13 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     btn.setText(z.getString("Nombre"));
                     btn.setTag(z.getString("ID"));
                     btn.setTextSize(16);
-                    String[] rgb = z.getString("RGB").trim().split(",");
-                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
-
+                    String rgb_str =  z.getString("RGB");
+                    if (rgb_str.equals("")){
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                    }else {
+                        String[] rgb = rgb_str.trim().split(",");
+                         btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                    }
                     btn.setOnClickListener(view -> {
                         setEstadoAutoFinish(true, false);
                         sec =  view.getTag().toString();
@@ -589,38 +593,36 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     @Override
     protected void onResume() {
         try {
-            stop = false;
-             if(timerAutoCancel==null) timerAutoCancel = new Timer();
-             timerAutoCancel.schedule(new TimerTask()
-            {
-                @Override
-                public void run() {
-                    if(!stop) {
-                        if (!reset){
-                            Log.i("STOP", "cuenta");
-                            finish();
-                        }
-                        else reset = false;
-                    }
-                }
-            },5000,autoCancel);
+             stop = false;
+             if(timerAutoCancel==null) {
+                 timerAutoCancel = new Timer();
+                 timerAutoCancel.schedule(new TimerTask() {
+                     @Override
+                     public void run() {
+                         if (!stop) {
+                             if (!reset) {
+                                 finish();
+                             } else reset = false;
+                         }
+                     }
+                 }, 5000, autoCancel);
+             }
 
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
 
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        super.onResume();
+       super.onResume();
     }
 
     @Override
     public void setEstadoAutoFinish(boolean r, boolean s) {
-       reset = r;
-       stop = s;
+        tipo = "m";
+        reset = r;
+        stop = s;
     }
 
     @Override
@@ -683,7 +685,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void clickMostrarBorrar(final JSONObject art) {
+    public void clickMostrarBorrar(final JSONObject obj) {
 
             setEstadoAutoFinish(true,true);
 
@@ -703,51 +705,54 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
             final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
             final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
+            final JSONObject art;
             try {
+                art = new JSONObject(obj.toString());
                 int canArt = art.getInt("Can");
                 if (cantidad > canArt) cantidad = canArt;
                 art.put("Can", cantidad);
                 txtInfo.setText("Borrar " + cantidad + " "+art.getString("descripcion_t"));
                 resetCantidad();
+
+                pneEdit.setVisibility(View.GONE);
+
+                exit.setOnClickListener(view -> dlg.cancel());
+
+                edit.setOnClickListener(view -> {
+                    if(pneEdit.getVisibility() == View.VISIBLE)  pneEdit.setVisibility(View.GONE);
+                    else pneEdit.setVisibility(View.VISIBLE);
+                });
+
+                ok.setOnClickListener(view -> {
+                    if (motivo.getText().length() > 0) {
+                        borrarLinea(art, motivo.getText().toString());
+                        dlg.cancel();
+                    }
+                });
+
+                error.setOnClickListener(view -> {
+                    borrarLinea(art, error.getText().toString());
+                    dlg.cancel();
+
+
+                });
+
+                simpa.setOnClickListener(view -> {
+                    borrarLinea(art, simpa.getText().toString());
+                    dlg.cancel();
+                });
+
+                inv.setOnClickListener(view -> {
+                    borrarLinea(art, inv.getText().toString());
+                    dlg.cancel();
+               });
+
             }catch (Exception e){
                 e.printStackTrace();
             }
 
-            pneEdit.setVisibility(View.GONE);
-
-            exit.setOnClickListener(view -> dlg.cancel());
-
-            edit.setOnClickListener(view -> {
-                if(pneEdit.getVisibility() == View.VISIBLE)  pneEdit.setVisibility(View.GONE);
-                else pneEdit.setVisibility(View.VISIBLE);
-            });
-
-            ok.setOnClickListener(view -> {
-                if (motivo.getText().length() > 0) {
-                    borrarLinea(art, motivo.getText().toString());
-                    dlg.cancel();
-
-                }
-            });
-
-            error.setOnClickListener(view -> {
-                borrarLinea(art, error.getText().toString());
-                dlg.cancel();
-
-
-            });
-
-            simpa.setOnClickListener(view -> {
-                borrarLinea(art, simpa.getText().toString());
-                dlg.cancel();
-            });
-
-            inv.setOnClickListener(view -> {
-                borrarLinea(art, inv.getText().toString());
-                dlg.cancel();
-           });
-
             dlg.show();
+
 
     }
 
@@ -796,7 +801,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     private void borrarLinea(final JSONObject art, String motivo){
         try{
-
+            reset = true;
             if (myServicio != null){
                 DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 if(dbCamareros.getConPermiso("borrar_linea").size() > 0) {

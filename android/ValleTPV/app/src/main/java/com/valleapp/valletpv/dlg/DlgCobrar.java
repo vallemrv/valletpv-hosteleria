@@ -66,19 +66,19 @@ public class DlgCobrar extends Dialog{
     public void clickEfectivo(View v){
         if(entrega>=totalCobro) {
             controlador.cobrar(lineas,totalCobro,entrega);
-            this.cancel();
+            clickSalir(v);
         }
     }
 
     public void clickTarjeta(View v){
         if (entrega == totalCobro) {
             controlador.cobrar(lineas, totalCobro, 0.00);
-            this.cancel();
+            clickSalir(v);
         }
     }
 
     public void clickSalir(View v){
-        cancel();
+       cancel();
     }
 
     public void clickEntrega(View v){
@@ -104,7 +104,7 @@ public class DlgCobrar extends Dialog{
 
     @Override
     protected void onStop() {
-        super.onStop();
         controlador.setEstadoAutoFinish(true, false);
+        super.onStop();
     }
 }

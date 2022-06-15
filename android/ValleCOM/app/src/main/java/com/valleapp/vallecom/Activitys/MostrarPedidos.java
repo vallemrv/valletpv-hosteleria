@@ -131,19 +131,6 @@ public class MostrarPedidos extends ActivityBase {
     protected void onResume() {
         try{
             rellenarPedido();
-            /*String idm = mesa.getString("ID");
-            if(!pause) {
-                Timer t = new Timer();
-                t.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        ContentValues p = new ContentValues();
-                        p.put("mesa_id", idm);
-                        new HTTPRequest(server + "/cuenta/get_cuenta", p, "actualizar", handlerHttp);
-                    }
-                }, 1000);
-            }
-            pause = false;*/
         } catch (Exception e) {
             e.printStackTrace();
         }

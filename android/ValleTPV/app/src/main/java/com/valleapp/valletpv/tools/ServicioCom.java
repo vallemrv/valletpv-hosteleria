@@ -47,6 +47,7 @@ public class ServicioCom extends Service {
 
 
     final IBinder myBinder = new MyBinder();
+    private JSONObject zn;
 
     String server = null;
 
@@ -86,6 +87,7 @@ public class ServicioCom extends Service {
 
         }
     };
+
 
     public void crearWebsocket() {
         super.onCreate();
@@ -381,12 +383,19 @@ public class ServicioCom extends Service {
     }
 
     public void pedirAutorizacion(ContentValues p) {
-        Log.i("autorias", p.toString());
-        new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, "", null);
+       new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, "", null);
     }
 
     public void sendMensaje(ContentValues p) {
         new HTTPRequest(server + "/autorizaciones/send_informacion", p, "", null);
+    }
+
+    public JSONObject getZona() {
+        return zn;
+    }
+
+    public void setZona(JSONObject zn){
+        this.zn = zn;
     }
 
     public class MyBinder extends Binder{

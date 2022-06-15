@@ -74,7 +74,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     private final Handler handlerPedidos = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             rellenarPedido();
-
         }
     };
 
