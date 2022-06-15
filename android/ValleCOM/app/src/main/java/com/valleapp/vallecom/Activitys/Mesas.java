@@ -71,6 +71,27 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         }
     };
 
+    private final Handler handlerEstadoWS = new Handler(Looper.getMainLooper()) {
+        public void handleMessage(Message msg) {
+            String op = msg.getData().getString("op");
+            String res = msg.getData().getString("RESPONSE");
+            try {
+                rellenarEstadoWS(op, res);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    };
+
+    private void rellenarEstadoWS(String op, String res) {
+        if (op.equals("estadows")){
+
+        }else if (op.equals("op_pendientes")){
+
+        }
+    }
+
     private final Handler handlerPedidos = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             rellenarPedido();
@@ -153,6 +174,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 myServicio.setExHandler("mesas", handlerMesas );
                 myServicio.setExHandler("mensajes", handlerMensajes);
                 myServicio.setExHandler("lineaspedido", handlerPedidos);
+                myServicio.setExHandler("estadows", handlerEstadoWS);
                 myServicio.setCamarero(cam); //debe de ir despues de setExHandler....
             }
         }

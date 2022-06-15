@@ -102,6 +102,9 @@ public class ServicioCom extends Service {
                 public void onOpen(ServerHandshake serverHandshake) {
                     isWebsocketClose = false;
                     //comprobamos los datos cada vez que se conecte.
+                    Handler h = exHandler.get("estadows");
+                    HTTPRequest http = new HTTPRequest();
+                    http.sendMessage(h, "estadows", "Conectado");
                     actualizarCamareros();
                     comprobarMesasAbiertas();
                     comprobarMensajes();
@@ -134,6 +137,9 @@ public class ServicioCom extends Service {
                 public void onClose(int code, String reason, boolean remote) {
                     // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
                     Log.i("Websocket", "Websocket close....");
+                    Handler h = exHandler.get("estadows");
+                    HTTPRequest http = new HTTPRequest();
+                    http.sendMessage(h, "estadows", "Desconectado");
                     isWebsocketClose = true;
                 }
 
@@ -156,6 +162,7 @@ public class ServicioCom extends Service {
             String op = o.getString("op");
             IBaseSocket db = (IBaseSocket) getDb(tb);
             if (db != null) {
+                Log.d("LINEA", "Operacion "+op+" Tabla "+ tb);
                 if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
                 if (op.equals("md")) db.update(o.getJSONObject("obj"));
                 if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
@@ -295,7 +302,7 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
-            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000), 2000, 1);
+            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000, exHandler), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {

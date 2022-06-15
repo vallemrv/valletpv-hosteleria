@@ -523,10 +523,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cuenta);
         cargarPreferencias();
-
         EditText bus = findViewById(R.id.txtBuscar);
         bus.addTextChangedListener(this);
-
         try {
            server = getIntent().getExtras().getString("url");
            cam = new JSONObject(getIntent().getExtras().getString("cam"));
@@ -534,7 +532,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
            tipo = getIntent().getExtras().getString("op");
            TextView title = findViewById(R.id.txtTitulo);
            title.setText(cam.getString("Nombre") +  " -- "+mesa.getString("Nombre"));
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

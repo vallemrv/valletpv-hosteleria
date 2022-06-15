@@ -11,6 +11,7 @@ import com.valleapp.vallecom.utilidades.HTTPRequest;
 import com.valleapp.vallecom.utilidades.Instruccion;
 
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,8 +22,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     private final Queue<Instruccion> cola;
     private final String server;
     private final long timeout;
-
-
+    private final Map<String, Handler>  handlers;
     boolean procesado = true;
     int count = 0;
 
@@ -64,18 +64,21 @@ public class TareaManejarInstrucciones extends TimerTask {
         }
     };
 
-    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instruccion> colaInstrucciones, String server, long timeout) {
-        this.cola= colaInstrucciones;
+    public TareaManejarInstrucciones(Timer timerManejarInstrucciones,
+                                     Queue<Instruccion> colaInstrucciones,
+                                     String server,
+                                     long timeout,  Map<String, Handler> handlers) {
+        this.cola = colaInstrucciones;
         this.parent = timerManejarInstrucciones;
         this.server = server;
         this.timeout = timeout;
+        this.handlers = handlers;
     }
 
     @Override
     public void run() {
         try {
 
-            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()) +" "+procesado);
             if (procesado) {
                 synchronized (cola) {
                     Instruccion inst = cola.peek();
@@ -95,6 +98,11 @@ public class TareaManejarInstrucciones extends TimerTask {
 
             synchronized (parent) {
                 parent.wait(timeout);
+                Handler h = handlers.get("estadows");
+                if (h!=null) {
+                    HTTPRequest http = new HTTPRequest();
+                    http.sendMessage(h, "op_pendientes", String.format("%d tareas pendientes", cola.size()));
+                }
             }
 
         }catch (Exception e){
