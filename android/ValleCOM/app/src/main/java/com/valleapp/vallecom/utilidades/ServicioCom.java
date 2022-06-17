@@ -101,10 +101,7 @@ public class ServicioCom extends Service {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
                     isWebsocketClose = false;
-                    //comprobamos los datos cada vez que se conecte.
-                    Handler h = exHandler.get("estadows");
-                    HTTPRequest http = new HTTPRequest();
-                    http.sendMessage(h, "estadows", "Conectado");
+                    //comprobamos los datos cada vez que se conected
                     actualizarCamareros();
                     comprobarMesasAbiertas();
                     comprobarMensajes();
@@ -137,9 +134,6 @@ public class ServicioCom extends Service {
                 public void onClose(int code, String reason, boolean remote) {
                     // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
                     Log.i("Websocket", "Websocket close....");
-                    Handler h = exHandler.get("estadows");
-                    HTTPRequest http = new HTTPRequest();
-                    http.sendMessage(h, "estadows", "Desconectado");
                     isWebsocketClose = true;
                 }
 
@@ -308,6 +302,17 @@ public class ServicioCom extends Service {
                 public void run() {
                     if (isWebsocketClose && client!= null){
                         client.reconnect();
+                        Handler h = exHandler.get("estadows");
+                        if(h!=null) {
+                            HTTPRequest http = new HTTPRequest();
+                            http.sendMessage(h, "estadows", "WS Desconectado");
+                        }
+                    }else{
+                        Handler h = exHandler.get("estadows");
+                        if(h!=null) {
+                            HTTPRequest http = new HTTPRequest();
+                            http.sendMessage(h, "estadows", " WS Conectado");
+                        }
                     }
                 }
             }, 2000, 5000);

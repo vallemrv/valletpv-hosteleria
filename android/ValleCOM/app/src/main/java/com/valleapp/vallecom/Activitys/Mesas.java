@@ -86,9 +86,11 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     private void rellenarEstadoWS(String op, String res) {
         if (op.equals("estadows")){
-
+            TextView txt = findViewById(R.id.txtInf_ws);
+            txt.setText(res);
         }else if (op.equals("op_pendientes")){
-
+            TextView txt = findViewById(R.id.txtInf_tareas);
+            txt.setText(res);
         }
     }
 
