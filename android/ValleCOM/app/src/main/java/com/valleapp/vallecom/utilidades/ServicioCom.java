@@ -101,12 +101,6 @@ public class ServicioCom extends Service {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
                     isWebsocketClose = false;
-<<<<<<< HEAD
-                    //comprobamos los datos cada vez que se conecte.
-
-=======
-                    //comprobamos los datos cada vez que se conected
->>>>>>> 198874501bc3db0be308dd26b399a7e78331f591
                     actualizarCamareros();
                     comprobarMesasAbiertas();
                     comprobarMensajes();
@@ -140,10 +134,6 @@ public class ServicioCom extends Service {
                 public void onClose(int code, String reason, boolean remote) {
                     // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
                     Log.i("Websocket", "Websocket close....");
-<<<<<<< HEAD
-
-=======
->>>>>>> 198874501bc3db0be308dd26b399a7e78331f591
                     isWebsocketClose = true;
                 }
 
@@ -313,25 +303,15 @@ public class ServicioCom extends Service {
                     if (isWebsocketClose && client!= null){
                         client.reconnect();
                         Handler h = exHandler.get("estadows");
-<<<<<<< HEAD
-                        if(h!= null) {
-=======
                         if(h!=null) {
->>>>>>> 198874501bc3db0be308dd26b399a7e78331f591
                             HTTPRequest http = new HTTPRequest();
                             http.sendMessage(h, "estadows", "WS Desconectado");
                         }
                     }else{
                         Handler h = exHandler.get("estadows");
-<<<<<<< HEAD
                         if(h != null) {
                             HTTPRequest http = new HTTPRequest();
                             http.sendMessage(h, "estadows", "WS Conectado");
-=======
-                        if(h!=null) {
-                            HTTPRequest http = new HTTPRequest();
-                            http.sendMessage(h, "estadows", " WS Conectado");
->>>>>>> 198874501bc3db0be308dd26b399a7e78331f591
                         }
                     }
                 }
