@@ -47,8 +47,10 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="26dp"
                 android:inputType="textPersonName"
+                android:minHeight="48dp"
                 android:text="Name"
-                android:textSize="10dip" />
+                android:textSize="10dip"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
                 android:id="@+id/txtInf_tareas"
@@ -62,7 +64,8 @@
                 android:layout_marginBottom="4dp"
                 android:inputType="textPersonName"
                 android:text="Name"
-                android:textSize="10dip" />
+                android:textSize="10dip"
+                tools:ignore="TouchTargetSizeCheck" />
         </RelativeLayout>
 
         <HorizontalScrollView
@@ -95,74 +98,74 @@
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp" />
 
-            <FrameLayout
-                android:id="@+id/loading"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#FAFAFA"
-                android:visibility="invisible">
-
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:indeterminate="true" />
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="152dp"
-                    android:layout_height="118dp"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:gravity="bottom|center_horizontal"
-                    android:text="@string/inicializando" />
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/show_autorias"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:foregroundGravity="bottom|center_horizontal"
-                android:visibility="invisible">
-
-                <com.getbase.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_show_autorias"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginBottom="22dp"
-                    android:contentDescription="@string/show"
-                    android:onClick="mostrarAutorias"
-                    fab:fab_colorNormal="@color/pink"
-                    fab:fab_colorPressed="@color/pink_pressed"
-                    fab:fab_icon="@drawable/sobre" />
-
-                <RelativeLayout
-                    android:id="@+id/view"
-                    android:layout_width="30sp"
-                    android:layout_height="30sp"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginEnd="20sp"
-                    android:layout_marginRight="20sp"
-                    android:layout_marginBottom="85sp"
-                    android:background="@drawable/fondo_redondo_btn_xml">
-
-                    <TextView
-                        android:id="@+id/txt_num_autorias"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_horizontal|center_vertical"
-                        android:text="@string/test_cantidad" />
-                </RelativeLayout>
-
-
-            </FrameLayout>
-
         </android.support.v4.view.ViewPager>
 
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FAFAFA"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="152dp"
+            android:layout_height="118dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:gravity="bottom|center_horizontal"
+            android:text="@string/inicializando" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/show_autorias"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:foregroundGravity="bottom|center_horizontal"
+        android:visibility="invisible">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_show_autorias"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="22dp"
+            android:contentDescription="@string/show"
+            android:onClick="mostrarAutorias"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/sobre" />
+
+        <RelativeLayout
+            android:id="@+id/view"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20sp"
+            android:layout_marginRight="20sp"
+            android:layout_marginBottom="85sp"
+            android:background="@drawable/fondo_redondo_btn_xml">
+
+            <TextView
+                android:id="@+id/txt_num_autorias"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="@string/test_cantidad" />
+        </RelativeLayout>
+
+
+    </FrameLayout>
 
 </RelativeLayout>
 
