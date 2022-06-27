@@ -31,9 +31,9 @@
             <v-card @click="change_linea(linea)" :color="linea.servido ? 'primary' : ''">
               <v-card-text>
                 <v-row>
-                  <v-col cols="2">{{ linea.can }}</v-col>
-                  <v-col cols="8">{{ linea.descripcion }}</v-col>
-                  <v-col cols="2">{{ linea.estado }}</v-col>
+                  <v-col cols="2" class="text-h6">{{ linea.can }}</v-col>
+                  <v-col cols="8" class="text-h6">{{ linea.descripcion }}</v-col>
+                  <v-col cols="2" class="text-h6">{{ linea.estado }}</v-col>
                 </v-row>
               </v-card-text>
             </v-card>
