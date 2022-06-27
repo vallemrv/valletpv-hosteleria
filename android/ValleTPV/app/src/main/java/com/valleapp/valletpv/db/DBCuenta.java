@@ -38,6 +38,20 @@ public class DBCuenta extends DBBase{
     }
 
     @Override
+    public void rellenarTabla(JSONArray objs) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM "+tb_name +" WHERE Estado != 'N'");
+        for (int i= 0 ; i < objs.length(); i++){
+            // Create a new map of values, where column names are the keys
+            try {
+                insert(objs.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     public JSONArray filter(String cWhere) {
         String strWhere = "";
         if (cWhere != null){
@@ -93,7 +107,7 @@ public class DBCuenta extends DBBase{
     }
 
     public List<JSONObject> getAll(String id) {
-        return filterList("IDMesa ="+id+" AND (estado = 'N' or estado ='P')" );
+        return filterList("IDMesa ="+id+" AND (Estado = 'N' or Estado = 'P')" );
     }
 
     public double getTotal(String id) {
@@ -101,7 +115,7 @@ public class DBCuenta extends DBBase{
         double s = 0.0;
         try {
             @SuppressLint("Recycle") Cursor cursor = db.rawQuery("SELECT SUM(Precio) AS TotalTicket " +
-                    "FROM cuenta WHERE IDMesa=" + id+ " AND (estado = 'N' or estado ='P')", null);
+                    "FROM cuenta WHERE IDMesa=" + id+ " AND (Estado = 'N' or Estado = 'P')", null);
             cursor.moveToFirst();
             if (cursor.getCount() > 0 && cursor.getColumnCount() > 0) {
                 s = cursor.getDouble(0);
@@ -167,8 +181,6 @@ public class DBCuenta extends DBBase{
     }
 
 
-
-
     public void replaceMesa(JSONArray datos, String IDMesa){
         // Gets the data repository in write mode
         SQLiteDatabase db = this.getWritableDatabase();
@@ -223,7 +235,7 @@ public class DBCuenta extends DBBase{
     public void eliminar(String IDMesa){
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-           db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa+" AND Estado != 'N'");
+            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa+" AND Estado != 'N'");
         }catch (SQLiteException e) {
             e.printStackTrace();
         }

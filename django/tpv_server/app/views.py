@@ -154,7 +154,7 @@ def mod_regs(request):
             add_reg_handler(app_name, tb_name, reg)
         elif inst["tipo"] == "md_teclados":
             mod_teclados(inst)
-            
+          
     return JsonResponse("success")
 
 def add_reg_handler(app_name, tb_name, reg):

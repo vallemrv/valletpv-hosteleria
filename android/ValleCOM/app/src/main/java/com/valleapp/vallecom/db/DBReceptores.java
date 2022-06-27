@@ -46,7 +46,7 @@ public class DBReceptores extends DBBase {
         ContentValues v = new ContentValues();
         try {
             v.put("nombre", o.getString("nombre"));
-            v.put("ID", o.getString("ID"));
+            v.put("ID", o.getString("id"));
         }catch (Exception e){
             e.printStackTrace();
         }

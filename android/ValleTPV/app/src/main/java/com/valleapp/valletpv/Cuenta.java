@@ -133,7 +133,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     private final Handler handlerSeccionesTeclas= new Handler(Looper.getMainLooper()){
         @Override
         public void handleMessage(Message msg) {
-
             super.handleMessage(msg);
             rellenarSecciones();
         }
@@ -151,7 +150,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 String res = msg.getData().getString("RESPONSE");
                 if (res != null) {
                     JSONArray datos = new JSONArray(res);
-                   synchronized (dbCuenta) {
+                    synchronized (dbCuenta) {
                        dbCuenta.replaceMesa(datos, mesa.getString("ID"));
                        rellenarTicket();
                    }

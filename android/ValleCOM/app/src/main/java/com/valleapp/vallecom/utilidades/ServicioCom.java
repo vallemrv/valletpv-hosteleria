@@ -76,7 +76,6 @@ public class ServicioCom extends Service {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
         {
-
             if (serviceClass.getName().equals(service.service.getClassName()))
             {
                 Log.i("checkservice", serviceClass.getName()+", "+service.service.getClassName());
@@ -125,7 +124,6 @@ public class ServicioCom extends Service {
                 @Override
                 public void onError(Exception ex) {
                     // devolución de llamada por error de conexión
-
                     Log.i("Websockets", "Error de conexion .....");
                     isWebsocketClose = true;
                 }
@@ -143,10 +141,9 @@ public class ServicioCom extends Service {
                     Log.i("Websocket","socket bytebuffer bytes");
                 }
             };
-
             client.connect();
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -199,7 +196,7 @@ public class ServicioCom extends Service {
         try {
             ContentValues p = new ContentValues();
             DBCuenta dbCuenta = (DBCuenta) getDb("lineaspedido");
-            JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta ");
+            JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta");
             p.put("lineas", lineas.toString());
             new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p,
                     "update_socket", controller_http);
@@ -234,7 +231,6 @@ public class ServicioCom extends Service {
                             }
                             break;
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -313,9 +309,10 @@ public class ServicioCom extends Service {
                             HTTPRequest http = new HTTPRequest();
                             http.sendMessage(h, "estadows", "WS Conectado");
                         }
+                        Log.d("carmelo", ""+isWebsocketClose);
                     }
                 }
-            }, 2000, 3000);
+            }, 2000, 2000);
             return START_STICKY;
         }
         return START_NOT_STICKY;
@@ -331,8 +328,8 @@ public class ServicioCom extends Service {
         try {
             timerUpdate.cancel();
             client.close();
-        }catch (Exception ignored){
-
+        }catch (Exception e){
+            e.printStackTrace();
         }
         super.onDestroy();
     }
@@ -370,7 +367,6 @@ public class ServicioCom extends Service {
                     "sugerencias",
                     "receptores"
             };
-
         }
         if (dbs == null){
             DBMesas dbMesas = new DBMesas(getApplicationContext());

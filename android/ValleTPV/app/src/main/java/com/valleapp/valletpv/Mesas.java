@@ -62,7 +62,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     boolean stop = false;
     boolean reset = false;
 
-
     DBZonas dbZonas;
     DBMesas dbMesas;
     DBCuenta dbCuenta;
@@ -70,7 +69,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     JSONObject cam = null;
     JSONObject zn = null;
     JSONArray lsTicket = null;
-
 
     Dialog dlgListadoTicket;
     String IDTicket = "";
@@ -112,7 +110,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                 }
                 else  {
                     String res = msg.getData().getString("RESPONSE");
-
                     switch (op){
                         case "get_lista_ticket":
                             lsTicket = new JSONArray(res);
@@ -130,7 +127,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                                 }
                                 adaptadorSettings = new AdaptadorSettings(cx, alista);
                                 lista_setting.setAdapter(adaptadorSettings);
-
                             }
                             break;
                     }
@@ -138,7 +134,6 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }catch (Exception e){
                 e.printStackTrace();
             }
-
         }
     };
 

@@ -58,8 +58,6 @@ public class HTTPRequest {
                 public void run(){
                     int statusCode = -1;
                     try {
-
-
                         DataOutputStream wr = new DataOutputStream(finalConn.getOutputStream());
                         wr.writeBytes(getParams(params));
                         wr.flush();
@@ -80,22 +78,17 @@ public class HTTPRequest {
                         if (handlerExternal != null)
                             sendMessage(handlerExternal, op, result.toString());
 
-
-
                      } catch ( ConnectException e){
                         if(handlerExternal!= null) sendMessage(handlerExternal, "no_connexion", null);
                      } catch (Exception e) {
                          // TODO Auto-generated catch block
                         if(handlerExternal!= null && statusCode==500) sendMessage(handlerExternal, "ERROR", null);
-
                     }
                 }
             };
-
             th.start();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+           e.printStackTrace();
         }finally {
             if(conn != null) conn.disconnect();
         }

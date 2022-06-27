@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="12" class="ma-0 pa-0 pl-3 pr-3" v-if="subteclas.length > 0">
+  <v-col cols="12" class="ma-0 pa-0 pl-3 pr-3 mt-3" v-if="subteclas.length > 0">
     <v-expansion-panels>
       <v-expansion-panel>
         <v-expansion-panel-title>
@@ -20,7 +20,7 @@
                 hint="Texto ticket"
               ></valle-float-form>
             </v-col>
-            <v-col cols="4" >
+            <v-col cols="4">
               <valle-float-form
                 :item="tecla"
                 column="descripcion_r"
@@ -34,13 +34,14 @@
         <v-expansion-panel-text class="text-center">
           <v-row v-for="(s, i) in subteclas" :key="i">
             <v-col cols="4" class="text-left">
-            <valle-float-form
+              <valle-float-form
                 :item="s"
                 column="nombre"
-                tb_name="teclas"
+                tb_name="subteclas"
                 hint="Texto ticket"
-              ></valle-float-form></v-col>
-            <v-col cols="4" >
+              ></valle-float-form
+            ></v-col>
+            <v-col cols="4">
               <valle-float-form
                 :item="s"
                 column="descripcion_t"
@@ -49,7 +50,7 @@
                 hint="Texto ticket"
               ></valle-float-form>
             </v-col>
-            <v-col cols="4" >
+            <v-col cols="4">
               <valle-float-form
                 :item="s"
                 column="descripcion_r"
@@ -63,18 +64,18 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </v-col>
-  <v-col cols="12" class="ma-0" v-else>
+  <v-col cols="12" class="ma-0 mt-3" v-else>
     <v-card elevation="3" class="mx-auto text-center">
       <v-row class="pl-3 pr-10">
         <v-col cols="4" class="text-left text-caption pl-6">
           <valle-float-form
-                :item="tecla"
-                column="nombre"
-                tb_name="teclas"
-                hint="Texto ticket"
-              ></valle-float-form>
+            :item="tecla"
+            column="nombre"
+            tb_name="teclas"
+            hint="Texto ticket"
+          ></valle-float-form>
         </v-col>
-        <v-col cols="4" >
+        <v-col cols="4">
           <valle-float-form
             :item="tecla"
             column="descripcion_t"
@@ -83,7 +84,7 @@
             hint="Texto ticket"
           ></valle-float-form>
         </v-col>
-        <v-col cols="4" >
+        <v-col cols="4">
           <valle-float-form
             :item="tecla"
             column="descripcion_r"
