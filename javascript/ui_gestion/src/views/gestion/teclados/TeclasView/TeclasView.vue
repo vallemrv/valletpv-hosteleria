@@ -18,7 +18,7 @@
   <valle-dialogo-form 
         @close="on_close_dialogo"
          :show="showDialogo" 
-         :tb_name="tb_name" 
+         :tb_name="tb_name_form" 
          :form="form"
          :item="itemSel"
          :title="titleForm"
@@ -107,6 +107,7 @@ export default {
        showEditSec: false,
        titleForm: "Agregar",
        tb_name: "teclas",
+       tb_name_form: "teclass",
        tipo:"add",
        localFilter: [],
        vista: "teclas",
@@ -148,7 +149,7 @@ export default {
     on_click_tools(op){
       if (op=="add-tecla"){
         this.showDialogo = true;
-        this.tb_name = "teclas",
+        this.tb_name_form = "teclas",
         this.titleForm = "Agregar tecla",
         this.tipo = "add"
         this.itemSel = {}
@@ -162,14 +163,14 @@ export default {
       }
     },
     on_click_tools_tecla(v, op){
-        switch (op) {
+      switch (op) {
           case "edit":
               this.titleForm = "Editar tecla";
               this.itemSel = v;
               this.showDialogo = true;
               this.tipo = "md";
               this.form = this.formTecla;
-              this.tb_name = "teclas"
+              this.tb_name_form = "teclas"
               break;
           case "sec":
               this.showEditSec = true;
@@ -192,18 +193,18 @@ export default {
               this.$store.state[this.tb_name] = ls.filter((e) => {
                   return e.id != v.id;
               });
-              add_instruccion(inst);
+              this.add_instruccion(inst);
               break;
           }
       
     },
     add_subtecla(v){
       this.titleForm = "Agregar subtecla";
-      this.itemSel = {tecla_id: v.id};
-      this.showDialogo = true;
       this.tipo = "add";
+      this.showDialogo = true;
+      this.itemSel = {tecla_id: v.id};
       this.form = this.formSubTecla;
-      this.tb_name = "subteclas"
+      this.tb_name_form = "subteclas";
     },
     edit_tipo_tecla(v){
       this.titleForm = "Editar tecla";
@@ -211,7 +212,7 @@ export default {
       this.showDialogo = true;
       this.tipo = "md";
       this.form = this.formTeclaSub;
-      this.tb_name = "teclas"
+      this.tb_name_form = "teclas"
     },
     add_instruccion(inst){
       this.addInstruccion({ inst: inst });
@@ -219,11 +220,11 @@ export default {
     },
     on_close_dialogo(item){
       this.showDialogo = false;
-      this.tb_name = "teclas"
+      this.tb_name_form = "teclas"
     },
     on_close_edit_sec() {
       this.showEditSec = false;
-      this.tb_name = "teclas"
+      this.tb_name_form = "teclas"
     },
   },
   watch: {

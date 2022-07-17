@@ -36,7 +36,7 @@ export default {
     },
     methods:{
         on_click_tools(v, op) {
-            this.$emit("click_tools", v, op);
+           this.$emit("click_tools", v, op);
         },
     }
 }
