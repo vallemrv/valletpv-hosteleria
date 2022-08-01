@@ -1,9 +1,11 @@
 {
   "name": "gestion_ui",
-  "description": "Gestion para ValleTPV",
-  "author": {"name": "Manuel Rodriguez"},
   "version": "0.1.0",
   "private": false,
+  "description": "Gestion para ValleTPV",
+  "author": {
+    "name": "Manuel Rodriguez"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
