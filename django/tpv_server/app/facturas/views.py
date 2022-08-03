@@ -22,7 +22,7 @@ def index(request, id, uid):
             pdfstr = f.read()
             return HttpResponse(pdfstr, content_type='application/pdf')
     else:
-        return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.EMPRESA})
+        return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
 
 
 def crear_factura(request):
@@ -31,7 +31,7 @@ def crear_factura(request):
         uid = request.POST["uid"]
         ticket = Ticket.objects.filter(id=id, uid=uid).first()
         if not ticket:
-            return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.EMPRESA})
+            return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
         if ticket.url_factura != "":
             return HttpResponse("la factura")
 
@@ -98,4 +98,4 @@ def crear_factura(request):
         f.write(pdfstr)
         return HttpResponse(pdfstr, content_type='application/pdf')
     else:
-        return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.EMPRESA})
+        return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
