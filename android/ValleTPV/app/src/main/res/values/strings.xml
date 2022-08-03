@@ -44,6 +44,7 @@
     <string name="articulos_pendientes">Articulos pendientes</string>
     <string name="mostrar_tickets">tickets</string>
     <string name="imprimir">imprimir</string>
+    <string name="imprimir_factura">imprimir_factura</string>
     <string name="agregar_camarero">agregar camarero</string>
     <string name="total">Total:</string>
     <string name="borrar">borrar</string>
@@ -51,7 +52,7 @@
     <string name="x">X</string>
     <string name="send_mensaje">send mensaje</string>
     <string name="ver">ver</string>
-    <string name="fecha_hora">12/12/12 - 00:22</string>
+    <string name="fecha_hora">12/12/12 – 00:22</string>
     <string name="texto_prueba_mesa">Mesa 1</string>
     <string name="cambio">Cambio:</string>
     <string name="guardar">Guardar</string>

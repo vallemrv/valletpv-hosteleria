@@ -41,15 +41,13 @@ def imprimir_pedido(id):
 
     send_mensaje_impresora(receptores)
 
-def send_imprimir_ticket(request, id):
+def send_imprimir_ticket(request, id, es_factura=False):
     receptor_activo = request.POST["receptor_activo"] if "receptor_activo" in request.POST else None
     abrircajon = request.POST["abrircajon"] if "abrircajon" in request.POST else True
-    handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon)
+    handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, request)
 
 
-def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
-    
-    
+def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, request):
     ticket = Ticket.objects.get(pk=id)
     camarero = Camareros.objects.get(pk=ticket.camarero_id)
     lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__idart"),
@@ -67,6 +65,10 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
     for l in lineas:
         lineas_ticket.append(l)
 
+    url_factura = ""
+    if es_factura:
+       url_factura = "http://"+request.get_host()+"/app/facturas/"+id+"/"+ticket.uid
+    
     obj = {
         "op": "ticket",
         "fecha": ticket.fecha + " " + ticket.hora,
@@ -79,7 +81,8 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon):
         "lineas":lineas_ticket,
         "num": ticket.id,
         "efectivo": ticket.entrega,
-        'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']
+        'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total'],
+        "url_factura": url_factura
     }
 
  

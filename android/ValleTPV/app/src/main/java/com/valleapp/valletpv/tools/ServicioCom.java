@@ -245,7 +245,6 @@ public class ServicioCom extends Service {
         return  null;
     }
 
-
     private void IniciarDB() {
         if (tbNameUpdateLow == null){
             tbNameUpdateLow = new String[]{
@@ -272,8 +271,6 @@ public class ServicioCom extends Service {
                 db.inicializar();
             }
         }
-
-
         if(dbTbUpdates==null)  dbTbUpdates = new DBTbUpdates(getApplicationContext());
     }
 
@@ -301,6 +298,14 @@ public class ServicioCom extends Service {
         p.put("abrircajon", "False");
         p.put("receptor_activo", "True");
         new HTTPRequest(server + "/impresion/imprimir_ticket", p, "", controller_http);
+    }
+
+    public void imprimirFactura(String idTicket) {
+        ContentValues p = new ContentValues();
+        p.put("id", idTicket);
+        p.put("abrircajon", "False");
+        p.put("receptor_activo", "True");
+        new HTTPRequest(server + "/impresion/imprimir_factura", p, "", controller_http);
     }
 
     public void getSettings(Handler controller) {
@@ -353,7 +358,6 @@ public class ServicioCom extends Service {
             }
             }, 500);
          }
-
 
     public void get_cuenta(Handler controller, String mesa_id) {
         ContentValues p = new ContentValues();

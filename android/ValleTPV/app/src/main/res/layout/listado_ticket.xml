@@ -45,7 +45,24 @@
         android:contentDescription="@string/imprimir"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/imprimirticket" />
+        android:src="@drawable/imprimirticket"
+       />
+
+    <ImageButton
+        android:id="@+id/btnImprimirFactura"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/btnImprimir"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/imprimir_factura"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/factura" />
 
     <ImageButton
         android:id="@+id/btnListado"
@@ -56,7 +73,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
-        android:layout_toStartOf="@+id/btnImprimir"
+        android:layout_toStartOf="@+id/btnImprimirFactura"
         android:background="@drawable/fondo_btn_xml"
         android:contentDescription="@string/lista_nticket"
         android:padding="10dp"
@@ -79,6 +96,6 @@
             android:id="@+id/pneListados"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"></LinearLayout>
+            android:orientation="vertical"/>
     </ScrollView>
 </RelativeLayout>

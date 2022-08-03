@@ -107,7 +107,7 @@ class DocPrint():
         except Exception as e:
             print("[ERROR  ] %s" % e)
 
-    def imprimirTicket(self, num, camarero,  fecha, mesa, total, efectivo, cambio, lineas):
+    def imprimirTicket(self, num, camarero,  fecha, mesa, total, efectivo, cambio, lineas, url_factura=None):
 
         if type(fecha) is datetime:
             fecha = fecha.strftime("El %a %d-%B a las (%H:%M)")
@@ -166,6 +166,13 @@ class DocPrint():
                 p.writelines("Iva incluido",  text_type='bold', font='a',  align='center')
                 p.writelines("Gracias por su visita",font='a',   align='center')
                 p.writelines("TLF: "+ self._datos["telefono"], text_type='bold', height=2, font='a',   align='center')
+
+                if url_factura != "":
+                    p.writelines("",  text_type='bold',  font='a', align='center')
+                    p.writelines("",  text_type='bold',  font='a', align='center')
+                    p.writelines("Escanea para la factura",  text_type='bold',  font='a', align='center')
+                    p.qr(url_factura)
+
 
         except Exception as e:
             print("[ERROR  ] %s" % e)

@@ -21,10 +21,18 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IVA = 10
 BRAND_TITLE = "{{nombre_empresa}}"
 BRAND = "{{nombre_empresa}}"
 EMPRESA = "{{name_tpv}}"
 MAIL = "{{email}}"
+RAZON_SOCIAL = "Valleapp S.L."
+NIF = "5555555f"
+DIRECCION = "Carretera casa los locos, 9"
+TELEFONO = "6666666"
+POBLACION= "Granada"
+PROVINCIA= "Granada"
+CP="18012"
 BASE_UI_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)),"javascript")
 
 

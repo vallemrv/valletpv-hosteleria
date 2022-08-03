@@ -1357,6 +1357,7 @@ class Ticket(models.Model):
     entrega = models.DecimalField(db_column='Entrega', max_digits=6, decimal_places=2)  # Field name made lowercase.
     uid = models.CharField(db_column='UID', max_length=100)  # Field name made lowercase.
     mesa = models.CharField(db_column='Mesa', max_length=40)  # Field name made lowercase.
+    url_factura = models.CharField(max_length=140, default="")  # Field name made lowercase.
 
     @staticmethod
     def cerrar_cuenta(idm, idc, entrega, art):

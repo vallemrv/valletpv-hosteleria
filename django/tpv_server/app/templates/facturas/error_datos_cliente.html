@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <title>Error en datos factura</title>
+    <style>
+        html{
+            min-width: 400px;
+        }
+        .card-error{
+            margin: auto;
+            margin-top: 20%;
+            width: 55%;
+            
+        }
+    </style>
+    </head>
+<body>
+
+
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">{{empresa}}</a>
+         
+        </div>
+      </nav>
+
+    
+    <div class="container-fluid">
+        <div class="card card-error">
+            <div class="card-body">
+                <div class="card-title p-3 text-bg-danger">Error !</div>
+                <h3 class="p-4 card-text text-center">
+                    No se puede crear la factura. Hay un error en los datos, no se encuetra el ticket u otros. Contacte con {{empresa}}
+                </h3>
+            </div>
+
+
+        </div>
+    </div>
+
+</body>
+</html>

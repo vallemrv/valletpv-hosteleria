@@ -105,3 +105,10 @@ def imprimir_ticket(request):
     id = request.POST["id"]
     send_imprimir_ticket(request, id)
     return HttpResponse("success")
+
+
+@csrf_exempt
+def imprimir_factura(request):
+    id = request.POST["id"]
+    send_imprimir_ticket(request, id, True)
+    return HttpResponse("success")

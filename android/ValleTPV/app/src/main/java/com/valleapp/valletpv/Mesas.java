@@ -324,20 +324,27 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         Window window = dlgListadoTicket.getWindow();
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         final ImageButton imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
+        final ImageButton impFactura = dlgListadoTicket.findViewById(R.id.btnImprimirFactura);
         final ImageButton salir = dlgListadoTicket.findViewById(R.id.btn_salir_monedas);
         final ImageButton ls =  dlgListadoTicket.findViewById(R.id.btnListado);
         imp.setVisibility(View.GONE);
         ls.setVisibility(View.GONE);
+        impFactura.setVisibility(View.GONE);
 
         salir.setOnClickListener(view -> dlgListadoTicket.cancel());
 
         ls.setOnClickListener(view -> {
             imp.setVisibility(View.GONE);
             ls.setVisibility(View.GONE);
+            impFactura.setVisibility(View.GONE);
             mostrarListadoTicket(lsTicket);
         });
         imp.setOnClickListener(view -> {
             if(myServicio!=null) myServicio.imprimirTicket(IDTicket);
+            dlgListadoTicket.cancel();
+        });
+        impFactura.setOnClickListener(view -> {
+            if(myServicio!=null) myServicio.imprimirFactura(IDTicket);
             dlgListadoTicket.cancel();
         });
         if(myServicio!=null) myServicio.getListaTickets(handleHttp);
@@ -348,6 +355,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         IDTicket =  v.getTag().toString();
         dlgListadoTicket.findViewById(R.id.btnImprimir).setVisibility(View.VISIBLE);
         dlgListadoTicket.findViewById(R.id.btnListado).setVisibility(View.VISIBLE);
+        dlgListadoTicket.findViewById(R.id.btnImprimirFactura).setVisibility(View.VISIBLE);
         if(myServicio!=null){
             myServicio.getLineasTicket(handleHttp, IDTicket);
         }

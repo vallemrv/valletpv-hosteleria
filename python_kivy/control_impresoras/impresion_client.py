@@ -28,7 +28,6 @@ class receptor_manager():
     def on_message(self, ws, msg):
         message = json.loads(msg)
         message = json.loads(message["message"])
-        print(message)
         op = message["op"]
         if op == "open":
             ws.doc.abrir_cajon()
@@ -44,7 +43,7 @@ class receptor_manager():
                 if cambio < 0:
                     cambio = 0
                 ws.doc.imprimirTicket(message['num'], message['camarero'], message['fecha'], message["mesa"],
-                                   message['total'], message['efectivo'], cambio, message['lineas'])
+                                   message['total'], message['efectivo'], cambio, message['lineas'], message["url_factura"])
         elif op == "pedido" and str(message["receptor_activo"]).strip() == "True":
             ws.doc.imprimirPedido(message["camarero"], message["mesa"], message["hora"], message["lineas"])
         elif op == "urgente" and str(message["receptor_activo"]).strip() == "True":
