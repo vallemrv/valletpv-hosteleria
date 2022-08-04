@@ -2,7 +2,7 @@ from token import OP
 from django.conf import  settings
 from django.db.models import  Sum, Count
 from django.http import  HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from io import BytesIO as OpenIO
 from gestion.models import Ticket
@@ -18,9 +18,13 @@ def index(request, id, uid):
             return render(request, "facturas/datos_cliente.html",
                             {'id':id, 'uid':uid, "empresa":settings.EMPRESA})
         else:
-            f = open(ticket.url_factura, "rb")
-            pdfstr = f.read()
-            return HttpResponse(pdfstr, content_type='application/pdf')
+            try:
+                f = open(ticket.url_factura, "rb")
+                pdfstr = f.read()
+                return HttpResponse(pdfstr, content_type='application/pdf')
+            except:
+               return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
+ 
     else:
         return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
 
@@ -96,6 +100,6 @@ def crear_factura(request):
         ticket.save()
         f = open(url_f, "wb")
         f.write(pdfstr)
-        return HttpResponse(pdfstr, content_type='application/pdf')
+        return redirect("/app/facturas/"+id+"/"+uid)
     else:
         return render(request, "facturas/error_datos_cliente.html", {'empresa':settings.BRAND_TITLE })
