@@ -85,8 +85,6 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         }
     }
 
-
-
     @Override
     public void insert(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
@@ -98,9 +96,9 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }else{
                     id = o.getString("id");
                 }
-                int count = count(db, "ID=" + id);
-                ContentValues values = caragarValues(o);
                 synchronized (db) {
+                    int count = count(db, "ID=" + id);
+                    ContentValues values = caragarValues(o);
                     if (count == 0) {
                         db.insert(tb_name, null, values);
                     } else {

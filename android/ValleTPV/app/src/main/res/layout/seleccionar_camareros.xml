@@ -14,29 +14,23 @@
         android:layout_height="match_parent"
         android:layout_margin="10sp"
         android:layout_weight="0.45"
+        android:minHeight="550dp"
         android:orientation="vertical">
 
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/editTextTextPersonName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10"
-            android:background="@drawable/fondo_btn_press">
-
-            <TextView
-                android:id="@+id/editTextTextPersonName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/camareros_libre"
-                android:textSize="25sp" />
-        </RelativeLayout>
+            android:layout_height="70dp"
+            android:background="@color/pink"
+            android:gravity="center"
+            android:text="@string/camareros_libre"
+            android:textSize="25sp" />
 
         <ListView
             android:id="@+id/lstnoautorizados"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
@@ -47,26 +41,19 @@
         android:layout_weight="0.45"
         android:orientation="vertical">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/editTextTextPersonName2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="10"
-            android:background="@drawable/fondo_btn_press">
-
-            <TextView
-                android:id="@+id/editTextTextPersonName2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/carmareros_pase"
-                android:textSize="25sp" />
-        </RelativeLayout>
+            android:layout_height="70dp"
+            android:background="@color/pink"
+            android:gravity="center"
+            android:text="@string/carmareros_pase"
+            android:textSize="25sp" />
 
         <ListView
             android:id="@+id/lstautorizados"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
@@ -117,7 +104,8 @@
             android:contentDescription="@string/agregar_camarero"
             fab:fab_colorNormal="@color/pink"
             fab:fab_colorPressed="@color/pink_pressed"
-            fab:fab_icon="@drawable/mas" />
+            fab:fab_icon="@drawable/mas"
+            tools:ignore="ImageContrastCheck" />
 
 
 

@@ -101,7 +101,10 @@ public class ValleTPV extends Activity {
     @Override
     protected void onResume() {
         cargarPreferencias();
-        if (myServicio!=null) myServicio.setExHandler("camareros", handleHttp);
+        if (myServicio!=null){
+            myServicio.setExHandler("camareros", handleHttp);
+            rellenarListas();
+        }
         if (server != null && !server.equals("") && myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);

@@ -274,7 +274,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     public void clickAddCamareros(View v) {
         try {
             stop = true; //paramos contador
-            final DlgSelCamareros sel_cam = new DlgSelCamareros(cx, myServicio, this);
+            final DlgSelCamareros sel_cam = new DlgSelCamareros(cx, myServicio, false, this);
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
             sel_cam.setNoautorizados(dbCamareros.getAutorizados(false));
             sel_cam.setAutorizados(dbCamareros.getAutorizados(true));

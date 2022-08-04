@@ -2,6 +2,7 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -34,13 +35,16 @@ public class DlgSelCamareros extends Dialog{
     private ArrayList<JSONObject> autorizados = new ArrayList<>();
 
 
-    public DlgSelCamareros(Context context, ServicioCom servicio, IAutoFinish controlador) {
+    public DlgSelCamareros(Context context, ServicioCom servicio, boolean mostrar_add, IAutoFinish controlador) {
         super(context);
         this.servicio = servicio;
         this.controlador = controlador;
         setContentView(R.layout.seleccionar_camareros);
 
         ImageButton s = findViewById(R.id.salir);
+
+        if (!mostrar_add) findViewById(R.id.btn_add_nuevo_camarero).setVisibility(View.GONE);
+
         lstautorizados = findViewById(R.id.lstautorizados);
         lsnoautorizados = findViewById(R.id.lstnoautorizados);
 

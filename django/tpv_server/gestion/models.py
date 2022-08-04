@@ -835,8 +835,6 @@ class Mesasabiertas(models.Model):
                         l.save()
                         comunicar_cambios_devices("md", "lineaspedido", l.serialize())
                         
-                mesaP.infmesa.componer_articulos()
-                mesaP.infmesa.unir_en_grupos()
                 obj = mesaS.serialize()
                 obj["abierta"] = 0
                 obj["num"] = 0
@@ -942,8 +940,6 @@ class Pedidos(models.Model):
         pedido.infmesa.save()   
         
 
-        pedido.infmesa.componer_articulos()
-        pedido.infmesa.unir_en_grupos()
         return pedido
 
     def save(self, *args, **kwargs):

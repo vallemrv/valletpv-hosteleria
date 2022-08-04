@@ -26,6 +26,8 @@ def get_cuenta(request):
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
     if m_abierta:
+        m_abierta.infmesa.componer_articulos()
+        m_abierta.infmesa.unir_en_grupos()
         lstArt = m_abierta.get_lineaspedido()
 
     return JsonResponse(lstArt)
@@ -74,8 +76,7 @@ def mvlinea(request):
          linea.infmesa_id =  mesa.infmesa.pk
          linea.pedido_id = pedido.pk
          linea.save()
-         mesa.infmesa.unir_en_grupos()
-         mesa.infmesa.componer_articulos()
+         
          comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
 
          numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__uid=uid)).count()
