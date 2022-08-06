@@ -85,7 +85,9 @@ export default {
         state.ocupado = false
         state.error = null
         state.instrucciones.forEach( (inst) => {
-            state[inst.tb] = null
+            if (inst.tb == "teclascom"){
+                state["teclas"] = null
+            }else state[inst.tb] = null
         })
         state.instrucciones = null
     },

@@ -38,6 +38,13 @@ export default {
         })
     }, 
     selEmpresa({ commit, state }, index){
+        const main_property = ["error","ocupado", "user", "token", "instrucciones", "empresa", "empresas"];
+        for (const p in state){
+            if (!main_property.includes(p)){
+                state[p] = null;
+            }
+        }
+        state.itemsFiltrados  = [];
         state.empresa = state.empresas[index];
         localStorage.empresa_index = index;
         commit(types.REQUEST_SUCCESS)

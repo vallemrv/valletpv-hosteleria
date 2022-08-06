@@ -11,7 +11,6 @@
         :elevation="elevation"
         class="h-100 text-center'"
         v-bind="props"
-        :color="col_sel"
         height="auto"
         @click.stop="() => {}"
       >
@@ -25,12 +24,7 @@
         </v-row>
       </v-btn>
     </template>
-    <v-card v-if="tipo == 'color'">
-      <v-card-text>
-        <v-color-picker @change="on_enter()" v-model="color_picker"> </v-color-picker>
-      </v-card-text>
-    </v-card>
-    <v-card width="200px" v-else>
+    <v-card width="200px">
       <v-card-header>
         <v-text-field
           v-model="val_modified"
@@ -61,6 +55,7 @@ export default {
     "hint",
     "location",
     "origin",
+    "filter",
   ],
   data: () => {
     return {
@@ -71,29 +66,6 @@ export default {
     };
   },
   computed: {
-    col_sel() {
-      if (this.column == "rgb") {
-        return this.$tools.rgbToHex(
-          this.color_picker.r + "," + this.color_picker.g + "," + this.color_picker.b
-        );
-      } else {
-        return "";
-      }
-    },
-    color_picker: {
-      get: function () {
-        var color_sel = { r: 255, g: 0, b: 255, a: 1 };
-        if (this.item[this.column] && this.item[this.column] != "") {
-          var color_item = this.item[this.column].split(",");
-          color_sel = { r: color_item[0], g: color_item[1], b: color_item[2], a: 1 };
-        }
-        return color_sel;
-      },
-      set: function (v) {
-        this.val_modified = v.r + "," + v.g + "," + v.b;
-        this.item[this.column] = this.val_modified;
-      },
-    },
     _value() {
       if (this.value) return this.value;
       else return this.item[this.column];
@@ -106,7 +78,7 @@ export default {
       if (!app) app = "gestion";
       this.val_old = this.item[this.column];
       this.item[this.column + "_old"] = this.val_old;
-      this.item[this.column] = this.val_modified;
+      this.item[this.column] = parseInt(this.val_modified);
       this.mostrar = false;
       var id = this.item.id ? this.item.id : this.item.ID;
       let inst = {
@@ -117,7 +89,12 @@ export default {
         id: id,
       };
 
-      inst["reg"][this.column] = this.val_modified;
+      if (this.filter) {
+        inst["filter"] = { tecla_id: id };
+        inst["reg"]["orden"] = this.val_modified;
+      } else {
+        inst["reg"][this.column] = this.val_modified;
+      }
       this.addInstruccion({ inst: inst });
       this.$emit("change", this.item);
     },

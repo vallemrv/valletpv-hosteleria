@@ -1,106 +1,109 @@
 <template>
-  <ValleHeader :title="title" anchor="bottom end"/>
+  <ValleHeader :title="title" anchor="bottom end" />
   <v-container>
-  <v-row v-show="!showOrdenarTeclas && !showAgregarTeclas">
-    <v-col cols="12" class="pa-2 mb-5">
-      <v-toolbar class="mb-2" color="#cfb6d4">
-        <v-toolbar-title v-if="secSel">
-          {{ secSel.nombre }}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <div v-if="secSel">
-          
-          <v-btn icon @click="editar_sec"> <v-icon>mdi-pencil</v-icon></v-btn>
-          <v-btn icon v-if="items.length < 18" @click="() => (showAgregarTeclas = true)">
-            <v-icon>mdi-plus</v-icon></v-btn
-          >
-          <v-btn v-if="click <= 1" icon @click="() => (showOrdenarTeclas = true)">
-            <v-icon>mdi-order-numeric-descending </v-icon></v-btn
-          >
-        </div>
-      </v-toolbar>
-      <v-row>
-        <v-col cols="12" sm="6" v-if="itemSel">
-          <v-card :color="$tools.rgbToHex(itemSel.RGB)">
-            <v-card-text>
-              {{ itemSel.nombre + " " + itemSel.p1 }}
-              <v-btn class="float-right" icon variant="text" @click="editar_tecla">
-                <v-icon>mdi-pencil</v-icon></v-btn
-              >
-              <v-btn
-                icon
-                class="float-right"
-                variant="text"
-                @click="agregar_subteclas"
-                v-if="itemSel.tipo == 'CM' && items.length < 18"
-              >
-                <v-icon>mdi-plus</v-icon></v-btn
-              >
+    <v-row v-show="!showOrdenarTeclas && !showAgregarTeclas">
+      <v-col cols="12" class="pa-2 mb-5">
+        <v-toolbar class="mb-2" color="#cfb6d4">
+          <v-toolbar-title v-if="secSel"> {{ secSel.nombre }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <div v-if="secSel">
+            <v-btn icon @click="editar_sec"> <v-icon>mdi-pencil</v-icon></v-btn>
+            <v-btn
+              icon
+              v-if="items.length < 18"
+              @click="() => (showAgregarTeclas = true)"
+            >
+              <v-icon>mdi-plus</v-icon></v-btn
+            >
+            <v-btn v-if="click <= 1" icon @click="() => (showOrdenarTeclas = true)">
+              <v-icon>mdi-order-numeric-descending </v-icon></v-btn
+            >
+          </div>
+        </v-toolbar>
+        <v-row>
+          <v-col cols="12" sm="6" v-if="itemSel">
+            <v-card :color="$tools.rgbToHex(itemSel.RGB)">
+              <v-card-text>
+                {{ itemSel.nombre + " " + itemSel.p1 }}
+                <v-btn class="float-right" icon variant="text" @click="editar_tecla">
+                  <v-icon>mdi-pencil</v-icon></v-btn
+                >
+                <v-btn
+                  icon
+                  class="float-right"
+                  variant="text"
+                  @click="agregar_subteclas"
+                  v-if="itemSel.tipo == 'CM' && items.length < 18"
+                >
+                  <v-icon>mdi-plus</v-icon></v-btn
+                >
 
-              <v-btn class="float-right" variant="text" icon @click="quitar_tecla">
-                <v-icon>mdi-delete</v-icon></v-btn
-              >
-              <div class="clearfix"></div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <v-col cols="12" sm="6" v-if="subItemSel">
-          <v-card elevation="2">
-            <v-card-text>
-              {{ subItemSel.nombre }}
-              <v-btn class="float-right" icon variant="text" @click="editar_subtecla">
-                <v-icon>mdi-pencil</v-icon></v-btn
-              >
-              <v-btn class="float-right" icon variant="text" @click="quitar_subtecla">
-                <v-icon>mdi-delete</v-icon></v-btn
-              >
-              <div class="clearfix"></div>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
+                <v-btn class="float-right" variant="text" icon @click="quitar_tecla">
+                  <v-icon>mdi-delete</v-icon></v-btn
+                >
+                <div class="clearfix"></div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col cols="12" sm="6" v-if="subItemSel">
+            <v-card elevation="2">
+              <v-card-text>
+                {{ subItemSel.nombre }}
+                <v-btn class="float-right" icon variant="text" @click="editar_subtecla">
+                  <v-icon>mdi-pencil</v-icon></v-btn
+                >
+                <v-btn class="float-right" icon variant="text" @click="quitar_subtecla">
+                  <v-icon>mdi-delete</v-icon></v-btn
+                >
+                <div class="clearfix"></div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
 
-    <v-col cols="3">
-      <valle-teclados cols="12" @click_tecla="on_click_sec" :items="seccionescom">
-      </valle-teclados>
-    </v-col>
-    <v-col cols="9">
-      <valle-teclados cols="4" :items="items" @click_tecla="on_click_tecla">
-      </valle-teclados>
-    </v-col>
-  </v-row>
+      <v-col cols="3">
+        <valle-teclados cols="12" @click_tecla="on_click_sec" :items="seccionescom">
+        </valle-teclados>
+      </v-col>
+      <v-col cols="9">
+        <valle-teclados cols="4" :items="items" @click_tecla="on_click_tecla">
+        </valle-teclados>
+      </v-col>
+    </v-row>
 
-  <valle-dialogo-form
-    :item="itemSelEdit"
-    :title="titleForm"
-    :tipo="tipo"
-    :show="showForm"
-    :form="form"
-    :tb_name="selTbName"
-    @close="on_form_close"
-  >
-  </valle-dialogo-form>
+    <valle-dialogo-form
+      :item="itemSelEdit"
+      :title="titleForm"
+      :tipo="tipo"
+      :show="showForm"
+      :form="form"
+      :tb_name="selTbName"
+      @close="on_form_close"
+    >
+    </valle-dialogo-form>
 
-  <ordenar-teclas
-    v-show="showOrdenarTeclas"
-    @close="() => (showOrdenarTeclas = false)"
-    @change="on_change"
-    :items="items"
-    tb_name="teclas"
-    column="OrdenCom"
-  ></ordenar-teclas>
+    <ordenar-teclas
+      v-show="showOrdenarTeclas"
+      @close="() => (showOrdenarTeclas = false)"
+      @change="on_change"
+      :items="items"
+      tb_name="teclascom"
+      column="OrdenCom"
+      filter="true"
+    ></ordenar-teclas>
 
-  <agregar-teclas
-    v-show="showAgregarTeclas"
-    @close="() => (showAgregarTeclas = false)"
-    @change="on_change"
-    tb_name="teclas"
-    tb_mod="teclascom"
-    col="tecla"
-    col_parent="IDSeccionCom"
-    :item="itemAddTecla"
-    :filter="['tecla']"
-  ></agregar-teclas>
+    <agregar-teclas
+      v-show="showAgregarTeclas"
+      @close="() => (showAgregarTeclas = false)"
+      @change="on_change"
+      tb_name="teclas"
+      tb_mod="teclascom"
+      col="tecla"
+      col_parent="IDSeccionCom"
+      :item="itemAddTecla"
+      :filter="['tecla']"
+    ></agregar-teclas>
   </v-container>
 </template>
 
@@ -113,8 +116,13 @@ import AgregarTeclas from "@/comp_especificos/AgregarTeclas.vue";
 import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
-  components: { ValleTeclados, ValleDialogoForm, 
-                OrdenarTeclas, AgregarTeclas, ValleHeader },
+  components: {
+    ValleTeclados,
+    ValleDialogoForm,
+    OrdenarTeclas,
+    AgregarTeclas,
+    ValleHeader,
+  },
   data() {
     return {
       title: "Teclados comanda",
@@ -132,11 +140,6 @@ export default {
       itemSelEdit: null,
       selTbName: "",
       form: [],
-      formTecla: [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
-        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
-      ],
       formGR: [
         {
           col: "tipo",
@@ -151,6 +154,15 @@ export default {
   computed: {
     ...mapState(["ocupado", "seccionescom", "teclas", "subteclas", "iconchoices"]),
     ...mapGetters(["getItemsFiltered", "getItemsOrdered", "getListValues"]),
+    formTecla() {
+      var form = [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
+        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
+      ];
+
+      return form;
+    },
     itemAddTecla() {
       return {
         orden: 0,
@@ -187,7 +199,11 @@ export default {
       this.tipo = "add";
       this.showForm = true;
       this.selTbName = "subteclas";
-      this.form = this.formTecla;
+
+      this.form = [
+        ...this.formTecla,
+        { col: "incremento", label: "Incremento", tp: "number" },
+      ];
     },
     editar_tecla() {
       this.itemSelEdit = this.itemSel;
@@ -208,7 +224,10 @@ export default {
       this.showForm = true;
       this.titleForm = "Editar subtecla";
       this.selTbName = "subteclas";
-      this.form = this.formTecla;
+      this.form = [
+        ...this.formTecla,
+        { col: "incremento", label: "Incremento", tp: "number" },
+      ];
     },
     quitar_subtecla() {
       if (this.itemSel) {

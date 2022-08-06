@@ -1,29 +1,19 @@
 <template>
   <v-app>
-      <v-main app>
-          <router-view></router-view>
-          
-      </v-main>
-      <valle-footer></valle-footer>
-      <v-snackbar v-model="snackbar" multi-line> 
-      {{error}}
+    <v-main app>
+      <router-view></router-view>
+    </v-main>
+    <valle-footer></valle-footer>
+    <v-snackbar v-model="snackbar" multi-line>
+      {{ error }}
       <template v-slot:actions>
-        <v-btn
-          color="blue"
-          variant="text"
-          @click="snackbar = false"
-        >
-          Close
-        </v-btn>
+        <v-btn color="blue" variant="text" @click="snackbar = false"> Close </v-btn>
       </template>
-      
-      </v-snackbar>
-
+    </v-snackbar>
   </v-app>
 </template>
 
 <script>
-
 import { mapState, mapActions } from "vuex";
 import ValleFooter from "./components/ValleFooter";
 import ValleMainHeader from "./components/ValleMainHeader.vue";
@@ -34,25 +24,25 @@ export default {
   data() {
     return {
       snackbar: false,
-   };
+    };
   },
   computed: {
     ...mapState(["ocupado", "empresa", "error"]),
   },
-  methods:{
+  methods: {
     ...mapActions(["cargarEmpresas"]),
   },
-  watch:{
-    error(v){
+  watch: {
+    error(v) {
       this.snackbar = v != null;
-    }
+    },
   },
-  mounted(){
+  mounted() {
     let empresas = localStorage.empresas;
-    if (empresas && empresas != "null" && empresas != ""){
+    if (empresas && empresas != "null" && empresas != "") {
       this.cargarEmpresas();
     }
-  }
+  },
 };
 </script>
 

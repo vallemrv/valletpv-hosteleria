@@ -16,13 +16,14 @@
             <v-row class="pa-3">
               <v-col cols="8">{{ item.nombre }}</v-col>
               <v-col cols="4">
-                <valle-float-form-vue
+                <FormFloatOrden
                   :item="item"
                   :column="column"
                   :tb_name="tb_name"
                   @change="on_click_ordenar"
+                  :filter="filter"
                   location="bottom end"
-                ></valle-float-form-vue>
+                ></FormFloatOrden>
               </v-col>
             </v-row>
           </v-card>
@@ -32,10 +33,10 @@
   </v-card>
 </template>
 <script>
-import ValleFloatFormVue from "@/components/ValleFloatForm.vue";
+import FormFloatOrden from "./FormFloatOrden.vue";
 export default {
-  components: { ValleFloatFormVue },
-  props: ["items", "tb_name", "column"],
+  components: { FormFloatOrden, FormFloatOrden },
+  props: ["items", "tb_name", "column", "filter"],
   methods: {
     on_click_ordenar() {
       this.$emit("change");

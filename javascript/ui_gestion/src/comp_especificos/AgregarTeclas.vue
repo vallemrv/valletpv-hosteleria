@@ -17,10 +17,10 @@
             @click_filter="on_filter_change"
           ></valle-filtros-vue>
         </v-col>
-        <v-col class="ma-1" cols="12" v-for="(item, i) in items" :key="i">
+        <v-col class="ma-1" cols="12" v-for="(obj, i) in items" :key="i">
           <v-card class="pa-3">
-            {{ item.nombre }}
-            <v-btn icon class="float-end" @click="add_item(item)"
+            {{ obj.nombre }}
+            <v-btn icon class="float-end" @click="add_item(obj)"
               ><v-icon>mdi-plus</v-icon></v-btn
             >
             <div class="clearfix"></div>
@@ -57,12 +57,10 @@ export default {
       var inst = {
         tb: this.tb_name,
         tb_mod: this.tb_mod,
-        reg: this.item,
+        reg: { orden: this.item.orden, seccion: this.item.seccion, tecla: v.id },
         tipo: "md_teclados",
         filter: this.filter,
       };
-      inst.reg[this.col] = v.id;
-      v[this.col_parent] = this.item[this.col_parent];
       this.addInstruccion({ inst: inst });
       this.$emit("change");
     },

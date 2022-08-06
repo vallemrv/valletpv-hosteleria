@@ -142,6 +142,7 @@ def add_reg(request):
 @token_required
 def mod_regs(request):
     insts = json.loads(request.POST["isnts"])
+    
     for inst in insts:
         if inst["tipo"] == "md":
            modifcar_reg(inst)
@@ -206,21 +207,27 @@ def modifcar_reg(inst):
     model = apps.get_model(app_name, tb_name)
 
     obj = model.objects.filter(**filter).first()
+  
     if (obj):
         for key in reg:
             k_lower = key.lower()
+            attr = reg[key]
             if hasattr(obj, k_lower):
                 field = getattr(model, k_lower)
-                attr = reg[key]
                 if "ForwardManyToOneDescriptor" in field.__class__.__name__:
                     k_lower =  k_lower+"_id"
-                else:
-                    attr = reg[key] 
+                
             setattr(obj, k_lower, attr)        
             
-
+        
         obj.save()
-        obj = obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj)
+
+        if(tb_name == "tecladoscom"):
+            tecla = Teclas.objects.filter(pk = inst["id"]).first()
+            obj = tecla.serialize()
+        else:
+            obj = obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj)
+            
         update = {
             "op": "md",
             "device": "",
@@ -228,6 +235,7 @@ def modifcar_reg(inst):
             "obj":obj,
             "receptor": "devices",
             }
+        
         send_mensaje_devices(update) 
 
 def delete_reg(inst):
@@ -236,8 +244,8 @@ def delete_reg(inst):
     filter = inst["filter"] if "filter" in inst else  {"id": inst["id"]}
     model = apps.get_model(app_name, tb_name)
 
-    obj = model.objects.filter(**filter).first()
-    if (obj):
+    objs = model.objects.filter(**filter)
+    for obj in objs:
         update = {
             "op": "rm",
             "device": "",
@@ -257,7 +265,7 @@ def mod_teclados(inst):
     fl = {}
     for f in filter:
         fl[f+'__pk'] = item[f]
-    
+  
     model = apps.get_model(app_name, tb_name)
     r = model.objects.filter(**fl)
     r.delete()
