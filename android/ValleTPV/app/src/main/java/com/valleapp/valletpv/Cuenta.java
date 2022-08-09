@@ -17,7 +17,6 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -82,6 +81,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     Timer timerAutoCancel = null;
 
     final long autoCancel = 10000;
+    private boolean lock = true;
 
     ServicioCom myServicio;
 
@@ -106,7 +106,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
 
                 if (tipo.equals("c"))
-                    mostarCobrar(dbCuenta.filter("IDMesa=" + mesa.getInt("ID")), totalMesa);
+                    mostrarCobrar(dbCuenta.filter("IDMesa=" + mesa.getInt("ID")), totalMesa);
 
                 get_cuenta();
             }catch (Exception e){
@@ -163,6 +163,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
         }
     };
+
 
 
     //Inicializacion de estados y vista
@@ -394,7 +395,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try {
             synchronized (dbCuenta) {
                 resetCantidad();
-
+                this.lock = true;
                 TextView l = findViewById(R.id.lblPrecio);
                 ListView lst = findViewById(R.id.lstCamareros);
 
@@ -402,7 +403,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
 
                 l.setText(String.format("%01.2f €", totalMesa));
-
                 lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineas, this));
             }
 
@@ -442,6 +442,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             setEstadoAutoFinish(true, false);
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
             lineas = dbCuenta.getAll(mesa.getString("ID"));
+
             if(totalMesa>0) {
                 ContentValues p = new ContentValues();
                 p.put("idm", mesa.getString("ID"));
@@ -476,7 +477,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try {
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
             JSONArray l = dbCuenta.filter("IDMesa="+mesa.getString("ID"));
-            mostarCobrar(l, totalMesa);
+            mostrarCobrar(l, totalMesa);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -621,8 +622,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         stop = s;
     }
 
-    @Override
-    public void mostarCobrar(JSONArray lsart, Double totalCobro) {
+    public void mostrarCobrar(JSONArray lsart, Double totalCobro) {
         if(totalCobro>0) {
             try {
                 setEstadoAutoFinish(true, true);
@@ -638,6 +638,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     @Override
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
+
         try {
             setEstadoAutoFinish(true, true);
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");

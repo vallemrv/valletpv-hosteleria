@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ import com.valleapp.vallecom.R;
 import com.valleapp.vallecom.adaptadores.AdaptadorMesas;
 import com.valleapp.vallecom.db.DBCuenta;
 import com.valleapp.vallecom.db.DBMesas;
+import com.valleapp.vallecom.db.DBReceptores;
 import com.valleapp.vallecom.db.DBZonas;
 import com.valleapp.vallecom.interfaces.IPedidos;
 import com.valleapp.vallecom.pestañas.ListaMesas;
@@ -44,6 +46,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -58,12 +61,19 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
     DBMesas dbMesas;
     DBZonas dbZonas;
     DBCuenta dbCuenta;
+    DBReceptores dbReceptores;
 
     JSONObject cam = null;
     JSONObject zn = null;
 
     JSONArray peticiones = new JSONArray();
+    ArrayList<JSONObject> receptores;
     boolean viendo_mensajes = false;
+    LinearLayout botonesReceptores ;
+
+    private int sel_receptor = 0;
+    private boolean all_cam = false;
+
 
     private final Handler handlerMesas = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -84,20 +94,9 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         }
     };
 
-    private void rellenarEstadoWS(String op, String res) {
-        if (op.equals("estadows")){
-            TextView txt = findViewById(R.id.txtInf_ws);
-            txt.setText(res);
-        }else if (op.equals("op_pendientes")){
-            TextView txt = findViewById(R.id.txtInf_tareas);
-            txt.setText(res);
-        }
-
-    }
-
     private final Handler handlerPedidos = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-            rellenarPedido();
+            rellenarPedido(sel_receptor, all_cam);
         }
     };
 
@@ -151,6 +150,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         }
     };
 
+
     private void manejarAurotias() {
            View v = findViewById(R.id.show_autorias);
            int numPeticiones = peticiones.length();
@@ -164,6 +164,17 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     }
 
+    private void rellenarEstadoWS(String op, String res) {
+        if (op.equals("estadows")){
+            TextView txt = findViewById(R.id.txtInf_ws);
+            txt.setText(res);
+        }else if (op.equals("op_pendientes")){
+            TextView txt = findViewById(R.id.txtInf_tareas);
+            txt.setText(res);
+        }
+
+    }
+
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -172,6 +183,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 dbMesas = (DBMesas) myServicio.getDb("mesas");
                 dbZonas = (DBZonas) myServicio.getDb("zonas");
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                dbReceptores = (DBReceptores) myServicio.getDb("receptores");
                 myServicio.setExHandler("mesasabiertas", handlerMesas );
                 myServicio.setExHandler("zonas", handlerMesas );
                 myServicio.setExHandler("mesas", handlerMesas );
@@ -181,38 +193,150 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 myServicio.setCamarero(cam); //debe de ir despues de setExHandler....
             }
         }
-
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             myServicio = null;
         }
     };
 
-    private void rellenarPedido() {
+    private void rellenarPedido(int IDReceptor, boolean all) {
         try{
 
-            JSONArray lineas = dbCuenta.filterByPedidos("IDZona = "+ zn.getString("ID") +
-                     "  AND servido = 0  AND Estado != 'A' AND Estado != 'C'");
+            IDReceptor = receptores.get(IDReceptor).getInt("ID");
+            String sql_where = "camarero=" + cam.getString("ID")+ " and ";
 
-            pedidos.vaciarPanel();
+            if (all) sql_where = "";
 
-            if(lineas.length()>0){
+            JSONArray lineas = dbCuenta.filterByPedidos( sql_where+ "  receptor=" + IDReceptor + " and servido=0", "IDArt, IDPedido, receptor");
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout ll = findViewById(R.id.listaPedidoComanda);
+            ll.removeAllViews();
 
-                params.setMargins(5,0,5,0);
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
 
-                 for (int i = 0; i < lineas.length(); i++) {
-                   JSONObject  art =  lineas.getJSONObject(i);
-                   pedidos.addLinea(art, params,this,this);
-                 }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            params.setMargins(5,5,5,5);
+
+            int IDPedido = -1;
+            View grupo = null;
+            LinearLayout listaGr = null;
+            LinearLayout.LayoutParams params_linea = null;
+
+            for (int i = 0; i < lineas.length(); i++) {
+
+                JSONObject art = lineas.getJSONObject(i);
+
+                if (IDPedido == -1 || IDPedido != art.getInt("IDPedido")){
+                    IDPedido = art.getInt("IDPedido");
+                    LayoutInflater inflater = (LayoutInflater) cx.getSystemService
+                            (Context.LAYOUT_INFLATER_SERVICE);
+                    grupo  = inflater.inflate(R.layout.grupos_pedidos, null);
+                    listaGr = grupo.findViewById(R.id.lista_pedidos_grupo);
+                    TextView m = grupo.findViewById(R.id.texto_mesa);
+                    m.setText("Mesa: "+art.getString("nomMesa"));
+                    ll.addView(grupo, params);
+                    ImageButton btn = grupo.findViewById(R.id.borrar_pedido);
+                    btn.setTag(IDPedido);
+
+                    btn.setOnClickListener(view -> {
+                        JSONArray finalLineas = dbCuenta.filterByPedidos("IDPedido="+view.getTag().toString());
+                        for (int i1 = 0; i1 < finalLineas.length(); i1++) {
+                            try {
+                                servirPedido(finalLineas.getJSONObject(i1));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        selectReceptor(sel_receptor, all_cam);
+                    });
+
+                    params_linea = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            (int) (metrics.density * 40f));
+
+
+                }
+
+                LayoutInflater inflater = (LayoutInflater) cx.getSystemService
+                        (Context.LAYOUT_INFLATER_SERVICE);
+                View v  = inflater.inflate(R.layout.linea_pedido_externo, null);
+
+                TextView c = v.findViewById(R.id.lblCantidad);
+                TextView n = v.findViewById(R.id.lblNombre);
+                ImageButton b = v.findViewById(R.id.btnBorrarPedido);
+                b.setTag(art);
+
+                c.setText(String.format("%s", art.getString("Can")));
+                n.setText(String.format("%s", art.getString("Descripcion")));
+                listaGr.addView(v, params_linea);
             }
-
 
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void rellenarReceptores() {
+        try {
+            receptores = dbReceptores.getAll();
+            botonesReceptores = findViewById(R.id.pneReceptores);
+            botonesReceptores.removeAllViews();
+
+            if(receptores.size()>0){
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT);
+
+                params.setMargins(5,0,5,0);
+                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                float dp = 5f;
+                float fpixels = metrics.density * dp;
+                int pixels = (int) (fpixels + 0.5f);
+                int i = 0;
+                for (JSONObject r: receptores) {
+
+                    Button btn = new Button(cx);
+                    btn.setId(i);
+                    btn.setSingleLine(false);
+
+                    btn.setTextSize(pixels);
+                    btn.setTag(r);
+                    btn.setText(r.getString("nombre").trim().replace(" ", "\n"));
+                    btn.setBackgroundResource(R.drawable.bg_pink);
+                    btn.setOnLongClickListener(this);
+                    btn.setOnClickListener(view -> {
+                        selectReceptor(view.getId(), false);
+                    });
+                    btn.setOnLongClickListener(view -> {
+                        selectReceptor(view.getId(), true);
+                        return true;
+                    });
+                    botonesReceptores.addView(btn, params);
+                    i++;
+                }
+                selectReceptor(0, false);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private void selectReceptor(int id, boolean all){
+        sel_receptor = id;
+        all_cam = all;
+        for(int l = 0; l < receptores.size(); l++){
+            View f = botonesReceptores.findViewById(l);
+            f.setBackgroundResource(R.drawable.bg_pink);
+        }
+        View f = botonesReceptores.findViewById(id);
+        if (all) f.setBackgroundResource(R.drawable.bg_red);
+        else f.setBackgroundResource(R.drawable.bg_blue_light);
+        rellenarPedido(id, all);
     }
 
     private void rellenarZonas() {
@@ -339,7 +463,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     }
 
                 }
-                rellenarPedido();
+
             }
 
         }catch (Exception e){
@@ -357,20 +481,22 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     }
 
-
-    public void clickServido(View v){
-        try {
-            JSONObject obj = (JSONObject) v.getTag();
+    private void servirPedido(JSONObject obj){
+        try{
             ContentValues p = new ContentValues();
             p.put("art", obj.toString());
             p.put("idz", zn.getString("ID"));
             myServicio.addColaInstrucciones(new Instruccion(p, "/pedidos/servido"));
             dbCuenta.artServido(obj);
-            rellenarPedido();
-
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void clickServido(View v){
+        JSONObject obj = (JSONObject) v.getTag();
+        servirPedido(obj);
+        selectReceptor(sel_receptor, all_cam);
     }
 
     public void mostrarListaTicket(View v) {
@@ -545,6 +671,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         }else {
             viendo_mensajes = false;
             rellenarZonas();
+            rellenarReceptores();
             manejarAurotias();
         }
         super.onResume();

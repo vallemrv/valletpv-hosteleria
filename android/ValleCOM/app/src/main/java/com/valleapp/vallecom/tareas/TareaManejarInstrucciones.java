@@ -6,7 +6,9 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.valleapp.vallecom.R;
 import com.valleapp.vallecom.utilidades.HTTPRequest;
 import com.valleapp.vallecom.utilidades.Instruccion;
 
@@ -29,6 +31,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     Handler handleHttp = new Handler(Looper.myLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
             try {
                 String op = msg.getData().getString("op");
                 if (op != null && op.equals("ERROR")){
@@ -59,7 +62,6 @@ public class TareaManejarInstrucciones extends TimerTask {
 
             procesado = true;
             count=0;
-            super.handleMessage(msg);
 
         }
     };
@@ -73,6 +75,16 @@ public class TareaManejarInstrucciones extends TimerTask {
         this.server = server;
         this.timeout = timeout;
         this.handlers = handlers;
+
+    }
+
+
+    private void enviarInfo(){
+        Handler h = handlers.get("estadows");
+        if (h!=null) {
+            HTTPRequest http = new HTTPRequest();
+            http.sendMessage(h, "op_pendientes", String.format("%d tareas pendientes", cola.size()));
+        }
     }
 
     @Override
@@ -91,17 +103,12 @@ public class TareaManejarInstrucciones extends TimerTask {
                 count++;
             }
 
-            if (count > 20) {
-                count = 0;
-                procesado = true;
-            }
-
             synchronized (parent) {
                 parent.wait(timeout);
-                Handler h = handlers.get("estadows");
-                if (h!=null) {
-                    HTTPRequest http = new HTTPRequest();
-                    http.sendMessage(h, "op_pendientes", String.format("%d tareas pendientes", cola.size()));
+                enviarInfo();
+                if (count > 60) {
+                    count = 0;
+                    procesado = true;
                 }
             }
 

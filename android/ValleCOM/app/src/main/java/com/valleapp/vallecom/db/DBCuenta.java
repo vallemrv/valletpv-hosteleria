@@ -32,7 +32,7 @@ public class DBCuenta extends DBBase  {
                 "IDMesa INTEGER," +
                 "IDArt INTEGER," +
                 "nomMesa TEXT, IDZona TEXT," +
-                "servido INTEGER )");
+                "servido INTEGER, receptor INTEGER, camarero INTEGER )");
 
     }
 
@@ -61,6 +61,8 @@ public class DBCuenta extends DBBase  {
             obj.put("servido", res.getString(res.getColumnIndex("servido")));
             obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
             obj.put("IDMesa", res.getString(res.getColumnIndex("IDMesa")));
+            obj.put("camarero", res.getString(res.getColumnIndex("camarero")));
+            obj.put("receptor", res.getString(res.getColumnIndex("receptor")));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -119,6 +121,16 @@ public class DBCuenta extends DBBase  {
                 " GROUP BY  IDArt, Descripcion, Precio, Estado, IDPedido ORDER BY ID DESC");
     }
 
+    public JSONArray filterByPedidos(String cWhere, String group_by) {
+
+        String strWhere = "";
+        if (cWhere != null){
+            strWhere = " WHERE "+ cWhere;
+        }
+        return execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta " + strWhere +
+                " GROUP BY "+group_by+" ORDER BY ID DESC");
+    }
+
     @Override
     protected ContentValues caragarValues(JSONObject o){
         ContentValues values = new ContentValues();
@@ -134,6 +146,8 @@ public class DBCuenta extends DBBase  {
             values.put("IDPedido", o.getString("IDPedido"));
             values.put("Estado", o.getString("Estado"));
             values.put("servido", o.getString("servido"));
+            values.put("camarero", o.getString("camarero"));
+            values.put("receptor", o.getString("receptor"));
         }catch (Exception e){
             Log.d("CUENTA-CARGARVALUES",  e.getMessage());
         }
@@ -308,5 +322,15 @@ public class DBCuenta extends DBBase  {
     }
 
 
+    public void servirPeido(String idp) {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            ContentValues p = new ContentValues();
+            p.put("servido", 1);
+            db.update("cuenta", p, "IDPedido = ?  ", new String[]{idp});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
 

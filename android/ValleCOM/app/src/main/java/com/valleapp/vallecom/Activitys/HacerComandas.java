@@ -181,12 +181,14 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                         @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.btn_art, null);
 
                         Button btn = v.findViewById(R.id.boton_art);
-                        String[] rgb = a.getString("RGB").split(",");
-
-                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                        if (!a.getString("RGB").equals("")) {
+                             String[] rgb = a.getString("RGB").split(",");
+                             btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                        }else{
+                            btn.setBackgroundResource(R.drawable.bg_pink);
+                        }
                         btn.setId(i);
                         btn.setSingleLine(false);
-
 
 
                         if (sec.getBoolean("es_promocion")) {

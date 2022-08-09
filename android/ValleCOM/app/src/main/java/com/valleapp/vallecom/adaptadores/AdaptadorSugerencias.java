@@ -39,7 +39,7 @@ public class AdaptadorSugerencias extends ArrayAdapter<JSONObject> {
         View rowView = inflater.inflate(R.layout.linea_simple, parent, false);
 
         try {
-            TextView can = (TextView) rowView.findViewById(R.id.labelTitle);
+            TextView can = (TextView) rowView.findViewById(R.id.txtTitulo);
             // Set the text size 25 dip for ListView each item
             can.setTextSize(TypedValue.COMPLEX_UNIT_DIP,25);
 

@@ -124,21 +124,21 @@ public class ServicioCom extends Service {
                 @Override
                 public void onError(Exception ex) {
                     // devolución de llamada por error de conexión
-                    Log.i("Websockets", "Error de conexion .....");
+                    Log.i("WEBSOCKET_INFO", "Error de conexion .....");
                     isWebsocketClose = true;
                 }
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
-                    Log.i("Websocket", "Websocket close....");
+                    Log.i("WEBSOCKET_INFO", "Websocket close....");
                     isWebsocketClose = true;
                 }
 
                 @Override
                 public void onMessage(ByteBuffer bytes) {
                     // El mensaje de flujo de bytes devuelto
-                    Log.i("Websocket","socket bytebuffer bytes");
+                    Log.i("WEBSOCKET_INFO","socket bytebuffer bytes");
                 }
             };
             client.connect();
@@ -153,13 +153,11 @@ public class ServicioCom extends Service {
             String op = o.getString("op");
             IBaseSocket db = (IBaseSocket) getDb(tb);
             if (db != null) {
-                Log.d("LINEA", "Operacion "+op+" Tabla "+ tb);
                 if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
                 if (op.equals("md")) db.update(o.getJSONObject("obj"));
                 if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
                 Handler h = exHandler.get(tb);
                 if (h != null){
-                    Log.d("SEND_HANDLER", tb);
                     h.sendEmptyMessage(0);
                 }
             } else if (op.equals("men")) {
@@ -296,6 +294,7 @@ public class ServicioCom extends Service {
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    Log.d("ESTADO_WS", "Is close "+isWebsocketClose);
                     if (isWebsocketClose && client!= null){
                         client.reconnect();
                         Handler h = exHandler.get("estadows");
@@ -309,7 +308,6 @@ public class ServicioCom extends Service {
                             HTTPRequest http = new HTTPRequest();
                             http.sendMessage(h, "estadows", "WS Conectado");
                         }
-                        Log.d("carmelo", ""+isWebsocketClose);
                     }
                 }
             }, 2000, 2000);

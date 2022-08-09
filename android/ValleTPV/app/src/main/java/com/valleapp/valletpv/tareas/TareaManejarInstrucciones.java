@@ -21,6 +21,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     private final long timeout;
     boolean procesado = true;
     int count = 0;
+
     Handler handleHttp = new Handler(Looper.myLooper()){
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -45,12 +46,11 @@ public class TareaManejarInstrucciones extends TimerTask {
                                     handlerInst.sendMessage(msgInst);
                                 }
                             }
-
                         }
                     }
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                Log.w("Instrucciones", "Error al ejecutar instruccion en el servidor");
             }
             procesado = true;count=0;
             super.handleMessage(msg);
@@ -59,7 +59,8 @@ public class TareaManejarInstrucciones extends TimerTask {
     };
 
     public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instrucciones> colaInstrucciones, long timeout) {
-        this.cola= colaInstrucciones; this.parent = timerManejarInstrucciones;
+        this.cola= colaInstrucciones;
+        this.parent = timerManejarInstrucciones;
         this.timeout = timeout;
     }
 
@@ -67,7 +68,6 @@ public class TareaManejarInstrucciones extends TimerTask {
     public void run() {
         try {
 
-            //Log.i("TAREAS_PENDIENTES", String.valueOf(cola.size()) + " "+ procesado);
             if (procesado) {
                 synchronized (cola) {
                     Instrucciones inst = cola.peek();
@@ -79,13 +79,13 @@ public class TareaManejarInstrucciones extends TimerTask {
             }else{
                 count ++;
             }
-            if (count > 20) {
-                count = 0;
-                procesado = true;
-            }
 
             synchronized (parent) {
                 parent.wait(timeout);
+                if (count > 60) {
+                    count = 0;
+                    procesado = true;
+                }
             }
 
         }catch (Exception e){

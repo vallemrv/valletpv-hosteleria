@@ -34,7 +34,7 @@ public class AdaptadorRefill extends ArrayAdapter<JSONObject> {
         View v = inflater.inflate(R.layout.linea_title_subtiltle, parent, false);
         try {
             JSONObject o = values.get(position);
-            TextView t = v.findViewById(R.id.labelTitle);
+            TextView t = v.findViewById(R.id.txtTitulo);
             t.setText("Pedido "+(position+1));
             TextView s = v.findViewById(R.id.labelSubTitle);
             s.setText(o.getString("subtitle"));

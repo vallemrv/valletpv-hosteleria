@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -27,14 +28,14 @@ public class DBCuenta extends DBBase{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-         db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
+          db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
                 "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
                 "Descripcion TEXT, descripcion_t TEXT, " +
                 "Precio DOUBLE, IDPedido INTEGER, " +
                 "IDMesa INTEGER," +
                 "IDArt INTEGER," +
                 "nomMesa TEXT, IDZona TEXT," +
-                "servido INTEGER )");
+                "servido INTEGER, IDControl TEXT )");
     }
 
     @Override
@@ -202,14 +203,17 @@ public class DBCuenta extends DBBase{
             int can = art.getInt("Can");
             for(int i=0;i<can;i++) {
                 ContentValues values = new ContentValues();
+                values.put("ID", this.last_id + 100);
+                values.put("IDControl", UUID.randomUUID().toString());
                 values.put("IDArt", art.getInt("ID"));
                 values.put("Descripcion", art.getString("Descripcion"));
                 values.put("descripcion_t", art.getString("descripcion_t"));
                 values.put("Precio", art.getDouble("Precio"));
                 values.put("IDMesa", IDMesa);
                 values.put("Estado", "N");
-                db.insert("cuenta", null, values);
+                this.last_id =  db.insert("cuenta", null, values);
             }
+
         }catch (JSONException e){
             e.printStackTrace();
         }
@@ -244,7 +248,9 @@ public class DBCuenta extends DBBase{
     public void aparcar(String id){
         SQLiteDatabase db = this.getWritableDatabase();
         try{
-            db.execSQL("UPDATE cuenta SET Estado='P' WHERE IDMesa="+id);
+            ContentValues p = new ContentValues();
+            p.put("Estado", "P");
+            db.update(tb_name, p, "IDMesa=?", new String[]{id});
         }catch (SQLiteException e){
             e.printStackTrace();
         }

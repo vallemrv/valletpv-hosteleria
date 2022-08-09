@@ -9,7 +9,7 @@ import org.json.JSONObject;
  */
 public interface IControladorCuenta {
     void setEstadoAutoFinish(boolean reset, boolean stop);
-    void mostarCobrar(final JSONArray lsart, Double totalCobro);
+    void mostrarCobrar(final JSONArray lsart, Double totalCobro);
     void cobrar(JSONArray lsart, Double totalCobro, Double entrega );
     void pedirArt(JSONObject art);
     void clickMostrarBorrar(final JSONObject art);

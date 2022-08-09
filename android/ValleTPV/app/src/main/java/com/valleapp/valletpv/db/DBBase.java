@@ -23,6 +23,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "valletpv";
     protected final String tb_name;
+    protected long last_id = 0;
 
     public DBBase(@Nullable Context context, String tb_name) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -90,20 +91,22 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         SQLiteDatabase db = getWritableDatabase();
         try{
             synchronized (db) {
+
                 String id;
                 if (o.has("ID")){
                     id = o.getString("ID");
                 }else{
                     id = o.getString("id");
                 }
-                synchronized (db) {
-                    int count = count(db, "ID=" + id);
-                    ContentValues values = caragarValues(o);
-                    if (count == 0) {
-                        db.insert(tb_name, null, values);
-                    } else {
-                        db.update(tb_name, values, "ID=?", new String[]{id});
-                    }
+                int count = count(db, "ID=" + id);
+                ContentValues values = caragarValues(o);
+                if (count == 0) {
+                   last_id = db.insert(tb_name, null, values);
+                   if (tb_name == "cuenta"){
+                       db.delete(tb_name, "IDControl!='' AND Estado!='N'", null);
+                   }
+                } else {
+                    db.update(tb_name, values, "ID=?", new String[]{id});
                 }
             }
         }catch (Exception e){

@@ -117,7 +117,7 @@ public class DlgSepararTicket extends Dialog{
             }
         }
         cancel();
-        controlador.mostarCobrar(arts, totalCobro);
+        controlador.mostrarCobrar(arts, totalCobro);
     }
 
     public void clickSalirSeparados(){

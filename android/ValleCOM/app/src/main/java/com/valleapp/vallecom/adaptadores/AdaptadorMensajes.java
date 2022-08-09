@@ -35,7 +35,7 @@ public class AdaptadorMensajes extends ArrayAdapter<JSONObject> {
         View v = inflater.inflate(R.layout.linea_simple, parent, false);
         try {
             JSONObject o = values.get(position);
-            TextView t = v.findViewById(R.id.labelTitle);
+            TextView t = v.findViewById(R.id.txtTitulo);
             RelativeLayout btn = v.findViewById(R.id.item);
             btn.setTag(o.getString("ID"));
             t.setText(o.getString("nombre"));
