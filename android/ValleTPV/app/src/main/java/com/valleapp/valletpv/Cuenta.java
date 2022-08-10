@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -81,12 +82,12 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     Timer timerAutoCancel = null;
 
     final long autoCancel = 10000;
-    private boolean lock = true;
 
     ServicioCom myServicio;
 
     final Context cx = this;
 
+    private DlgCobrar dlgCobrar;
 
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
@@ -105,9 +106,18 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 rellenarTicket();
 
 
-                if (tipo.equals("c"))
-                    mostrarCobrar(dbCuenta.filter("IDMesa=" + mesa.getInt("ID")), totalMesa);
+                if (tipo.equals("c")) {
+                    Timer t = new Timer();
+                    findViewById(R.id.loading).setVisibility(View.VISIBLE);
+                    t.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            handlerMostrarCobrar.sendEmptyMessage(0);
+                        }
+                    }, 1000);
 
+                }
+                myServicio.setMesa_abierta(mesa);
                 get_cuenta();
             }catch (Exception e){
                 e.printStackTrace();
@@ -117,6 +127,21 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             myServicio = null;
+        }
+    };
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handlerMostrarCobrar = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            try {
+                final String id_mesa = mesa.getString("ID");
+                mostrarCobrar(dbCuenta.filter("IDMesa=" + id_mesa), totalMesa);
+                findViewById(R.id.loading).setVisibility(View.GONE);
+            }catch (Exception e ){
+                e.printStackTrace();
+            }
         }
     };
 
@@ -395,13 +420,22 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try {
             synchronized (dbCuenta) {
                 resetCantidad();
-                this.lock = true;
-                TextView l = findViewById(R.id.lblPrecio);
-                ListView lst = findViewById(R.id.lstCamareros);
-
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
                 totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
 
+                if (dlgCobrar != null){
+                    dlgCobrar.dismiss();
+                    Timer t = new Timer();
+                    findViewById(R.id.loading).setVisibility(View.VISIBLE);
+                    t.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                           handlerMostrarCobrar.sendEmptyMessage(0);
+                         }
+                    }, 1000);
+                }
+                TextView l = findViewById(R.id.lblPrecio);
+                ListView lst = findViewById(R.id.lstCamareros);
                 l.setText(String.format("%01.2f €", totalMesa));
                 lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineas, this));
             }
@@ -583,6 +617,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             timerAutoCancel.cancel();
             timerAutoCancel=null;
         }
+        myServicio.setMesa_abierta(null);
         unbindService(mConexion);
         super.onDestroy();
     }
@@ -608,10 +643,11 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+            findViewById(R.id.loading).setVisibility(View.GONE);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
        super.onResume();
     }
 
@@ -626,10 +662,18 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         if(totalCobro>0) {
             try {
                 setEstadoAutoFinish(true, true);
-                DlgCobrar dlg = new DlgCobrar(this, this);
-                dlg.setTitle("Cobrar " + mesa.getString("Nombre"));
-                dlg.setDatos(lsart, totalCobro);
-                dlg.show();
+                if (dlgCobrar != null) dlgCobrar.dismiss();
+                dlgCobrar = new DlgCobrar(this, this);
+                dlgCobrar.setTitle("Cobrar " + mesa.getString("Nombre"));
+                dlgCobrar.setDatos(lsart, totalCobro);
+                dlgCobrar.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        dlgCobrar = null;
+                    }
+                });
+                dlgCobrar.show();
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

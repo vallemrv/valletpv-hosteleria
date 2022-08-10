@@ -48,6 +48,7 @@ public class ServicioCom extends Service {
 
     final IBinder myBinder = new MyBinder();
     private JSONObject zn;
+    private JSONObject mesa_abierta;
 
     String server = null;
 
@@ -121,11 +122,23 @@ public class ServicioCom extends Service {
                             if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
                             if (op.equals("md")) db.update(o.getJSONObject("obj"));
                             if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
+
                             Handler h = getExHandler(tb);
-                            if (h != null) h.sendEmptyMessage(0);
+                            if (h != null){
+                                if (tb.equals("lineaspedido") && !op.equals("rm") && mesa_abierta != null){
+                                    Log.d("COMPROBACION", o.getJSONObject("obj").toString());
+                                    String obj_idmesa = o.getJSONObject("obj").getString("IDMesa");
+                                    String id_mesa_abierta = mesa_abierta.getString("ID");
+                                    if (!obj_idmesa.equals(id_mesa_abierta)) return;
+
+                                }
+                                h.sendEmptyMessage(0);
+                            }
                         }
 
-                    }catch (Exception ignored){ }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -399,6 +412,10 @@ public class ServicioCom extends Service {
 
     public void setZona(JSONObject zn){
         this.zn = zn;
+    }
+
+    public void setMesa_abierta(JSONObject m){
+        this.mesa_abierta = m;
     }
 
     public class MyBinder extends Binder{

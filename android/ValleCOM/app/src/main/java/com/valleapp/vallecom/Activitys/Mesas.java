@@ -527,7 +527,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         intent.putExtra("url", server);
         intent.putExtra("mesa", v.getTag().toString());
         startActivity(intent);
-    }
+   }
 
     private void cargarPreferencias() {
         JSON json = new JSON();

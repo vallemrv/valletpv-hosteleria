@@ -55,7 +55,7 @@ def  comparar_lineaspedido(request):
     for m in mesas:
         lineas_server = [*lineas_server, *m.get_lineaspedido()]
 
-    #if len(lineas_server) > 0:
+    
     for l in lineas_server:
         linea = find(l["ID"], lineas)
         if linea:
@@ -82,7 +82,11 @@ def servido(request):
         serv = Servidos()
         serv.linea_id = l.pk
         serv.save()
-        comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+        obj = l.serialize()
+        if obj:
+            comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+        else:
+            comunicar_cambios_devices("rm", "lineaspedido", {"ID":l.pk})
     
     return JsonResponse({})
 

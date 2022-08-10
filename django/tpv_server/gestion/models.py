@@ -495,21 +495,23 @@ class Infmesa(models.Model):
                     l.es_compuesta = False
                     l.cantidad -= 1
                     l.save()
+                    comunicar_cambios_devices("md", "lineaspedido", l.serialize())
                     break;
 
         elif linea.es_compuesta:
             composicion = linea.tecla.familia.compToList()
             if (len(composicion) > 0):
-                for a in self.lineaspedido_set.filter(estado="R", tecla__familia__nombre__in=composicion).order_by("-id"):
+                for l in self.lineaspedido_set.filter(estado="R", tecla__familia__nombre__in=composicion).order_by('-id'):
                     if linea.cantidad == 0:
                         break;
                     
-                    a.lrToP(mesa_a)
-                    comunicar_cambios_devices("insert", "lineaspedido", a.serialize())
+                    l.lrToP(mesa_a)
+                    comunicar_cambios_devices("md", "lineaspedido", l.serialize())
                     linea.cantidad -= 1
 
                 linea.es_compuesta = False
                 linea.save()
+            comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
 
 
     def unir_en_grupos(self):
@@ -550,10 +552,11 @@ class Infmesa(models.Model):
             if hasattr(l.tecla, "familia"):
                 familia = l.tecla.familia
                 composicion = familia.compToList()
+
                 if (len(composicion) > 0):
                     cantidad = familia.cantidad - l.cantidad
                     
-                    for a in lineas.order_by("-id"):
+                    for a in lineas.order_by("id"):
                         if a.id == l.id:
                             continue
                         
@@ -562,7 +565,6 @@ class Infmesa(models.Model):
                                 a.precio = 0
                                 a.estado = "R"
                                 a.save()
-                                comunicar_cambios_devices("md", "lineaspedido", a.serialize())
                                 obj_comp.append(a.id)
                                 cantidad = cantidad - 1
                                 l.cantidad = l.cantidad + 1
@@ -639,24 +641,27 @@ class Lineaspedido(models.Model):
     def serialize(self):
         l = self
         m = Mesasabiertas.objects.filter(infmesa=self.infmesa).first()
-        obj = {
-            'ID': l.pk,
-            'IDPedido': l.pedido_id,
-            'UID': m.infmesa.pk,
-            'IDArt': l.idart,
-            'Estado': l.estado,
-            'Precio': float(l.precio),
-            'Descripcion': l.descripcion,
-            'IDMesa': m.mesa.pk,
-            'nomMesa': m.mesa.nombre,
-            'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-            'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
-            'descripcion_t': l.descripcion_t,
-            'receptor': l.tecla.familia.receptor.pk,
-            'camarero': l.pedido.camarero_id,
-            }
-        return obj
-   
+        if m:
+            obj = {
+                'ID': l.pk,
+                'IDPedido': l.pedido_id,
+                'UID': m.infmesa.pk,
+                'IDArt': l.idart,
+                'Estado': l.estado,
+                'Precio': float(l.precio),
+                'Descripcion': l.descripcion,
+                'IDMesa': m.mesa.pk,
+                'nomMesa': m.mesa.nombre,
+                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
+                'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
+                'descripcion_t': l.descripcion_t,
+                'receptor': l.tecla.familia.receptor.pk,
+                'camarero': l.pedido.camarero_id,
+                }
+            return obj
+        else:
+            return None
+
     def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
         num = -1
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
@@ -936,11 +941,15 @@ class Pedidos(models.Model):
                 linea.estado =  'P'
                 linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
                 linea.save()
-                comunicar_cambios_devices("insert", "lineaspedido", linea.serialize())
+                
 
         pedido.infmesa.numcopias = 0
         pedido.infmesa.save()   
-        
+        pedido.infmesa.componer_articulos()
+        pedido.infmesa.unir_en_grupos()
+     
+        for l in pedido.lineaspedido_set.all():
+            comunicar_cambios_devices("insert", "lineaspedido", l.serialize())
 
         return pedido
 
@@ -1379,7 +1388,7 @@ class Ticket(models.Model):
             for l in art:
                 can = int(l["Can"])
                 reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=l["IDArt"],
-                                                  precio=l["Precio"], estado='P')[:can]
+                                                  precio=l["Precio"], estado=l["Estado"])[:can]
 
                 for r in reg:
                     total = total + r.precio

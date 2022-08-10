@@ -113,6 +113,7 @@ public class ServicioCom extends Service {
                         JSONObject o = new JSONObject(message);
                         updateTablesByWS(o);
                         DBCamareros db_cam = (DBCamareros) getDb("camareros");
+                        Log.d("MENSAJE_WS", message);
                         if (cam != null && !db_cam.is_autorizado(cam)){
                             System.exit(0);
                         }
@@ -294,8 +295,7 @@ public class ServicioCom extends Service {
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    Log.d("ESTADO_WS", "Is close "+isWebsocketClose);
-                    if (isWebsocketClose && client!= null){
+                   if (isWebsocketClose && client!= null){
                         client.reconnect();
                         Handler h = exHandler.get("estadows");
                         if(h!=null) {

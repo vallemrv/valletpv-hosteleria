@@ -1,14 +1,18 @@
 package com.valleapp.vallecom.Activitys;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,6 +25,7 @@ import com.valleapp.vallecom.db.DBCuenta;
 import com.valleapp.vallecom.db.DBMesas;
 import com.valleapp.vallecom.utilidades.ActivityBase;
 import com.valleapp.vallecom.utilidades.HTTPRequest;
+import com.valleapp.vallecom.utilidades.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,22 +38,44 @@ public class MostrarPedidos extends ActivityBase {
     JSONObject mesa;
     DBCuenta dbCuenta;
     Context cx;
-    boolean pause = false;
 
+
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            try {
+                myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+                myServicio.setExHandler("lineaspedido", handlerHttp);
+                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                ContentValues p = new ContentValues();
+                p.put("mesa_id",mesa.getString("ID"));
+                new HTTPRequest(server+"/cuenta/get_cuenta",p,"actualizar", handlerHttp);
+                rellenarPedido();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myServicio = null;
+        }
+    };
 
     @SuppressLint("HandlerLeak")
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            if(op.equals("actualizar")){
+            if(op != null && op.equals("actualizar")){
+                Log.d("MOSTRAR_PEDIDOS", res);
                 try {
                     dbCuenta.actualizarMesa(new JSONArray(res), mesa.getString("ID"));
                     rellenarPedido();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }else{
+            }else if(op != null){
                 mostrarToast("Peticion envidada....");
             }
         }
@@ -98,10 +125,6 @@ public class MostrarPedidos extends ActivityBase {
 
                     ll.addView(v, params);
                 }
-            }else {
-                DBMesas db = new DBMesas(cx);
-                db.cerrarMesa(mesa.getString("ID"));
-                finish();
             }
 
         }catch (Exception e){
@@ -117,7 +140,6 @@ public class MostrarPedidos extends ActivityBase {
         setContentView(R.layout.activity_mostrar_pedidos);
         TextView lbl = findViewById(R.id.lblMesa);
         this.cx = this;
-        dbCuenta = new DBCuenta(this);
         try {
             server = getIntent().getExtras().getString("url");
             mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
@@ -129,17 +151,25 @@ public class MostrarPedidos extends ActivityBase {
 
     @Override
     protected void onResume() {
-        try{
+        if(myServicio == null) {
+            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            intent.putExtra("url", server);
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
+        }else{
             rellenarPedido();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         super.onResume();
     }
 
     @Override
+    protected void onDestroy() {
+        myServicio.rmExHandler("lineaspedido");
+        unbindService(mConexion);
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
-        pause = true;
         super.onPause();
     }
 

@@ -47,17 +47,16 @@
             android:layout_margin="5dp" />
 
 
-
         <ImageButton
+            android:id="@+id/btnCobrar"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/btnCobrar"
-            android:onClick="clickCobrarMesa"
+            android:layout_margin="5dp"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/cobrar"
+            android:onClick="clickCobrarMesa"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:layout_margin="5dp" />
+            android:src="@drawable/cobrar" />
 
 
     </LinearLayout>
