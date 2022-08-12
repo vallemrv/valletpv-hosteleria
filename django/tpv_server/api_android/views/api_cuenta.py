@@ -51,8 +51,8 @@ def mvlinea(request):
          pedido = Pedidos.objects.get(pk=linea.pedido_id)
          idc = pedido.camarero_id;
          uid = linea.infmesa.uid;
-
-         linea.infmesa.modifiar_composicion(linea)
+         linea.modifiar_composicion()
+         infmesa_aux = linea.infmesa
          
          mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
          if not mesa:
@@ -78,7 +78,8 @@ def mvlinea(request):
          linea.infmesa_id =  mesa.infmesa.pk
          linea.pedido_id = pedido.pk
          linea.save()
-
+         
+         infmesa_aux.componer_articulos()
          pedido.infmesa.componer_articulos()
              
          comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
@@ -110,11 +111,10 @@ def cuenta_cobrar(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
     entrega = request.POST["entrega"]
-    
     art = json.loads(request.POST["art"])
+
     total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
-    
-            
+           
     if (id > 0):
         send_imprimir_ticket(request, id)
         

@@ -125,7 +125,7 @@ public class BuscarPedidos extends Activity implements TextWatcher {
                       e.printStackTrace();
                   }
                   String str = charSequence.toString();
-                  lPedidos = dbCuenta.filterList("Descripcion LIKE '%"+ str +"%' AND servido = 0", true);
+                  lPedidos = dbCuenta.filterList("Descripcion LIKE '%"+ str +"%' ", true);
                   handelerBusqueda.sendEmptyMessage(0);
               }).start();
 

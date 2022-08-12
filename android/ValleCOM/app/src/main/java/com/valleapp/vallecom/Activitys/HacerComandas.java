@@ -380,12 +380,17 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
     public void clickEnviarComanda(View v){
         try{
           ContentValues p = new ContentValues();
-          p.put("idm", mesa.getString("ID"));
-          p.put("pedido", nota.getLineas().toString());
-          p.put("idc", cam.getString("ID"));
+          List<JSONObject> nl = nota.getLineas();
+          String idm = mesa.getString("ID");
+          String idc = cam.getString("ID");
+          String nom_mesa = mesa.getString("Nombre");
+          p.put("idm", idm);
+          p.put("pedido", nl.toString());
+          p.put("idc", idc);
            if(myServicio!=null){
-              myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
               nota.eliminarComanda();
+              myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));
+              dbCuenta.addArt(idm, nl, idc, nom_mesa);
               dbMesas.abrirMesa(mesa.getString("ID"), "0");
               finish();
           }

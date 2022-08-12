@@ -381,8 +381,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="261dp"
-            android:layout_height="219dp"
+            android:layout_width="188dp"
+            android:layout_height="160dp"
             android:layout_gravity="center_horizontal|center_vertical" />
     </FrameLayout>
 

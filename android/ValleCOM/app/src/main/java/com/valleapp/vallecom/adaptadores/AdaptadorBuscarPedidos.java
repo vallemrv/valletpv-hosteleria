@@ -43,6 +43,7 @@ public class AdaptadorBuscarPedidos extends ArrayAdapter<JSONObject> {
             cantidad.setText(String.format("%s",art.getString("Can")));
 
             ImageButton btnRm = rowView.findViewById(R.id.btnBorrarPedido);
+            if (!art.getString("servido").equals("0")) btnRm.setVisibility(View.GONE);
             btnRm.setTag(art);
 
 

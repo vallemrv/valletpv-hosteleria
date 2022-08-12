@@ -207,7 +207,8 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
             if (all) sql_where = "";
 
-            JSONArray lineas = dbCuenta.filterByPedidos( sql_where+ "  receptor=" + IDReceptor + " and servido=0", "IDArt, IDPedido, receptor");
+            JSONArray lineas = dbCuenta.filterByPedidos( sql_where+ "  receptor=" + IDReceptor + " and servido=0",
+                             "IDArt, Descripcion,  IDPedido, receptor");
 
             LinearLayout ll = findViewById(R.id.listaPedidoComanda);
             ll.removeAllViews();
@@ -221,7 +222,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             params.setMargins(5,5,5,5);
 
             int IDPedido = -1;
-            View grupo = null;
+            View grupo;
             LinearLayout listaGr = null;
             LinearLayout.LayoutParams params_linea = null;
 
@@ -242,20 +243,42 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     btn.setTag(IDPedido);
 
                     btn.setOnClickListener(view -> {
-                        JSONArray finalLineas = dbCuenta.filterByPedidos("IDPedido="+view.getTag().toString());
-                        for (int i1 = 0; i1 < finalLineas.length(); i1++) {
-                            try {
-                                servirPedido(finalLineas.getJSONObject(i1));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        try {
+                            String id = receptores.get(sel_receptor).getString("ID");
+                            String idp = view.getTag().toString();
+                            JSONArray finalLineas = dbCuenta.filterByPedidos("IDPedido=" + idp +" and receptor="+id);
+                            ContentValues p = new ContentValues();
+                            p.put("art", finalLineas.toString());
+                            p.put("idz", zn.getString("ID"));
+                            //p.put("ver", "1");
+                            myServicio.addColaInstrucciones(new Instruccion(p, "/pedidos/servido"));
+                            dbCuenta.servirPeido(idp, id);
+                            selectReceptor(sel_receptor, all_cam);
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
-                        selectReceptor(sel_receptor, all_cam);
+                    });
+
+                    ImageButton send = grupo.findViewById(R.id.reeviarPedido);
+                    send.setTag(IDPedido);
+
+                    send.setOnClickListener(view -> {
+                        try {
+                            String id = receptores.get(sel_receptor).getString("ID");
+                            String idp = view.getTag().toString();
+                            ContentValues p = new ContentValues();
+                            p.put("idp",idp);
+                            p.put("idr",id);
+                            myServicio.addColaInstrucciones(new Instruccion(p,
+                                    "/impresion/reenviarpedido", handlerOperaciones, "reenviar"));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     });
 
                     params_linea = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
-                            (int) (metrics.density * 40f));
+                            (int) (metrics.density * 50f));
 
 
                 }
@@ -268,6 +291,12 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                 TextView n = v.findViewById(R.id.lblNombre);
                 ImageButton b = v.findViewById(R.id.btnBorrarPedido);
                 b.setTag(art);
+                LinearLayout linea = v.findViewById(R.id.btnPedir);
+                linea.setTag(art);
+                linea.setOnLongClickListener(view -> {
+                    pedir(view);
+                    return true;
+                });
 
                 c.setText(String.format("%s", art.getString("Can")));
                 n.setText(String.format("%s", art.getString("Descripcion")));
@@ -481,6 +510,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
 
     }
 
+
     private void servirPedido(JSONObject obj){
         try{
             ContentValues p = new ContentValues();
@@ -685,7 +715,8 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             p.put("idp",obj.getString("IDPedido"));
             p.put("id",obj.getString("IDArt"));
             p.put("Descripcion",obj.getString("Descripcion"));
-            myServicio.addColaInstrucciones(new Instruccion(p, "/impresion/reenviarlinea", handlerOperaciones, "reenviar"));
+            myServicio.addColaInstrucciones(new Instruccion(p,
+                    "/impresion/reenviarlinea", handlerOperaciones, "reenviar"));
         } catch (Exception e) {
             e.printStackTrace();
         }

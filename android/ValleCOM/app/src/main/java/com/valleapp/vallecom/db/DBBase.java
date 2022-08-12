@@ -16,8 +16,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
+import java.util.List;
 
+public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -86,7 +87,6 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
     }
 
 
-
     @Override
     public void insert(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
@@ -98,15 +98,21 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }else{
                     id = o.getString("id");
                 }
-                int count = count(db, "ID=" + id);
                 ContentValues values = caragarValues(o);
-                synchronized (db) {
-                    if (count == 0) {
-                        db.insert(tb_name, null, values);
-                    } else {
-                        db.update(tb_name, values, "ID=?", new String[]{id});
-                    }
+
+                if(tb_name=="cuenta"){
+                    db.delete(tb_name, "estado='N' and IDMesa = ?",
+                            new String[]{values.getAsString("IDMesa")});
                 }
+
+                int count = count(db, "ID=" + id);
+
+                if (count == 0) {
+                    db.insert(tb_name, null, values);
+                } else {
+                    db.update(tb_name, values, "ID=?", new String[]{id});
+                }
+
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -166,4 +172,6 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         }
 
     }
+
+
 }

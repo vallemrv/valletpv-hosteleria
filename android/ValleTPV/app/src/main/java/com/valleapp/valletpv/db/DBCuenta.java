@@ -29,13 +29,13 @@ public class DBCuenta extends DBBase{
     @Override
     public void onCreate(SQLiteDatabase db) {
           db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
-                "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
+                "(ID TEXT PRIMARY KEY, Estado TEXT, " +
                 "Descripcion TEXT, descripcion_t TEXT, " +
                 "Precio DOUBLE, IDPedido INTEGER, " +
                 "IDMesa INTEGER," +
                 "IDArt INTEGER," +
                 "nomMesa TEXT, IDZona TEXT," +
-                "servido INTEGER, IDControl TEXT )");
+                "servido INTEGER )");
     }
 
     @Override
@@ -203,15 +203,14 @@ public class DBCuenta extends DBBase{
             int can = art.getInt("Can");
             for(int i=0;i<can;i++) {
                 ContentValues values = new ContentValues();
-                values.put("ID", this.last_id + 100);
-                values.put("IDControl", UUID.randomUUID().toString());
+                values.put("ID",  UUID.randomUUID().toString());
                 values.put("IDArt", art.getInt("ID"));
                 values.put("Descripcion", art.getString("Descripcion"));
                 values.put("descripcion_t", art.getString("descripcion_t"));
                 values.put("Precio", art.getDouble("Precio"));
                 values.put("IDMesa", IDMesa);
                 values.put("Estado", "N");
-                this.last_id =  db.insert("cuenta", null, values);
+                db.insert("cuenta", null, values);
             }
 
         }catch (JSONException e){
@@ -228,7 +227,7 @@ public class DBCuenta extends DBBase{
                                + IDMesa + " AND IDArt=" + art.getString("IDArt")
                                         + " AND Descripcion='" + art.getString("Descripcion")+"'"
                                         + " AND Precio=" + art.getString("Precio")
-                                        + " AND Estado='" + art.getString("Estado") + "' LIMIT "+art.getString("Can")+")";
+                                        + " LIMIT "+art.getString("Can")+")";
                 db.execSQL(sql);
             }
         }catch (Exception e){
@@ -239,7 +238,7 @@ public class DBCuenta extends DBBase{
     public void eliminar(String IDMesa){
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa+" AND Estado != 'N'");
+            db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
         }catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -249,7 +248,7 @@ public class DBCuenta extends DBBase{
         SQLiteDatabase db = this.getWritableDatabase();
         try{
             ContentValues p = new ContentValues();
-            p.put("Estado", "P");
+            p.put("Estado", "N");
             db.update(tb_name, p, "IDMesa=?", new String[]{id});
         }catch (SQLiteException e){
             e.printStackTrace();

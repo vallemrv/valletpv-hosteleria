@@ -95,8 +95,6 @@ public class DlgSepararTicket extends Dialog{
         }
         });
 
-
-
     }
 
     public void setLineasTicket(List<JSONObject> lsart) throws JSONException {

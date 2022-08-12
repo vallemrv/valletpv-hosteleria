@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.ExpandableListAdapter;
 
 import com.valleapp.vallecom.db.DBCamareros;
 import com.valleapp.vallecom.db.DBCuenta;
@@ -113,7 +114,6 @@ public class ServicioCom extends Service {
                         JSONObject o = new JSONObject(message);
                         updateTablesByWS(o);
                         DBCamareros db_cam = (DBCamareros) getDb("camareros");
-                        Log.d("MENSAJE_WS", message);
                         if (cam != null && !db_cam.is_autorizado(cam)){
                             System.exit(0);
                         }
@@ -154,9 +154,20 @@ public class ServicioCom extends Service {
             String op = o.getString("op");
             IBaseSocket db = (IBaseSocket) getDb(tb);
             if (db != null) {
-                if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
-                if (op.equals("md")) db.update(o.getJSONObject("obj"));
-                if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
+                JSONArray objs = new JSONArray();
+                try {
+                    JSONObject obj = o.getJSONObject("obj");
+                    objs.put(obj);
+                }catch (JSONException ignored){
+                    objs = o.getJSONArray("obj");
+                }
+
+                for(int i=0; i<objs.length();i++) {
+                    JSONObject obj = objs.getJSONObject(i);
+                    if (op.equals("insert")) db.insert(obj);
+                    if (op.equals("md")) db.update(obj);
+                    if (op.equals("rm")) db.rm(obj);
+                }
                 Handler h = exHandler.get(tb);
                 if (h != null){
                     h.sendEmptyMessage(0);
@@ -291,7 +302,11 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
-            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, server, 1000, exHandler), 2000, 1);
+            timerManejarInstrucciones.schedule(
+                    new TareaManejarInstrucciones(timerManejarInstrucciones,
+                                                  colaInstrucciones,
+                                                  server, 500,
+                                                  exHandler), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -310,7 +325,7 @@ public class ServicioCom extends Service {
                         }
                     }
                 }
-            }, 2000, 2000);
+            }, 2000, 1500);
             return START_STICKY;
         }
         return START_NOT_STICKY;

@@ -119,14 +119,24 @@ public class ServicioCom extends Service {
                         String op = o.getString("op");
                         IBaseSocket db = (IBaseSocket) getDb(tb);
                         if (db != null) {
-                            if (op.equals("insert")) db.insert(o.getJSONObject("obj"));
-                            if (op.equals("md")) db.update(o.getJSONObject("obj"));
-                            if (op.equals("rm")) db.rm(o.getJSONObject("obj"));
+                            JSONArray objs = new JSONArray();
+                            try {
+                                JSONObject obj = o.getJSONObject("obj");
+                                objs.put(obj);
+                            }catch (JSONException ignored){
+                                objs = o.getJSONArray("obj");
+                            }
+
+                            for(int i=0; i<objs.length();i++) {
+                                JSONObject obj = objs.getJSONObject(i);
+                                if (op.equals("insert")) db.insert(obj);
+                                if (op.equals("md")) db.update(obj);
+                                if (op.equals("rm")) db.rm(obj);
+                            }
 
                             Handler h = getExHandler(tb);
                             if (h != null){
                                 if (tb.equals("lineaspedido") && !op.equals("rm") && mesa_abierta != null){
-                                    Log.d("COMPROBACION", o.getJSONObject("obj").toString());
                                     String obj_idmesa = o.getJSONObject("obj").getString("IDMesa");
                                     String id_mesa_abierta = mesa_abierta.getString("ID");
                                     if (!obj_idmesa.equals(id_mesa_abierta)) return;

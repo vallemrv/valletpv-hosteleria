@@ -65,15 +65,15 @@ public class DlgCobrar extends Dialog{
 
     public void clickEfectivo(View v){
         if(entrega>=totalCobro) {
-            controlador.cobrar(lineas,totalCobro,entrega);
             clickSalir(v);
+            controlador.cobrar(lineas,totalCobro,entrega);
         }
     }
 
     public void clickTarjeta(View v){
         if (entrega == totalCobro) {
-            controlador.cobrar(lineas, totalCobro, 0.00);
             clickSalir(v);
+            controlador.cobrar(lineas, totalCobro, 0.00);
         }
     }
 

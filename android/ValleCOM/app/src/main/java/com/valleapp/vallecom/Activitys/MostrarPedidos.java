@@ -68,7 +68,6 @@ public class MostrarPedidos extends ActivityBase {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
             if(op != null && op.equals("actualizar")){
-                Log.d("MOSTRAR_PEDIDOS", res);
                 try {
                     dbCuenta.actualizarMesa(new JSONArray(res), mesa.getString("ID"));
                     rellenarPedido();

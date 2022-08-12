@@ -5,6 +5,8 @@
 # @Last modified time: 2019-04-26T14:53:11+02:00
 # @License: Apache License v2.0
 
+import re
+from unittest import result
 from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
@@ -72,21 +74,41 @@ def  comparar_lineaspedido(request):
 
 @csrf_exempt
 def servido(request):
-    art = json.loads(request.POST["art"])
-    lineas = Lineaspedido.objects.filter(idart=art["IDArt"],
-                                         descripcion=art["Descripcion"],
-                                         precio=art["Precio"],
-                                         pedido_id=art["IDPedido"])
+    arts = json.loads(request.POST["art"])
+    ver = 0 if "ver" not in request.POST else request.POST["ver"]
+    if not hasattr(arts, "append"):
+        arts = [arts]
+    
+    result_md = []
+    result_rm = []
+    for art in arts:
+        lineas = Lineaspedido.objects.filter(idart=art["IDArt"],
+                                            descripcion=art["Descripcion"],
+                                            precio=art["Precio"],
+                                            pedido_id=art["IDPedido"])
+        
+        
+        for l in lineas:
+            serv = Servidos()
+            serv.linea_id = l.pk
+            serv.save() 
+            obj = l.serialize()
+            if obj:
+                if ver == "1":
+                    result_md.append(obj) 
+                else:
+                    comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+            else:
+                if ver == "1":
+                    result_rm.append({"ID":l.pk})  
+                else:
+                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":l.pk})
 
-    for l in lineas:
-        serv = Servidos()
-        serv.linea_id = l.pk
-        serv.save()
-        obj = l.serialize()
-        if obj:
-            comunicar_cambios_devices("md", "lineaspedido", l.serialize())
-        else:
-            comunicar_cambios_devices("rm", "lineaspedido", {"ID":l.pk})
+   
+    if len(result_rm) > 0:
+        comunicar_cambios_devices("rm", "lineaspedido", result_rm)
+    if len(result_md) > 0:
+        comunicar_cambios_devices("md", "lineaspedido", result_md)       
     
     return JsonResponse({})
 

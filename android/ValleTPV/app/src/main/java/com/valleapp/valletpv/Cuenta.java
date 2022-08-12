@@ -18,6 +18,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -88,6 +89,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     final Context cx = this;
 
     private DlgCobrar dlgCobrar;
+    private boolean can_refresh = true;
 
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
@@ -163,7 +165,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         }
     };
     
-    
 
     @SuppressLint("HandlerLeak")
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
@@ -180,7 +181,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                        rellenarTicket();
                    }
                 }else{
-                    rellenarTicket();
+                    if (can_refresh) rellenarTicket();
                 }
 
             } catch (JSONException e) {
@@ -434,6 +435,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                          }
                     }, 1000);
                 }
+
                 TextView l = findViewById(R.id.lblPrecio);
                 ListView lst = findViewById(R.id.lstCamareros);
                 l.setText(String.format("%01.2f €", totalMesa));
@@ -525,8 +527,15 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             p.put("pedido", nuevos.toString());
             if (myServicio != null) {
                 myServicio.nuevoPedido(p);
-                dbCuenta.aparcar(idm);
                 dbMesas.abrirMesa(idm);
+                can_refresh = false;
+                Timer t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        can_refresh = true;
+                    }
+                }, 2000);
             }
         }
     }
@@ -685,6 +694,10 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
         try {
             setEstadoAutoFinish(true, true);
+            if (dlgCobrar != null){
+                dlgCobrar.dismiss();
+                dlgCobrar = null;
+            }
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
             if(dbCamareros.getConPermiso("cobrar_ticket").size() > 0) {
                 JSONObject p = new JSONObject();

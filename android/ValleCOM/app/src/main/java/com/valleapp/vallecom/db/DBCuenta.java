@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -26,13 +27,13 @@ public class DBCuenta extends DBBase  {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-          db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
-                "(ID INTEGER PRIMARY KEY, Estado TEXT, " +
-                "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, IDPedido INTEGER, " +
-                "IDMesa INTEGER," +
-                "IDArt INTEGER," +
-                "nomMesa TEXT, IDZona TEXT," +
-                "servido INTEGER, receptor INTEGER, camarero INTEGER )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS cuenta " +
+            "(ID TEXT PRIMARY KEY, Estado TEXT, " +
+            "Descripcion TEXT, descripcion_t TEXT, Precio DOUBLE, IDPedido INTEGER, " +
+            "IDMesa INTEGER," +
+            "IDArt INTEGER," +
+            "nomMesa TEXT, IDZona TEXT," +
+            "servido INTEGER, receptor INTEGER, camarero INTEGER )");
 
     }
 
@@ -275,18 +276,20 @@ public class DBCuenta extends DBBase  {
     public ArrayList<JSONObject> getPedidosChoices(String idMesa) {
 
         SQLiteDatabase db = getReadableDatabase();
-        @SuppressLint("Recycle") Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total FROM cuenta  WHERE estado ='P' AND IDMesa=" + idMesa +
-                " GROUP BY  IDArt, Descripcion, Precio, Estado, IDPedido ORDER BY IDPedido", null);
         ArrayList<JSONObject>  ls = new ArrayList<> ();
-        res.moveToFirst();
-        int max = 3;
-        int count = 0;
-        int id_aux = -1;
-        StringBuilder subtilte = new StringBuilder();
-        JSONObject o = null;
         try {
-        while (!res.isAfterLast()){
+            @SuppressLint("Recycle") Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can FROM cuenta  WHERE estado ='P' AND IDMesa=" + idMesa +
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado, IDPedido ORDER BY IDPedido", null);
 
+
+            res.moveToFirst();
+            int max = 3;
+            int count = 0;
+            int id_aux = -1;
+            StringBuilder subtilte = new StringBuilder();
+            JSONObject o = null;
+
+            while (!res.isAfterLast()){
                 int idPedido = res.getInt(res.getColumnIndex("IDPedido"));
                 String can = res.getString(res.getColumnIndex("Can"));
                 String nombre =  res.getString(res.getColumnIndex("Descripcion"));
@@ -308,7 +311,6 @@ public class DBCuenta extends DBBase  {
                     count++;
                 }
                 res.moveToNext();
-
             }
             if (o != null && !subtilte.toString().equals("")){
                 subtilte.append(", etc..");
@@ -322,12 +324,45 @@ public class DBCuenta extends DBBase  {
     }
 
 
-    public void servirPeido(String idp) {
+    public void servirPeido(String idp, String idr) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             ContentValues p = new ContentValues();
             p.put("servido", 1);
-            db.update("cuenta", p, "IDPedido = ?  ", new String[]{idp});
+            db.update("cuenta", p, "IDPedido = ?  AND receptor= ?", new String[]{idp, idr});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void addArt(String idm, List<JSONObject> nl, String idc, String nom_mesa) {
+        SQLiteDatabase db = getWritableDatabase();
+        @SuppressLint("Recycle") Cursor res = db.rawQuery("SELECT ID FROM receptores LIMIT 1", null);
+        ArrayList<JSONObject>  ls = new ArrayList<> ();
+        res.moveToFirst();
+        int IDReceptor = res.getInt(0);
+
+        try {
+            for (JSONObject o : nl) {
+                int can = o.getInt("Can");
+                for(int i=0; i < can; i++) {
+                    ContentValues values = new ContentValues();
+                    values.put("ID", UUID.randomUUID().toString());
+                    values.put("IDArt", o.getString("ID"));
+                    values.put("Descripcion", o.getString("Descripcion"));
+                    values.put("descripcion_t", o.getString("descripcion_t"));
+                    values.put("Precio", o.getDouble("Precio"));
+                    values.put("IDMesa", idm);
+                    values.put("IDZona", "");
+                    values.put("nomMesa",  nom_mesa);
+                    values.put("IDPedido", "0");
+                    values.put("Estado", "N");
+                    values.put("servido", "0");
+                    values.put("camarero", idc);
+                    values.put("receptor", IDReceptor);
+                    db.insert(tb_name, null, values);
+                }
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

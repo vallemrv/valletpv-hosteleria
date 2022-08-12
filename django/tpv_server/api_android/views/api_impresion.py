@@ -54,40 +54,33 @@ def preimprimir(request):
     send_mensaje_impresora(obj)
     return JsonResponse({})
 
+
+@csrf_exempt
+def reenviarpedido(request):
+    idp = request.POST["idp"];
+    idr = request.POST["idr"];
+    pedido = Pedidos.objects.get(pk=idp);
+    camarero = Camareros.objects.get(pk=pedido.camarero_id)
+    mesa_a = pedido.infmesa.mesasabiertas_set.first()
+    lineas = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).values("idart",
+                                            "descripcion",
+                                            "estado",
+                                            "pedido_id").annotate(can=Count('idart'))
+    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
+
 @csrf_exempt
 def reenviarlinea(request):
     idp = request.POST["idp"];
     id = request.POST["id"];
     nombre = request.POST["Descripcion"];
     pedido = Pedidos.objects.get(pk=idp)
-    camareo = Camareros.objects.get(pk=pedido.camarero_id)
-    try:
-        mesa = pedido.infmesa.mesasabiertas_set.get().mesa
-    except:
-        mesa = None
-    if mesa:
-        lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
+    camarero = Camareros.objects.get(pk=pedido.camarero_id)
+    mesa_a = pedido.infmesa.mesasabiertas_set.first()
+    lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
                                             "descripcion",
                                             "estado",
                                             "pedido_id").annotate(can=Count('idart'))
-        receptores = {}
-        for l in lineas:
-            receptor = Teclas.objects.get(id=l['idart']).familia.receptor
-            if receptor.nombre not in receptores:
-                receptores[receptor.nombre] = {
-                    "op": "urgente",
-                    "hora": pedido.hora,
-                    "receptor_activo": receptor.activo,
-                    "receptor": receptor.nomimp,
-                    "nom_receptor": receptor.nombre,
-                    "camarero": camareo.nombre + " " + camareo.apellidos,
-                    "mesa": mesa.nombre,
-                    "lineas": []
-                }
-            receptores[receptor.nombre]['lineas'].append(l)
-
-        send_mensaje_impresora(receptores)
-    return HttpResponse("success")
+    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
 @csrf_exempt
 def abrircajon(request):
@@ -111,4 +104,27 @@ def imprimir_ticket(request):
 def imprimir_factura(request):
     id = request.POST["id"]
     send_imprimir_ticket(request, id, True)
+    return HttpResponse("success")
+
+
+def send_urgente(lineas, hora, camarero, mesa_a):
+    if mesa_a:
+        mesa = mesa_a.mesa
+        receptores = {}
+        for l in lineas:
+            receptor = Teclas.objects.get(id=l['idart']).familia.receptor
+            if receptor.nombre not in receptores:
+                receptores[receptor.nombre] = {
+                    "op": "urgente",
+                    "hora": hora,
+                    "receptor_activo": receptor.activo,
+                    "receptor": receptor.nomimp,
+                    "nom_receptor": receptor.nombre,
+                    "camarero": camarero.nombre + " " + camarero.apellidos,
+                    "mesa": mesa.nombre,
+                    "lineas": []
+                }
+            receptores[receptor.nombre]['lineas'].append(l)
+    
+        send_mensaje_impresora(receptores)
     return HttpResponse("success")
