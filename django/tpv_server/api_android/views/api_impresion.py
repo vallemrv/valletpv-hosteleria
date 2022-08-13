@@ -19,39 +19,44 @@ from datetime import datetime
 @csrf_exempt
 def preimprimir(request):
     idm = request.POST["idm"]
-    mesa_abierta = Mesasabiertas.objects.get(mesa_id=idm)
-    infmesa = mesa_abierta.infmesa
-    infmesa.numcopias = infmesa.numcopias + 1
-    infmesa.save()
-    Sync.actualizar("mesasabiertas")
-    camareo = infmesa.camarero
-    mesa = mesa_abierta.mesa
-    lineas = infmesa.lineaspedido_set.filter(estado="P")
-    lineas = lineas.values("idart", "descripcion_t", "precio").annotate(can=Count('idart'),
-                                                       totallinea=Sum("precio"))
-    
+    mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
+    if mesa_abierta:
+        infmesa = mesa_abierta.infmesa
+        infmesa.numcopias = infmesa.numcopias + 1
+        infmesa.save()
+        Sync.actualizar("mesasabiertas")
+        camareo = infmesa.camarero
+        mesa = mesa_abierta.mesa
+        lineas = infmesa.lineaspedido_set.filter(estado="P")
+        lineas = lineas.values("idart", 
+                            "descripcion_t", 
+                            "precio").annotate(can=Count('idart'),
+                                                totallinea=Sum("precio"))
+        
 
-    receptor = Receptores.objects.get(nombre='Ticket')
-    lineas_ticket = []
-    for l in lineas:
-        lineas_ticket.append(l)
+        receptor = Receptores.objects.get(nombre='Ticket')
+        lineas_ticket = []
+        for l in lineas:
+            lineas_ticket.append(l)
 
-    obj = {
-      "op": "preticket",
-      "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-      "receptor": receptor.nomimp,
-      "receptor_activo": receptor.activo,
-      "camarero": camareo.nombre + " " + camareo.apellidos,
-      "mesa": mesa.nombre,
-      "numcopias": infmesa.numcopias,
-      "lineas": lineas_ticket,
-      'total': infmesa.lineaspedido_set.filter(estado="P").aggregate(Total=Sum("precio"))['Total']
-      }
+        obj = {
+        "op": "preticket",
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
+        "receptor": receptor.nomimp,
+        "receptor_activo": receptor.activo,
+        "camarero": camareo.nombre + " " + camareo.apellidos,
+        "mesa": mesa.nombre,
+        "numcopias": infmesa.numcopias,
+        "lineas": lineas_ticket,
+        'total': infmesa.lineaspedido_set.filter(estado="P").aggregate(Total=Sum("precio"))['Total']
+        }
 
-    if infmesa.numcopias <= 1:
-        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize(), {"op": "preimprimir"})
+        if infmesa.numcopias <= 1:
+            comunicar_cambios_devices("md", "mesasabiertas", 
+                                    mesa_abierta.serialize(), 
+                                    {"op": "preimprimir"})
 
-    send_mensaje_impresora(obj)
+        send_mensaje_impresora(obj)
     return JsonResponse({})
 
 

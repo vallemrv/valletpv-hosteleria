@@ -659,7 +659,7 @@ class Lineaspedido(models.Model):
                 'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
                 'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
                 'descripcion_t': l.descripcion_t,
-                'receptor': l.tecla.familia.receptor.pk,
+                'receptor': l.tecla.familia.receptor.pk if l.tecla else "",
                 'camarero': l.pedido.camarero_id,
                 }
             return obj

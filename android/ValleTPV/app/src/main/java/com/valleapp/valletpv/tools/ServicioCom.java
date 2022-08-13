@@ -373,14 +373,10 @@ public class ServicioCom extends Service {
     }
 
     public void preImprimir(final ContentValues p) {
-        Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                new HTTPRequest(server + "/impresion/preimprimir", p, "", controller_http);
-            }
-            }, 500);
-         }
+        synchronized (colaInstrucciones){
+            colaInstrucciones.add(new Instrucciones(p, server+"/impresion/preimprimir"));
+        }
+    }
 
     public void get_cuenta(Handler controller, String mesa_id) {
         ContentValues p = new ContentValues();
