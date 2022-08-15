@@ -22,11 +22,14 @@ dist/
 test/
 javascript/**/android/
 dist_electron/
+django/**/valleges
 
 #excepciones
 !manage_template.py
 !management/
 !gestion_ui/
+!django/valletpv_web/static/www
+!django/valletpv_web/manage.py
 
 
 

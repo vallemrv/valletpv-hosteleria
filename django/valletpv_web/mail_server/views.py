@@ -8,7 +8,6 @@ def index(resquest):
 
 @csrf_exempt
 def contactar(resquest):
-    print(resquest.POST)
     if "contactusername" in resquest.POST and 'contactemail' in resquest.POST and 'contactcomment' in resquest.POST:
         send_mail(
             'Contacto valletpv '+resquest.POST["contactusername"],
@@ -33,3 +32,6 @@ def suscribirse(resquest):
             fail_silently=False,
         )
     return redirect( "index")
+
+def valleges(request):
+    return render(request, template_name="aplicaciones/valleges/index.html")
