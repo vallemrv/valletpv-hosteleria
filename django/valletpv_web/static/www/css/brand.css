@@ -461,8 +461,9 @@ nav.navbar.fixed-top.navbar-expand-lg.navbar-light.navbar-fixed-top.top-nav-coll
 }
 
 div#home {
-	background: url(../images/m-bg1.jpg) center no-repeat;
-	background-size: cover;
+	background: url(../images/m_bg_baner_v2.png) center no-repeat;
+	background-size: contain;
+	background-color: #808080ff;
 	position: relative;
 	z-index: 1;
 }
@@ -471,7 +472,7 @@ div#home:before {
 	content: '';
 	width: 100%;
 	height: 100%;
-	background: rgba(0, 0, 0, 0.26);
+	background: #00000042;
 	left: 0;
 	right: 0;
 	position: absolute;

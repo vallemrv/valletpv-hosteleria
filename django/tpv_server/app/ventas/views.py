@@ -16,3 +16,9 @@ def get_pedidos_by_hora(request):
 def datasets(request):
     last_id = Ticket.get_last_id_linea()
     return JsonResponse( get_total("estado", {'id__gt':last_id}))
+
+
+@token_required
+def mesas_abiertas(request):
+    print(request.POST)
+    return JsonResponse({'tb':"infmesas", 'regs':[]})

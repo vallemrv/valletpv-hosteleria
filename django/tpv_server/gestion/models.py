@@ -697,6 +697,7 @@ class Lineaspedido(models.Model):
                     obj = m.serialize()
                     obj["abierta"] = 0
                     obj["num"] = 0
+                    obj["nomMesa"] = m.mesa.nombre
                     comunicar_cambios_devices("md", "mesasabiertas", obj)
                     m.delete()
                 Sync.actualizar(Mesasabiertas._meta.db_table)

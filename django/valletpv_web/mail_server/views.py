@@ -34,4 +34,4 @@ def suscribirse(resquest):
     return redirect( "index")
 
 def valleges(request):
-    return render(request, template_name="aplicaciones/valleges/index.html")
+    return render(request, template_name="www/valleges/index.html")

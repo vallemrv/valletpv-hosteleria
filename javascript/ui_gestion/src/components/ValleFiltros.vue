@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="3" title="Filtros" class>
+  <v-card elevation="3" :title="title" class>
     <v-divider></v-divider>
     <v-card-text>
       <v-row v-if="filtro && filtro.text_filters">
@@ -45,7 +45,7 @@
                     >
                       <v-item v-slot="{ isSelected, toggle }">
                         <v-btn
-                         block
+                          block
                           class="text-caption pa-6"
                           :color="isSelected ? 'primary' : '#cfb6d4'"
                           @click="toggle"
@@ -66,7 +66,15 @@
 
 <script>
 export default {
-  props: ["filtro"],
+  props: {
+    filtro: Object,
+    title: {
+      type: String,
+      default(v) {
+        return "Filtro";
+      },
+    },
+  },
   data() {
     return {
       selected: [],
@@ -135,6 +143,6 @@ export default {
 
 <style scoped>
 span {
-   white-space: normal;
+  white-space: normal;
 }
 </style>

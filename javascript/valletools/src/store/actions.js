@@ -39,6 +39,18 @@ export default {
         })
     },
     selEmpresa({ commit, state }, index){
+        state.error= "";
+        state.instrucciones= null;
+        state.dateset= {
+            labels: ["borrado", "cobrado", "pedido"],
+            datasets: [{backgroundColor:["#D6EAF8", "#F6D6F8", "#ABEBC6"], data:[0,0,0] }]
+        }
+        state.total = 0;
+        state.mensajes=[];
+        state.last_accion= "";
+        state.mesasabiertas= [];
+        state.new_men= null;
+        state.isWSConnected = false;
         state.empresa = state.empresas[index];
         localStorage.empresa_index = index;
         connet_ws(commit, state);
@@ -112,6 +124,18 @@ export default {
     },
     addInstruccion( {commit }, {inst}) {
         commit(types.ADD_INSTRUCTIONS, {inst:inst})
+    },
+    getMesasAbiertas({ commit, state } ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        console.log(state.mesasabiertas);
+        API.getMesasAbiertas(state.empresa.url, params)
+        .then( r => commit(types.GET_LISTADOS, {result: r}))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
     },
     getListados({ commit, state }, tablas ){
         commit(types.GET_REQUEST)

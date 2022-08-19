@@ -31,5 +31,9 @@ export default {
     },
     login(server, params){
         return post(server, "token/new.json", params)
+    },
+    getMesasAbiertas(server, params){
+        
+        return post(server, "app/ventas/mesas_abiertas", params)
     }
 }

@@ -1,28 +1,68 @@
 <template>
- <valle-header anchor="bottom center" :btns="btns" title="Teclas"></valle-header>
+  <valle-header anchor="bottom center" :btns="btns" title="Teclas"></valle-header>
   <v-container>
     <v-row>
-        <v-col cols="12">
-          <valle-filtros
-            :filtro="filtro"
-            @click_filter="on_filter_change"
-          ></valle-filtros>
-        </v-col>
+      <v-col cols="12">
+        <v-card>
+          <v-card-title> Filtrar por: </v-card-title>
+          <v-card-actions class="text-right">
+            <v-btn
+              variant="outlined"
+              @click="show_fsecciones = true"
+              :color="show_fsecciones ? 'primary' : ''"
+              class="ml-3"
+              >Secciones</v-btn
+            >
+            <v-btn
+              variant="outlined"
+              :color="!show_fsecciones ? 'primary' : ''"
+              @click="show_fsecciones = false"
+              class="ml-3"
+              >Comanda</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <v-col cols="12" v-if="show_fsecciones">
+        <valle-filtros
+          title="Filtro texto, secciones"
+          :filtro="filtro"
+          @click_filter="on_filter_change"
+        ></valle-filtros>
+      </v-col>
+      <v-col cols="12" v-else>
+        <valle-filtros
+          title="Filtro secciones comanda"
+          :filtro="filtro_comanda"
+          @click_filter="on_filter_comanda_change"
+        ></valle-filtros>
+      </v-col>
 
-        <vista-precio-tecla v-if="vista=='precio'" :listTeclas="listTeclas"></vista-precio-tecla>
-        <vista-tecla-mod  v-else-if="vista=='teclas'" @click_tools="on_click_tools_tecla" :listTeclas="listTeclas"></vista-tecla-mod>
-        <vista-tecla-vista v-else-if="vista=='vista'"  :listTeclas="listTeclas" ></vista-tecla-vista>
-      </v-row>
+      <vista-precio-tecla
+        v-if="vista == 'precio'"
+        :listTeclas="listTeclas"
+      ></vista-precio-tecla>
+      <vista-tecla-mod
+        v-else-if="vista == 'teclas'"
+        @click_tools="on_click_tools_tecla"
+        :listTeclas="listTeclas"
+      ></vista-tecla-mod>
+      <vista-tecla-vista
+        v-else-if="vista == 'vista'"
+        :listTeclas="listTeclas"
+      ></vista-tecla-vista>
+    </v-row>
   </v-container>
 
-  <valle-dialogo-form 
-        @close="on_close_dialogo"
-         :show="showDialogo" 
-         :tb_name="tb_name_form" 
-         :form="form"
-         :item="itemSel"
-         :title="titleForm"
-         :tipo="tipo"></valle-dialogo-form>
+  <valle-dialogo-form
+    @close="on_close_dialogo"
+    :show="showDialogo"
+    :tb_name="tb_name_form"
+    :form="form"
+    :item="itemSel"
+    :title="titleForm"
+    :tipo="tipo"
+  ></valle-dialogo-form>
 
   <valle-secciones-tecla
     :item="itemSel"
@@ -43,11 +83,16 @@ import VistaPrecioTecla from "./components/VistaPrecioTecla";
 import VistaTeclaMod from "./components/VistaTeclaMod";
 import VistaTeclaVista from "./components/VistaTeclaVista";
 
-
 export default {
-  components: { ValleHeader, ValleFiltros, VistaPrecioTecla, 
-                VistaTeclaMod, VistaTeclaVista, ValleDialogoForm,
-                ValleSeccionesTecla },
+  components: {
+    ValleHeader,
+    ValleFiltros,
+    VistaPrecioTecla,
+    VistaTeclaMod,
+    VistaTeclaVista,
+    ValleDialogoForm,
+    ValleSeccionesTecla,
+  },
   computed: {
     ...mapGetters(["getItemsFiltered", "getListValues", "getFilters"]),
     ...mapState(["teclas", "familias", "secciones", "subteclas"]),
@@ -66,7 +111,16 @@ export default {
         multiple: false,
       };
     },
-    formTecla(){
+    filtro_comanda() {
+      return {
+        caption: this.getListValues("seccionescom", "nombre"),
+        filters: this.getFilters("seccionescom", "id", ["IDSeccionCom"]),
+        tools: [],
+        all: [{ IDSeccion: -1 }],
+        multiple: false,
+      };
+    },
+    formTecla() {
       return [
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "p1", label: "Precio 1", tp: "number" },
@@ -87,41 +141,42 @@ export default {
           keys: this.getListValues("familias", "id"),
           choices: this.getListValues("familias", "nombre"),
         },
-      ]
+      ];
     },
-    
-    btns(){
+
+    btns() {
       let aux = [
-        {icon:"mdi-dialpad", callback:this.on_click_tools, op:"ch-teclas"},
-        {icon:"mdi-cash", callback:this.on_click_tools, op:"ch-precio"},
-        {icon:"mdi-eye", callback:this.on_click_tools, op:"ch-vista"},
-        {icon:"mdi-plus", callback:this.on_click_tools, op:"add-tecla"},
-      ]
-      
+        { icon: "mdi-dialpad", callback: this.on_click_tools, op: "ch-teclas" },
+        { icon: "mdi-cash", callback: this.on_click_tools, op: "ch-precio" },
+        { icon: "mdi-eye", callback: this.on_click_tools, op: "ch-vista" },
+        { icon: "mdi-plus", callback: this.on_click_tools, op: "add-tecla" },
+      ];
+
       return aux;
     },
   },
   data() {
     return {
-       showDialogo: false,
-       showEditSec: false,
-       titleForm: "Agregar",
-       tb_name: "teclas",
-       tb_name_form: "teclass",
-       tipo:"add",
-       localFilter: [],
-       vista: "teclas",
-       itemSel: {},
-       form: null,
-       formTeclaSub:[
-            {
-              col: "tipo",
-              label: "Tipo",
-              tp: "select",
-              keys: ["SP", "CM"],
-              choices: ["SIMPLE", "COMPUESTA"],
-            },
-         ],
+      show_fsecciones: true,
+      showDialogo: false,
+      showEditSec: false,
+      titleForm: "Agregar",
+      tb_name: "teclas",
+      tb_name_form: "teclass",
+      tipo: "add",
+      localFilter: [],
+      vista: "teclas",
+      itemSel: {},
+      form: null,
+      formTeclaSub: [
+        {
+          col: "tipo",
+          label: "Tipo",
+          tp: "select",
+          keys: ["SP", "CM"],
+          choices: ["SIMPLE", "COMPUESTA"],
+        },
+      ],
       formSubTecla: [
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "descripcion_t", label: "Texto ticket", tp: "text" },
@@ -134,97 +189,102 @@ export default {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
     getTablas() {
       var request = [];
+      if (!this.seccionescom || this.seccionescom.length <= 0)
+        request.push("seccionescom");
       if (!this.teclas || this.teclas.length <= 0) request.push("teclas");
       if (!this.subteclas || this.subteclas.length <= 0) request.push("subteclas");
       if (!this.secciones || this.secciones.length <= 0) request.push("secciones");
       if (!this.familias || this.familias.length <= 0) request.push("familias");
-      if (request.length > 0){
+      if (request.length > 0) {
         this.getListadoCompuesto({ tablas: request });
       }
     },
     on_filter_change(f) {
-      this.tb_name = "teclas"
+      this.tb_name = "teclas";
       this.localFilter = f;
     },
-    on_click_tools(op){
-      if (op=="add-tecla"){
+    on_filter_comanda_change(f) {
+      this.tb_name = "teclas";
+      this.localFilter = f;
+    },
+    on_click_tools(op) {
+      if (op == "add-tecla") {
         this.showDialogo = true;
-        this.tb_name_form = "teclas",
-        this.titleForm = "Agregar tecla",
-        this.tipo = "add"
-        this.itemSel = {}
-        this.form = this.formTecla
-      } else if (op == "ch-teclas"){
-        this.vista = "teclas"
-      } else if (op == "ch-precio"){
-        this.vista = "precio"
-      } else if (op == "ch-vista"){
-        this.vista = "vista"
+        (this.tb_name_form = "teclas"),
+          (this.titleForm = "Agregar tecla"),
+          (this.tipo = "add");
+        this.itemSel = {};
+        this.form = this.formTecla;
+      } else if (op == "ch-teclas") {
+        this.vista = "teclas";
+      } else if (op == "ch-precio") {
+        this.vista = "precio";
+      } else if (op == "ch-vista") {
+        this.vista = "vista";
       }
     },
-    on_click_tools_tecla(v, op){
+    on_click_tools_tecla(v, op) {
       switch (op) {
-          case "edit":
-              this.titleForm = "Editar tecla";
-              this.itemSel = v;
-              this.showDialogo = true;
-              this.tipo = "md";
-              this.form = this.formTecla;
-              this.tb_name_form = "teclas"
-              break;
-          case "sec":
-              this.showEditSec = true;
-              this.itemSel = v;
-              break;
-          case "add_sub":
-               if (v.tipo == "SP"){
-                 this.edit_tipo_tecla(v)
-               }else{
-                  this.add_subtecla(v)
-               }
-              break;
-          case "rm":
-              let inst = {
-                  tb: this.tb_name,
-                  tipo: "rm",
-                  id: v.id,
-              };
-              let ls = this.$store.state[this.tb_name];
-              this.$store.state[this.tb_name] = ls.filter((e) => {
-                  return e.id != v.id;
-              });
-              this.add_instruccion(inst);
-              break;
+        case "edit":
+          this.titleForm = "Editar tecla";
+          this.itemSel = v;
+          this.showDialogo = true;
+          this.tipo = "md";
+          this.form = this.formTecla;
+          this.tb_name_form = "teclas";
+          break;
+        case "sec":
+          this.showEditSec = true;
+          this.itemSel = v;
+          break;
+        case "add_sub":
+          if (v.tipo == "SP") {
+            this.edit_tipo_tecla(v);
+          } else {
+            this.add_subtecla(v);
           }
-      
+          break;
+        case "rm":
+          let inst = {
+            tb: this.tb_name,
+            tipo: "rm",
+            id: v.id,
+          };
+          let ls = this.$store.state[this.tb_name];
+          this.$store.state[this.tb_name] = ls.filter((e) => {
+            return e.id != v.id;
+          });
+          this.add_instruccion(inst);
+          break;
+      }
     },
-    add_subtecla(v){
+    add_subtecla(v) {
       this.titleForm = "Agregar subtecla";
       this.tipo = "add";
       this.showDialogo = true;
-      this.itemSel = {tecla_id: v.id};
+      this.itemSel = { tecla_id: v.id };
       this.form = this.formSubTecla;
       this.tb_name_form = "subteclas";
     },
-    edit_tipo_tecla(v){
+    edit_tipo_tecla(v) {
       this.titleForm = "Editar tecla";
       this.itemSel = v;
       this.showDialogo = true;
       this.tipo = "md";
       this.form = this.formTeclaSub;
-      this.tb_name_form = "teclas"
+      this.tb_name_form = "teclas";
     },
-    add_instruccion(inst){
+    add_instruccion(inst) {
       this.addInstruccion({ inst: inst });
       this.on_filter_change(this.localFilter);
     },
-    on_close_dialogo(item){
+    on_close_dialogo(item) {
       this.showDialogo = false;
-      this.tb_name_form = "teclas"
+      this.tb_name_form = "teclas";
     },
     on_close_edit_sec() {
       this.showEditSec = false;
-      this.tb_name_form = "teclas"
+      this.tb_name_form = "teclas";
     },
   },
   watch: {

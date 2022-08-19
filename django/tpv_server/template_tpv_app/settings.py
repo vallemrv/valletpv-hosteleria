@@ -88,7 +88,6 @@ ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
 STATICFILES_DIRS = (
         os.path.join(BASE_DIR, 'static', 'resources'),
-        os.path.join(BASE_DIR, 'static', 'dist'),
     )
 
 TEMPLATES = [

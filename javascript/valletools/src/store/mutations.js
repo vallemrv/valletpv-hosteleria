@@ -51,6 +51,7 @@ export default {
         })
     },
     [types.ON_MENSAJE] (state, mensaje){
+        
         let op = mensaje.op;
         let tb = mensaje.tb;
         if (tb == "lineaspedido"){
@@ -64,6 +65,8 @@ export default {
                 let precio = mensaje.extras.precio;
                 if (op_ex == "borrado"){
                      state.total -= precio;
+                     state.last_accion = "Se acaba de borrar "+ parseFloat(mensaje.extras.precio).toFixed(2)+"  €";
+                 
                 }
                 let index = state.chartSet.labels.indexOf("pedido");
                 state.chartSet.datasets[0].data[index] -= precio;
