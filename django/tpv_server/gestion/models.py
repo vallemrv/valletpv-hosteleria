@@ -8,13 +8,12 @@ from __future__ import unicode_literals
 
 import json
 from datetime import datetime
-from typing_extensions import Self
 from uuid import uuid4
 from django.db import models
 from django.db import connection
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from comunicacion.tools import (comunicar_cambios_devices, 
                                 send_mensaje_impresora)
 
@@ -857,10 +856,27 @@ class Mesasabiertas(models.Model):
                 infmesa.delete()
     
     def serialize(self):
+        total_pedido = self.infmesa.lineaspedido_set.filter(estado='P').aggregate(total=Sum('precio')) ["total"]
+        total_r = self.infmesa.lineaspedido_set.filter(estado='R').aggregate(total=Count('precio'))["total"]
+        total_m = self.infmesa.lineaspedido_set.filter(estado='M').aggregate(total=Count('precio'))["total"]
+        total_cobrado = self.infmesa.lineaspedido_set.filter(estado='C').aggregate(total=Sum('precio'))["total"]
+        total_anulado = self.infmesa.lineaspedido_set.filter(estado='A').aggregate(total=Sum('precio'))["total"]
+        total_pedido = total_pedido if total_pedido else 0
+        total_r = total_r if total_r else 0
+        total_m = total_m if total_m else 0
+        total_cobrado = total_cobrado if total_cobrado else 0
+        total_anulado = total_anulado if total_anulado else 0
         return {
+            "PK": self.pk,
             "ID": self.mesa_id,
             "num": self.infmesa.numcopias,
-            "abierta": 1
+            "abierta": 1,
+            "nomMesa": self.mesa.nombre,
+            "total_pedido": float(total_pedido),
+            "total_regalado": float(total_r) + float(total_m),
+            "total_anulado": float(total_anulado),
+            "total_cobrado": float(total_cobrado),
+            "hora": self.infmesa.hora,
         }
 
     def get_lineaspedido(self):

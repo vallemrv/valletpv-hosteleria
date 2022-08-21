@@ -32,8 +32,10 @@ export default {
     login(server, params){
         return post(server, "token/new.json", params)
     },
-    getMesasAbiertas(server, params){
-        
-        return post(server, "app/ventas/mesas_abiertas", params)
+    borrarMesa(server, params){
+        return post(server, "app/ventas/borrar_mesa", params)
+    },
+    getInfMesa(server, params){
+        return post(server, "app/ventas/get_infomesa", params)
     }
 }

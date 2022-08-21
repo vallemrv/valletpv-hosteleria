@@ -12,4 +12,5 @@ export default {
     last_accion: "",
     mesasabiertas: [],
     new_men: null,
+    infmesa: null,
 }

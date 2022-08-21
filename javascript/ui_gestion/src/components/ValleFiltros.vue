@@ -4,7 +4,7 @@
     <v-card-text>
       <v-row v-if="filtro && filtro.text_filters">
         <v-col cols="12">
-          <v-expansion-panels>
+          <v-expansion-panels variant="accordion">
             <v-expansion-panel>
               <v-expansion-panel-title>
                 Fitros de texto o buscadores

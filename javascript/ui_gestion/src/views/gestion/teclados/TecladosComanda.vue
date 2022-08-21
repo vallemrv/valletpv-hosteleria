@@ -24,7 +24,7 @@
           <v-col cols="12" sm="6" v-if="itemSel">
             <v-card :color="$tools.rgbToHex(itemSel.RGB)">
               <v-card-text>
-                {{ itemSel.nombre + " " + itemSel.p1 }}
+                {{ itemSel.nombre + " --- " + parseFloat(itemSel.p1).toFixed(2) + " €" }}
                 <v-btn class="float-right" icon variant="text" @click="editar_tecla">
                   <v-icon>mdi-pencil</v-icon></v-btn
                 >
@@ -48,7 +48,12 @@
           <v-col cols="12" sm="6" v-if="subItemSel">
             <v-card elevation="2">
               <v-card-text>
-                {{ subItemSel.nombre }}
+                {{
+                  subItemSel.nombre +
+                  " --- " +
+                  parseFloat(itemSel.p1 + subItemSel.incremento).toFixed(2) +
+                  " €"
+                }}
                 <v-btn class="float-right" icon variant="text" @click="editar_subtecla">
                   <v-icon>mdi-pencil</v-icon></v-btn
                 >
@@ -160,7 +165,6 @@ export default {
         { col: "descripcion_t", label: "Texto ticket", tp: "text" },
         { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
       ];
-
       return form;
     },
     itemAddTecla() {
@@ -226,7 +230,11 @@ export default {
       this.selTbName = "subteclas";
       this.form = [
         ...this.formTecla,
-        { col: "incremento", label: "Incremento", tp: "number" },
+        {
+          col: "incremento",
+          label: "Incremento",
+          tp: "number",
+        },
       ];
     },
     quitar_subtecla() {

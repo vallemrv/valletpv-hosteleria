@@ -125,14 +125,34 @@ export default {
     addInstruccion( {commit }, {inst}) {
         commit(types.ADD_INSTRUCTIONS, {inst:inst})
     },
-    getMesasAbiertas({ commit, state } ){
+    rmMesa({ commit, state }, idm ){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("user", state.empresa.user)
         params.append("token", state.empresa.token)
-        console.log(state.mesasabiertas);
-        API.getMesasAbiertas(state.empresa.url, params)
-        .then( r => commit(types.GET_LISTADOS, {result: r}))
+        params.append("idm", idm);
+        params.append("motivo", "Borrado por el administrador.")
+        state.mesasabiertas = state.mesasabiertas.filter(e =>{
+            return e.ID != idm;
+        });
+        
+        API.borrarMesa(state.empresa.url, params)
+        .then( r =>  commit(types.REQUEST_SUCCESS))
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getInfMesa({ commit, state }, pk ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        params.append("pk", pk);
+        API.getInfMesa(state.empresa.url, params)
+        .then( r => {
+            state.infmesa = r; 
+            commit(types.REQUEST_SUCCESS);
+        })
         .catch(error => {
             commit(types.ERROR_REQUEST, {error: error})
         })

@@ -1,7 +1,8 @@
 from .utils import get_total_by_horas, get_total
 from tokenapi.http import JsonResponse
-from gestion.models import Ticket
+from gestion.models import Camareros, Ticket
 from tokenapi.decorators import token_required
+from gestion.models import Mesasabiertas
 
 @token_required
 def get_pedidos_by_hora(request):
@@ -19,6 +20,18 @@ def datasets(request):
 
 
 @token_required
-def mesas_abiertas(request):
-    print(request.POST)
-    return JsonResponse({'tb':"infmesas", 'regs':[]})
+def cuenta_rm(request):
+    idm = request.POST["idm"]
+    motivo = request.POST["motivo"]
+    idc = Camareros.objects.first().id
+    Mesasabiertas.borrar_mesa_abierta(idm,idc,motivo)
+    return JsonResponse({})
+
+@token_required
+def get_infomesa(request):
+    pk = request.POST["pk"]
+    m = Mesasabiertas.objects.filter(id=pk).first()
+    if m:
+        for p in m.infmesa.pedidos_set.all():
+            pass
+    return JsonResponse({})

@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
    path("datasets", views.datasets, name="ventas_datasets"),
-   path("mesas_abiertas", views.mesas_abiertas, name="ventas_mesas_abiertas")
+   path("borrar_mesa", views.cuenta_rm, name="cuenta_rm"),
+   path("get_infomesa", views.get_infomesa, name="get_infomesa")
 ]
