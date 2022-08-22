@@ -142,21 +142,6 @@ export default {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getInfMesa({ commit, state }, pk ){
-        commit(types.GET_REQUEST)
-        let params = new FormData()
-        params.append("user", state.empresa.user)
-        params.append("token", state.empresa.token)
-        params.append("pk", pk);
-        API.getInfMesa(state.empresa.url, params)
-        .then( r => {
-            state.infmesa = r; 
-            commit(types.REQUEST_SUCCESS);
-        })
-        .catch(error => {
-            commit(types.ERROR_REQUEST, {error: error})
-        })
-    },
     getListados({ commit, state }, tablas ){
         commit(types.GET_REQUEST)
         let params = new FormData()
@@ -193,5 +178,65 @@ export default {
         .catch(error => {
            commit(types.ERROR_REQUEST, {error: error})
         })
-    }
+    },
+    getInfMesa({ commit, state }, pk ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        params.append("pk", pk);
+        API.getInfMesa(state.empresa.url, params)
+        .then( r => {
+            state.infmesa = r; 
+            commit(types.REQUEST_SUCCESS);
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    sendCobrarMesa({ commit, state },{entrega, pk} ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        params.append("pk", pk);
+        params.append("entrega", entrega);
+        API.sendCobrarMesa(state.empresa.url, params)
+        .then( r => {
+            state.infmesa = null; 
+            commit(types.REQUEST_SUCCESS);
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getNulos({ commit, state }, filtro ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        params.append("filter", filtro);
+        API.getNulos(state.empresa.url, params)
+        .then( r => {
+            state.nulos = r; 
+            commit(types.REQUEST_SUCCESS);
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getListadoMesas({ commit, state }, filtro ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        API.getListdoMesas(state.empresa.url, params)
+        .then( r => {
+            state.listadomesas = r; 
+            commit(types.REQUEST_SUCCESS);
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
 }

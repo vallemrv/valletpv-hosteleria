@@ -17,7 +17,11 @@ import json
 
 def find(id, lineas):
     for l in lineas:
-        if int(l["ID"]) == int(id):
+        try:
+            if int(l["ID"]) == int(id):
+                lineas.remove(l)
+                return l
+        except:
             lineas.remove(l)
             return l
     return None

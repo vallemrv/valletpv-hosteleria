@@ -68,6 +68,8 @@ export default {
     itemEmpresa: {},
     items: [
       { label: "Mesas abiertas", icon: "mdi-table-chair", value: "mesas_abiertas" },
+      { label: "Listado mesas", icon: "mdi-list-status", value: "listado_mesas" },
+      { label: "Historial nulos", icon: "mdi-null", value: "nulos" },
       { label: "Arqueos", icon: "mdi-cash-register", value: "arqueos" },
     ],
   }),

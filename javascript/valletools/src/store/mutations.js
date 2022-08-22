@@ -56,10 +56,15 @@ export default {
         let tb = mensaje.tb;
         if (tb == "lineaspedido"){
             if ( op == "insert" ){
-                let precio = mensaje.obj.Precio;
-                state.total += precio;
-                let index = state.chartSet.labels.indexOf("pedido");
-                state.chartSet.datasets[0].data[index] += precio;
+                var objs = []
+                if(mensaje.obj.Precio){ objs[0] = mensaje.obj }
+                else objs = mensaje.obj
+                for(var i=0; i < objs.length; i++){
+                    let precio = objs[i].Precio;
+                    state.total += precio;
+                    let index = state.chartSet.labels.indexOf("pedido");
+                    state.chartSet.datasets[0].data[index] += precio;
+                }
             } else if ( op == "rm") {
                 let op_ex = mensaje.extras.op
                 let precio = mensaje.extras.precio;
@@ -74,9 +79,16 @@ export default {
                 state.chartSet.datasets[0].data[index] += precio;
             } 
         }
-        else if (tb == "mesasabiertas" && op == "md"){
+        else if (tb == "mesasabiertas"){
             let obj = mensaje.obj;
-            if (obj.abierta == 1 && obj.num == 0) state.mesasabiertas.push(obj);
+            if (obj.abierta == 1 && obj.num == 0){
+                let f = state.mesasabiertas.filter( e => e.ID == obj.ID);
+                if (f.length > 0 ){
+                    let i = state.mesasabiertas.indexOf(f[0]);
+                    state.mesasabiertas[i] = obj;
+                }  
+                else state.mesasabiertas.push(obj);
+            }
             else if (obj.abierta == 0) {
                 state.mesasabiertas = Object.values(state.mesasabiertas).filter( e => e.ID != obj.ID)
             }

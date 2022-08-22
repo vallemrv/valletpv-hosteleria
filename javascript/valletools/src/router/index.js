@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import ArqueosView from '@/views/ArqueosView'
 import MensajesView from '@/views/MensajesView'
 import MesasAbiertasView from '@/views/MesasAbiertasView'
+import NulosView from '@/views/NulosView'
+import ListadoMesasView from '@/views/ListadoMesasView'
 
 const routes = [
   {
@@ -21,6 +23,16 @@ const routes = [
     component: MesasAbiertasView
   },
   {
+    path :'/listado_mesas',
+    name: 'listado_mesas',
+    component: ListadoMesasView
+  },
+  {
+    path :'/nulos',
+    name: 'nulos',
+    component: NulosView
+  },
+  { 
     path :'/mensajes',
     name: 'Mensajes',
     component: MensajesView

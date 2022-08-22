@@ -37,5 +37,14 @@ export default {
     },
     getInfMesa(server, params){
         return post(server, "app/ventas/get_infomesa", params)
+    },
+    sendCobrarMesa(server, params){
+        return post(server, "app/ventas/send_cobrar_mesa", params)
+    },
+    getNulos(server, params){
+        return post(server, "app/ventas/get_nulos", params)
+    },
+    getListdoMesas(server, params){
+        return post(server, "app/ventas/get_list_mesas", params)
     }
 }

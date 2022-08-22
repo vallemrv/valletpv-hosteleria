@@ -21,7 +21,6 @@ def get_total_by_horas(filter):
 
 
 def get_total(order_by, filter):
-    print(order_by)
     res = []
     for l in Lineaspedido.objects.filter(**filter).values_list(order_by).annotate(total=Sum("precio")):
         res.append({"estado":l[0], "total": float(l[1])})

@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import datetime
+from posixpath import split
 from uuid import uuid4
 from django.db import models
 from django.db import connection
@@ -442,8 +443,14 @@ class Historialnulos(models.Model):
     def update_for_devices():
         a = []
         for obj in Historialnulos.objects.all():
-            a.append(model_to_dict(obj))
+            a.append(obj.serialize())
         return a
+
+    def serialize(self):
+        obj = model_to_dict(self)
+        obj["camarero"] = self.camarero.nombre + " " + self.camarero.apellidos
+        obj["lineapedido"] = self.lineapedido.serialize()
+        return obj
 
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
@@ -515,7 +522,6 @@ class Infmesa(models.Model):
                     if (comp.cantidad <= cantidad_realizada):
                         break
 
-
     def componer_articulos(self):
         lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
@@ -546,7 +552,6 @@ class Infmesa(models.Model):
                                 l.save()
                                 break; 
                             
-
     def save(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().save(*args, **kwargs)
@@ -554,6 +559,61 @@ class Infmesa(models.Model):
     def delete(self, *args, **kwargs):
         Sync.actualizar(self._meta.db_table)
         return super().delete(*args, **kwargs)
+
+    def serialize(self):
+        total_pedido = self.lineaspedido_set.filter(estado='P').aggregate(total=Sum('precio')) ["total"]
+        total_r = self.lineaspedido_set.filter(estado='R').aggregate(total=Count('precio'))["total"]
+        total_m = self.lineaspedido_set.filter(estado='M').aggregate(total=Count('precio'))["total"]
+        total_cobrado = self.lineaspedido_set.filter(estado='C').aggregate(total=Sum('precio'))["total"]
+        total_anulado = self.lineaspedido_set.filter(estado='A').aggregate(total=Sum('precio'))["total"]
+        total_pedido = total_pedido if total_pedido else 0
+        total_r = total_r if total_r else 0
+        total_m = total_m if total_m else 0
+        total_cobrado = total_cobrado if total_cobrado else 0
+        total_anulado = total_anulado if total_anulado else 0
+        split = self.pk.split("-")
+        mesa = Mesas.objects.filter(pk=split[0]).first()
+        mesa_id = mesa.id if mesa else -1
+        nomMesa = mesa.nombre if mesa else ""
+        return {
+            "PK": self.pk,
+            "ID": mesa_id,
+            "num": self.numcopias,
+            "abierta": 0,
+            "nomMesa": nomMesa,
+            "total_pedido": float(total_pedido),
+            "total_regalado": float(total_r) + float(total_m),
+            "total_anulado": float(total_anulado),
+            "total_cobrado": float(total_cobrado),
+            "hora": self.hora,
+            "camarero": self.camarero.nombre + " " + self.camarero.apellidos
+        }
+
+    def get_pedidos(self):
+        pedidos = []
+        for p in self.pedidos_set.all():
+            camarero = Camareros.objects.filter(id=p.camarero_id).first()
+            if not camarero: camarero = "Camarero borrado"
+            else: camarero = camarero.nombre + " " + camarero.apellidos
+            lineas = []
+            for l in p.lineaspedido_set.values_list("descripcion", 
+                                 "precio", 
+                                 "estado").annotate(Cam=Count("idart"),
+                                                    Total=Sum("precio")):
+                lineas.append({
+                    "Descripcion": l[0],
+                    "Precio": float(l[4]),
+                    "Can": l[3],
+                    "Estado": l[2]
+                })
+
+            pedidos.append({
+                "hora": p.hora,
+                "camarero": camarero,
+                "lineas": lineas
+            })
+        return pedidos
+
 
     class Meta:
         db_table = 'infmesa'
@@ -642,28 +702,26 @@ class Lineaspedido(models.Model):
 
 
     def serialize(self):
-        l = self
-        m = Mesasabiertas.objects.filter(infmesa=self.infmesa).first()
-        if m:
-            obj = {
-                'ID': l.pk,
-                'IDPedido': l.pedido_id,
-                'UID': m.infmesa.pk,
-                'IDArt': l.idart,
-                'Estado': l.estado,
-                'Precio': float(l.precio),
-                'Descripcion': l.descripcion,
-                'IDMesa': m.mesa.pk,
-                'nomMesa': m.mesa.nombre,
-                'IDZona': m.mesa.mesaszona_set.all().first().zona.pk,
-                'servido': Servidos.objects.filter(linea__pk=l.pk).count(),
-                'descripcion_t': l.descripcion_t,
-                'receptor': l.tecla.familia.receptor.pk if l.tecla else "",
-                'camarero': l.pedido.camarero_id,
-                }
-            return obj
-        else:
-            return None
+        split = self.infmesa.pk.split("-")
+        mesa = Mesas.objects.filter(id=split[0]).first()
+        obj = {
+            'ID': self.pk,
+            'IDPedido': self.pedido_id,
+            'UID': self.infmesa.pk,
+            'IDArt': self.idart,
+            'Estado': self.estado,
+            'Precio': float(self.precio),
+            'Descripcion': self.descripcion,
+            'IDMesa': mesa.pk if mesa else -1,
+            'nomMesa': mesa.nombre if mesa else "",
+            'IDZona': mesa.mesaszona_set.all().first().zona.pk if mesa else -1,
+            'servido': Servidos.objects.filter(linea__pk=self.pk).count(),
+            'descripcion_t': self.descripcion_t,
+            'receptor': self.tecla.familia.receptor.pk if self.tecla else "",
+            'camarero': self.pedido.camarero_id,
+            }
+        return obj
+            
 
     def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
         num = -1
@@ -856,28 +914,10 @@ class Mesasabiertas(models.Model):
                 infmesa.delete()
     
     def serialize(self):
-        total_pedido = self.infmesa.lineaspedido_set.filter(estado='P').aggregate(total=Sum('precio')) ["total"]
-        total_r = self.infmesa.lineaspedido_set.filter(estado='R').aggregate(total=Count('precio'))["total"]
-        total_m = self.infmesa.lineaspedido_set.filter(estado='M').aggregate(total=Count('precio'))["total"]
-        total_cobrado = self.infmesa.lineaspedido_set.filter(estado='C').aggregate(total=Sum('precio'))["total"]
-        total_anulado = self.infmesa.lineaspedido_set.filter(estado='A').aggregate(total=Sum('precio'))["total"]
-        total_pedido = total_pedido if total_pedido else 0
-        total_r = total_r if total_r else 0
-        total_m = total_m if total_m else 0
-        total_cobrado = total_cobrado if total_cobrado else 0
-        total_anulado = total_anulado if total_anulado else 0
-        return {
-            "PK": self.pk,
-            "ID": self.mesa_id,
-            "num": self.infmesa.numcopias,
-            "abierta": 1,
-            "nomMesa": self.mesa.nombre,
-            "total_pedido": float(total_pedido),
-            "total_regalado": float(total_r) + float(total_m),
-            "total_anulado": float(total_anulado),
-            "total_cobrado": float(total_cobrado),
-            "hora": self.infmesa.hora,
-        }
+        obj = self.infmesa.serialize()
+        obj["PK"] = self.pk
+        obj["abierta"] = 1
+        return obj
 
     def get_lineaspedido(self):
         lineas = []
@@ -929,6 +969,7 @@ class Pedidos(models.Model):
    
     @staticmethod
     def agregar_nuevas_lineas(idm, idc, lineas):
+        
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
         if not mesa:
@@ -943,7 +984,6 @@ class Pedidos(models.Model):
             mesa.mesa_id = idm
             mesa.infmesa_id = infmesa.pk
             mesa.save()
-            comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
             Sync.actualizar("mesasabiertas")
 
         pedido = Pedidos()
@@ -951,6 +991,7 @@ class Pedidos(models.Model):
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
         pedido.save()
+        
 
         for pd in lineas:
             can = int(pd["Can"])
@@ -965,15 +1006,20 @@ class Pedidos(models.Model):
                 linea.estado =  'P'
                 linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
                 linea.save()
+               
                 
-
+        print("mesa: "+idm, "camarero: "+idc)
         pedido.infmesa.numcopias = 0
         pedido.infmesa.save()   
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
-     
+        comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
+           
+        lineas = []
         for l in pedido.lineaspedido_set.all():
-            comunicar_cambios_devices("insert", "lineaspedido", l.serialize())
+            lineas.append(l.serialize())
+
+        comunicar_cambios_devices("insert", "lineaspedido", lineas)
 
         return pedido
 
@@ -1396,6 +1442,7 @@ class Ticket(models.Model):
         total = 0
         numart = -1
         id = -1
+     
         if mesa:
             uid = mesa.infmesa.pk
             ticket = Ticket()
@@ -1412,7 +1459,7 @@ class Ticket(models.Model):
             for l in art:
                 can = int(l["Can"])
                 reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & Q(idart=l["IDArt"]) &  Q(precio=l["Precio"]) &
-                                                  Q(descripcion_t=l["descripcion_t"]) & (Q(estado="P") | Q(estado="M")))[:can]
+                                                  Q(descripcion_t=l["descripcion_t"]) & (Q(estado="P")))[:can]
 
                 for r in reg:
                     total = total + r.precio

@@ -1,8 +1,8 @@
 <template>
-  <valle-tool-bar :title="mesasabiertas.length + '  Mesas abiertas '"></valle-tool-bar>
+  <valle-tool-bar title="Lista de mesas"></valle-tool-bar>
   <v-container>
     <v-row>
-      <v-col cols="12" v-for="(item, i) in mesasabiertas" :key="i">
+      <v-col cols="12" v-for="(item, i) in listadomesas" :key="i">
         <v-card>
           <v-card-title
             >Mesa: {{ item.nomMesa }}
@@ -26,31 +26,14 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn icon @click="borrarMesa(item)" class="float-right"
-              ><v-icon>mdi-delete</v-icon></v-btn
-            >
             <v-btn icon @click="mostrarMesa(item)"><v-icon>mdi-eye</v-icon></v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
 
-    
 
-    <v-dialog v-model="showBorrarMesa">
-      <v-card color="warning">
-        <v-card-title> Atencion!! </v-card-title>
-        <v-card-text>
-          Esta apunto de borrar la mesa {{ nomMesa }} completa ¿esta seguro?</v-card-text
-        >
-        <v-card-actions>
-          <v-btn @click="ejecutarBorrar()" color="primary">Aceptar</v-btn>
-          <v-btn @click="showBorrarMesa = false">Cancelar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <ValleInfMesa @close="showMesa = false" :showMesa="showMesa" :mesa="itemSel" puedo_cobrar='true'/>
+    <ValleInfMesa @close="showMesa = false" :showMesa="showMesa" :mesa="itemSel" :puedo_cobrar='false'/>
   </v-container>
 </template>
 
@@ -63,18 +46,16 @@ export default {
   data() {
     return {
       itemSel: null,
-      showBorrarMesa: false,
       showMesa: false,
       nomMesa: "",
       hora: "",
-      showCobrarMesa: false,
     };
   },
   computed: {
-    ...mapState(["mesasabiertas", "infmesa", "ocupado"]),
+    ...mapState(["listadomesas", "infmesa", "ocupado"]),
   },
   methods: {
-    ...mapActions(["getListado", "getInfMesa", "rmMesa", "sendCobrarMesa"]),
+    ...mapActions(["getListadoMesas", "getInfMesa"]),
     decimalToStr(v) {
       return parseFloat(v).toFixed(2) + " €";
     },
@@ -85,18 +66,9 @@ export default {
       this.itemSel = m;
       this.getInfMesa(this.itemSel.PK);
     },
-    borrarMesa(m) {
-      this.showBorrarMesa = true;
-      this.nomMesa = m.nomMesa;
-      this.itemSel = m;
-    },
-    ejecutarBorrar() {
-      this.showBorrarMesa = false;
-      if (this.itemSel) this.rmMesa(this.itemSel.ID);
-    }
   },
   mounted() {
-      this.getListado("mesasabiertas");
+      this.getListadoMesas();
   },
 };
 </script>
