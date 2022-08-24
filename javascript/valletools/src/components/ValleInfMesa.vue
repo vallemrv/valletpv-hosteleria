@@ -86,7 +86,7 @@ export default{
         estadoToColor(e) {
             if (e == "P") return "bg-primary";
             else if (e == "C") return "bg-blue-lighten-5";
-            else if (e == "A") return "bg-red-lighten-5";
+            else if (e == "A") return "bg-red-lighten-1";
             else if (e == "R") return "bg-pink-lighten-5";
             else if (e == "M") return "bg-pink-lighten-3";
         }

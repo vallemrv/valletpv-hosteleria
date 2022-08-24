@@ -210,12 +210,11 @@ export default {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getNulos({ commit, state }, filtro ){
+    getNulos({ commit, state } ){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("user", state.empresa.user)
         params.append("token", state.empresa.token)
-        params.append("filter", filtro);
         API.getNulos(state.empresa.url, params)
         .then( r => {
             state.nulos = r; 
@@ -225,7 +224,7 @@ export default {
             commit(types.ERROR_REQUEST, {error: error})
         })
     },
-    getListadoMesas({ commit, state }, filtro ){
+    getListadoMesas({ commit, state } ){
         commit(types.GET_REQUEST)
         let params = new FormData()
         params.append("user", state.empresa.user)
@@ -233,6 +232,20 @@ export default {
         API.getListdoMesas(state.empresa.url, params)
         .then( r => {
             state.listadomesas = r; 
+            commit(types.REQUEST_SUCCESS);
+        })
+        .catch(error => {
+            commit(types.ERROR_REQUEST, {error: error})
+        })
+    },
+    getListadoArqueos({ commit, state } ){
+        commit(types.GET_REQUEST)
+        let params = new FormData()
+        params.append("user", state.empresa.user)
+        params.append("token", state.empresa.token)
+        API.getListadoArqueos(state.empresa.url, params)
+        .then( r => {
+            state.listadoarqueos = r; 
             commit(types.REQUEST_SUCCESS);
         })
         .catch(error => {

@@ -9,30 +9,32 @@
       </v-col>
       <v-col cols="12" v-for="(n, i) in nulos" :key="i">
         <v-card>
-          <v-card-title>
-            <v-alert color="primary" >
-              {{ n.motivo }}
-            </v-alert>
-          </v-card-title>
           <v-card-text>
-             <v-row>
-              <v-col cols="6">
-                Mesa: {{ n.nomMesa }}
-              </v-col>
-              <v-col cols="6">
-                Hora: {{ n.hora }}
-              </v-col>
-              <v-col cols="2" class="text-right">
-                {{ n.can }}
-              </v-col>
-              <v-col cols="8">
-                {{ n.descripcion }}
-              </v-col>
-              <v-col cols="2">
-                <v-btn flat icon @click="mostrar(n)"> <v-icon>mdi-eye</v-icon></v-btn>
-              </v-col>
+            <v-sheet color="primary" class="pa-5" elevation="3" >
+              <v-row>
+                <v-col cols="9" class="mt-4 pl-6">
+                    <v-row>
+                    <v-col cols="12" class="pa-0 ma-0">
+                      Mesa: {{ n.nomMesa }} --- Hora: {{ n.hora }}
+                    </v-col>
+                    <v-col cols="12" class="pa-0 ma-0">
+                      Camarero: {{ n.camarero}}
+                    </v-col>
+                  </v-row>
+                </v-col>
+                 
+                <v-col cols="3">
+                   <v-btn icon flat color="primary" @click="mostrar(n)"><v-icon color="white">mdi-eye</v-icon></v-btn>
+                </v-col>
+              </v-row>
               
-            </v-row>
+              
+            </v-sheet>
+             <v-row v-for="(l, r) in n.lineas" :key="r" class="pt-4 pr-3 pl-3">
+                <v-col cols="2" class="text-right"> {{ l.can }}</v-col>
+                <v-col cols="6" class="text-left"> {{ l.descripcion }}</v-col>
+                <v-col cols="4" class="text-right"> {{ parseFloat(l.precio).toFixed(2) }} €</v-col>
+             </v-row>
           </v-card-text>
         </v-card>
       </v-col>

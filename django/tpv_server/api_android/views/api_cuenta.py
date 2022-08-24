@@ -26,10 +26,9 @@ def get_cuenta(request):
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
     if m_abierta:
-        #m_abierta.infmesa.componer_articulos()
-        #m_abierta.infmesa.unir_en_grupos()
         lstArt = m_abierta.get_lineaspedido()
 
+    
     return JsonResponse(lstArt)
 
 @csrf_exempt

@@ -1,6 +1,6 @@
 from .utils import get_total_by_horas, get_total
 from tokenapi.http import JsonResponse
-from gestion.models import Camareros, Historialnulos, Infmesa, Mesas, Ticket
+from gestion.models import Arqueocaja, Camareros, Historialnulos, Infmesa, Mesas, Ticket
 from tokenapi.decorators import token_required
 from gestion.models import Mesasabiertas
 
@@ -64,32 +64,50 @@ def get_nulos(request):
     nulos = Historialnulos.objects.all()[:100]
     objs = []
     obj = None
-   
+    linea = None
     for n in nulos:
-        split = n.lineapedido.infmesa_id.split('-')
-        mesa = Mesas.objects.filter(pk=split[0]).first()
-        nomMesa = mesa.nombre if mesa else ''
-        if (obj and obj["descripcion"] == n.lineapedido.descripcion and
-                    obj["precio"] == n.lineapedido.precio and
-                    obj["PK"] == n.lineapedido.infmesa_id ):
-            obj["can"] += 1
-        else:
+
+        if (not obj or obj["PK"] !=  n.lineapedido.infmesa_id):
+            split = n.lineapedido.infmesa_id.split('-')
+            mesa = Mesas.objects.filter(pk=split[0]).first()
+            nomMesa = mesa.nombre if mesa else ''
+            camarero = n.lineapedido.infmesa.camarero
             obj = {
-                "descripcion": n.lineapedido.descripcion,
                 "PK": n.lineapedido.infmesa_id,
-                "hora": n.hora,
-                "precio": n.lineapedido.precio,
-                "can": 1,
                 "nomMesa":nomMesa,
-                "motivo": n.motivo,
+                "lineas": [],
+                "hora": n.lineapedido.infmesa.hora,
+                "camarero": camarero.nombre + " " + camarero.apellidos
                 }
             objs.append(obj)
+            linea = None   
+
+        if (linea and linea["descripcion"] == n.lineapedido.descripcion and
+                      linea["precio"] == n.lineapedido.precio):
+            linea["can"] += 1
+        else: 
+            linea = {
+                "descripcion": n.lineapedido.descripcion,
+                "hora": n.hora,
+                "motivo": n.motivo,
+                "precio": n.lineapedido.precio,
+                "can": 1
+            }
+            obj["lineas"].append(linea)
         
     return JsonResponse(objs)
 
 @token_required
 def get_list_mesas(request):
     lista = Infmesa.objects.all()[:50]
+    r = []
+    for l in lista:
+        r.append(l.serialize())
+    return JsonResponse(r)
+
+@token_required
+def get_list_arqueos(request):
+    lista = Arqueocaja.objects.all()[:50]
     r = []
     for l in lista:
         r.append(l.serialize())

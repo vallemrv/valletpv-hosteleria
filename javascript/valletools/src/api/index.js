@@ -46,5 +46,8 @@ export default {
     },
     getListdoMesas(server, params){
         return post(server, "app/ventas/get_list_mesas", params)
+    },
+    getListadoArqueos(server, params){
+        return post(server, "app/ventas/get_list_arqueos", params)
     }
 }

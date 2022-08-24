@@ -140,6 +140,18 @@ class Arqueocaja(models.Model):
         db_table = 'arqueocaja'
         ordering = ['-id']
 
+    def serialize(self):
+        return {
+            "hora": self.cierre.hora,
+            "fecha": self.cierre.fecha,
+            "cambio": self.cambio,
+            "descuadre": self.descuadre,
+            'totaltarjeta': float(self.cierre.get_total_tarjeta()),
+            'totalefectivo_ticado': float(self.cierre.get_efectivo_tickado()),
+            'totalefectivo': self.get_efectivo(),
+            'gastos': self.get_gastos(),
+        }
+
     def save(self, *args, **kwargs):
         sync = Sync.objects.filter(nombre=self._meta.db_table).first()
         if not sync:
@@ -571,8 +583,13 @@ class Infmesa(models.Model):
         total_m = total_m if total_m else 0
         total_cobrado = total_cobrado if total_cobrado else 0
         total_anulado = total_anulado if total_anulado else 0
-        split = self.pk.split("-")
-        mesa = Mesas.objects.filter(pk=split[0]).first()
+        mesa = Mesasabiertas.objects.filter(infmesa__pk=self.pk).first()
+        if not mesa:
+            split = self.pk.split("-")
+            mesa = Mesas.objects.filter(pk=split[0]).first()
+        else:
+            mesa = mesa.mesa  
+
         mesa_id = mesa.id if mesa else -1
         nomMesa = mesa.nombre if mesa else ""
         return {
@@ -613,7 +630,6 @@ class Infmesa(models.Model):
                 "lineas": lineas
             })
         return pedidos
-
 
     class Meta:
         db_table = 'infmesa'
@@ -702,8 +718,12 @@ class Lineaspedido(models.Model):
 
 
     def serialize(self):
-        split = self.infmesa.pk.split("-")
-        mesa = Mesas.objects.filter(id=split[0]).first()
+        mesa = Mesasabiertas.objects.filter(infmesa__pk=self.infmesa.pk).first()
+        if mesa:
+            mesa = mesa.mesa
+        else:
+            split = self.infmesa.pk.split("-")
+            mesa = Mesas.objects.filter(id=split[0]).first()
         obj = {
             'ID': self.pk,
             'IDPedido': self.pedido_id,
@@ -886,8 +906,7 @@ class Mesasabiertas(models.Model):
             elif mesaP:
                 mesaP.mesa_id = ids
                 mesaP.save()
-                comunicar_cambios_devices("md", "mesasabiertas", mesaP.serialize())
-                comunicar_cambios_devices("md", "mesasabiertas", {"ID":idp,"num":0, "abierta":0})
+                comunicar_cambios_devices("md", "mesasabiertas", [mesaP.serialize(), {"ID":idp,"num":0, "abierta":0}])
             else:
                 Sync.actualizar("mesasabiertas")
 
@@ -921,8 +940,8 @@ class Mesasabiertas(models.Model):
 
     def get_lineaspedido(self):
         lineas = []
-        m = self
-        for l in Lineaspedido.objects.filter(Q(infmesa__pk=m.infmesa.pk) & (Q(estado='P') | Q(estado="R") | Q(estado="M"))):
+        for l in Lineaspedido.objects.filter(Q(infmesa__pk=self.infmesa.pk) 
+                    & (Q(estado='P') | Q(estado="R") | Q(estado="M"))):
             lineas.append(l.serialize())
         return lineas
 
