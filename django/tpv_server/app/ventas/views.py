@@ -61,7 +61,7 @@ def get_infomesa(request):
 
 @token_required
 def get_nulos(request):
-    nulos = Historialnulos.objects.all()[:100]
+    nulos = Historialnulos.objects.all()[:200]
     objs = []
     obj = None
     linea = None
@@ -107,7 +107,7 @@ def get_list_mesas(request):
 
 @token_required
 def get_list_arqueos(request):
-    lista = Arqueocaja.objects.all()[:50]
+    lista = Arqueocaja.objects.all()[1:2]
     r = []
     for l in lista:
         r.append(l.serialize())

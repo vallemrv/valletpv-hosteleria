@@ -172,8 +172,8 @@ class DocPrint():
                     p.writelines("",  text_type='bold',  font='a', align='center')
                     p.writelines("Escanea para la factura",  text_type='bold',  font='a', width=1, height=2, align='center')
                     p.printer.set(align=u'center')
-                    p.writelines()
-                    p.writelines()
+                    p.writelines("")
+                    p.writelines("")
                     p.printer.qr(url_factura, size=6, native=True)
 
 

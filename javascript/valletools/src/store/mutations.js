@@ -96,8 +96,6 @@ export default {
               state.last_accion = mensaje.obj.mensaje
               state.mensajes.push(mensaje.obj);
               state.new_men = true;
-        }else{
-            console.log(mensaje)
         }
 
 

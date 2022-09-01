@@ -5,11 +5,9 @@
 # @Last modified time: 2019-02-07T17:20:09+01:00
 # @License: Apache License v2.0
 
-from django.db.models import Sum, F
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models.fields import DecimalField
 from django.db import connection
 from api_android.tools import send_mensaje_impresora
 from api_android.tools.mails import send_cierre, getUsuariosMail
@@ -121,49 +119,20 @@ def run_enviar_correro(arqueo):
 
 
 def imprimir_desglose(request, arqueo):
-    cambio = arqueo.cambio
-    efectivo = arqueo.efectivo_set.all().values("moneda").annotate(can = Sum("can")).order_by("-moneda")
-    retirar = arqueo.efectivo_set.all().aggregate(total=Sum(F("can") * F("moneda"), output_field=DecimalField()))['total']
-    if retirar:
-        retirar = float(retirar) - float(cambio)
-        lineas_retirada = []
-        lineas_cambio = []
-        parcial = 0
-        for linea in efectivo:
-            can = linea["can"]
-            moneda = linea["moneda"]
-            texto = "moneda" if moneda < 5 else "billete"
-            texto = texto + "s" if can > 1 else ""
-            if retirar <= parcial:
-                if can > 0:
-                    lineas_cambio.append({"titulo": "Cambio", 'can':can,'tipo':float(moneda), 'texto_tipo': texto })
-            elif retirar > ((can * float(moneda)) + parcial):
-                parcial = parcial + float((can * moneda))
-                if can > 0:
-                    lineas_retirada.append({"titulo": "Retirar", 'can':can,'tipo':float(moneda), 'texto_tipo': texto })
-            else:
-                diferencia = retirar - parcial
-                can_parcial = int(diferencia/float(moneda))
-                parcial = parcial + (can_parcial * float(moneda))
-                if can_parcial > 0:
-                    lineas_retirada.append({"titulo": "Retirar", 'can':can_parcial,'tipo':float(moneda), 'texto_tipo': texto })
-                texto = "moneda" if moneda < 5 else "billete"
-                texto = texto + "s" if can_parcial > 1 else texto
-                if can - can_parcial > 0:
-                    lineas_cambio.append({"titulo": "Cambio", 'can':can - can_parcial, 'tipo':float(moneda), 'texto_tipo': texto })
-
+    obj = arqueo.get_desglose_efectivo()
+    if obj:
         obj_cambio = {
             "op": "desglose",
             "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
             "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-            "lineas": lineas_cambio
-        }
+            "lineas": obj['lineas_cambio']
+            }
 
         obj_desglose = {
             "op": "desglose",
             "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
             "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-            "lineas": lineas_retirada
-        }
+            "lineas": obj['lineas_retirar']
+            }
         send_mensaje_impresora(obj_desglose)
         send_mensaje_impresora(obj_cambio)

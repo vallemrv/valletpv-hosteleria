@@ -14,10 +14,7 @@
                                 Hora: {{ a.hora }}
                             </v-col>
                             <v-col cols="12" class="pa-0 ma-0">
-                                Descuadre: {{ parseFloat(a.descuadre).toFixed(2) }}€
-                            </v-col>
-                            <v-col cols="12" class="pa-0 ma-0">
-                                Total efectivo: {{ parseFloat(a.totalefectivo_ticado).toFixed(2) }}€
+                                Total efectivo: {{ parseFloat(a.totalefectivo).toFixed(2) }}€
                             </v-col>
                             <v-col cols="12" class="pa-0 ma-0">
                                 Total tarjeta: {{ parseFloat(a.totaltarjeta).toFixed(2) }}€
@@ -25,28 +22,48 @@
                             <v-col cols="12" class="pa-0 ma-0">
                                 Gastos: {{ parseFloat(a.gastos).toFixed(2) }}€
                             </v-col>
+                            <v-col cols="12" class="pa-0 ma-0">
+                                Total ticado: {{ parseFloat(a.totalefectivo_ticado).toFixed(2) }}€
+                            </v-col>
+                            <v-col cols="12" class="pa-0 ma-0">
+                                Descuadre: {{ parseFloat(a.descuadre).toFixed(2) }}€
+                            </v-col>
                         </v-row>
                     </v-sheet>
                 </v-card-title>
-                <v-card-text>
-
-                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="showArqueo(a)"><v-icon>mdi-eye</v-icon>
+                    </v-btn>
+                </v-card-actions>
             </v-card>
         </v-col>
     </v-row>
+    <ArqueoDialog @close="showDialog=false" :arqueo="arqueoSel" :show="showDialog"/>
     </v-container>
 </template>
 
 <script>
 import ValleToolBar from '@/components/ValleToolBar.vue'
+import ArqueoDialog from './ArqueoComponets/ArqueoDialog.vue';
 import { mapActions, mapState } from 'vuex';
 export default {
-    components:{ ValleToolBar },
+    components:{ ValleToolBar, ArqueoDialog },
+    data(){
+        return {
+            showDialog: false,
+            arqueoSel: null,
+        }
+    },
     computed:{
         ...mapState(["listadoarqueos"])
     },
     methods:{
-        ...mapActions(["getListadoArqueos"])
+        ...mapActions(["getListadoArqueos"]),
+        showArqueo(a){
+            this.showDialog= true;
+            this.arqueoSel = a;
+        }
     },
     mounted(){
         this.getListadoArqueos()

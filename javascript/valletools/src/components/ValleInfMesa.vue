@@ -41,7 +41,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn v-if="puedo_cobrar" @click="showCobrarMesa = true">Cobrar</v-btn>
-          <v-btn @click="$emit('close')">Cerrar</v-btn>
+          <v-btn @click="showMesa=false">Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -80,7 +80,6 @@ export default{
         ...mapActions(["sendCobrarMesa"]),
         cobrarMesa(forma) {
             this.showCobrarMesa = false;
-            this.$emit("close")
             this.sendCobrarMesa({ entrega: forma, pk: this.mesa.PK });
         },
         estadoToColor(e) {
@@ -91,8 +90,16 @@ export default{
             else if (e == "M") return "bg-pink-lighten-3";
         }
     },
+    watch:{
+      showMesa(v){
+        if (!v){
+          this.$emit("close");
+        }
+      }
+    },
     computed: {
         ...mapState(["infmesa", "ocupado"]),
     },
+    
 }
 </script>
