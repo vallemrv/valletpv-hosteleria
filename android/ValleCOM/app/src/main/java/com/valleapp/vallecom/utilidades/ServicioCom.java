@@ -10,7 +10,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ExpandableListAdapter;
 
 import com.valleapp.vallecom.db.DBCamareros;
 import com.valleapp.vallecom.db.DBCuenta;
@@ -26,7 +25,7 @@ import com.valleapp.vallecom.db.DBTbUpdates;
 import com.valleapp.vallecom.interfaces.IBaseDatos;
 import com.valleapp.vallecom.interfaces.IBaseSocket;
 import com.valleapp.vallecom.tareas.TareaManejarInstrucciones;
-import com.valleapp.vallecom.tareas.TareaUpdateForDevices;
+
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -43,7 +42,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
+
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -65,7 +64,7 @@ public class ServicioCom extends Service {
 
     DBTbUpdates DBTbUpdates;
 
-    Queue<Instruccion> colaInstrucciones = new LinkedList<>();
+    final Queue<Instruccion> colaInstrucciones = new LinkedList<>();
 
     String[] tbNameUpdate;
 
@@ -73,7 +72,7 @@ public class ServicioCom extends Service {
     WebSocketClient client;
     boolean isWebsocketClose = false;
 
-    public boolean checkServiceRunning(Class<?> serviceClass){
+    public void checkServiceRunning(Class<?> serviceClass){
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
         {
@@ -81,10 +80,8 @@ public class ServicioCom extends Service {
             {
                 Log.i("checkservice", serviceClass.getName()+", "+service.service.getClassName());
                 stopService(new Intent(getApplicationContext(), serviceClass));
-                return true;
             }
         }
-        return false;
     }
 
     public void crearWebsocket() {
@@ -101,22 +98,18 @@ public class ServicioCom extends Service {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
                     isWebsocketClose = false;
-                    actualizarCamareros();
-                    comprobarMesasAbiertas();
+                    sync_device(new String[]{"mesasabiertas", "lineaspedido"});
+                    comprobarCamareros();
                     comprobarMensajes();
-                    comprobarCuentas();
-                 }
+                    syncDb();
+                }
 
 
                 @Override
                 public void onMessage(String message) {
                     try {
                         JSONObject o = new JSONObject(message);
-                        updateTablesByWS(o);
-                        DBCamareros db_cam = (DBCamareros) getDb("camareros");
-                        if (cam != null && !db_cam.is_autorizado(cam)){
-                            System.exit(0);
-                        }
+                        updateTables(o);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -148,7 +141,29 @@ public class ServicioCom extends Service {
         }
     }
 
-    private void updateTablesByWS(JSONObject o){
+    private void sync_device(String[] tbs) {
+
+        try {
+            for(String tb: tbs) {
+                ContentValues p = new ContentValues();
+                IBaseDatos db =  getDb(tb);
+                p.put("tb", tb);
+                p.put("reg", db.filter(null).toString());
+                new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void comprobarCamareros(){
+        new HTTPRequest(server+"/camareros/listado",
+                new ContentValues(),
+                "camareros", controller_http);
+    }
+
+    private void updateTables(JSONObject o){
         try {
             String tb = o.getString("tb");
             String op = o.getString("op");
@@ -164,6 +179,7 @@ public class ServicioCom extends Service {
 
                 for(int i=0; i<objs.length();i++) {
                     JSONObject obj = objs.getJSONObject(i);
+                    Log.d("UPDATETEBLES", "tb_name: "+tb+", op: "+op+", reg: "+obj.toString());
                     if (op.equals("insert")) db.insert(obj);
                     if (op.equals("md")) db.update(obj);
                     if (op.equals("rm")) db.rm(obj);
@@ -183,11 +199,6 @@ public class ServicioCom extends Service {
         }
     }
 
-    private  void comprobarMesasAbiertas(){
-        ContentValues p = new ContentValues();
-        p.put("tb", "mesasabiertas");
-        new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
-    }
 
     private void comprobarMensajes() {
         try {
@@ -202,24 +213,6 @@ public class ServicioCom extends Service {
         }
     }
 
-    public void comprobarCuentas(){
-        try {
-            ContentValues p = new ContentValues();
-            DBCuenta dbCuenta = (DBCuenta) getDb("lineaspedido");
-            JSONArray lineas = dbCuenta.execSql("SELECT * FROM cuenta");
-            p.put("lineas", lineas.toString());
-            new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p,
-                    "update_socket", controller_http);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void actualizarCamareros(){
-        ContentValues p = new ContentValues();
-        p.put("tb", "camareros");
-        new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
-    }
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -227,19 +220,14 @@ public class ServicioCom extends Service {
             String res = msg.getData().getString("RESPONSE");
             if (res != null) {
                 try {
-                    switch (op) {
-                        case "check_updates":
-                            delegadoHandleCheckUpdates(res);
-                            break;
-                        case "update_table":
-                            delegadoHandleUpdateTable(res);
-                            break;
-                        case "update_socket":
-                            JSONArray objs = new JSONArray(res);
-                            for(int i= 0; i < objs.length(); i++) {
-                                updateTablesByWS(objs.getJSONObject(i));
-                            }
-                            break;
+                    if ("update_socket".equals(op)) {
+                        JSONArray objs = new JSONArray(res);
+                        for (int i = 0; i < objs.length(); i++) {
+                            updateTables(objs.getJSONObject(i));
+                        }
+                    }else if (op.equals("camareros")) {
+                        DBCamareros db = (DBCamareros) getDb("camareros");
+                        db.rellenarTabla(new JSONArray(res));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -248,50 +236,6 @@ public class ServicioCom extends Service {
         }
     };
 
-    private void delegadoHandleUpdateTable(String res) {
-        try{
-            JSONObject obj = new JSONObject(res);
-            String tb_name = obj.getString("nombre");
-            String last = obj.getString("last");
-            JSONArray objs = obj.getJSONArray("objs");
-            IBaseDatos db = dbs.get(tb_name);
-            if (db!= null) {
-                synchronized (DBTbUpdates) {
-                    db.rellenarTabla(objs);
-                    DBTbUpdates.upTabla(tb_name, last);
-                    if (exHandler.containsKey(tb_name)) Objects.requireNonNull(exHandler.get(tb_name)).sendEmptyMessage(0);
-                    if (tb_name.equalsIgnoreCase("camareros") && cam != null) {
-                        DBCamareros dbCam = (DBCamareros) db;
-                        JSONArray ls = dbCam.filter("ID=" + cam.getString("ID") + " AND autorizado = '1'");
-                        if (ls.length() == 0) {
-                            System.exit(0);
-                        }
-                    }
-                }
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void delegadoHandleCheckUpdates(String res) {
-        try {
-            synchronized (DBTbUpdates) {
-                JSONObject obj = new JSONObject(res);
-                String t = obj.getString("nombre");
-                if (dbs.containsKey(t) && DBTbUpdates.is_updatable(obj)) {
-                    ContentValues p = new ContentValues();
-                    p.put("tb", t);
-                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
-                }else{
-                    if(t.equals("mesas")) Objects.requireNonNull(exHandler.get("mesas")).sendEmptyMessage(0);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -305,11 +249,15 @@ public class ServicioCom extends Service {
             timerManejarInstrucciones.schedule(
                     new TareaManejarInstrucciones(timerManejarInstrucciones,
                                                   colaInstrucciones,
-                                                  server, 500,
+                                                  server, 1000,
                                                   exHandler), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
+                    DBCamareros db_cam = (DBCamareros) getDb("camareros");
+                    if (cam != null && !db_cam.is_autorizado(cam)){
+                        System.exit(0);
+                    }
                    if (isWebsocketClose && client!= null){
                         client.reconnect();
                         Handler h = exHandler.get("estadows");
@@ -359,7 +307,9 @@ public class ServicioCom extends Service {
 
 
     public void rmExHandler(String handlerName) {
-        if (exHandler.containsKey(handlerName))   exHandler.remove(exHandler.get(handlerName));
+        if (exHandler.containsKey(handlerName)) {
+          exHandler.remove(exHandler.get(handlerName));
+        }
     }
 
 
@@ -378,8 +328,8 @@ public class ServicioCom extends Service {
                     "subteclas",
                     "seccionescom",
                     "sugerencias",
-                    "receptores"
-            };
+                    "receptores",
+                  };
         }
         if (dbs == null){
             DBMesas dbMesas = new DBMesas(getApplicationContext());
@@ -392,7 +342,7 @@ public class ServicioCom extends Service {
             dbs.put("lineaspedido", new DBCuenta(getApplicationContext()));
             dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
             dbs.put("sugerencias", new DBSugerencias(getApplicationContext()));
-            dbs.put("mesasabiertas", new DBMesasAbiertas(dbMesas));
+            dbs.put("mesasabiertas", new DBMesasAbiertas(getApplicationContext()));
             dbs.put("receptores", new DBReceptores(getApplicationContext()));
             for (IBaseDatos db: dbs.values()){
                 db.inicializar();
@@ -409,7 +359,15 @@ public class ServicioCom extends Service {
     public void setCamarero(JSONObject cam) {
         this.cam = cam;
         comprobarMensajes();
-        timerUpdate.schedule(new TareaUpdateForDevices(this.tbNameUpdate, server, controller_http, timerUpdate, 2000), 1000);
+    }
+
+    private void syncDb() {
+        timerUpdate.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sync_device(tbNameUpdate);
+            }
+        },2000);
     }
 
     public class MyBinder extends Binder{

@@ -36,7 +36,7 @@ public class DBSugerencias extends DBBase {
         try {
             obj.put("ID", res.getString(res.getColumnIndex("ID")));
             obj.put("sugerencia", res.getString(res.getColumnIndex("sugerencia")));
-            obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
+            obj.put("tecla", res.getString(res.getColumnIndex("IDTecla")));
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -1,30 +1,33 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import com.valleapp.valletpv.interfaces.IBaseDatos;
-import com.valleapp.valletpv.interfaces.IBaseSocket;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
+public class DBMesasAbiertas extends DBMesas {
 
-    DBMesas db;
-
-    public DBMesasAbiertas(DBMesas db){
-        this.db = db;
+    public DBMesasAbiertas(Context context) {
+        super(context);
     }
 
     @Override
     public JSONArray filter(String cWhere) {
-        return db.filter(cWhere);
+        if (cWhere!=null && !cWhere.equals("")){
+            cWhere += " and abierta=1";
+        }else{
+            cWhere = "abierta=1";
+        }
+        return super.filter(cWhere);
     }
 
     @Override
     public void rellenarTabla(JSONArray objs) {
-        SQLiteDatabase sqlDb = db.getWritableDatabase();
+        SQLiteDatabase sqlDb = getWritableDatabase();
         try {
             ContentValues initialValues = new ContentValues();
             initialValues.put("abierta", 0);
@@ -42,28 +45,46 @@ public class DBMesasAbiertas implements IBaseDatos, IBaseSocket {
             e.printStackTrace();
         }
     }
+    @SuppressLint("Range")
+    @Override
+    protected JSONObject cursorToJSON(Cursor res) {
+        JSONObject obj = new JSONObject();
+        try {
+            int num = res.getInt(res.getColumnIndex("num"));
+            obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
+            obj.put("num", num);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
 
     @Override
     public void inicializar() {}
 
     @Override
     public void rm(JSONObject o) {
-       db.rm(o);
+
     }
 
     @Override
-    public void insert(JSONObject o) {
-        db.insert(o);
-    }
+    public void insert(JSONObject o) {  }
 
     @Override
     public void update(JSONObject o) {
-        SQLiteDatabase dbsql = db.getWritableDatabase();
         try{
+            String id;
+            if (o.has("ID")){
+                id = o.getString("ID");
+            }else{
+                id = o.getString("id");
+            }
+            SQLiteDatabase dbsql = getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("abierta", o.getString("abierta"));
             values.put("num", o.getInt("num"));
-            dbsql.update("mesas", values, "ID=?", new String[]{o.getString("ID")});
+            dbsql.update("mesas", values, "ID=?", new String[]{id});
         }catch (Exception e){
             e.printStackTrace();
         }

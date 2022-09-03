@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +37,8 @@ public class DBMesas extends DBBase {
         try {
             int num = res.getInt(res.getColumnIndex("num"));
             String RGB = res.getString(res.getColumnIndex("RGB"));
+            String nom = res.getString(res.getColumnIndex("Nombre"));
+            obj.put("Nombre", nom == null ? "" : nom);
             obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
             obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
             obj.put("RGB", num <= 0 ? RGB : "255,0,0");

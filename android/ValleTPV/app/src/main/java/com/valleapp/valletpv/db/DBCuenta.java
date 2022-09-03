@@ -52,15 +52,27 @@ public class DBCuenta extends DBBase{
         }
     }
 
-    @Override
-    public JSONArray filter(String cWhere) {
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+ cWhere;
+    public JSONArray filterGroup(String cWhere) {
+        JSONArray lista = new JSONArray();
+        try {
+            String strWhere = "";
+            if (cWhere != null){
+                strWhere = " WHERE "+ cWhere;
+            }
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor res = db.rawQuery("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
+                    " FROM cuenta " + strWhere +
+                    " GROUP BY  IDArt, Descripcion, Precio, Estado ORDER BY ID DESC", null);
+            res.moveToFirst();
+            while (!res.isAfterLast()) {
+                lista.put(cursorToJSON(res));
+                res.moveToNext();
+            }
+
+        }catch (SQLiteException e){
+            e.printStackTrace();
         }
-        return execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
-                " FROM cuenta " + strWhere +
-                " GROUP BY  IDArt,  Descripcion, Precio, Estado ORDER BY ID DESC");
+        return lista;
     }
 
     public List<JSONObject> filterList(String cWhere) {
@@ -169,17 +181,6 @@ public class DBCuenta extends DBBase{
         return obj;
     }
 
-    public JSONArray execSql(String sql) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery(sql, null);
-        JSONArray ls = new JSONArray();
-        res.moveToFirst();
-        while (!res.isAfterLast()){
-            ls.put(cursorToJSON(res));
-            res.moveToNext();
-        }
-        return  ls;
-    }
 
 
     public void replaceMesa(JSONArray datos, String IDMesa){
@@ -244,16 +245,6 @@ public class DBCuenta extends DBBase{
         }
     }
 
-    public void aparcar(String id){
-        SQLiteDatabase db = this.getWritableDatabase();
-        try{
-            ContentValues p = new ContentValues();
-            p.put("Estado", "N");
-            db.update(tb_name, p, "IDMesa=?", new String[]{id});
-        }catch (SQLiteException e){
-            e.printStackTrace();
-        }
-    }
 
     @SuppressLint("Range")
     public JSONArray getNuevos(String id) {

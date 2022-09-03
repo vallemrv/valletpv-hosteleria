@@ -71,19 +71,6 @@ public class DBCuenta extends DBBase  {
     }
 
 
-    @Override
-    public JSONArray filter(String cWhere) {
-
-        String strWhere = "";
-        if (cWhere != null){
-            strWhere = " WHERE "+ cWhere;
-        }
-
-        return execSql("SELECT *, COUNT(ID) AS Can, SUM(PRECIO) AS Total" +
-                " FROM cuenta " + strWhere +
-                " GROUP BY  IDArt,  Descripcion, Precio, Estado ORDER BY ID DESC");
-    }
-
     public List<JSONObject> filterList(String cWhere, boolean gr) {
         List<JSONObject> lista = new ArrayList<>();
         try {
@@ -202,8 +189,6 @@ public class DBCuenta extends DBBase  {
 
     }
 
-
-
     public JSONArray execSql(String sql) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery(sql, null);
@@ -215,8 +200,6 @@ public class DBCuenta extends DBBase  {
         }
         return  ls;
     }
-
-
 
 
     public void moverLinea(JSONObject m, JSONObject linea) {
@@ -338,7 +321,6 @@ public class DBCuenta extends DBBase  {
     public void addArt(String idm, List<JSONObject> nl, String idc, String nom_mesa) {
         SQLiteDatabase db = getWritableDatabase();
         @SuppressLint("Recycle") Cursor res = db.rawQuery("SELECT ID FROM receptores LIMIT 1", null);
-        ArrayList<JSONObject>  ls = new ArrayList<> ();
         res.moveToFirst();
         int IDReceptor = res.getInt(0);
 

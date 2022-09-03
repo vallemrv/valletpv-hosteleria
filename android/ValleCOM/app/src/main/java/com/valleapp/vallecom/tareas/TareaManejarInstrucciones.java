@@ -1,17 +1,15 @@
 package com.valleapp.vallecom.tareas;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.TextView;
 
-import com.valleapp.vallecom.R;
 import com.valleapp.vallecom.utilidades.HTTPRequest;
 import com.valleapp.vallecom.utilidades.Instruccion;
-
 
 import java.util.Map;
 import java.util.Queue;
@@ -79,6 +77,7 @@ public class TareaManejarInstrucciones extends TimerTask {
     }
 
 
+    @SuppressLint("DefaultLocale")
     private void enviarInfo(){
         Handler h = handlers.get("estadows");
         if (h!=null) {
@@ -106,7 +105,7 @@ public class TareaManejarInstrucciones extends TimerTask {
             synchronized (parent) {
                 parent.wait(timeout);
                 enviarInfo();
-                if (count > 60) {
+                if (count > 20) {
                     count = 0;
                     procesado = true;
                 }

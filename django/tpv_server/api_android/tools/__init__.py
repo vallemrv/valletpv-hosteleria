@@ -9,3 +9,9 @@
 from .impresion import *
 from .ws_tools import *
 
+def is_float(str):
+    try:
+        float(str)
+        return True
+    except:
+        return False

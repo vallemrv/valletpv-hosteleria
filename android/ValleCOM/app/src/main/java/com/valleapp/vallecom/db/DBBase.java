@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.Objects;
 
 public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
 
@@ -100,7 +100,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }
                 ContentValues values = caragarValues(o);
 
-                if(tb_name=="cuenta"){
+                if(Objects.equals(tb_name, "cuenta")){
                     db.delete(tb_name, "estado='N' and IDMesa = ?",
                             new String[]{values.getAsString("IDMesa")});
                 }
@@ -138,9 +138,11 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                     db.delete(tb_name, "ID=?", new String[]{o.getString("id")});
                 }
             }
+
         }catch (Exception e){
             e.printStackTrace();
         }
+
 
     }
 

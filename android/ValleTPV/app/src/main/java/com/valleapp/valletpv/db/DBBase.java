@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +16,8 @@ import com.valleapp.valletpv.interfaces.IBaseSocket;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBaseSocket {
 
@@ -100,7 +103,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }
                 ContentValues values = caragarValues(o);
 
-                if(tb_name=="cuenta"){
+                if(Objects.equals(tb_name, "cuenta")){
                     db.delete(tb_name, "estado='N' and IDMesa = ?",
                             new String[]{values.getAsString("IDMesa")});
                 }
@@ -148,7 +151,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         if (cWhere != null){
             w = " WHERE "+cWhere;
         }
-        Cursor mCount= db.rawQuery("select count(*) from  "+ tb_name +" "+ w, null);
+        @SuppressLint("Recycle") Cursor mCount= db.rawQuery("select count(*) from  "+ tb_name +" "+ w, null);
         mCount.moveToFirst();
         return  mCount.getInt(0);
     }
@@ -159,14 +162,14 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         if (cWhere != null){
             w = " WHERE "+cWhere;
         }
-        Cursor res= db.rawQuery("select * from  "+ tb_name +" "+ w, null);
+        @SuppressLint("Recycle") Cursor res= db.rawQuery("select * from  "+ tb_name +" "+ w, null);
         res.moveToFirst();
         while (!res.isAfterLast()){
-            String dta = "";
+            StringBuilder dta = new StringBuilder();
             for (int i=0; i< res.getColumnCount(); i++) {
-                dta += res.getColumnName(i)+ "="+ res.getString(i) + " - ";
+                dta.append(res.getColumnName(i)).append("=").append(res.getString(i)).append(" - ");
             }
-            Log.i("SHOWDATA", dta);
+            Log.i("SHOWDATA", dta.toString());
             res.moveToNext();
         }
 

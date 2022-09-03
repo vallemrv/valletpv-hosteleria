@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -52,7 +51,7 @@ public class Camareros extends ActivityBase {
             if(myServicio!=null) {
                 myServicio.setExHandler("camareros", handlerHttp);
                 dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                descargarCamarerosActivos();
+                comprobarCamareros();
                 mostrarListado();
             }
         }
@@ -131,14 +130,13 @@ public class Camareros extends ActivityBase {
                     btnCamarero.setTag(cam);
                     btnCamarero.setSingleLine(false);
                     btnCamarero.setTextSize(15);
-                    btnCamarero.setText(cam.getString("Nombre")
-                            .trim().replace(" ", "\n"));
+                    btnCamarero.setText(cam.getString("nombre") + "\n" + cam.getString("apellidos"));
 
                     btnCamarero.setOnClickListener(view -> {
 
                         try {
                             final JSONObject camSeleccionado = (JSONObject) view.getTag();
-                            final String cam_pass = camSeleccionado.getString("Pass");
+                            final String cam_pass = camSeleccionado.getString("pass_field");
                             if (cam_pass.equals("") || cam_pass.equals("null")){
                                 final Dialog createPass = new Dialog(cx);
                                 createPass.setTitle("Crear una contraseña");
@@ -214,7 +212,7 @@ public class Camareros extends ActivityBase {
 
     public void reloadCamareros(View v){
         mostrarToast("Refrescando camareros", Gravity.BOTTOM, 0, 80);
-        descargarCamarerosActivos();
+        comprobarCamareros();
     }
 
     protected void entrarEnMesas(String cam){
@@ -241,9 +239,7 @@ public class Camareros extends ActivityBase {
 
     }
 
-
-
-    public void descargarCamarerosActivos(){
+    public void comprobarCamareros(){
         new HTTPRequest(server+"/camareros/listado",
                 new ContentValues(),
                 "listado", handlerHttp);

@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +22,9 @@ public class DBCamareros extends DBBase{
     }
 
     public void onCreate(SQLiteDatabase db) {
-         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, activo TEXT," +
+         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, " +
+                                                          "nombre TEXT, apellidos TEXT," +
+                                                          "activo TEXT," +
                                                           "pass_field TEXT, " +
                                                           "autorizado TEXT, " +
                                                           "permisos TEXT)");
@@ -42,9 +43,10 @@ public class DBCamareros extends DBBase{
     protected JSONObject cursorToJSON(Cursor res) {
         JSONObject cam = new JSONObject();
         try {
-            cam.put("Nombre", res.getString(res.getColumnIndex("nombre")));
+            cam.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            cam.put("apellidos", res.getString(res.getColumnIndex("apellidos")));
             cam.put("ID", res.getString(res.getColumnIndex("ID")));
-            cam.put("Pass", res.getString(res.getColumnIndex("pass_field")));
+            cam.put("pass_field", res.getString(res.getColumnIndex("pass_field")));
             cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
             cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
         }catch (Exception e){
@@ -54,19 +56,21 @@ public class DBCamareros extends DBBase{
     }
 
     @Override
-    protected ContentValues caragarValues(JSONObject o) {
-        ContentValues values = new ContentValues();
+    protected ContentValues caragarValues(JSONObject obj) {
+        ContentValues v = new ContentValues();
         try{
-            values.put("ID", o.getInt("id"));
-            values.put("activo", o.getString("activo"));
-            values.put("pass_field", o.getString("pass_field"));
-            values.put("autorizado", o.getString("autorizado"));
-            values.put("nombre", o.getString("nombre") + " " + o.getString("apellidos"));
-            values.put("permisos", o.getString("permisos"));
+            String id = obj.getString("id");
+            v.put("ID", id);
+            v.put("activo", obj.getString("activo"));
+            v.put("pass_field", obj.getString("pass_field"));
+            v.put("autorizado", obj.getString("autorizado"));
+            v.put("nombre",  obj.getString("nombre"));
+            v.put("apellidos",  obj.getString("apellidos"));
+            v.put("permisos", obj.getString("permisos"));
         }catch (Exception e){
             e.printStackTrace();
         }
-        return values;
+        return v;
     }
 
     public JSONArray getAll()
@@ -81,9 +85,6 @@ public class DBCamareros extends DBBase{
         cv.put("autorizado", autorizado);
         db.update("camareros",  cv, "ID="+id, null);
     }
-
-
-
 
     public ArrayList<JSONObject> getAutorizados(Boolean a)
     {
@@ -120,7 +121,8 @@ public class DBCamareros extends DBBase{
             v.put("activo", 1);
             v.put("pass_field", "");
             v.put("autorizado", 1);
-            v.put("nombre", n + " " + a);
+            v.put("nombre", n );
+            v.put("apellidos",  a);
             v.put("permisos", "");
             db.insert("camareros", null, v);
         }catch (Exception e){

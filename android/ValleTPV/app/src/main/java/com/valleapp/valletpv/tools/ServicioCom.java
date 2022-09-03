@@ -10,20 +10,18 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DBZonas;
-import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
 import com.valleapp.valletpv.db.DBMesasAbiertas;
 import com.valleapp.valletpv.db.DBSecciones;
+import com.valleapp.valletpv.db.DBSubTeclas;
 import com.valleapp.valletpv.db.DBTbUpdates;
 import com.valleapp.valletpv.db.DBTeclas;
-
+import com.valleapp.valletpv.db.DBZonas;
+import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IBaseSocket;
 import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
-import com.valleapp.valletpv.tareas.TareaUpdateForDevices;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -38,10 +36,10 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 public class ServicioCom extends Service {
 
@@ -62,7 +60,7 @@ public class ServicioCom extends Service {
 
     DBTbUpdates dbTbUpdates;
 
-    Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
+    final Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
     String[] tbNameUpdateLow;
 
     WebSocketClient client;
@@ -72,20 +70,21 @@ public class ServicioCom extends Service {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
-            try{
-                switch (op){
-                    case "check_updates":
-                        delegadoHandleCheckUpdates(res);
-                        break;
-                    case "update_table":
-                        delegadoHandleUpdateTable(res);
-                        break;
+            if (res != null) {
+                try {
+                    if ("update_socket".equals(op)) {
+                        JSONArray objs = new JSONArray(res);
+                        for (int i = 0; i < objs.length(); i++) {
+                            updateTables(objs.getJSONObject(i));
+                        }
+                    }else if (op.equals("camareros")) {
+                        DBCamareros db = (DBCamareros) getDb("camareros");
+                        db.rellenarTabla(new JSONArray(res));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-            }catch (Exception e){
-                e.printStackTrace();
             }
-
         }
     };
 
@@ -105,9 +104,8 @@ public class ServicioCom extends Service {
                 public void onOpen(ServerHandshake serverHandshake) {
                     // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
-                    ContentValues p = new ContentValues();
-                    p.put("tb", "mesasabiertas");
-                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+                    sync_device(new String[]{"mesasabiertas", "lineaspedido"});
+                    syncDb();
                 }
 
 
@@ -115,37 +113,7 @@ public class ServicioCom extends Service {
                 public void onMessage(String message) {
                     try {
                         JSONObject o = new JSONObject(message);
-                        String tb = o.getString("tb");
-                        String op = o.getString("op");
-                        IBaseSocket db = (IBaseSocket) getDb(tb);
-                        if (db != null) {
-                            JSONArray objs = new JSONArray();
-                            try {
-                                JSONObject obj = o.getJSONObject("obj");
-                                objs.put(obj);
-                            }catch (JSONException ignored){
-                                objs = o.getJSONArray("obj");
-                            }
-
-                            for(int i=0; i<objs.length();i++) {
-                                JSONObject obj = objs.getJSONObject(i);
-                                if (op.equals("insert")) db.insert(obj);
-                                if (op.equals("md")) db.update(obj);
-                                if (op.equals("rm")) db.rm(obj);
-                            }
-
-                            Handler h = getExHandler(tb);
-                            if (h != null){
-                                if (tb.equals("lineaspedido") && !op.equals("rm") && mesa_abierta != null){
-                                    String obj_idmesa = o.getJSONObject("obj").getString("IDMesa");
-                                    String id_mesa_abierta = mesa_abierta.getString("ID");
-                                    if (!obj_idmesa.equals(id_mesa_abierta)) return;
-
-                                }
-                                h.sendEmptyMessage(0);
-                            }
-                        }
-
+                        updateTables(o);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -178,38 +146,66 @@ public class ServicioCom extends Service {
         }
     }
 
-
-    private void delegadoHandleUpdateTable(String res) {
-        try{
-            JSONObject obj = new JSONObject(res);
-            String tb_name = obj.getString("nombre");
-            String last = obj.getString("last");
-            JSONArray objs = obj.getJSONArray("objs");
-            IBaseDatos db = dbs.get(tb_name);
-            if (db != null) {
-                synchronized (dbTbUpdates) {
-                    db.rellenarTabla(objs);
-                    dbTbUpdates.upTabla(tb_name, last);
-                    if (exHandler.containsKey(tb_name)) exHandler.get(tb_name).sendEmptyMessage(0);
-                }
+    private void syncDb() {
+        timerUpdateLow.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sync_device(tbNameUpdateLow);
             }
-        }catch (Exception e){
+        },2000);
+    }
+
+    private void sync_device(String[] tbs) {
+
+        try {
+            for(String tb: tbs) {
+                ContentValues p = new ContentValues();
+                IBaseDatos db =  getDb(tb);
+                p.put("tb", tb);
+                p.put("reg", db.filter(null).toString());
+                new HTTPRequest(server + "/sync/sync_devices", p,
+                        "update_socket", controller_http);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void delegadoHandleCheckUpdates(String res) {
+    private void updateTables(JSONObject o){
         try {
-            synchronized (dbTbUpdates) {
-                JSONObject obj = new JSONObject(res);
-                String t = obj.getString("nombre");
-                if (dbs.containsKey(t) && dbTbUpdates.is_updatable(obj)) {
-                    ContentValues p = new ContentValues();
-                    p.put("tb", t);
-                    new HTTPRequest(server + "/sync/update_for_devices", p, "update_table", controller_http);
+            String tb = o.getString("tb");
+            String op = o.getString("op");
+            IBaseSocket db = (IBaseSocket) getDb(tb);
+            if (db != null) {
+                JSONArray objs = new JSONArray();
+                try {
+                    JSONObject obj = o.getJSONObject("obj");
+                    objs.put(obj);
+                }catch (JSONException ignored){
+                    objs = o.getJSONArray("obj");
+                }
+
+                for(int i=0; i<objs.length();i++) {
+                    JSONObject obj = objs.getJSONObject(i);
+                    if (op.equals("insert")) db.insert(obj);
+                    if (op.equals("md")) db.update(obj);
+                    if (op.equals("rm")) db.rm(obj);
+                }
+
+                Handler h = getExHandler(tb);
+                if (h != null){
+                    if (tb.equals("lineaspedido") && !op.equals("rm") && mesa_abierta != null){
+                        String obj_idmesa = o.getJSONObject("obj").getString("IDMesa");
+                        String id_mesa_abierta = mesa_abierta.getString("ID");
+                        if (!obj_idmesa.equals(id_mesa_abierta)) return;
+
+                    }
+                    h.sendEmptyMessage(0);
                 }
             }
-        } catch (JSONException e) {
+
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -222,8 +218,9 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
-            timerUpdateLow.schedule(new TareaUpdateForDevices(this.tbNameUpdateLow, server, controller_http, timerUpdateLow, 2000), 1000);
-            timerManejarInstrucciones.schedule(new TareaManejarInstrucciones(timerManejarInstrucciones, colaInstrucciones, 1000), 2000, 1);
+            timerManejarInstrucciones.schedule(
+                    new TareaManejarInstrucciones(timerManejarInstrucciones,
+                            colaInstrucciones, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -288,7 +285,7 @@ public class ServicioCom extends Service {
             dbs.put("secciones", new DBSecciones(getApplicationContext()));
             dbs.put("teclas", new DBTeclas(getApplicationContext()));
             dbs.put("lineaspedido", new DBCuenta(getApplicationContext()));
-            dbs.put("mesasabiertas", new DBMesasAbiertas(dbMesas));
+            dbs.put("mesasabiertas", new DBMesasAbiertas(getApplicationContext()));
             dbs.put("subteclas", new DBSubTeclas(getApplicationContext()));
             for (IBaseDatos db: dbs.values()){
                 db.inicializar();
@@ -302,17 +299,20 @@ public class ServicioCom extends Service {
     }
 
     public void abrirCajon() {
-        if(server!=null) new HTTPRequest(server + "/impresion/abrircajon", new ContentValues(), "abrir_cajon", controller_http);
+        if(server!=null) new HTTPRequest(server + "/impresion/abrircajon",
+                new ContentValues(), "abrir_cajon", controller_http);
     }
 
     public void getLineasTicket(Handler mostrarLsTicket, String IDTicket) {
         ContentValues p = new ContentValues();
         p.put("id", IDTicket);
-        new HTTPRequest(server + "/cuenta/lslineas", p, "get_lineas_ticket", mostrarLsTicket);
+        new HTTPRequest(server + "/cuenta/lslineas", p,
+                "get_lineas_ticket", mostrarLsTicket);
     }
 
     public void getListaTickets(Handler hLsTicket) {
-        new HTTPRequest(server+"/cuenta/lsticket", new ContentValues(),"get_lista_ticket", hLsTicket);
+        new HTTPRequest(server+"/cuenta/lsticket", new ContentValues(),
+                "get_lista_ticket", hLsTicket);
     }
 
     public void imprimirTicket(String idTicket) {
@@ -332,13 +332,15 @@ public class ServicioCom extends Service {
     }
 
     public void getSettings(Handler controller) {
-        new HTTPRequest(server + "/receptores/get_lista", new ContentValues(), "get_lista_receptores", controller);
+        new HTTPRequest(server + "/receptores/get_lista", new ContentValues(),
+                "get_lista_receptores", controller);
     }
 
     public void setSettings(String lista) {
         ContentValues p = new ContentValues();
         p.put("lista", lista);
-        new HTTPRequest(server + "/receptores/set_settings", p, "set_settings", controller_http);
+        new HTTPRequest(server + "/receptores/set_settings", p,
+                "set_settings", controller_http);
     }
 
     public void rmMesa(ContentValues params) {
@@ -349,7 +351,7 @@ public class ServicioCom extends Service {
 
     public void opMesas(ContentValues params, String op) {
         synchronized (colaInstrucciones){
-            String url =  op == "juntarmesas" ? "/cuenta/juntarmesas" : "/cuenta/cambiarmesas";
+            String url = Objects.equals(op, "juntarmesas") ? "/cuenta/juntarmesas" : "/cuenta/cambiarmesas";
             colaInstrucciones.add(new Instrucciones(params, server + url));
         }
     }
@@ -405,11 +407,13 @@ public class ServicioCom extends Service {
     }
 
     public void pedirAutorizacion(ContentValues p) {
-       new HTTPRequest(server + "/autorizaciones/pedir_autorizacion", p, "", null);
+       new HTTPRequest(server + "/autorizaciones/pedir_autorizacion",
+               p, "", null);
     }
 
     public void sendMensaje(ContentValues p) {
-        new HTTPRequest(server + "/autorizaciones/send_informacion", p, "", null);
+        new HTTPRequest(server + "/autorizaciones/send_informacion",
+                p, "", null);
     }
 
     public JSONObject getZona() {

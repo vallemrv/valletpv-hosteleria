@@ -22,7 +22,8 @@ public class DBCamareros extends DBBase {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, activo TEXT," +
+         db.execSQL("CREATE TABLE IF NOT EXISTS camareros (ID INTEGER PRIMARY KEY, nombre TEXT, " +
+                                                          "apellidos TEXT, activo TEXT," +
                                                           "pass_field TEXT, " +
                                                           "autorizado TEXT, " +
                                                           "permisos TEXT)");
@@ -32,9 +33,10 @@ public class DBCamareros extends DBBase {
     protected JSONObject cursorToJSON(Cursor res) {
         JSONObject cam = new JSONObject();
         try {
-            cam.put("Nombre", res.getString(res.getColumnIndex("nombre")));
+            cam.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            cam.put("apellidos", res.getString(res.getColumnIndex("apellidos")));
             cam.put("ID", res.getString(res.getColumnIndex("ID")));
-            cam.put("Pass", res.getString(res.getColumnIndex("pass_field")));
+            cam.put("pass_field", res.getString(res.getColumnIndex("pass_field")));
             cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
             cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
         }catch (Exception e) {
@@ -52,7 +54,8 @@ public class DBCamareros extends DBBase {
             v.put("activo", obj.getString("activo"));
             v.put("pass_field", obj.getString("pass_field"));
             v.put("autorizado", obj.getString("autorizado"));
-            v.put("nombre", obj.getString("nombre") + " " + obj.getString("apellidos"));
+            v.put("nombre",  obj.getString("nombre"));
+            v.put("apellidos",  obj.getString("apellidos"));
             v.put("permisos", obj.getString("permisos"));
         }catch (Exception e){
             e.printStackTrace();

@@ -38,7 +38,7 @@ public class AdaptadorSelCam extends ArrayAdapter<JSONObject> {
         try {
             JSONObject obj = values.get(position);
             TextView nombre = (TextView) rowView.findViewById(R.id.texto_linea);
-            nombre.setText(String.format("%s",obj.getString("Nombre")));
+            nombre.setText(String.format("%s %s",obj.getString("nombre"),obj.getString("apellidos")));
             rowView.setTag(obj);
 
         } catch (JSONException e) {

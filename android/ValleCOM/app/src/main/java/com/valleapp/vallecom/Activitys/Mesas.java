@@ -372,6 +372,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         try {
             JSONArray lszonas = dbZonas.getAll();
             LinearLayout ll = findViewById(R.id.pneZonas);
+            if (ll == null) return;
             ll.removeAllViews();
 
             if(lszonas.length()>0){
@@ -398,8 +399,13 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     btn.setTextSize(pixels);
                     btn.setTag(z);
                     btn.setText(z.getString("Nombre").trim().replace(" ", "\n"));
-                    String[] rgb = z.getString("RGB").split(",");
-                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
+                    String str_rgb =  z.getString("RGB");
+                    if (str_rgb.contains(",") ){
+                        String[] rgb = str_rgb.split(",");
+                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
+                    }else{
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                    }
                     btn.setOnLongClickListener(this);
                     btn.setOnClickListener(view -> {
                             zn = (JSONObject)view.getTag();
@@ -467,8 +473,13 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
                     btn.setTextSize(15);
                     btn.setTag(m);
 
-                    String[] rgb = m.getString("RGB").trim().split(",");
-                    btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
+                    String str_rgb =  m.getString("RGB");
+                    if (str_rgb.contains(",")) {
+                        String[] rgb = str_rgb.trim().split(",");
+                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0].trim()), Integer.parseInt(rgb[1].trim()), Integer.parseInt(rgb[2].trim())));
+                    }else{
+                        btn.setBackgroundResource(R.drawable.bg_pink);
+                    }
 
                     btn.setOnClickListener(view -> {
                         try {
@@ -634,7 +645,7 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
             server = getIntent().getExtras().getString("url");
             cam = new JSONObject(getIntent().getExtras().getString("cam"));
             TextView title = findViewById(R.id.lblTitulo);
-            title.setText(cam.getString("Nombre"));
+            title.setText(cam.getString("nombre") + " " + cam.getString("apellidos"));
             findViewById(R.id.show_autorias).setVisibility(View.GONE);
         } catch (Exception e) {
             e.printStackTrace();

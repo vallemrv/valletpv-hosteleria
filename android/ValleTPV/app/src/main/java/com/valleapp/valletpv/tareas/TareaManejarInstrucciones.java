@@ -82,7 +82,7 @@ public class TareaManejarInstrucciones extends TimerTask {
 
             synchronized (parent) {
                 parent.wait(timeout);
-                if (count > 60) {
+                if (count > 20) {
                     count = 0;
                     procesado = true;
                 }

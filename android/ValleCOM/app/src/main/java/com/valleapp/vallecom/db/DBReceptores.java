@@ -24,7 +24,7 @@ public class DBReceptores extends DBBase {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS receptores (ID INTEGER PRIMARY KEY, nombre TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS receptores (ID INTEGER PRIMARY KEY, nombre TEXT, nomimp TEXT)");
     }
 
     @SuppressLint("Range")
@@ -33,6 +33,7 @@ public class DBReceptores extends DBBase {
         JSONObject receptor = new JSONObject();
         try {
             receptor.put("nombre", res.getString(res.getColumnIndex("nombre")));
+            receptor.put("nomimp", res.getString(res.getColumnIndex("nomimp")));
             receptor.put("ID", res.getString(res.getColumnIndex("ID")));
         }catch (Exception e){
             e.printStackTrace();
@@ -46,6 +47,7 @@ public class DBReceptores extends DBBase {
         ContentValues v = new ContentValues();
         try {
             v.put("nombre", o.getString("nombre"));
+            v.put("nomimp", o.getString("nomimp"));
             v.put("ID", o.getString("id"));
         }catch (Exception e){
             e.printStackTrace();
@@ -56,7 +58,7 @@ public class DBReceptores extends DBBase {
 
     public ArrayList<JSONObject> getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from receptores WHERE nombre NOT LIKE '%Nulo%' ", null );
+        Cursor res =  db.rawQuery( "select * from receptores WHERE nomimp!='Nulo' and nomimp!='None' and nomimp!='' ", null );
         res.moveToFirst();
         ArrayList<JSONObject>  ls = new ArrayList<>();
         res.moveToFirst();

@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -18,7 +17,6 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -31,11 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
-import com.valleapp.valletpv.db.DBSubTeclas;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
 import com.valleapp.valletpv.db.DBSecciones;
+import com.valleapp.valletpv.db.DBSubTeclas;
 import com.valleapp.valletpv.db.DBTeclas;
 import com.valleapp.valletpv.dlg.DlgCobrar;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
@@ -139,7 +137,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             super.handleMessage(msg);
             try {
                 final String id_mesa = mesa.getString("ID");
-                mostrarCobrar(dbCuenta.filter("IDMesa=" + id_mesa), totalMesa);
+                mostrarCobrar(dbCuenta.filterGroup("IDMesa=" + id_mesa), totalMesa);
                 findViewById(R.id.loading).setVisibility(View.GONE);
             }catch (Exception e ){
                 e.printStackTrace();
@@ -164,7 +162,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             rellenarSecciones();
         }
     };
-    
+
 
     @SuppressLint("HandlerLeak")
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
@@ -512,7 +510,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     public void cobrarMesa(View v){
         try {
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            JSONArray l = dbCuenta.filter("IDMesa="+mesa.getString("ID"));
+            JSONArray l = dbCuenta.filterGroup("IDMesa="+mesa.getString("ID"));
             mostrarCobrar(l, totalMesa);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -574,7 +572,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
            mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
            tipo = getIntent().getExtras().getString("op");
            TextView title = findViewById(R.id.txtTitulo);
-           title.setText(cam.getString("Nombre") +  " -- "+mesa.getString("Nombre"));
+           title.setText(cam.getString("nombre") +" "+
+                   cam.getString("apellidos")+  " -- "+mesa.getString("Nombre"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -675,12 +674,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dlgCobrar = new DlgCobrar(this, this);
                 dlgCobrar.setTitle("Cobrar " + mesa.getString("Nombre"));
                 dlgCobrar.setDatos(lsart, totalCobro);
-                dlgCobrar.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        dlgCobrar = null;
-                    }
-                });
+                dlgCobrar.setOnDismissListener(dialogInterface -> dlgCobrar = null);
                 dlgCobrar.show();
 
             } catch (JSONException e) {

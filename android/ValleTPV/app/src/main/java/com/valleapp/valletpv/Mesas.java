@@ -602,7 +602,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
             cam = new JSONObject(getIntent().getStringExtra("cam"));
             TextView title = findViewById(R.id.lblTitulo);
-            title.setText(cam.getString("Nombre"));
+            title.setText(cam.getString("apellidos")+" "+cam.getString("apellidos"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

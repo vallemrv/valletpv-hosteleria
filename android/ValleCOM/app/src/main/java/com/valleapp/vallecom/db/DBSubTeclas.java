@@ -39,10 +39,12 @@ public class DBSubTeclas extends DBBase {
     protected JSONObject cursorToJSON(Cursor res) {
         JSONObject obj = new JSONObject();
         try {
+            obj.put("ID", res.getString(res.getColumnIndex("ID")));
             obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
             obj.put("Incremento", res.getString(res.getColumnIndex("Incremento")));
             obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));
             obj.put("descripcion_r", res.getString(res.getColumnIndex("descripcion_r")));
+            obj.put("tecla", res.getString(res.getColumnIndex("IDTecla")));
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,7 +44,7 @@ public class DBSubTeclas extends DBBase {
         JSONObject obj = new JSONObject();
         try {
             obj.put("ID", res.getString(res.getColumnIndex("ID")));
-            obj.put("IDTecla", res.getString(res.getColumnIndex("IDTecla")));
+            obj.put("tecla", res.getString(res.getColumnIndex("IDTecla")));
             obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
             obj.put("Incremento", res.getString(res.getColumnIndex("Incremento")));
             obj.put("descripcion_t", res.getString(res.getColumnIndex("descripcion_t")));

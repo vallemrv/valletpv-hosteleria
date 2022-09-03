@@ -5,7 +5,6 @@
 # @Last modified time: 2019-10-10T15:51:11+02:00
 # @License: Apache License v2.0
 
-from unicodedata import name
 from django.urls import path, include
 
 from api_android import views

@@ -106,9 +106,9 @@ public class Camareros extends Activity {
                    Button btn = new Button(cx);
                    btn.setId(i);
                    btn.setSingleLine(false);
-                   String[] nom = cam.getString("Nombre").split(" ");
-
-                   btn.setText(nom.length > 1 ? nom[0]+"\n"+nom[1] : cam.getString("Nombre") +"\n");
+                   String n = cam.getString("nombre");
+                   String a = cam.getString("apellidos");
+                   btn.setText(n +" "+a);
                    btn.setBackgroundResource(R.drawable.fondo_btn_xml);
                    btn.setOnClickListener(view -> {
                        try {

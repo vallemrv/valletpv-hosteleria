@@ -868,7 +868,7 @@ class Mesas(models.Model):
         'Nombre': self.nombre,
         'Orden': self.orden,
         'num': 0,
-        'abierta': False,
+        'abierta': 0,
         'RGB': mz.zona.rgb if mz else "207,182,212",
         'IDZona': mz.zona.id if mz else -1,
         "Tarifa": mz.zona.tarifa if mz else 1,
@@ -877,7 +877,7 @@ class Mesas(models.Model):
         mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=self.id).first()
         if mesa_abierta:
             obj["num"] = mesa_abierta.infmesa.numcopias
-            obj["abierta"] = True;
+            obj["abierta"] = 1;
         return obj
 
 

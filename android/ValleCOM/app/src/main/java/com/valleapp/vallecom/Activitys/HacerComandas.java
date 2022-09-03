@@ -94,7 +94,9 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
                 TextView title = findViewById(R.id.lblTitulo);
                 vpPager.setAdapter(aComanda);
                 try {
-                    title.setText(cam.getString("Nombre") + " -- " + mesa.getString("Nombre"));
+                    String nombre = cam.getString("nombre") + " "+cam.getString("apellidos");
+
+                   title.setText(nombre + " -- " + mesa.getString("Nombre"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
