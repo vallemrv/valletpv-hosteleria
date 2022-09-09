@@ -1,12 +1,43 @@
 <template>
   <valle-tool-bar title="Lista de mesas"></valle-tool-bar>
   <v-container>
+
     <v-row>
+      <v-col cols="12">
+        <v-sheet
+          class="mx-auto"
+          max-width="600"
+        >
+    <v-slide-group
+      show-arrows
+    >
+      <v-slide-group-item
+        v-for="n in 25"
+        :key="n"
+        v-slot="{ isSelected, toggle }"
+      >
+        <v-btn
+          class="ma-2"
+          rounded
+          :color="isSelected ? 'primary' : undefined"
+          @click="toggle"
+        >
+          Options {{ n }}
+        </v-btn>
+      </v-slide-group-item>
+    </v-slide-group>
+  </v-sheet>
+      </v-col>
       <v-col cols="12" v-for="(item, i) in listadomesas" :key="i">
         <v-card>
           <v-card-title
-            >Mesa: {{ item.nomMesa }}
-            <div class="text-right w-75">Hora: {{ item.hora }}</div>
+            >
+            <v-row>
+              <v-col cols="6">
+                Mesa: {{ item.nomMesa }}
+              </v-col>
+              <v-col cols="6" class="text-right"> Hora: {{ item.hora }}</v-col>
+            </v-row>
           </v-card-title>
           <v-card-text>
             <v-row>

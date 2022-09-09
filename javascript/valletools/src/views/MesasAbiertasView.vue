@@ -4,9 +4,11 @@
     <v-row>
       <v-col cols="12" v-for="(item, i) in mesasabiertas" :key="i">
         <v-card>
-          <v-card-title
-            >Mesa: {{ item.nomMesa }}
-            <div class="text-right w-75">Hora: {{ item.hora }}</div>
+          <v-card-title>
+            <v-row>
+              <v-col cols="6"> Mesa: {{ item.nomMesa }}</v-col>
+              <v-col cols="6" class="text-right"> Hora: {{ item.hora }}</v-col>
+            </v-row>  
           </v-card-title>
           <v-card-text>
             <v-row>
@@ -17,8 +19,7 @@
                 Borrado: {{ decimalToStr(item.total_anulado) }}
               </v-col>
               <v-col class="text-center" cols="6">
-                Regalado: {{ item.total_regalado }} Ud.</v-col
-              >
+                Regalado: {{ item.total_regalado }} Ud.</v-col>
               <v-col class="text-center" cols="6">
                 Cobrado: {{ decimalToStr(item.total_cobrado) }}
               </v-col>
@@ -26,9 +27,9 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn icon @click="borrarMesa(item)" class="float-right"
-              ><v-icon>mdi-delete</v-icon></v-btn
-            >
+            <v-btn icon @click="borrarMesa(item)" class="float-right">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
             <v-btn icon @click="mostrarMesa(item)"><v-icon>mdi-eye</v-icon></v-btn>
           </v-card-actions>
         </v-card>

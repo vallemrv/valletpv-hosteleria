@@ -24,11 +24,11 @@
                 </v-col>
                  
                 <v-col cols="3" class="text-right">
-                   <v-btn icon flat color="primary" @click="mostrar(n)"><v-icon color="white">mdi-eye</v-icon></v-btn>
+                   <v-btn icon flat color="primary" @click="mostrar(n)">
+                    <v-icon color="white">mdi-eye</v-icon>
+                  </v-btn>
                 </v-col>
               </v-row>
-              
-              
             </v-sheet>
              <v-row v-for="(l, r) in n.lineas" :key="r" class="pt-4 pr-3 pl-3">
                 <v-col cols="2" class="text-right"> {{ l.can }}</v-col>

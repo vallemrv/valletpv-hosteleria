@@ -638,8 +638,16 @@ class Infmesa(models.Model):
         else:
             mesa = mesa.mesa  
 
-        mesa_id = mesa.id if mesa else -1
-        nomMesa = mesa.nombre if mesa else ""
+        mesa_id = -1 
+        nomMesa = ""
+        zona_id = -1
+        if mesa:
+            mesa_id = mesa.id
+            nomMesa = mesa.nombre
+            zona = mesa.mesaszona_set.first()
+            if zona:
+                zona_id = zona.id
+
         return {
             "PK": self.pk,
             "ID": mesa_id,
@@ -651,7 +659,8 @@ class Infmesa(models.Model):
             "total_anulado": float(total_anulado),
             "total_cobrado": float(total_cobrado),
             "hora": self.hora,
-            "camarero": self.camarero.nombre + " " + self.camarero.apellidos
+            "camarero": self.camarero.nombre + " " + self.camarero.apellidos,
+            "zona_id": zona_id
         }
 
     def get_pedidos(self):
