@@ -6,12 +6,11 @@
 # @License: Apache License v2.0
 
 import json
-from traceback import print_tb
 from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from gestion.models import *
 from django.apps import apps
-from api_android.tools import is_float, send_mensaje_devices
+from api_android.tools import is_float
 
 from datetime import datetime
 

@@ -23,7 +23,7 @@
                   </v-row>
                 </v-col>
                  
-                <v-col cols="3">
+                <v-col cols="3" class="text-right">
                    <v-btn icon flat color="primary" @click="mostrar(n)"><v-icon color="white">mdi-eye</v-icon></v-btn>
                 </v-col>
               </v-row>

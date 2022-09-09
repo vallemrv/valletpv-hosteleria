@@ -1,6 +1,6 @@
 <template>
   <valle-header></valle-header>
-  <v-container>
+  <v-container class="mt-4">
     <v-alert v-if="last_accion != ''" color="info">{{ last_accion }}</v-alert>
 
     <ReactiveChart class="mt-3" :chartData="chartSet" />
@@ -30,5 +30,6 @@ export default {
       return parseFloat(this.total).toFixed(2) + " €";
     },
   },
+  
 };
 </script>

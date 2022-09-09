@@ -1,12 +1,12 @@
 <template>
    <v-toolbar>
-            <v-btn
-                icon
-                class="hidden-xs-only" 
-                @click="$router.back()"
-            >
-                <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
+        <v-btn
+            icon
+            class="hidden-xs-only" 
+            @click="$router.back()"
+        >
+            <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
         <v-toolbar-title>{{title}}</v-toolbar-title>
          <div class="text-center" v-if="ocupado" >
             <v-progress-circular indeterminate color="primary"></v-progress-circular>

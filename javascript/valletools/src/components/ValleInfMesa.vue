@@ -2,7 +2,7 @@
 <v-dialog v-model="showMesa" fullscreen>
       <v-app-bar class="bg-pink-lighten-3" fixed>
         <v-row>
-            <v-col class="text-h6 mt-2" cols="5"> Mesa: {{ mesa.nomMesa }} </v-col>
+            <v-col class="text-h6 mt-2 text-center" cols="5"> Mesa: {{ mesa.nomMesa }} </v-col>
             <v-col class="text-h6 mt-2 text-right" cols="5"> Hora: {{ mesa.hora }} </v-col>
             <v-col cols="2"> <v-btn icon @click="$emit('close')"><v-icon>mdi-close</v-icon></v-btn></v-col>
           </v-row>

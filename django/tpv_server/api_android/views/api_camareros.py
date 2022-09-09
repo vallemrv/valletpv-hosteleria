@@ -3,7 +3,6 @@ from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import Camareros
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from api_android.tools import send_mensaje_devices
 import json
 
 #Utilizado por los comanderros

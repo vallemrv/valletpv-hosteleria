@@ -5,7 +5,7 @@
 # @Last modified time: 2019-01-31T16:11:02+01:00
 # @License: Apache License v2.0
 
-from api_android.tools import (send_mensaje_devices, send_imprimir_ticket, send_mensaje_impresora)
+from api_android.tools import (send_imprimir_ticket, send_mensaje_impresora)
 from tokenapi.http import  JsonResponse
 from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Pedidos, Teclas, Receptores,

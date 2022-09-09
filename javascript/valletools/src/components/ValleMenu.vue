@@ -5,17 +5,16 @@
         temporary
       >
         <v-list>
-          <v-list-item v-for="(item, i) in items" 
-                    :key="i" 
-                    :value="item" 
-                    @click="on_click_item(item.value)">
-              <v-list-item-avatar start v-if="item.icon">
-                <v-icon :icon="item.icon"></v-icon>
-              </v-list-item-avatar>
-              <v-list-item-title v-text="item.label"></v-list-item-title>  
-          </v-list-item>
-        </v-list>
-      </v-navigation-drawer>
+        <v-list-item v-for="(item, i) in items" 
+                  :key="i" 
+                  :value="item" 
+                  @click="on_click_item(item.value)">
+            <v-list-item start :prepend-icon="item.icon" :title="item.label" v-if="item.icon">
+            </v-list-item>
+            <v-list-item-title v-else v-text="item.label"></v-list-item-title>  
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
 </template>
 
 <script>

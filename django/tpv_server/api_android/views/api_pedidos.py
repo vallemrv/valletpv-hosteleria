@@ -5,8 +5,6 @@
 # @Last modified time: 2019-04-26T14:53:11+02:00
 # @License: Apache License v2.0
 
-import re
-from unittest import result
 from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
