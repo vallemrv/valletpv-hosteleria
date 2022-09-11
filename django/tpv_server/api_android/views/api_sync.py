@@ -97,7 +97,10 @@ def sync_devices(request):
                     result.append({"tb":tb_name, "op": "md", "obj":{ 'ID':v, 'abierta': 0, "num":0 }})
                     continue
             elif (tb_name == "lineaspedido"):
-                obj = model.objects.filter(estado__in=["P", "R", "M"], id=v).first()
+                if not is_float(v):
+                    obj = None
+                else:
+                    obj = model.objects.filter(estado__in=["P", "R", "M"], id=v).first()
                 if not obj or not Mesasabiertas.objects.filter(infmesa=obj.infmesa).first():
                     result.append({"tb":tb_name, "op": "rm", "obj":{key:v}})
                     continue

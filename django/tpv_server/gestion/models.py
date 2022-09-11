@@ -1048,7 +1048,7 @@ class Pedidos(models.Model):
     @staticmethod
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
         p = Pedidos.objects.filter(uid_device=uid_device).first()
-        if p: return
+        if not p: return
         
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
