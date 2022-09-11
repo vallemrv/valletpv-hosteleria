@@ -8,10 +8,8 @@
                   :key="i" 
                   :value="item" 
                   @click="on_click_item(item.value)">
-              <v-list-item-avatar start v-if="item.icon">
-                <v-icon :icon="item.icon"></v-icon>
-              </v-list-item-avatar>
-              <v-list-item-title v-text="item.label"></v-list-item-title>  
+              <v-list-item start v-if="item.icon" :prepend-icon="item.icon" :title="item.label"> </v-list-item>
+              <v-list-item-title v-else v-text="item.label"></v-list-item-title>  
           </v-list-item>
         </v-list>
       </v-navigation-drawer>

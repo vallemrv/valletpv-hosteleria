@@ -5,6 +5,7 @@
 # @Last modified time: 2019-10-10T17:44:16+02:00
 # @License: Apache License v2.0
 
+from uuid import uuid4
 from api_android.tools import imprimir_pedido
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
@@ -35,8 +36,9 @@ def marcar_rojo(request):
 def pedir(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
+    uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
-    pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas)
+    pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, uid_device)
     imprimir_pedido(pedido.id)
     return HttpResponse("success")
 

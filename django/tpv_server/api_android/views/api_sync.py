@@ -98,7 +98,7 @@ def sync_devices(request):
                     continue
             elif (tb_name == "lineaspedido"):
                 obj = model.objects.filter(estado__in=["P", "R", "M"], id=v).first()
-                if not Mesasabiertas.objects.filter(infmesa=obj.infmesa).first():
+                if not obj or not Mesasabiertas.objects.filter(infmesa=obj.infmesa).first():
                     result.append({"tb":tb_name, "op": "rm", "obj":{key:v}})
                     continue
             else:
@@ -115,7 +115,7 @@ def sync_devices(request):
                 obj = model_to_dict(obj)
             for k, v in r.items():
                 obj_v =  obj[k] if k in obj else obj[k.lower()]
-                if not equals(str(obj_v), str(v)):
+                if not equals(k, str(obj_v), str(v)):
                     result.append({"tb":tb_name, "op": "md", "obj":obj})
                     break
 
@@ -148,7 +148,9 @@ def sync_devices(request):
 
 
 
-def equals(obj1, obj2):
+def equals(k, obj1, obj2):
+    if k.lower() in ["p1", "p2", "precio", "incremento", "entrega"]:
+        return float(obj1) == float(obj2)
 
     if obj1 in ["None", "null"]:
         if obj2 in ["None", "null"]:
@@ -156,7 +158,5 @@ def equals(obj1, obj2):
         else:
             return False
 
-    if is_float(obj1):
-        return float(obj1) == float(obj2)
     
     return obj1.lower() == obj2.lower()

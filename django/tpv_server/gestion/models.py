@@ -1042,9 +1042,13 @@ class Pedidos(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     infmesa = models.ForeignKey(Infmesa,  on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
+    uid_device = models.CharField(max_length=150, default=str(uuid4()))
+    
    
     @staticmethod
-    def agregar_nuevas_lineas(idm, idc, lineas):
+    def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
+        p = Pedidos.objects.filter(uid_device=uid_device).first()
+        if p: return
         
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
@@ -1084,7 +1088,7 @@ class Pedidos(models.Model):
                 linea.save()
                
                 
-        print("mesa: "+idm, "camarero: "+idc)
+        
         pedido.infmesa.numcopias = 0
         pedido.infmesa.save()   
         pedido.infmesa.componer_articulos()

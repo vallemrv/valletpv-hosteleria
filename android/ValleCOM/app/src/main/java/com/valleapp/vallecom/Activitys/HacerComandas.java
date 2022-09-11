@@ -43,6 +43,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 public class HacerComandas extends ActivityBase implements  INota, IComanda, ITeclados {
@@ -389,6 +390,7 @@ public class HacerComandas extends ActivityBase implements  INota, IComanda, ITe
           p.put("idm", idm);
           p.put("pedido", nl.toString());
           p.put("idc", idc);
+          p.put("uid_device", UUID.randomUUID().toString());
            if(myServicio!=null){
               nota.eliminarComanda();
               myServicio.addColaInstrucciones(new Instruccion(p, "/comandas/pedir"));

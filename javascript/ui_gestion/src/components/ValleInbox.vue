@@ -9,7 +9,7 @@
     </template>
 
     <v-card variant="outlined">
-      <v-card-header> Actualizaciones </v-card-header>
+      <v-card-title> Actualizaciones </v-card-title>
       <v-spacer></v-spacer>
       <v-list border class="mx-auto">
         <v-list-item>
