@@ -83,6 +83,7 @@ def update_from_devices(request):
 def sync_devices(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
+    if (tb_name == "lineaspedido"): return JsonResponse([])
     reg = json.loads(request.POST["reg"])
     model = apps.get_model(app_name, tb_name)
     result = []
@@ -96,14 +97,7 @@ def sync_devices(request):
                 if not obj:
                     result.append({"tb":tb_name, "op": "md", "obj":{ 'ID':v, 'abierta': 0, "num":0 }})
                     continue
-            elif (tb_name == "lineaspedido"):
-                if not is_float(v):
-                    obj = None
-                else:
-                    obj = model.objects.filter(estado__in=["P", "R", "M"], id=v).first()
-                if not obj or not Mesasabiertas.objects.filter(infmesa=obj.infmesa).first():
-                    result.append({"tb":tb_name, "op": "rm", "obj":{key:v}})
-                    continue
+           
             else:
                 obj = model.objects.filter(pk=v).first()
                 if not obj:
@@ -126,26 +120,22 @@ def sync_devices(request):
             print(e)
             print(tb_name, r)  
         
-    if (tb_name == "lineaspedido"):
-        objs = model.objects.exclude(pk__in=pks).exclude(estado__in=["C", "A"])
-        for obj in objs:
-            if Mesasabiertas.objects.filter(infmesa=obj.infmesa).first():
-                result.append({"tb":tb_name, "op": "insert", "obj":obj.serialize()}) 
-                continue   
-    else:
-        op = "insert"
-        if (tb_name == "mesasabiertas"):
-            objs = model.objects.exclude(mesa__id__in=pks)
-            op = "md"
-        else:    
-            objs = model.objects.exclude(pk__in=pks)
+   
+   
+    op = "insert"
+    if (tb_name == "mesasabiertas"):
+        objs = model.objects.exclude(mesa__id__in=pks)
+        op = "md"
+    else:    
+        objs = model.objects.exclude(pk__in=pks)
+        
 
-        for obj in objs:
-            if hasattr(obj, "serialize"):
-                obj = obj.serialize()
-            else:
-                obj = model_to_dict(obj)
-            result.append({"tb":tb_name, "op": op, "obj":obj})     
+    for obj in objs:
+        if hasattr(obj, "serialize"):
+            obj = obj.serialize()
+        else:
+            obj = model_to_dict(obj)
+        result.append({"tb":tb_name, "op": op, "obj":obj})     
 
     return JsonResponse(result)
 

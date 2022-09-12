@@ -15,13 +15,10 @@ import json
 
 def find(id, lineas):
     for l in lineas:
-        try:
-            if int(l["ID"]) == int(id):
-                lineas.remove(l)
-                return l
-        except:
+        if int(l["ID"]) == int(id):
             lineas.remove(l)
             return l
+        
     return None
 
 @csrf_exempt
@@ -48,36 +45,18 @@ def  get_pendientes(request):
                 result.append({'op':'md', 'tb':"lineaspedido", 'reg': l})
         else:
             result.append({'op':'insert', 'tb':"lineaspedido", 'reg': l})
-            
+
+    #Las linesa que no esten en el servidor o esten cobradas se borran.      
     for l in lineas:
         result.append({'op':'rm', 'tb':"lineaspedido", 'reg': {"ID":l["ID"]}})   
     
-    return JsonResponse(result)    
+    return JsonResponse(result)
+
+
 
 @csrf_exempt
 def  comparar_lineaspedido(request):
-    mesas = Mesasabiertas.objects.all()
-    lineas = json.loads(request.POST["lineas"])
-    result = []
-    lineas_server = []
-    
-    for m in mesas:
-        lineas_server = [*lineas_server, *m.get_lineaspedido()]
-
-    
-    for l in lineas_server:
-        linea = find(l["ID"], lineas)
-        if linea:
-            if not Lineaspedido.is_equals(l, linea):
-                result.append({'op':'md', 'tb':"lineaspedido", 'obj': l})
-        else:
-            result.append({'op':'insert', 'tb':"lineaspedido", 'obj': l})
-            
-    for l in lineas:
-        result.append({'op':'rm', 'tb':"lineaspedido", 'obj': {"ID":l["ID"]}})   
-
-    
-    return JsonResponse(result)
+    return get_pendientes(request)
 
 @csrf_exempt
 def servido(request):
@@ -124,10 +103,8 @@ def get_pedidos_by_receptor(request):
     rec = json.loads(request.POST["receptores"])
     result = []
     for r in rec:
-        partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=int(r)) 
-                                          & (Q(estado='P') | 
-                                             Q(estado="R") | 
-                                             Q(estado="M"))).order_by("-pedido_id")
+        partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=int(r)) & (Q(estado='P') | 
+                                              Q(estado="R") | Q(estado="M"))).order_by("-pedido_id")
         lineas = partial.values("pedido").distinct()
         for l in lineas:
             p = Pedidos.objects.get(pk=l["pedido"])
@@ -152,7 +129,7 @@ def get_pedidos_by_receptor(request):
 def recuperar_pedido(request):
     p = json.loads(request.POST["pedido"])
     partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=p["idReceptor"])  &
-                                           Q(pedido_id=p["id"]) &
+                                          Q(pedido_id=p["id"]) &
                                           (Q(estado='P') | Q(estado="R") | Q(estado="M")))
     lineas = partial.values("idart",
                             "descripcion",

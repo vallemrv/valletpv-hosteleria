@@ -101,8 +101,8 @@ public class ServicioCom extends Service {
                     Log.i("WEBSOCKET_INFO", "Websocket open.....");
                     comprobarCamareros();
                     comprobarMensajes();
-                    sync_device(new String[]{"mesasabiertas"}, 500);
-                    sync_device(tbNameUpdate, 2000);
+                    sync_device(tbNameUpdate, 1000);
+                    sync_device(new String[]{"mesasabiertas"}, 5);
                     comprobarLineasPedido();
                 }
 
@@ -170,7 +170,7 @@ public class ServicioCom extends Service {
                         }
                     }
                 }
-            }, 1000);
+            }, 50);
 
 
         } catch (Exception e) {
@@ -268,8 +268,7 @@ public class ServicioCom extends Service {
             IniciarDB();
             crearWebsocket();
             timerManejarInstrucciones.schedule(
-                    new TareaManejarInstrucciones(timerManejarInstrucciones,
-                                                  colaInstrucciones,
+                    new TareaManejarInstrucciones(colaInstrucciones,
                                                   server, 1000,
                                                   exHandler), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {

@@ -16,7 +16,6 @@ import com.valleapp.valletpv.db.DBMesas;
 import com.valleapp.valletpv.db.DBMesasAbiertas;
 import com.valleapp.valletpv.db.DBSecciones;
 import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DBTbUpdates;
 import com.valleapp.valletpv.db.DBTeclas;
 import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
@@ -57,8 +56,6 @@ public class ServicioCom extends Service {
 
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
-
-    DBTbUpdates dbTbUpdates;
 
     final Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
     String[] tbNameUpdateLow;
@@ -104,8 +101,10 @@ public class ServicioCom extends Service {
                 public void onOpen(ServerHandshake serverHandshake) {
                     // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
-                    sync_device(new String[]{"mesasabiertas", "lineaspedido"});
-                    syncDb();
+                    Log.i("WEBSOCKET_INFO", "Websocket open.....");
+                    sync_device(tbNameUpdateLow, 1000);
+                    sync_device(new String[]{"mesasabiertas"}, 5);
+                    comprobarLineasPedido();
                 }
 
 
@@ -146,31 +145,42 @@ public class ServicioCom extends Service {
         }
     }
 
-    private void syncDb() {
-        timerUpdateLow.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sync_device(tbNameUpdateLow);
-            }
-        },2000);
+    private void comprobarLineasPedido() {
+        ContentValues p = new ContentValues();
+        IBaseDatos db =  getDb("lineaspedido");
+        p.put("lineas", db.filter(null).toString());
+        new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p, "update_socket", controller_http);
     }
 
-    private void sync_device(String[] tbs) {
+    private void sync_device(String[] tbs, long timeout) {
 
         try {
-            for(String tb: tbs) {
-                ContentValues p = new ContentValues();
-                IBaseDatos db =  getDb(tb);
-                p.put("tb", tb);
-                p.put("reg", db.filter(null).toString());
-                new HTTPRequest(server + "/sync/sync_devices", p,
-                        "update_socket", controller_http);
-            }
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run(){
+                    for(String tb: tbs) {
+                        ContentValues p = new ContentValues();
+                        IBaseDatos db =  getDb(tb);
+                        p.put("tb", tb);
+                        p.put("reg", db.filter(null).toString());
+                        new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
+                        try {
+                            Thread.sleep(timeout);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, 50);
+
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     private void updateTables(JSONObject o){
         try {
@@ -219,8 +229,7 @@ public class ServicioCom extends Service {
             IniciarDB();
             crearWebsocket();
             timerManejarInstrucciones.schedule(
-                    new TareaManejarInstrucciones(timerManejarInstrucciones,
-                            colaInstrucciones, 1000), 2000, 1);
+                    new TareaManejarInstrucciones(colaInstrucciones, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -291,7 +300,7 @@ public class ServicioCom extends Service {
                 db.inicializar();
             }
         }
-        if(dbTbUpdates==null)  dbTbUpdates = new DBTbUpdates(getApplicationContext());
+
     }
 
     public IBaseDatos getDb(String nombre){

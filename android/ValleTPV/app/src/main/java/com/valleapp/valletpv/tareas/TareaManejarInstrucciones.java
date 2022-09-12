@@ -16,7 +16,6 @@ import java.util.TimerTask;
 
 public class TareaManejarInstrucciones extends TimerTask {
 
-    private final Timer parent;
     private final Queue<Instrucciones> cola;
     private final long timeout;
     boolean procesado = true;
@@ -58,9 +57,8 @@ public class TareaManejarInstrucciones extends TimerTask {
         }
     };
 
-    public TareaManejarInstrucciones(Timer timerManejarInstrucciones, Queue<Instrucciones> colaInstrucciones, long timeout) {
+    public TareaManejarInstrucciones(Queue<Instrucciones> colaInstrucciones, long timeout) {
         this.cola= colaInstrucciones;
-        this.parent = timerManejarInstrucciones;
         this.timeout = timeout;
     }
 
@@ -80,13 +78,12 @@ public class TareaManejarInstrucciones extends TimerTask {
                 count ++;
             }
 
-            synchronized (parent) {
-                parent.wait(timeout);
-                if (count > 20) {
-                    count = 0;
-                    procesado = true;
-                }
+            if (count > 20) {
+                count = 0;
+                procesado = true;
             }
+
+            Thread.sleep(timeout);
 
         }catch (Exception e){
             e.printStackTrace();
