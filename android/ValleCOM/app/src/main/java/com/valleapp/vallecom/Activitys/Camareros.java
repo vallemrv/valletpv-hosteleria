@@ -232,11 +232,9 @@ public class Camareros extends ActivityBase {
             }else{
                 server = pref.getString("URL");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void comprobarCamareros(){

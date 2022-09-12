@@ -104,9 +104,6 @@ public class Preferencias extends Activity {
             JSONObject obj = new JSONObject();
             obj.put("lista", lista);
             rellenarLista(obj);
-            DBTbUpdates db = new DBTbUpdates(cx);
-            db.vaciar();
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

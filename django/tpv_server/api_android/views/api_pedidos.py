@@ -26,8 +26,13 @@ def find(id, lineas):
 
 @csrf_exempt
 def  get_pendientes(request):
-    idz = request.POST["idz"]
-    mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz).distinct()
+    if "idz" in request.POST:
+        idz = request.POST["idz"]
+        mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz).distinct()
+    else:
+        mesas = Mesasabiertas.objects.filter()
+
+        
     lineas = json.loads(request.POST["lineas"])
     result = []
     lineas_server = []

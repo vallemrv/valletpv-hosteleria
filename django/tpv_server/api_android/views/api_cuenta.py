@@ -101,8 +101,9 @@ def mvlinea(request):
 def cuenta_add(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
+    uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
-    Pedidos.agregar_nuevas_lineas(idm, idc, lineas)
+    Pedidos.agregar_nuevas_lineas(idm, idc, lineas, uid_device)
     return HttpResponse('success')
 
 @csrf_exempt

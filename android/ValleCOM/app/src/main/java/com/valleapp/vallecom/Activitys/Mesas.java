@@ -580,7 +580,6 @@ public class Mesas extends ActivityBase implements View.OnLongClickListener, IPe
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void buscarPedidos(View v){

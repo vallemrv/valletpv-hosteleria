@@ -70,7 +70,7 @@ public class ServicioCom extends Service {
 
     private JSONObject cam;
     WebSocketClient client;
-    boolean isWebsocketClose = false;
+    boolean isWebsocketClose = true;
 
     public void checkServiceRunning(Class<?> serviceClass){
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -98,10 +98,12 @@ public class ServicioCom extends Service {
                 @Override
                 public void onOpen(ServerHandshake serverHandshake) {
                     isWebsocketClose = false;
-                    sync_device(new String[]{"mesasabiertas", "lineaspedido"});
+                    Log.i("WEBSOCKET_INFO", "Websocket open.....");
                     comprobarCamareros();
                     comprobarMensajes();
-                    syncDb();
+                    sync_device(new String[]{"mesasabiertas"}, 500);
+                    sync_device(tbNameUpdate, 2000);
+                    comprobarLineasPedido();
                 }
 
 
@@ -141,16 +143,35 @@ public class ServicioCom extends Service {
         }
     }
 
-    private void sync_device(String[] tbs) {
+    private void comprobarLineasPedido() {
+        ContentValues p = new ContentValues();
+        IBaseDatos db =  getDb("lineaspedido");
+        p.put("lineas", db.filter(null).toString());
+        new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p, "update_socket", controller_http);
+    }
+
+    private void sync_device(String[] tbs, long timeout) {
 
         try {
-            for(String tb: tbs) {
-                ContentValues p = new ContentValues();
-                IBaseDatos db =  getDb(tb);
-                p.put("tb", tb);
-                p.put("reg", db.filter(null).toString());
-                new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
-            }
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run(){
+                    for(String tb: tbs) {
+                        ContentValues p = new ContentValues();
+                        IBaseDatos db =  getDb(tb);
+                        p.put("tb", tb);
+                        p.put("reg", db.filter(null).toString());
+                        new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
+                        try {
+                            Thread.sleep(timeout);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, 1000);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,7 +200,6 @@ public class ServicioCom extends Service {
 
                 for(int i=0; i<objs.length();i++) {
                     JSONObject obj = objs.getJSONObject(i);
-                    Log.d("UPDATETEBLES", "tb_name: "+tb+", op: "+op+", reg: "+obj.toString());
                     if (op.equals("insert")) db.insert(obj);
                     if (op.equals("md")) db.update(obj);
                     if (op.equals("rm")) db.rm(obj);
@@ -219,6 +239,7 @@ public class ServicioCom extends Service {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
             if (res != null) {
+                Log.d("RESPONSE", res);
                 try {
                     if ("update_socket".equals(op)) {
                         JSONArray objs = new JSONArray(res);
@@ -258,8 +279,8 @@ public class ServicioCom extends Service {
                     if (cam != null && !db_cam.is_autorizado(cam)){
                         System.exit(0);
                     }
-                   if (isWebsocketClose && client!= null){
-                        client.reconnect();
+                   if (isWebsocketClose){
+                        if (client != null ) client.reconnect();
                         Handler h = exHandler.get("estadows");
                         if(h!=null) {
                             HTTPRequest http = new HTTPRequest();
@@ -361,14 +382,6 @@ public class ServicioCom extends Service {
         comprobarMensajes();
     }
 
-    private void syncDb() {
-        timerUpdate.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sync_device(tbNameUpdate);
-            }
-        },2000);
-    }
 
     public class MyBinder extends Binder{
        public ServicioCom getService() {

@@ -15,6 +15,8 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class HTTPRequest {
@@ -54,7 +56,9 @@ public class HTTPRequest {
 
             // Execute HTTP Post Request
             final HttpURLConnection finalConn = conn;
-            final Thread th = new Thread(){
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
                 public void run(){
                     int statusCode = -1;
                     try {
@@ -78,15 +82,14 @@ public class HTTPRequest {
                         if (handlerExternal != null)
                             sendMessage(handlerExternal, op, result.toString());
 
-                     } catch ( ConnectException e){
+                    } catch ( ConnectException e){
                         if(handlerExternal!= null) sendMessage(handlerExternal, "no_connexion", null);
-                     } catch (Exception e) {
-                         // TODO Auto-generated catch block
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
                         if(handlerExternal!= null && statusCode==500) sendMessage(handlerExternal, "ERROR", null);
                     }
                 }
-            };
-            th.start();
+            }, 1000);
         } catch (Exception e) {
            e.printStackTrace();
         }finally {

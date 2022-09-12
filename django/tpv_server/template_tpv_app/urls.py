@@ -22,21 +22,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.urls import  include, path, re_path
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.views.generic.base import RedirectView, TemplateView
+from django.views.generic.base import RedirectView
 
 
 
 urlpatterns = [
     path('api/', include('api_android.urls'), name="api"),
     path('token/', include('tokenapi.urls')),
-    path('favicon.ico',
-            RedirectView.as_view( # the redirecting function
-                url=staticfiles_storage.url('favicon.ico'), 
-            ),
-            name="favicon" # name of our view
-        ),
     path("app/", include("app.urls"), name="app"),
-    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"))
-
+    re_path(r'^.*$', RedirectView.as_view(url="http://valletpv.es"))
 ]

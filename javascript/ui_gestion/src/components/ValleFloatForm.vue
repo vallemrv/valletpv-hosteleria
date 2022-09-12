@@ -31,7 +31,7 @@
       </v-card-text>
     </v-card>
     <v-card width="200px" v-else>
-      <v-card-header>
+      <v-card-title>
         <v-text-field
           v-model="val_modified"
           @click.stop=""
@@ -40,7 +40,7 @@
           @keypress.enter="on_enter()"
           :hint="hint"
         ></v-text-field>
-      </v-card-header>
+      </v-card-title>
     </v-card>
   </v-menu>
 </template>

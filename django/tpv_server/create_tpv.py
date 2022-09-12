@@ -25,13 +25,24 @@ if __name__ == '__main__':
     while is_correct not in ["yes"]:
         print("Introduce los datos de la empresa:")
         print()
+        nombre_empresa = input("Nombre de la comercial [Valle TPV]: ")
+        if nombre_empresa == "":
+            nombre_empresa = "Valle TPV"
+        razon_social = input("Razón social [%a]: " % nombre_empresa)
+        if razon_social == "":
+            razon_social = nombre_empresa
+        nif = input("NIF o CIF: ")
+        direccion = input("Direccion: ")
+        telefono = input("Telefono: ")
+        poblacion = input("Poblacion: ")
+        provincia =  input("Provicia: ")
+        codio_cp = input("Codigo postal: ")
+        email = input("Email de la empresa: ")
+        print("Datos configuración del la aplicación:")
+        print()
         name_tpv = input("Nombre del servidor tpv [testTPV]: ")
         if name_tpv == "":
             name_tpv = "testTPV"
-        nombre_empresa = input("Nombre de la empresa [Valle TPV]: ")
-        if nombre_empresa == "":
-            nombre_empresa = "Valle TPV"
-        email = input("Email de la empresa []: ")
         name_db = input("Nombre de la base: [%a]" % name_tpv)
         if name_db == "":
             name_db = name_tpv.lower()
@@ -85,7 +96,15 @@ if __name__ == '__main__':
                                               "nombre_empresa":nombre_empresa,
                                               "is_debug":is_debug,
                                               "secret_key":secret_key,
-                                              "sql_mode":sql_mode})
+                                              "sql_mode":sql_mode,
+                                              "razon_social": razon_social,
+                                              "nif":nif,
+                                              "direccion":direccion,
+                                              "telefono":telefono,
+                                              "poblacion":poblacion,
+                                              "provincia":provincia,
+                                              "cp":codio_cp,
+                                              })
 
     manage = open(os.path.join(BASE_DIR, "template_tpv_app",  "manage_template.py"), "r")
     template_manage  = Template(manage.read())

@@ -26,14 +26,14 @@ BRAND_TITLE = "{{nombre_empresa}}"
 BRAND = "{{nombre_empresa}}"
 EMPRESA = "{{name_tpv}}"
 MAIL = "{{email}}"
-RAZON_SOCIAL = "Valleapp S.L."
-NIF = "5555555f"
-DIRECCION = "Carretera casa los locos, 9"
-TELEFONO = "6666666"
-POBLACION= "Granada"
-PROVINCIA= "Granada"
-CP="18012"
-BASE_UI_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)),"javascript")
+RAZON_SOCIAL = "{{razon_social}}."
+NIF = "{{nif}}"
+DIRECCION = "{{direccion}}"
+TELEFONO = "{{telefono}}"
+POBLACION= "{{poblacion}}"
+PROVINCIA= "{{provincia}}"
+CP="{{cp}}"
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -93,9 +93,7 @@ STATICFILES_DIRS = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'static', 'dist'),
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -199,5 +197,3 @@ MEDIA_URL   = '/media/'
 STATIC_URL  = '/static/'
 STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT  =  os.path.join(STATIC_ROOT, 'media_{{name_tpv}}')
-
-

@@ -91,8 +91,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
     public void insert(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-            synchronized (db) {
-                String id;
+               String id;
                 if (o.has("ID")){
                     id = o.getString("ID");
                 }else{
@@ -113,7 +112,6 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                     db.update(tb_name, values, "ID=?", new String[]{id});
                 }
 
-            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -131,14 +129,11 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
     public void rm(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-            synchronized (db){
-                if(o.has("ID")) {
-                    db.delete(tb_name, "ID=?", new String[]{o.getString("ID")});
-                }else {
-                    db.delete(tb_name, "ID=?", new String[]{o.getString("id")});
-                }
+            if(o.has("ID")) {
+                db.delete(tb_name, "ID=?", new String[]{o.getString("ID")});
+            }else {
+                db.delete(tb_name, "ID=?", new String[]{o.getString("id")});
             }
-
         }catch (Exception e){
             e.printStackTrace();
         }
