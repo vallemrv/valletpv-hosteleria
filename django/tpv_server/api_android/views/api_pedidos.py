@@ -10,12 +10,13 @@ from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from gestion.models import  Camareros, Lineaspedido, Mesasabiertas, Pedidos, Receptores, Servidos
+from api_android.tools import is_float
 import json
 
 
 def find(id, lineas):
     for l in lineas:
-        if int(l["ID"]) == int(id):
+        if is_float(l["ID"]) and int(l["ID"]) == int(id):
             lineas.remove(l)
             return l
         
@@ -30,7 +31,8 @@ def  get_pendientes(request):
         mesas = Mesasabiertas.objects.filter()
 
         
-    lineas = json.loads(request.POST["lineas"])
+    lineas = json.loads(request.POST["lineas"]) if "lineas" in request.POST else json.loads(request.POST["reg"])
+    
     result = []
     lineas_server = []
     
@@ -42,13 +44,17 @@ def  get_pendientes(request):
         linea = find(l["ID"], lineas)
         if linea:
             if not Lineaspedido.is_equals(l, linea):
-                result.append({'op':'md', 'tb':"lineaspedido", 'reg': l})
+                result.append({'op':'md', 'tb':"lineaspedido", 'obj': l})
         else:
-            result.append({'op':'insert', 'tb':"lineaspedido", 'reg': l})
+            result.append({'op':'insert', 'tb':"lineaspedido", 'obj': l})
 
+
+   
     #Las linesa que no esten en el servidor o esten cobradas se borran.      
     for l in lineas:
-        result.append({'op':'rm', 'tb':"lineaspedido", 'reg': {"ID":l["ID"]}})   
+        result.append({'op':'rm', 'tb':"lineaspedido", 'obj': {"ID":l["ID"]}})  
+
+   
     
     return JsonResponse(result)
 

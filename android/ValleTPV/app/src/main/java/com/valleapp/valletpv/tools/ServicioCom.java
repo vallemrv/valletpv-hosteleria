@@ -102,9 +102,7 @@ public class ServicioCom extends Service {
                     // Devolución de llamada después de que se abre la conexión
                     isWebsocketClose = false;
                     Log.i("WEBSOCKET_INFO", "Websocket open.....");
-                    sync_device(tbNameUpdateLow, 1000);
-                    sync_device(new String[]{"mesasabiertas"}, 5);
-                    comprobarLineasPedido();
+                    sync_device(new String[]{"mesasabiertas", "lineaspedido", "camareros"}, 500);
                 }
 
 
@@ -145,12 +143,6 @@ public class ServicioCom extends Service {
         }
     }
 
-    private void comprobarLineasPedido() {
-        ContentValues p = new ContentValues();
-        IBaseDatos db =  getDb("lineaspedido");
-        p.put("lineas", db.filter(null).toString());
-        new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p, "update_socket", controller_http);
-    }
 
     private void sync_device(String[] tbs, long timeout) {
 
@@ -228,6 +220,12 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
+            timerUpdateLow.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    sync_device(tbNameUpdateLow, 1000);
+                }
+            },1000, 290000);
             timerManejarInstrucciones.schedule(
                     new TareaManejarInstrucciones(colaInstrucciones, 1000), 2000, 1);
             checkWebsocket.schedule(new TimerTask() {

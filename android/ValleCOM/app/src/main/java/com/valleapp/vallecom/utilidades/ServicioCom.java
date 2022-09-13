@@ -21,7 +21,6 @@ import com.valleapp.vallecom.db.DBSubTeclas;
 import com.valleapp.vallecom.db.DBSugerencias;
 import com.valleapp.vallecom.db.DBTeclas;
 import com.valleapp.vallecom.db.DBZonas;
-import com.valleapp.vallecom.db.DBTbUpdates;
 import com.valleapp.vallecom.interfaces.IBaseDatos;
 import com.valleapp.vallecom.interfaces.IBaseSocket;
 import com.valleapp.vallecom.tareas.TareaManejarInstrucciones;
@@ -62,8 +61,6 @@ public class ServicioCom extends Service {
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
 
-    DBTbUpdates DBTbUpdates;
-
     final Queue<Instruccion> colaInstrucciones = new LinkedList<>();
 
     String[] tbNameUpdate;
@@ -101,9 +98,7 @@ public class ServicioCom extends Service {
                     Log.i("WEBSOCKET_INFO", "Websocket open.....");
                     comprobarCamareros();
                     comprobarMensajes();
-                    sync_device(tbNameUpdate, 1000);
-                    sync_device(new String[]{"mesasabiertas"}, 5);
-                    comprobarLineasPedido();
+                    sync_device(new String[]{"mesasabiertas", "lineaspedido"}, 50);
                 }
 
 
@@ -143,12 +138,6 @@ public class ServicioCom extends Service {
         }
     }
 
-    private void comprobarLineasPedido() {
-        ContentValues p = new ContentValues();
-        IBaseDatos db =  getDb("lineaspedido");
-        p.put("lineas", db.filter(null).toString());
-        new HTTPRequest(server + "/pedidos/comparar_lineaspedido", p, "update_socket", controller_http);
-    }
 
     private void sync_device(String[] tbs, long timeout) {
 
@@ -267,6 +256,12 @@ public class ServicioCom extends Service {
             server = url;
             IniciarDB();
             crearWebsocket();
+            timerUpdate.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    sync_device(tbNameUpdate, 1000);
+                }
+            },1000, 180000);
             timerManejarInstrucciones.schedule(
                     new TareaManejarInstrucciones(colaInstrucciones,
                                                   server, 1000,
@@ -369,7 +364,6 @@ public class ServicioCom extends Service {
             }
         }
 
-        if(DBTbUpdates ==null)  DBTbUpdates = new DBTbUpdates(getApplicationContext());
     }
 
     public IBaseDatos getDb(String nombre){

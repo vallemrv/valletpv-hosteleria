@@ -70,6 +70,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
             res.moveToNext();
         }
         return  list;
+
     }
 
     @Override
@@ -91,26 +92,26 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
     public void insert(JSONObject o) {
         SQLiteDatabase db = getWritableDatabase();
         try{
-               String id;
-                if (o.has("ID")){
-                    id = o.getString("ID");
-                }else{
-                    id = o.getString("id");
-                }
-                ContentValues values = caragarValues(o);
+           String id;
+            if (o.has("ID")){
+                id = o.getString("ID");
+            }else{
+                id = o.getString("id");
+            }
+            ContentValues values = caragarValues(o);
 
-                if(Objects.equals(tb_name, "cuenta")){
-                    db.delete(tb_name, "estado='N' and IDMesa = ?",
-                            new String[]{values.getAsString("IDMesa")});
-                }
+            if(Objects.equals(tb_name, "cuenta")){
+                db.delete(tb_name, "estado='N' and IDMesa = ?",
+                        new String[]{values.getAsString("IDMesa")});
+            }
 
-                int count = count(db, "ID=" + id);
+            int count = count(db, "ID=" + id);
 
-                if (count == 0) {
-                    db.insert(tb_name, null, values);
-                } else {
-                    db.update(tb_name, values, "ID=?", new String[]{id});
-                }
+            if (count == 0) {
+                db.insert(tb_name, null, values);
+            } else {
+                db.update(tb_name, values, "ID=?", new String[]{id});
+            }
 
         }catch (Exception e){
             e.printStackTrace();

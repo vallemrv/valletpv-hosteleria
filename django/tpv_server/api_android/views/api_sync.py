@@ -10,9 +10,8 @@ from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from gestion.models import *
 from django.apps import apps
-from api_android.tools import is_float
-
 from datetime import datetime
+from api_android.views.api_pedidos import comparar_lineaspedido
 
 
 @csrf_exempt
@@ -83,7 +82,7 @@ def update_from_devices(request):
 def sync_devices(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
-    if (tb_name == "lineaspedido"): return JsonResponse([])
+    if (tb_name == "lineaspedido"): return comparar_lineaspedido(request)
     reg = json.loads(request.POST["reg"])
     model = apps.get_model(app_name, tb_name)
     result = []

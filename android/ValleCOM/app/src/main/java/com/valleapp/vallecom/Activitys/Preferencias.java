@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.valleapp.vallecom.R;
-import com.valleapp.vallecom.db.DBTbUpdates;
 import com.valleapp.vallecom.utilidades.JSON;
 import com.valleapp.vallecom.adaptadores.AdaptadorEmpresas;
 

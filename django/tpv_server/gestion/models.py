@@ -1071,8 +1071,8 @@ class Pedidos(models.Model):
         pedido.infmesa_id = mesa.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
+        pedido.uid_device = uid_device
         pedido.save()
-        
 
         for pd in lineas:
             can = int(pd["Can"])
