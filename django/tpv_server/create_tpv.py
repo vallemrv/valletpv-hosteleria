@@ -38,8 +38,10 @@ if __name__ == '__main__':
         provincia =  input("Provicia: ")
         codio_cp = input("Codigo postal: ")
         email = input("Email de la empresa: ")
+        
         print("Datos configuración del la aplicación:")
         print()
+
         name_tpv = input("Nombre del servidor tpv [testTPV]: ")
         if name_tpv == "":
             name_tpv = "testTPV"
@@ -47,6 +49,7 @@ if __name__ == '__main__':
         if name_db == "":
             name_db = name_tpv.lower()
         sql_mode = input("Tipo de base de datos [lite/mysql] [lite]: ")
+        name_user_db = ""
         if sql_mode not in ["mysql", "lite"]:
             sql_mode = "lite"
             name_user_db = name_tpv
@@ -59,15 +62,19 @@ if __name__ == '__main__':
                 name_user_db = "valletpv"
             password_db = input("Contraseña de la base de datos []: ")
             
-        
-        
-        print()
-        print("Datos de configuración para la aplicación:")
-        
         is_debug = bool(input("Debug  True o False [True]: "))
         if is_debug not in [True, False]:
             is_debug = True
        
+        print()
+        print("Datos de configuración servidor smtp:")
+        print()
+        
+        host_smtp = input("Host smtp: ")
+        port_smtp = input("Port smtp: ")
+        email_smtp = input("Usuario smtp: ")
+        password_mail = input("Password smtp: ")
+
         is_correct = input("Todos los datos correctos [yes/no]: ")
         print()
 
@@ -90,7 +97,7 @@ if __name__ == '__main__':
     settings.close()
     r_settings = template_settings.render(**{"name_tpv":name_tpv,
                                               "name_db": name_db,
-                                              "name_user_db":name_user_db,
+                                              "name_user_db": name_user_db,
                                               "password_db": password_db,
                                               "email":email,
                                               "nombre_empresa":nombre_empresa,
@@ -104,6 +111,10 @@ if __name__ == '__main__':
                                               "poblacion":poblacion,
                                               "provincia":provincia,
                                               "cp":codio_cp,
+                                              "password_mail":password_mail,
+                                              "email_smtp":email_smtp,
+                                              "port_smtp":port_smtp,
+                                              "host_smtp":host_smtp
                                               })
 
     manage = open(os.path.join(BASE_DIR, "template_tpv_app",  "manage_template.py"), "r")

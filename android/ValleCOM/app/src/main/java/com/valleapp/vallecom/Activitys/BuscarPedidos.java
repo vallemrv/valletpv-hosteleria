@@ -49,6 +49,8 @@ public class BuscarPedidos extends Activity implements TextWatcher {
             try {
                 myServicio = ((ServicioCom.MyBinder) iBinder).getService();
                 dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+                lPedidos = dbCuenta.filterList(null, true);
+                handelerBusqueda.sendEmptyMessage(0);
             }catch (Exception e){
                 e.printStackTrace();
             }

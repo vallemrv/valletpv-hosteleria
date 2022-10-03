@@ -1,14 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file(var)
+            storePassword var
+            keyAlias var
+            keyPassword var
+        }
+    }
     useLibrary 'org.apache.http.legacy'
     compileSdkVersion 32
     defaultConfig {
         applicationId "com.valleapp.vallecom"
         minSdkVersion 15
         targetSdkVersion 32
-        versionCode 4
-        versionName "3.0.1"
+        versionCode 5
+        versionName '3.3.3'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

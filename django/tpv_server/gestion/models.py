@@ -294,7 +294,7 @@ class Camareros(models.Model):
         c = Camareros.objects.filter(id=row["ID"]).first()
         if c:
             c.autorizado = int(row["autorizado"])
-            c.pass_field = row["pass_field"]
+            c.pass_field = row["pass_field"] if "pass_field" in row else row["Pass"]
             c.permisos = row["permisos"]
             c.save()
             comunicar_cambios_devices("md", "camareros", c.serialize())

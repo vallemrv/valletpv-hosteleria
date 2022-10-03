@@ -14,6 +14,10 @@ buildscript {
     }
 }
 
+ext {
+    var = '/home/valle/proyectos/keys_android_app/valleapp.jks'
+}
+
 allprojects {
     repositories {
         google()
