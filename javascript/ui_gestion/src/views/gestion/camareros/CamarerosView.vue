@@ -7,7 +7,7 @@
     <ValleDialogoForm :show="showDialogo" :form="form" 
                         @close="on_close_add_cam" 
                         tb_name="camareros"
-                        :item="{}"
+                        :item="item"
                         tipo="add" title="Agregar camarero"/>
 
    </v-container>
@@ -21,8 +21,6 @@ import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
 import Camareros from "./components/Camareros.vue";
 import CamarerosPase from "./components/CamarerosPase.vue";
 
-
-
 export default {
     components:{ ValleHeader, ValleDialogoForm, Camareros, CamarerosPase },
     data() {
@@ -30,6 +28,7 @@ export default {
             title: "Camareros",
             vista: "edicion",
             showDialogo: false,
+            item: {},
             btns:[
                 {icon: "mdi-pencil", op: "show-edit", callback: this.op_cam},
                 {icon: "mdi-key", op: "show-pase", callback: this.op_cam},
@@ -60,6 +59,7 @@ export default {
         op_cam(op){
           switch(op){
               case "add-cam":
+                  this.item = {}
                   this.showDialogo = true
                   break;
               case "show-pase":

@@ -21,7 +21,7 @@
         <v-card-text>
           <v-row>
             <v-col cols="6"
-              ><span>{{ item.nombre }}</span></v-col
+              ><span>{{ item.nombre }}</span> <br/><span>{{ parseFloat(item.p1).toFixed(2) }} €</span></v-col
             >
             <v-col cols="6" class="text-right">
               <v-btn size="x-small" variant="text" icon>

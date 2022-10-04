@@ -164,6 +164,11 @@ export default {
         { col: "nombre", label: "Nombre", tp: "text" },
         { col: "descripcion_t", label: "Texto ticket", tp: "text" },
         { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
+        { col: "tag", label: "Tag", tp: "text" },
+        { col: "tipo", label: "Tipo", tp: "select",
+          keys: ["SP", "CM"],
+          choices: ["SIMPLE", "COMPUESTA"],
+        },
       ];
       return form;
     },
@@ -205,7 +210,9 @@ export default {
       this.selTbName = "subteclas";
 
       this.form = [
-        ...this.formTecla,
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
+        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
         { col: "incremento", label: "Incremento", tp: "number" },
       ];
     },

@@ -70,8 +70,8 @@
     </v-expansion-panels>
   </v-col>
   <v-col cols="12" class="ma-0 mt-3" v-else>
-    <v-card elevation="3" class="mx-auto text-center">
-      <v-row class="pl-3 pr-10">
+    <v-card elevation="3" class="pb-4 pt-4 mx-auto text-center">
+      <v-row class="pl-3 pr-10 ">
         <v-col cols="4" class="text-left text-caption pl-6">
           <valle-float-form
             :item="tecla"
