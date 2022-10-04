@@ -1,5 +1,4 @@
 <template>
-
  <ValleHeader title="Teclas por familia" anchor="bottom end"/>
  <v-container>
   <v-row>
