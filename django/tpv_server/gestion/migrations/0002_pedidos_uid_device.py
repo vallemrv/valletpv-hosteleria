@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pedidos',
             name='uid_device',
-            field=models.CharField(default='11f1a3c7-5fdc-4950-b800-594932c6add5', max_length=15),
+            field=models.CharField(default='11f1a3c7-5fdc-4950-b800-594932c6add5', max_length=150),
         ),
     ]
