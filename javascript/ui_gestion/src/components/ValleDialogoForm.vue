@@ -102,7 +102,7 @@ export default {
             filter: this.item.filter,
           };
           this.addInstruccion({ inst: inst });
-        } else if (this.tipo == "add_empresa"){
+        } else {
            this.$emit("close", this.item);
         }
         this.close_dialogo();

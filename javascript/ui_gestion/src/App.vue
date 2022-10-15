@@ -16,10 +16,9 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import ValleFooter from "./components/ValleFooter";
-import ValleMainHeader from "./components/ValleMainHeader.vue";
 
 export default {
-  components: { ValleFooter, ValleMainHeader },
+  components: { ValleFooter },
   name: "App",
   data() {
     return {

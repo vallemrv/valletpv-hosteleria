@@ -29,11 +29,11 @@
       </v-menu>
     </v-btn>
   </v-app-bar>
-  <valle-menu :drawer="drawer" :items="items" @click_item="on_click_menu"></valle-menu>
+  <valle-menu :items="items" @click_item="on_click_menu"></valle-menu>
   <valle-dialogo-form
     @close="on_close_form"
-    title="Agregar empresa"
-    tipo="add_empresa"
+    :title="titledialog"
+    :tipo="tipo"
     :show="showDialog"
     :item="itemEmpresa"
     :form="formEmpresa"
@@ -53,7 +53,8 @@ export default {
   },
   components: { ValleDialogoForm, ValleMenu },
   data: () => ({
-    drawer: false,
+    titledialog: "Agregar empresa",
+    tipo: "add_empresa",
     showDialog: false,
     formEmpresa: [
       { col: "nombre", label: "Nombre", tp: "text" },

@@ -6,6 +6,7 @@ export default {
         let params = new FormData();
         params.append("username", empresa.user);
         params.append("password", empresa.pass);
+        
         API.login(empresa.url, params).then( r => {
             const obj = {
                     nombre:empresa.nombre,
@@ -24,7 +25,7 @@ export default {
                  obj.nombre_server = r.nombre;
                  obj.email = r.email;
                  v.push(obj);
-                 state.empresas = Object.values(v);
+                 state.empresas = [...v];
                  localStorage.empresas = JSON.stringify(v)
                  state.empresa = obj;
                  commit(types.REQUEST_SUCCESS)
