@@ -238,11 +238,10 @@ export default {
           this.itemSel = v;
           break;
         case "add_sub":
-          if (v.tipo == "SP") {
-            this.edit_tipo_tecla(v);
-          } else {
             this.add_subtecla(v);
-          }
+          break;
+        case "mod_tipo":
+            this.edit_tipo_tecla(v);
           break;
         case "rm":
           let inst = {

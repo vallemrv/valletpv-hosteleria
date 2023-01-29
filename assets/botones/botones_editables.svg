@@ -7,7 +7,7 @@
    viewBox="0 0 594 420"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
    sodipodi:docname="botones_editables.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,14 +25,16 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.70710681"
-     inkscape:cx="951.05858"
-     inkscape:cy="1236.7297"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:cx="1042.9825"
+     inkscape:cy="444.77015"
+     inkscape:window-width="1440"
+     inkscape:window-height="847"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="25"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
   <defs
      id="defs2" />
   <g
@@ -88,7 +90,8 @@
        y="7.0939345"
        inkscape:export-filename="/home/valle/proyectos/python/valletpv-hosteleria/android/ValleTPV/app/src/main/res/drawable-hdpi/fondo_btn.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-ydpi="90"
+       style="fill:#cfb6d4;fill-opacity:1" />
     <image
        width="62.441666"
        height="62.08889"
@@ -394,7 +397,8 @@
          inkscape:connector-curvature="0"
          id="text4454-1-9-1"
          d="m 327.78677,-51.417467 3.42674,8.975299 1.25275,-3.2814 -2.14254,-5.693899 z m 13.92297,0 -2.14681,5.69287 1.25114,3.282429 3.42056,-8.975299 z m -8.00865,8.975299 -1.23483,3.28154 2.17384,5.693899 h 2.75326 l 2.16957,-5.692871 -1.23775,-3.282567 -2.31448,6.137972 z"
-         style="font-style:normal;font-weight:normal;font-size:327.274px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+         style="font-style:normal;font-weight:normal;font-size:327.274px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0443909px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         inkscape:export-filename="logo_valleGES.png" />
     </g>
     <path
        style="fill:#000000;stroke-width:0.10048"
@@ -527,9 +531,9 @@
        id="image49325"
        x="256.01703"
        y="144.14809"
-       inkscape:export-filename="/home/valle/Imágenes/iconos/ic_gestion.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       inkscape:export-filename="logo_valleGES.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <image
        width="40.803604"
        height="44.550873"

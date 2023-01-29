@@ -29,11 +29,14 @@ export default {
             tools: [
                 { op: "edit", text: "Editar", icon: "mdi-account-edit" },
                 { op: "rm", text: "Borrar", icon: "mdi-delete" },
-                { op: "sec", text: "Modificar secciones", icon: "mdi-pencil" },
-                { op: "add_sub", text: "Agregar subtecla", icon: "mdi-plus" },
+                { op: "sec", text: "Modificar secciones", icon: "mdi-pencil" }, 
+                { op: "mod_tipo", text: "Modificar tipo", icon: "mdi-call-merge" }, 
+                { op: "add_sub", text: "Agregar subtecla", icon: "mdi-plus" },  
             ],
+            
         }
     },
+    
     methods:{
         on_click_tools(v, op) {
            this.$emit("click_tools", v, op);

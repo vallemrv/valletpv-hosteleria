@@ -17,10 +17,10 @@
 
 <script>
 export default {
-    props:["drawer", "items"],
+    props:[ "items"],
     data(){
         return {
-            
+            drawer: true
         }
     },
     methods: {
