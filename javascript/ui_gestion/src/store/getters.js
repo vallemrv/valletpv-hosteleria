@@ -35,7 +35,7 @@ export default {
         })
         return lista;
     },
-    getItemsOrdered: (state) => (items, column)  =>{
+    getItemsOrdered: () => (items, column)  =>{
         items.sort((a, b) => {
             if (a[column] > b[column]) {
             return -1;
@@ -54,7 +54,7 @@ export default {
         if (!f || f.length == 0 || !state[tb_name]) return []
         
         if (filter.include){
-            return Object.values(state[tb_name])
+            return Object.values( state[tb_name])
             .filter( o => {
                 var is_corret = false
             
@@ -71,7 +71,7 @@ export default {
             })
             
         }
-       
+        
         return Object.values(state[tb_name])
         .filter( o => {
             var is_corret = false

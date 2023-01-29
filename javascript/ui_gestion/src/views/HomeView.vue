@@ -41,7 +41,6 @@ export default {
            {label: "Zonas", icon: "",  value:"zonas"},
            {label: "Receptores", icon: "",  value:"receptores"},
            {label: "Familias", icon: "",  value:"familias"},
-
         ],
   }),
   computed:{

@@ -154,6 +154,12 @@ export default {
           choices: ["SIMPLE", "COMPUESTA"],
         },
       ],
+      formSubTecla: [
+        { col: "nombre", label: "Nombre", tp: "text" },
+        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
+        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
+        { col: "incremento", label: "Incremento", tp: "number" },
+      ]
     };
   },
   computed: {
@@ -209,12 +215,7 @@ export default {
       this.showForm = true;
       this.selTbName = "subteclas";
 
-      this.form = [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "descripcion_t", label: "Texto ticket", tp: "text" },
-        { col: "descripcion_r", label: "Texto recepcion", tp: "text" },
-        { col: "incremento", label: "Incremento", tp: "number" },
-      ];
+      this.form = this.formSubTecla;
     },
     editar_tecla() {
       this.itemSelEdit = this.itemSel;
@@ -235,14 +236,7 @@ export default {
       this.showForm = true;
       this.titleForm = "Editar subtecla";
       this.selTbName = "subteclas";
-      this.form = [
-        ...this.formTecla,
-        {
-          col: "incremento",
-          label: "Incremento",
-          tp: "number",
-        },
-      ];
+      this.form = this.formSubTecla;
     },
     quitar_subtecla() {
       if (this.itemSel) {
