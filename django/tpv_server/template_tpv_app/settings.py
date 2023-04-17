@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'app',
     'api_android',
     'corsheaders',
+    'valleIA'
 ]
 
 MIDDLEWARE = [

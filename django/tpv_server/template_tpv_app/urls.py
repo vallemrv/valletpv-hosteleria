@@ -30,5 +30,6 @@ urlpatterns = [
     path('api/', include('api_android.urls'), name="api"),
     path('token/', include('tokenapi.urls')),
     path("app/", include("app.urls"), name="app"),
+    path("valleIA/", include("valleIA.urls"), name="valleia"),
     re_path(r'^.*$', RedirectView.as_view(url="http://valletpv.es"))
 ]
