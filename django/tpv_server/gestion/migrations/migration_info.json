@@ -1,0 +1,66 @@
+[    
+    {        
+          "name": "arqueocaja",       
+          "fields": [    
+            ["id", "AutoField", ""],
+            ["cambio", "FloatField", ""],
+            ["descuadre", "FloatField", ""]
+        ]
+    },
+    {
+        "name": "camareros",
+        "fields": [
+            ["id", "AutoField", ""],
+            ["nombre", "CharField", ""],
+            ["apellidos", "CharField", ""],
+            ["email", "CharField", ""],
+            ["pass_field", "CharField", ""],
+            ["activo", "IntegerField", ""],
+            ["autorizado", "IntegerField", ""],
+            ["permisos", "CharField", ""]
+        ]
+    },
+    {
+        "name": "cierrecaja",
+        "fields": [ 
+            ["id", "AutoField", ""],
+            ["ticketcom", "IntegerField", ""],
+            ["ticketfinal", "IntegerField", ""],
+            ["fecha", "CharField", ""],
+            ["hora", "CharField", ""]
+        ]
+    },
+    {
+        "name": "composicionteclas",
+        "fields": [
+            ["id", "AutoField", ""],
+            ["composicion", "CharField", ""],
+            ["cantidad", "IntegerField", ""]
+        ]
+    },
+    {
+        "name": "familias",
+        "fields": [
+            ["id", "AutoField", ""],
+            ["nombre", "CharField", ""],
+            ["composicion", "CharField", ""],
+            ["cantidad", "IntegerField", ""]
+        ]
+    },
+    {
+        "name": "iconchoices",
+        "fields": [ 
+            ["id", "AutoField", ""]
+        ]
+    },
+    {
+        "name": "infmesa",
+        "fields": [
+            ["uid", "CharField", ""],
+            ["fecha", "CharField", ""],
+            ["hora", "CharField", ""],
+            ["numcopias", "IntegerField", ""],
+            ["camarero", "ForeignKey", "camareros"]
+        ]
+    }
+]

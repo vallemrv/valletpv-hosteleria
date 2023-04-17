@@ -1042,7 +1042,7 @@ class Pedidos(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     infmesa = models.ForeignKey(Infmesa,  on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
-    uid_device = models.CharField(max_length=150, default=str(uuid4()))
+    uid_device = models.CharField(max_length=150, default="")
     
    
     @staticmethod
