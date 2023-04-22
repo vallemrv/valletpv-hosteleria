@@ -21,7 +21,7 @@
       <v-app-bar app>
         <!-- Encabezado -->
         
-        <v-toolbar-title>ValleIA</v-toolbar-title>
+        <v-toolbar-title>ValleGES IA</v-toolbar-title>
       </v-app-bar>
   
       <v-main>

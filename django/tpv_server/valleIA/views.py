@@ -10,8 +10,6 @@ from django.db import connection
 
 openai.api_key = os.environ.get("API_KEY")
 
-
-
 @api_view(['POST'])
 def upload_audio(request):
     if 'audio' not in request.FILES:

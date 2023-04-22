@@ -4,14 +4,14 @@
      <v-toolbar-title >
         <v-row class="pa-2 pl-3">
           <v-col cols="12" class="pa-0 ma-0 text-uppercase">{{ title }}</v-col>
-          <v-col cols="12" class="pa-0 ma-0 text-caption">{{ empresa.nombre }} </v-col>
+          <v-col v-if="empresa" cols="12" class="pa-0 ma-0 text-caption">{{ empresa.nombre }} </v-col>
         </v-row>
      </v-toolbar-title>
      <v-progress-circular
             indeterminate
             color="primary"
             v-if="ocupado"
-          ></v-progress-circular>
+      ></v-progress-circular>
     <v-spacer></v-spacer>
     <valle-inbox :anchor="anchor" :num_inst="num_inst" v-if="num_inst > 0"></valle-inbox>
      <v-btn v-for="(btn, i) in btns" :key="i" icon @click="btn.callback(btn.op)">
