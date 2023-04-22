@@ -1,15 +1,46 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.core.files.storage import default_storage
-from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.db import connection
 import openai
 import os
 import json
-from django.apps import apps
-from django.db import connection
+import re
 
 openai.api_key = os.environ.get("API_KEY")
 
+@method_decorator(csrf_exempt, name='dispatch')
+class GPT3View(View):
+
+    def post(self, request):
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "El cuerpo de la solicitud no es JSON válido."}, status=400)
+
+        prompt = body.get('prompt', '')
+        if not prompt:
+            return JsonResponse({"error": "Falta proporcionar un 'prompt' en la consulta."}, status=400)
+
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt,
+                max_tokens=150,
+                n=1,
+                stop=None,
+                temperature=0.7,
+            )
+
+            text = response.choices[0].text.strip()
+            return JsonResponse({"response": text})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
 
 @api_view(['POST'])
@@ -35,7 +66,6 @@ def upload_audio(request):
 
     return Response({"url": file_url, "transcript": transcript})
 
-
 def transcribe_audio(file_path):
     try:
         
@@ -48,44 +78,46 @@ def transcribe_audio(file_path):
         print("Error al transcribir el audio:", e)
         return None
 
-
-
-def model_info(request):
-    save_model_info_to_file("db_str.json")
-    Response("Holeeeeeee")
-
-def get_model_info(cursor):
-    models_info = []
-    
-    for model in apps.get_model("gestion", "camareros"):
-        model_info = {
-            "model": model.__name__,
-            "table": model._meta.db_table,
-            "columns": [],
-            "relations": [],
-        }
-
-        for field in model._meta.get_fields():
-            model_info["columns"].append({
-                "name": field.name,
-                "type": field.get_internal_type(),
-            })
-
-        relations = connection.introspection.get_relations(cursor, model._meta.db_table)
-        for index, relation in relations.items():
-            model_info["relations"].append({
-                "name": model._meta.get_field(relation[1]).name,
-                "target_table": apps.get_model(*relation[2])._meta.db_table,
-            })
-
-        models_info.append(model_info)
-
-    return models_info
-
-def save_model_info_to_file(filename):
-    with connection.cursor() as cursor:
-        model_info = get_model_info(cursor)
+@csrf_exempt
+def sql_query_view(request):
+    if request.method == 'POST':
+        sql_query = request.POST.get('sql_query')
         
-    with open(filename, 'w') as outfile:
-        json.dump(model_info, outfile, indent=2)
+        if not sql_query:
+            return JsonResponse({'error': 'No SQL query provided'})
 
+        query_type = get_query_type(sql_query)
+        if not query_type:
+            return JsonResponse({'error': 'Invalid SQL query type'})
+
+        if query_type == 'SELECT':
+            results = execute_select_query(sql_query)
+            print(results)
+            return JsonResponse(results)
+
+        elif query_type in ['UPDATE', 'DELETE']:
+            execute_update_delete_query(sql_query)
+            return JsonResponse({'status': 'Query executed successfully'})
+
+    return JsonResponse({'error': 'Invalid request method'})
+
+
+def get_query_type(sql_query):
+    query_type_regex = re.compile(r'^\s*(SELECT|UPDATE|DELETE)', re.IGNORECASE)
+    match = query_type_regex.match(sql_query)
+    return match.group(1).upper() if match else None
+
+
+def execute_select_query(sql_query):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query)
+        column_names = [col[0] for col in cursor.description]
+        values = cursor.fetchall()
+    return {'columnas': column_names, 'valores': values}
+
+
+
+def execute_update_delete_query(sql_query):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query)
+        connection.commit()

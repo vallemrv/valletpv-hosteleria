@@ -1,37 +1,43 @@
+import sys
 import sqlite3
 
-def execute_sql_query(database, query):
+def execute_sql_query(database, queries):
     conn = sqlite3.connect(database)
     cursor = conn.cursor()
+    results = []
 
-    cursor.execute(query)
-    conn.commit()
+    for query in queries:
+        query = query.strip().upper()
+        if query.startswith("SELECT"):
+            cursor.execute(query)
+            query_results = cursor.fetchall()
+            results.extend(query_results)
+        elif query.startswith("UPDATE") or query.startswith("DELETE"):
+            cursor.execute(query)
+            conn.commit()
+            print(f"Se ha ejecutado la consulta '{query}' con éxito.")
+        else:
+            print(f"La consulta '{query}' no es válida. Por favor, ingrese solo consultas SELECT, UPDATE o DELETE.")
 
-    if query.startswith("SELECT"):
-        results = cursor.fetchall()
-        conn.close()
-        return results
+    conn.close()
+    return results
+
+if __name__ == "__main__":
+    # La base de datos donde deseas ejecutar la consulta
+    database = "testtpv.sqlite3"
+
+    # Las consultas SQL ingresadas como argumentos en la línea de comandos
+    queries = sys.argv[1:]
+
+    if not queries:
+        print("No se proporcionaron consultas SQL. Por favor, ingrese al menos una consulta.")
+        sys.exit(1)
+
+    results = execute_sql_query(database, queries)
+
+    if results:
+        print("Resultados de las consultas SELECT:")
+        for row in results:
+            print(row)
     else:
-        conn.close()
-        return None
-
-# La consulta SQL que deseas ejecutar
-query = "SELECT name, sql FROM sqlite_master WHERE type = 'table' AND (name LIKE 'gestion_%' or name NOT LIKE '%\_%' ESCAPE '\\');"
-#query = "SELECT * FROM teclas WHERE ID IN (SELECT IDTecla FROM teclaseccion WHERE IDSeccion IN (SELECT ID FROM secciones WHERE Nombre = 'Bocadillos'))"
-
-
-# La base de datos donde deseas ejecutar la consulta
-database = "testtpv.sqlite3"
-
-results = execute_sql_query(database, query)
-
-if results:
-    result = "{"
-    for row in results:
-        result += "'%s':'%s'," % (row[0], row[1].replace("CREATE TABLE \"%s\" " % row[0],""))
-    
-    result += "}"
-    r = open("structura_info.py", "w")
-    r.write("models="+result)
-else:
-    print("La consulta no devuelve resultados.")
+        print("Las consultas SELECT no devolvieron resultados.")

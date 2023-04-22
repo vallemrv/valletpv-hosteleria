@@ -1,16 +1,18 @@
 <template>
   <v-app>
-    <MainComponet />
+    <SQLInterface />
   </v-app>
 </template>
 
 <script>
 import MainComponet from "./components/MainComponent.vue";
+import SQLInterface from '@/components/SQLInterface.vue';
 
 export default {
   name: "App",
   components: {
-    MainComponet
+    MainComponet,
+    SQLInterface
   }
 };
 </script>
@@ -24,4 +26,5 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
 </style>
