@@ -78,13 +78,16 @@ def gpt3_api(request):
     )
 
     output_text = response.choices[0].message.content
-  
+    print(output_text)
     query_type = extract_query(output_text)
 
-    if query_type:
+    if query_type == "SELECT":
         output_text = execute_select_query(output_text)
         chat_item['text'] = "Aqui tienes el resultado:"
         chat_item['table'] = output_text
+    elif query_type in ["UPDATE", "DELETE"]:
+        execute_update_delete_query(output_text)
+        chat_item["text"] = "Operacion realizada con exito"
     else:
         chat_item["text"] = "Perdona pero no tengo autorización a contestar esto. Solo puedo contestar o ejecutar preguntas relacioneas con le TPV."
         
@@ -108,36 +111,6 @@ def extract_query(gpt3_response):
 
     return None
 
-
-
-
-@csrf_exempt
-def sql_query_view(request):
-    if request.method == 'POST':
-        sql_query = request.POST.get('sql_query')
-        
-        if not sql_query:
-            return JsonResponse({'error': 'No SQL query provided'})
-
-        query_type = get_query_type(sql_query)
-        if not query_type:
-            return JsonResponse({'error': 'Invalid SQL query type'})
-
-        if query_type == 'SELECT':
-            results = execute_select_query(sql_query)
-            print(results)
-            return JsonResponse(results)
-
-        elif query_type in ['UPDATE', 'DELETE']:
-            execute_update_delete_query(sql_query)
-            return JsonResponse({'status': 'Query executed successfully'})
-
-    return JsonResponse({'error': 'Invalid request method'})
-
-def get_query_type(sql_query):
-    query_type_regex = re.compile(r'^\s*(SELECT|UPDATE|DELETE)', re.IGNORECASE)
-    match = query_type_regex.match(sql_query)
-    return match.group(1).upper() if match else None
 
 def execute_select_query(sql_query):
     with connection.cursor() as cursor:
