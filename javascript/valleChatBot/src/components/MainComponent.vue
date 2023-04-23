@@ -20,14 +20,11 @@
   
       <v-app-bar app>
         <!-- Encabezado -->
-        
         <v-toolbar-title>ValleGES IA</v-toolbar-title>
       </v-app-bar>
   
       <v-main>
-        <v-container fluid>
-          
-        </v-container>
+        <ChatComponent/>
       </v-main>
   
       <v-footer app>
@@ -41,7 +38,7 @@
         clearable
         :append-inner-icon="message ? 'mdi-send' : (isRecording ? 'mdi-stop': 'mdi-microphone') "
         @click:append-inner="message ? enviarInst() : toggleRecording()" :disabled="isRecordingDisabled && !message"
-        append->
+        append>
         
         </v-textarea>
         
@@ -51,11 +48,20 @@
   
   <script> 
   import axios from "axios";
+  import ChatComponent from "./ChatComponent.vue";
+  import { useChatStore } from "@/stores/chatStore";
 
   export default {
     components: {
-      
+      ChatComponent
     },
+    setup() {
+    const chatStore = useChatStore();
+     return {
+         chatStore
+      };
+    },
+    
     data() {
       return {
         drawer: false,
@@ -107,7 +113,29 @@
         this.isRecording = !this.isRecording;
       },
       async enviarInst(){
-        this.message = ""
+        try {
+            var params = new FormData();
+            var sendObj = {
+               count: 0,
+               instruciones: "",
+               query:this.message
+            }
+            params.append("message", JSON.stringify(sendObj));
+            const response = await axios.post("http://localhost:8000/valleIA/gpt3_api/", params);
+
+            // Aquí puedes procesar la respuesta generada por el modelo GPT-3 y hacer lo que necesites con ella
+            const generated_text = response.data.generated_text;
+            console.log("Respuesta de GPT-3:", generated_text);
+            this.chatStore.addItems({
+              type: "question",
+              text: this.message
+            })
+            this.chatStore.addItems(generated_text)
+            
+            this.message = ""; // Limpiar el mensaje después de enviarlo
+          } catch (error) {
+            console.error("Error al enviar el mensaje a la vista:", error);
+          }
       }
     }
   };

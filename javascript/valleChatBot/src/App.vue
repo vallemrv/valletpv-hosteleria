@@ -1,18 +1,16 @@
 <template>
   <v-app>
-    <SQLInterface />
+    <MainComponet />
   </v-app>
 </template>
 
 <script>
 import MainComponet from "./components/MainComponent.vue";
-import SQLInterface from '@/components/SQLInterface.vue';
 
 export default {
   name: "App",
   components: {
-    MainComponet,
-    SQLInterface
+    MainComponet
   }
 };
 </script>
