@@ -1,54 +1,73 @@
 <template>
-    <v-container fluid>
-      <v-row class="ma-auto w-lg-75" justify="center">
-        <v-col cols="12" sm="8" md="6">
-          <v-card>
-            <v-card-title>{{ title }}</v-card-title>
-            <v-card-text>
-              <v-form ref="form">
-                <v-text-field label="Nombre de la empresa" v-model="companyName"></v-text-field>
-                <v-text-field label="URL" v-model="url" type="url"></v-text-field>
-                <v-text-field label="Nombre de usuario" v-model="username"></v-text-field>
-                <v-text-field label="Contraseña" v-model="password" type="password"></v-text-field>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="red" @click="cancel" v-if="store.countEmpresas > 0">Cancelar</v-btn>
-              <v-btn color="green" @click="submit">Enviar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-  </template>
-  
-  <script>
-  import { defineComponent } from "vue";
-  import { useStore } from "../path/to/your/store";
-  
-  export default defineComponent({
-    setup() {
-      const store = useStore();
-      const title = store.title;
-      return { store, title };
+  <v-container fluid>
+    <v-row class="ma-auto w-lg-75" justify="center">
+      <v-col cols="12" sm="8" md="6">
+        <v-card>
+          <v-img
+           src="@/assets/logo.png"
+            aspect-ratio="2"
+            max-height="100"
+            max-width="100%"
+            class="mx-auto"
+          ></v-img>
+          <v-card-title >
+            <v-card color="blue"><v-card-text class="text-h5">{{ title }}</v-card-text></v-card></v-card-title>
+          <v-card-text>
+            <v-form ref="form">
+              <v-text-field label="Nombre de la empresa" v-model="companyName"></v-text-field>
+              <v-text-field label="URL" v-model="url" type="url"></v-text-field>
+              <v-text-field label="Nombre de usuario" v-model="username"></v-text-field>
+              <v-text-field label="Contraseña" v-model="password" type="password"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="red" @click="cancel" v-if="empresaStore.countEmpresas > 0">Cancelar</v-btn>
+            <v-btn color="green" @click="submit">Enviar</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+import { defineComponent } from "vue";
+import { useEmpresaStore } from "@/stores/empresaStore";
+
+export default defineComponent({
+  props: {
+    title: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        companyName: "",
-        url: "",
-        username: "",
-        password: "",
+  },
+  setup() {
+    const empresaStore = useEmpresaStore();
+    return { empresaStore };
+  },
+  data() {
+    return {
+      companyName: "",
+      url: "",
+      username: "",
+      password: "",
+    };
+  },
+  methods: {
+    submit() {
+      const newEmpresa = {
+        id: Date.now(),
+        nombre: this.companyName,
+        url: this.url,
+        username: this.username,
+        password: this.password,
       };
+      this.empresaStore.addEmpresa(newEmpresa);
     },
-    methods: {
-      submit() {
-        // Procesa los datos del formulario aquí
-      },
-      cancel() {
-        // Lógica para el botón cancelar aquí
-      },
+    cancel() {
+      // Lógica para el botón cancelar aquí, si es necesario
     },
-  });
-  </script>
-  
+  },
+});
+</script>
