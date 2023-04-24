@@ -59,7 +59,15 @@
   
       <!-- Aquí va el contenido principal de tu aplicación -->
       <v-main>
+        <v-container fluid>
+        <v-row>
+          <v-col cols="12" sm="6" md="4">
+            <VentasCard :empresa="empresaStore.empresa" />
+          </v-col>
 
+        </v-row>
+        </v-container>
+        
         
         <EditEmpresaDialog ref="editEmpresaDialog" :tipo="tipo"  :title="titleDialog"/>
         <confirmation-dialog ref="rmEmpDialog" 
@@ -67,22 +75,6 @@
                        @result="borrarEmpresa"></confirmation-dialog>
       </v-main>
        
-      <v-footer app>
-        <!-- Barra del pie de página -->
-        <v-textarea
-        color="success"
-        v-model="message"
-        label="Instrucciones"
-        rows="2"
-        clear-icon="mdi-close-circle"
-        clearable
-        :append-inner-icon="message ? 'mdi-send' : (isRecording ? 'mdi-stop': 'mdi-microphone') "
-        @click:append-inner="message ? enviarInst() : toggleRecording()" :disabled="isRecordingDisabled && !message"
-        append>
-        
-        </v-textarea>
-        
-      </v-footer>
     </v-app>
   </template>
   
@@ -91,21 +83,20 @@
 import { useEmpresaStore } from "@/stores/empresaStore";
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue';
 import EditEmpresaDialog from "@/components/dialogs/EditEmpresaDialog.vue";
+import VentasCard from "@/components/appMain/dashBoard/VentasCard.vue";
 
 
 export default {
     components: {
-        ConfirmationDialog,
-        EditEmpresaDialog
-    },
+    ConfirmationDialog,
+    EditEmpresaDialog,
+    VentasCard
+},
     data() {
       return {
         tipo: "editar",
         titleDialog: "Editar empresa",
         drawer: true,
-        message: "",
-        isRecording: false,
-        isRecordingDisabled: false,
       };
     },
     setup() {
@@ -138,13 +129,6 @@ export default {
       showConfirmarRmEmpresa(){
           this.$refs.rmEmpDialog.openDialog();
       },
-      toggleRecording() {
-      // Agrega aquí la lógica para activar/desactivar la grabación
-      },
-      enviarInst() {
-      // Agrega aquí la lógica para enviar instrucciones
-      },
-        
     },
     };
     

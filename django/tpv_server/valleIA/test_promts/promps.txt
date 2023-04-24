@@ -1,0 +1,13 @@
+total_estado_c = Lineaspedido.objects.filter(estado='C', IDTicket__in=ticket_ids_no_cierre).annotate(venta=F('Precio') * F('cantidad')).aggregate(total_ventas=Sum('venta'))['total_ventas'] or 0
+
+Sabiendo que Ticket.id y CierreCaja.ticketfinal esta relacionados
+y queremos todos los ticket con todas sus lineas de ticket mediante
+TicketLinea: ticket.id -> ticketlineas.idticket mayores que el ticketfinal y 
+queremos el total (precio * cantidad) sabiendo que la relacion etre el ticketlineas y Lineaspedido
+es TicketLinea: lineaspedido.id -> ticketlineas.idlinea  
+
+
+dame una vista con el total de todas las ventas con estado C, N y P 
+
+total_estado_c = Lineaspedido.objects.filter(estado='C', id__in=lineas_pedido_ids).annotate(venta=F('precio') * F('cantidad')).aggregate(total_ventas=Sum('venta'))['total_ventas'] or 0
+row value misused

@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'comunicacion',
-    'contabilidad',
     'gestion',
     'app',
     'api_android',

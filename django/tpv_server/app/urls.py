@@ -13,5 +13,5 @@ urlpatterns = [
     path("get_datos_empresa", views.get_datos_empresa, name="get_datos_empresa"),
     path("send_cierre", views.send_cierre_by_id, name="send_cierre_by_id" ),
     path("ventas/", include("app.ventas.urls"), name="ventas"),
-    path("facturas/", include("app.facturas.urls"), name="facturas")
+    path("facturas/", include("app.facturas.urls"), name="facturas"),
 ]
