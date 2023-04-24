@@ -1,27 +1,30 @@
 <template>
-    <div id="app">
-      <FormEmpresas v-if="!empresa" title="Crear una empresa" />
-      <MainView v-else />
-    </div>
-  </template>
+  <div id="app">
+    <FormEmpresa v-if="!empresaStore.empresa" title="Crear una empresa"  tipo="nuevo"/>
+    <MainView v-else />
+  </div>
+</template>
   
   <script>
-  import FormEmpresas from "@/components/appMain/FormEmpresa.vue";
+  import FormEmpresa from "@/components/appMain/FormEmpresa.vue";
   import MainView from "@/views/appMain/MainView.vue";
   import { useEmpresaStore } from "@/stores/empresaStore";
   
   export default {
     components: {
-      FormEmpresas,
+      FormEmpresa,
       MainView,
     },
     setup() {
       const empresaStore = useEmpresaStore();
   
       return {
-        empresa: empresaStore.empresa,
+        empresaStore
       };
     },
+    mounted(){
+      this.empresaStore.cargarEmpresas();
+    }
   };
   </script>
   

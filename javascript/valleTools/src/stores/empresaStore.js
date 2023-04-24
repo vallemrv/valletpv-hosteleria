@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
+import { getNewToken } from "@/api";
 
 export const useEmpresaStore = defineStore('empresaStore', {
   state: () => ({
     empresa: null,
     empresas: [],
+    error: null
   }),
   actions: {
     cargarEmpresas() {
@@ -17,14 +19,34 @@ export const useEmpresaStore = defineStore('empresaStore', {
         this.empresa = JSON.parse(empresaActivaJSON);
       }
     },
-    addEmpresa(nuevaEmpresa) {
-      this.empresa = nuevaEmpresa;
-      this.empresas.push(nuevaEmpresa);
-      localStorage.setItem('valleges_empresas', JSON.stringify(this.empresas));
-      localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
+    async addEmpresa(nuevaEmpresa, username, password) {
+      const token = await getNewToken(username, password, nuevaEmpresa.url);
+
+      if (token) {
+        nuevaEmpresa.token = token; 
+        this.empresa = nuevaEmpresa;
+        this.empresas.push(nuevaEmpresa);
+        localStorage.setItem('valleges_empresas', JSON.stringify(this.empresas));
+        localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
+        this.error = null;
+      }else{
+        this.error = "Datos incorrectos."
+      }
+    },
+    async upEmpresa(username, password) {
+      const token = await getNewToken(username, password, this.empresa.url);
+
+      if (token) {
+        this.empresa.token = token; 
+        localStorage.setItem('valleges_empresas', JSON.stringify(this.empresas));
+        localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
+        this.error = null;
+      }else{
+        this.error = "Datos incorrectos."
+      }
     },
     rmEmpresa() {
-        const index = this.empresas.findIndex((empresa) => empresa === this.empresa);
+        const index = this.empresas.findIndex((empresa) => empresa.id === this.empresa.id);
 
         if (index !== -1) {
           this.empresas.splice(index, 1);

@@ -4,9 +4,9 @@
            rail v-model="drawer" >
         <v-list>
           <v-list-item
-            prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
-            title="Sandra Adams"
-            subtitle="sandra_a88@gmailcom"
+            prepend-icon="mdi-handshake"
+            :title="empresaStore.empresa.nombre"
+            :subtitle="empresaStore.empresa.url"
           ></v-list-item>
         </v-list>
 
@@ -19,28 +19,35 @@
         </v-list>
       </v-navigation-drawer>
       <v-app-bar app>
-        <v-toolbar-title>{{ empresa.nombre }}</v-toolbar-title>
+        <v-btn v-if="!drawer" icon @click="drawer = true">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
+        <v-toolbar-title>{{ empresaStore.empresa.nombre }}</v-toolbar-title>
   
         <v-spacer></v-spacer>
   
-        <v-btn icon @click="borrarEmpresa">
+        <v-btn icon @click="showConfirmarRmEmpresa">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
   
         <v-btn icon @click="modificarEmpresa">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
+
+        <v-btn icon @click="addEmpresa">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
   
         <v-menu offset-y>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
+          <template v-slot:activator="{ props }">
+            <v-btn icon v-bind="props">
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
   
           <v-list>
             <v-list-item
-              v-for="empresaItem in empresas"
+              v-for="empresaItem in empresaStore.empresas"
               :key="empresaItem.id"
               @click="seleccionarEmpresa(empresaItem)"
             >
@@ -53,6 +60,11 @@
       <!-- Aquí va el contenido principal de tu aplicación -->
       <v-main>
 
+        
+        <EditEmpresaDialog ref="editEmpresaDialog" :tipo="tipo"  :title="titleDialog"/>
+        <confirmation-dialog ref="rmEmpDialog" 
+                       message="Esta seguro que quieres borrar esta empresa?" 
+                       @result="borrarEmpresa"></confirmation-dialog>
       </v-main>
        
       <v-footer app>
@@ -74,40 +86,64 @@
     </v-app>
   </template>
   
-  <script>
+<script>
   
-  import { useEmpresaStore } from "@/stores/empresaStore";
+import { useEmpresaStore } from "@/stores/empresaStore";
+import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue';
+import EditEmpresaDialog from "@/components/dialogs/EditEmpresaDialog.vue";
 
-    export default {
+
+export default {
+    components: {
+        ConfirmationDialog,
+        EditEmpresaDialog
+    },
     data() {
-        return {
-        drawer: false,
+      return {
+        tipo: "editar",
+        titleDialog: "Editar empresa",
+        drawer: true,
         message: "",
         isRecording: false,
         isRecordingDisabled: false,
-        };
+      };
     },
     setup() {
         const empresaStore = useEmpresaStore();
 
         return {
-        empresa: empresaStore.empresa,
-        empresas: empresaStore.empresas,
-        borrarEmpresa: empresaStore.rmEmpresa,
-        modificarEmpresa: () => {}, // Agrega aquí la función para modificar la empresa
+        empresaStore,
         seleccionarEmpresa: (empresaItem) => {
             empresaStore.empresa = empresaItem;
             localStorage.setItem("valleges_empresa", JSON.stringify(empresaItem));
         },
-        };
+      };
     },
     methods: {
-        toggleRecording() {
-        // Agrega aquí la lógica para activar/desactivar la grabación
-        },
-        enviarInst() {
-        // Agrega aquí la lógica para enviar instrucciones
-        },
+      modificarEmpresa(){
+        this.tipo = "editar";
+        this.titleDialog = "Editar empresa";
+        this.$refs.editEmpresaDialog.openDialog();
+      },
+      addEmpresa(){
+        this.tipo = "nuevo";
+        this.titleDialog = "Agregar empresa";
+        this.$refs.editEmpresaDialog.openDialog();
+      },
+      borrarEmpresa(result){
+        if (result){
+          this.empresaStore.rmEmpresa();
+        }
+      },
+      showConfirmarRmEmpresa(){
+          this.$refs.rmEmpDialog.openDialog();
+      },
+      toggleRecording() {
+      // Agrega aquí la lógica para activar/desactivar la grabación
+      },
+      enviarInst() {
+      // Agrega aquí la lógica para enviar instrucciones
+      },
         
     },
     };
