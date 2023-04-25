@@ -14,4 +14,5 @@ urlpatterns = [
     path("send_cierre", views.send_cierre_by_id, name="send_cierre_by_id" ),
     path("ventas/", include("app.ventas.urls"), name="ventas"),
     path("facturas/", include("app.facturas.urls"), name="facturas"),
+    path("dashboard/", include("app.dash_board.urls"), name="dashboard"),
 ]

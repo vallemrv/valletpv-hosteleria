@@ -1,43 +1,9 @@
 from .utils import get_total_by_horas, get_total
-from django.db.models import F, Sum, Count
-
 from tokenapi.http import JsonResponse
 from gestion.models import (Arqueocaja, Camareros, Historialnulos,
-                            Lineaspedido, 
-                            Infmesa, Mesas, Ticket, Cierrecaja, Ticketlineas)
+                            Infmesa, Mesas, Ticket)
 from tokenapi.decorators import token_required
 from gestion.models import Mesasabiertas
-
-@token_required
-def get_estado_ventas(request):
-    ultimo_ticket = Cierrecaja.objects.latest("pk").ticketfinal
-
-    # Obtener los tickets cuyo PK es mayor que el valor de ticketfinal del último cierre de caja
-    tickets_no_cerrados = Ticket.objects.filter(pk__gt=ultimo_ticket)
-
-    # Obtener todas las Ticketlinea de los tickets no cerrados
-    ticketlineas_no_cerrados = Ticketlineas.objects.filter(ticket__id__in=tickets_no_cerrados)
-    linea_ids = ticketlineas_no_cerrados.values_list('id', flat=True)
-
-
-    # Obtener todas las Lineaspedido de las Ticketlinea no cerradas y agregar columnas extra
-    lineaspedido_no_cerrados = Lineaspedido.objects.filter(pk__in=linea_ids).annotate(
-        can=Count('tecla_id'),
-        total=F('cantidad') * F('precio')
-    )
-    suma_total_c = lineaspedido_no_cerrados.filter(estado="C").aggregate(Sum('total'))['total__sum'] or 0
-    suma_total_p = lineaspedido_no_cerrados.filter(estado="P").aggregate(Sum('total'))['total__sum'] or 0
-    suma_total_n = lineaspedido_no_cerrados.filter(estado="N").aggregate(Sum('total'))['total__sum'] or 0
-
-    # Crear un JSON con los resultados
-    resultados_json = {
-        "cobrado": suma_total_c,
-        "pedido": suma_total_p,
-        "borrado": suma_total_n
-    }
-    
-
-    return JsonResponse(resultados_json)
 
 
 @token_required
