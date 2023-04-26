@@ -4,6 +4,43 @@ from tokenapi.decorators import token_required
 from tokenapi.http import JsonResponse
 from gestion.models import (Cierrecaja, Infmesa, Pedidos,
                             Lineaspedido, Camareros)
+from datetime import datetime, time, timedelta, timezone
+
+@token_required
+def ventas_por_intervalos(request):
+    date_param = request.POST.get("date")
+    if date_param:
+        selected_date = datetime.strptime(date_param, "%Y-%m-%d").date()
+    else:
+        selected_date = timezone.now().date() - timedelta(days=1)
+
+
+    print(date_param)
+    time_ranges = [
+        (time(8, 0), time(13, 0)),
+        (time(13, 1), time(17, 0)),
+        (time(17, 1), time(20, 0)),
+        (time(20, 1), time(23, 59)),
+    ]
+
+    resultado = []
+
+    for start, end in time_ranges:
+        ventas = Lineaspedido.objects.filter(
+            pedido_id__infmesa__fecha=selected_date,
+            pedido_id__infmesa__hora__range=(start, end),
+        ).annotate(
+            can=Count("idart"), sub=(F("can")*F("precio"))
+        ).aggregate(
+            total=Sum("sub")
+        )["total"]
+
+        if ventas is None:
+            ventas = 0
+
+        resultado.append({"inicio": start, "fin": end, "ventas": ventas})
+
+    return JsonResponse(resultado)
 
 @token_required
 def get_estado_ventas_by_cam(request):
