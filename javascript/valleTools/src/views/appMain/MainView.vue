@@ -61,14 +61,14 @@
       <v-main>
         <v-container fluid>
         <v-row>
-          <v-col cols="12" sm="6" md="4">
-            <VentasCard :empresa="empresaStore.empresa" />
+          <v-col  cols="12" sm="6" md="4" height="100">
+            <VentasCard class="fill-height"  :empresa="empresaStore.empresa" />
           </v-col>
-            <v-col cols="12" sm="6" md="4" >
-              <VentasByCamCard :empresa="empresaStore.empresa" class="fill-height"/>
+            <v-col  cols="12" sm="6" md="4" >
+              <VentasByCamCard class="fill-height" :empresa="empresaStore.empresa" />
             </v-col>
             <v-col cols="12" sm="6" md="4" >
-              <VentasByIntervalos :empresa="empresaStore.empresa" class="fill-height" />
+              <VentasByIntervalos class="fill-height" :empresa="empresaStore.empresa" />
             </v-col>
           </v-row>
         </v-container>
@@ -143,3 +143,5 @@ export default {
     
   </script>
   
+
+ 

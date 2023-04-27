@@ -18,6 +18,14 @@
             ></VueDatePicker>
         
          </v-dialog>
+
+         <v-switch
+            class="pa-0 ma-0"
+            v-model="switchEstado"
+            :label="`Mostrar: ${estado === 'C' ? 'T. Nulo' : 'T. Cobrado'}`"
+            @change="updateData"
+          ></v-switch>
+
          <v-table>
           <template v-slot:default>
             <thead>
@@ -46,7 +54,7 @@
   import '@vuepic/vue-datepicker/dist/main.css'
 
   
-  export default {
+  export default{
     components:{ VueDatePicker },
     props: ["empresa"],
     data() {
@@ -54,17 +62,21 @@
         intervalos: [],
         selectedDate: new Date().toISOString().split("T")[0],
         datePickerDialog: false,
+        switchEstado: false
       };
     },
     computed:{
-        formattedSelectedDate: {
-            get() {
-                return this.formatDate(this.selectedDate);
-            },
-            set(date) {
-                this.selectedDate = date.toISOString().split("T")[0];
-            },
-        },
+      estado() {
+         return this.switchEstado ? "A" : "C";
+      },
+      formattedSelectedDate: {
+          get() {
+              return this.formatDate(this.selectedDate);
+          },
+          set(date) {
+            this.selectedDate = this.formatDate(date);
+          },
+      },
     },
     methods:{
         formatDate(date) {
@@ -88,6 +100,7 @@
                 params.append("user", this.empresa.token.user)
                 params.append("token", this.empresa.token.token)
                 params.append("date", this.formattedSelectedDate)
+                params.append("estado", this.estado);
                 const response = await axios.post(this.empresa.url + "/app/dashboard/ventas_por_intervalos", params);
                 this.intervalos = response.data;
             } catch (error) {

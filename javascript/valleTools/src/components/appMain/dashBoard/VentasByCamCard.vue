@@ -54,26 +54,24 @@ export default {
   async mounted() {
     const fetchData = async () => {
         try {
-        const params = new FormData();
-        params.append("user", this.empresa.token.user);
-        params.append("token", this.empresa.token.token);
+          const params = new FormData();
+          params.append("user", this.empresa.token.user);
+          params.append("token", this.empresa.token.token);
 
-        const response = await axios.post(
-            this.empresa.url + "/app/dashboard/get_estado_ventas_by_cam",
-            params
-        );
-       
-       
-            const datasets = response.data.map((element, i) => ({
-                data: [element.total_vendido],
-                label: [element.nombre],
-                backgroundColor: (i < this.camareroVentas.datasets.length 
-                        && this.camareroVentas.datasets[i].label[0] == element.nombre ) ? 
-                        this.camareroVentas.datasets[i].backgroundColor :[this.randomHexColor()]
-            
-               }))
-
-            
+          const response = await axios.post(
+              this.empresa.url + "/app/dashboard/get_estado_ventas_by_cam",
+              params
+          );
+        
+        
+          const datasets = response.data.map((element, i) => ({
+              data: [element.total_vendido],
+              label: [element.nombre],
+              backgroundColor: (i < this.camareroVentas.datasets.length 
+                      && this.camareroVentas.datasets[i].label[0] == element.nombre ) ? 
+                      this.camareroVentas.datasets[i].backgroundColor :[this.randomHexColor()]
+          
+              }))
 
             this.camareroVentas = {
                 labels: ["Ventas por camarero"],

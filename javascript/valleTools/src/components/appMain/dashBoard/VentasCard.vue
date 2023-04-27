@@ -71,3 +71,11 @@ export default {
 };
 </script>
   
+<style scoped>
+canvas{
+    margin: auto;
+    width: 100%;
+    height: 200px;
+}
+
+</style>

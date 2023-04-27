@@ -9,13 +9,12 @@ from datetime import datetime, time, timedelta, timezone
 @token_required
 def ventas_por_intervalos(request):
     date_param = request.POST.get("date")
+    estado = request.POST.get("estado", "C")
     if date_param:
-        selected_date = datetime.strptime(date_param, "%Y-%m-%d").date()
+        selected_date = datetime.strptime(date_param, "%Y/%m/%d").date()
     else:
         selected_date = timezone.now().date() - timedelta(days=1)
 
-
-    print(date_param)
     time_ranges = [
         (time(8, 0), time(13, 0)),
         (time(13, 1), time(17, 0)),
@@ -26,9 +25,14 @@ def ventas_por_intervalos(request):
     resultado = []
 
     for start, end in time_ranges:
+        fecha_str = selected_date.strftime("%Y/%m/%d")
+        hora_start_str = start.strftime("%H:%M")
+        hora_end_str = end.strftime("%H:%M")
+
         ventas = Lineaspedido.objects.filter(
-            pedido_id__infmesa__fecha=selected_date,
-            pedido_id__infmesa__hora__range=(start, end),
+            pedido_id__infmesa__fecha=fecha_str,
+            pedido_id__infmesa__hora__range=(hora_start_str, hora_end_str),
+            estado=estado
         ).annotate(
             can=Count("idart"), sub=(F("can")*F("precio"))
         ).aggregate(
@@ -38,7 +42,7 @@ def ventas_por_intervalos(request):
         if ventas is None:
             ventas = 0
 
-        resultado.append({"inicio": start, "fin": end, "ventas": ventas})
+        resultado.append({"inicio": hora_start_str, "fin": hora_end_str, "ventas": ventas})
 
     return JsonResponse(resultado)
 
@@ -114,7 +118,7 @@ def get_estado_ventas(request):
         can=Count('idart'), sub_total=F('can') * F('precio')
     ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
 
-    suma_total_n = lineas_pedido.filter(estado='N').annotate(
+    suma_total_n = lineas_pedido.filter(estado='A').annotate(
         can=Count('idart'), sub_total=F('can') * F('precio')
     ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
 
