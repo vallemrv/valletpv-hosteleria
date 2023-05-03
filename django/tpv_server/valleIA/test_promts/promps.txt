@@ -47,3 +47,17 @@ con este formato:
         "pedido": suma_total_p, ##estado="P"
         "borrado": suma_total_n ##estado="N"
     }
+
+Crea una vista Django.
+
+Teniendo encuenta un modelo de Lineaspedido(id, idart) donde idart pertenece a Teclas(pk, nombre)-
+Quiero el numero de articulos vendidos en el mes en que estamos. articulos=teclas. Agrupados por idart y estado = "C".
+La fecha se tiene que coger de Infmesa(fecha) donde se asocia por medio de Lineaspedido(infmesa_id).
+
+Devuelve: 
+
+# Crear un JSON con los resultados
+    resultado = [{
+        "can": cantidad de articulos
+        "nombre": nombre
+    }]

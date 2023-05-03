@@ -24,7 +24,7 @@ class HistorialMensajes(models.Model):
     mensaje = models.CharField(max_length=300)
     receptor = models.ForeignKey("Receptores", on_delete=models.CASCADE)
     hora = models.CharField(max_length=10)
-    fecha = models.CharField( max_length=10)
+    fecha = models.DateField()
 
 
     @staticmethod
@@ -39,7 +39,7 @@ class HistorialMensajes(models.Model):
         c.receptor_id = row["receptor"]
         c.mensaje = row["mensaje"]
         c.hora = datetime.now().strftime("%H:%M:%S")
-        c.fecha = datetime.now().strftime("%Y-%m-%d")
+        c.fecha = datetime.now()    #.strftime("%Y-%m-%d")
         c.save()
         mensaje = {
             "op": "mensaje",
@@ -141,11 +141,11 @@ class Arqueocaja(models.Model):
         ordering = ['-id']
 
     def serialize(self):
-        f = self.cierre.fecha.split("/")
+        f = self.cierre.fecha.strftime("%d/%m/%Y")
         return {
             "id": self.id,
             "hora": self.cierre.hora,
-            "fecha": f[2]+'/'+f[1]+'/'+f[0],
+            "fecha": f,
             "cambio": self.cambio,
             "descuadre": self.descuadre,
             'totaltarjeta': float(self.cierre.get_total_tarjeta()),
@@ -211,7 +211,7 @@ class Arqueocaja(models.Model):
             "IDCierre": self.cierre.pk,
             "Cambio": self.cambio,
             "gastos": gastos,
-            "Fecha": self.cierre.fecha +" - "+self.cierre.hora,
+            "Fecha": self.cierre.fecha.strftime("%d/%m/%Y") +" - "+self.cierre.hora,
             "TotalTarjeta":  totaltarjeta,
             "TotalEfectivo": totalefectivo_ticado,
             "TotalCaja": float(totaltarjeta) + float(totalefectivo_ticado),
@@ -331,7 +331,7 @@ class Cierrecaja(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     ticketcom = models.IntegerField(db_column='TicketCom')  # Field name made lowercase.
     ticketfinal = models.IntegerField(db_column='TicketFinal')  # Field name made lowercase.
-    fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
+    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
 
     class Meta:
@@ -548,7 +548,7 @@ class HorarioUsr(models.Model):
 class Infmesa(models.Model):
     uid = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100)  # Field name made lowercase.
     camarero = models.ForeignKey(Camareros,  on_delete=models.CASCADE, db_column='IDCam')  # Field name made lowercase.
-    fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
+    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase
 
@@ -1057,7 +1057,7 @@ class Pedidos(models.Model):
             infmesa = Infmesa()
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
-            infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
+            infmesa.fecha = datetime.now()    #.strftime("%Y/%m/%d")
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
             
@@ -1509,7 +1509,7 @@ class Teclaseccion(models.Model):
 
 class Ticket(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
+    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
     camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     entrega = models.DecimalField(db_column='Entrega', max_digits=6, decimal_places=2)  # Field name made lowercase.
@@ -1528,7 +1528,7 @@ class Ticket(models.Model):
             uid = mesa.infmesa.pk
             ticket = Ticket()
             ticket.hora = datetime.now().strftime("%H:%M")
-            ticket.fecha = datetime.now().strftime("%Y/%m/%d")
+            ticket.fecha = datetime.now()  #.strftime("%Y/%m/%d")
             ticket.camarero_id = idc
             ticket.uid = uid
             ticket.entrega = entrega

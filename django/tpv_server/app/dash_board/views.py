@@ -1,10 +1,40 @@
-from django.db.models import F, Q, Sum, Count, Value, FloatField
-from django.db.models.functions import Concat
+from django.db.models import F, Q, Sum, Count, Value, FloatField, CharField
+from django.db.models.functions import Concat, Cast
 from tokenapi.decorators import token_required
 from tokenapi.http import JsonResponse
 from gestion.models import (Cierrecaja, Infmesa, Pedidos,
-                            Lineaspedido, Camareros)
+                            Lineaspedido, Camareros, Teclas)
 from datetime import datetime, time, timedelta, timezone
+
+
+@token_required
+def articulos_vendidos(request):
+    # Obtener el mes y año actual
+    today = datetime.today()
+    current_month = today.month-1
+    current_year = today.year
+
+    # Filtrar por mes y año actual y estado "C"
+    ventas = Lineaspedido.objects.filter(
+        infmesa_id__fecha__month=current_month,
+        infmesa_id__fecha__year=current_year,
+        estado="C",
+    ).values("idart")
+
+    # Contar y agrupar por idart
+    ventas = ventas.annotate(can=Count("idart")).order_by("-can")
+
+    # Limitar los resultados a 10 y obtener nombres de los artículos
+    resultado = []
+    for venta in ventas[:25]:
+        tecla = Teclas.objects.filter(pk=venta["idart"]).first()
+        if tecla:
+            resultado.append({"can": venta["can"], "nombre": tecla.nombre})
+
+    return JsonResponse(resultado)
+
+
+
 
 @token_required
 def ventas_por_intervalos(request):
@@ -25,7 +55,7 @@ def ventas_por_intervalos(request):
     resultado = []
 
     for start, end in time_ranges:
-        fecha_str = selected_date.strftime("%Y/%m/%d")
+        fecha_str = selected_date
         hora_start_str = start.strftime("%H:%M")
         hora_end_str = end.strftime("%H:%M")
 
@@ -50,12 +80,12 @@ def ventas_por_intervalos(request):
 def get_estado_ventas_by_cam(request):
     # Obtener la fecha y hora del último cierre de caja
     ultimo_cierre = Cierrecaja.objects.latest('pk')
-    dt_ultimo_cierre = ultimo_cierre.fecha +" "+ ultimo_cierre.hora
+    dt_ultimo_cierre = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
 
     # Filtrar las Infmesa que cumplan con la condición
     infmesas = Infmesa.objects.annotate(
         datetime_fecha_hora=Concat(
-            F('fecha'), Value(' '), F('hora'))
+            Cast(F('fecha'), CharField()), Value(' '), F('hora'))
     ).filter(
         datetime_fecha_hora__gt=dt_ultimo_cierre
     )
@@ -85,21 +115,20 @@ def get_estado_ventas_by_cam(request):
                 "total_vendido": total_vendido
             })
     
-  
-
+   
     return JsonResponse(resultado)
 
 @token_required
 def get_estado_ventas(request):
     # Obtener la fecha y hora del último cierre de caja
     ultimo_cierre = Cierrecaja.objects.latest('pk')
-    con_fecha_hora = ultimo_cierre.fecha +" "+ ultimo_cierre.hora
-
+    con_fecha_hora = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
+    
 
     # Filtrar las Infmesa que cumplan con la condición
     infmesas = Infmesa.objects.annotate(
         datetime_fecha_hora=(Concat(
-            F('fecha'), Value(' '), F('hora')))
+            Cast(F('fecha'), CharField()), Value(' '), F('hora')))
     ).filter(
         datetime_fecha_hora__gt=con_fecha_hora
     )

@@ -67,8 +67,11 @@
             <v-col  cols="12" sm="6" md="4" >
               <VentasByCamCard class="fill-height" :empresa="empresaStore.empresa" />
             </v-col>
-            <v-col cols="12" sm="6" md="4" >
+            <v-col cols="12" sm="12" md="4" >
               <VentasByIntervalos class="fill-height" :empresa="empresaStore.empresa" />
+            </v-col>
+            <v-col cols="12" >
+              <VentasByArt class="fill-height" :empresa="empresaStore.empresa" />
             </v-col>
           </v-row>
         </v-container>
@@ -91,6 +94,7 @@ import EditEmpresaDialog from "@/components/dialogs/EditEmpresaDialog.vue";
 import VentasCard from "@/components/appMain/dashBoard/VentasCard.vue";
 import VentasByCamCard from "../../components/appMain/dashBoard/VentasByCamCard.vue";
 import VentasByIntervalos from "../../components/appMain/dashBoard/VentasByIntervalos.vue";
+import VentasByArt from "../../components/appMain/dashBoard/VentasByArt.vue";
 
 
 export default {
@@ -99,7 +103,8 @@ export default {
     EditEmpresaDialog,
     VentasCard,
     VentasByCamCard,
-    VentasByIntervalos
+    VentasByIntervalos,
+    VentasByArt
 },
     data() {
       return {
