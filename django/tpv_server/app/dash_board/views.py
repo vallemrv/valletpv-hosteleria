@@ -38,125 +38,141 @@ def articulos_vendidos(request):
 
 @token_required
 def ventas_por_intervalos(request):
-    date_param = request.POST.get("date")
-    estado = request.POST.get("estado", "C")
-    if date_param:
-        selected_date = datetime.strptime(date_param, "%Y/%m/%d").date()
-    else:
-        selected_date = timezone.now().date() - timedelta(days=1)
-
-    time_ranges = [
-        (time(8, 0), time(13, 0)),
-        (time(13, 1), time(17, 0)),
-        (time(17, 1), time(20, 0)),
-        (time(20, 1), time(23, 59)),
-    ]
-
     resultado = []
+    try:
+        date_param = request.POST.get("date")
+        estado = request.POST.get("estado", "C")
+        if date_param:
+            selected_date = datetime.strptime(date_param, "%Y/%m/%d").date()
+        else:
+            selected_date = timezone.now().date() - timedelta(days=1)
 
-    for start, end in time_ranges:
-        fecha_str = selected_date
-        hora_start_str = start.strftime("%H:%M")
-        hora_end_str = end.strftime("%H:%M")
+        time_ranges = [
+            (time(8, 0), time(13, 0)),
+            (time(13, 1), time(17, 0)),
+            (time(17, 1), time(20, 0)),
+            (time(20, 1), time(23, 59)),
+        ]
 
-        ventas = Lineaspedido.objects.filter(
-            pedido_id__infmesa__fecha=fecha_str,
-            pedido_id__infmesa__hora__range=(hora_start_str, hora_end_str),
-            estado=estado
-        ).annotate(
-            can=Count("idart"), sub=(F("can")*F("precio"))
-        ).aggregate(
-            total=Sum("sub")
-        )["total"]
+        
 
-        if ventas is None:
-            ventas = 0
+        for start, end in time_ranges:
+            fecha_str = selected_date
+            hora_start_str = start.strftime("%H:%M")
+            hora_end_str = end.strftime("%H:%M")
 
-        resultado.append({"inicio": hora_start_str, "fin": hora_end_str, "ventas": ventas})
+            ventas = Lineaspedido.objects.filter(
+                pedido_id__infmesa__fecha=fecha_str,
+                pedido_id__infmesa__hora__range=(hora_start_str, hora_end_str),
+                estado=estado
+            ).annotate(
+                can=Count("idart"), sub=(F("can")*F("precio"))
+            ).aggregate(
+                total=Sum("sub")
+            )["total"]
+
+            if ventas is None:
+                ventas = 0
+
+            resultado.append({"inicio": hora_start_str, "fin": hora_end_str, "ventas": ventas})
+    except Exception as e:
+        print(e)
 
     return JsonResponse(resultado)
 
 @token_required
 def get_estado_ventas_by_cam(request):
     # Obtener la fecha y hora del último cierre de caja
-    ultimo_cierre = Cierrecaja.objects.latest('pk')
-    dt_ultimo_cierre = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
-
-    # Filtrar las Infmesa que cumplan con la condición
-    infmesas = Infmesa.objects.annotate(
-        datetime_fecha_hora=Concat(
-            Cast(F('fecha'), CharField()), Value(' '), F('hora'))
-    ).filter(
-        datetime_fecha_hora__gt=dt_ultimo_cierre
-    )
-
-    # Obtener la lista de camareros
-    camareros = Camareros.objects.filter(activo=1)
-
     resultado = []
+    try:
+        ultimo_cierre = Cierrecaja.objects.latest('pk')
+        dt_ultimo_cierre = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
 
-    # Realizar la consulta para cada camarero
-    for camarero in camareros:
-        pedidos_camarero = Pedidos.objects.filter(
-            camarero_id=camarero.pk,
-            infmesa_id__in=infmesas
+        # Filtrar las Infmesa que cumplan con la condición
+        infmesas = Infmesa.objects.annotate(
+            datetime_fecha_hora=Concat(
+                Cast(F('fecha'), CharField()), Value(' '), F('hora'))
+        ).filter(
+            datetime_fecha_hora__gt=dt_ultimo_cierre
         )
-        
-        total_vendido = Lineaspedido.objects.filter(
-           Q(pedido_id__in=pedidos_camarero) & (Q(estado='P') | Q(estado='C'))
-        ).annotate(
-            can=Count('idart'),
-            subtotal=F('can') * F('precio')
-        ).aggregate(total=Sum('subtotal'))['total'] or 0
-        
-        if total_vendido > 0:
-            resultado.append({
-                "nombre": camarero.nombre,
-                "total_vendido": total_vendido
-            })
+
+        # Obtener la lista de camareros
+        camareros = Camareros.objects.filter(activo=1)
+
     
-   
+        # Realizar la consulta para cada camarero
+        for camarero in camareros:
+            pedidos_camarero = Pedidos.objects.filter(
+                camarero_id=camarero.pk,
+                infmesa_id__in=infmesas
+            )
+            
+            total_vendido = Lineaspedido.objects.filter(
+            Q(pedido_id__in=pedidos_camarero) & (Q(estado='P') | Q(estado='C'))
+            ).annotate(
+                can=Count('idart'),
+                subtotal=F('can') * F('precio')
+            ).aggregate(total=Sum('subtotal'))['total'] or 0
+            
+            if total_vendido > 0:
+                resultado.append({
+                    "nombre": camarero.nombre,
+                    "total_vendido": total_vendido
+                })
+    except Exception as e:
+        print(e)
+    
     return JsonResponse(resultado)
 
 @token_required
 def get_estado_ventas(request):
-    # Obtener la fecha y hora del último cierre de caja
-    ultimo_cierre = Cierrecaja.objects.latest('pk')
-    con_fecha_hora = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
-    
-
-    # Filtrar las Infmesa que cumplan con la condición
-    infmesas = Infmesa.objects.annotate(
-        datetime_fecha_hora=(Concat(
-            Cast(F('fecha'), CharField()), Value(' '), F('hora')))
-    ).filter(
-        datetime_fecha_hora__gt=con_fecha_hora
-    )
-
-    # Filtrar las Lineaspedido que cumplan con la condición
-    lineas_pedido = Lineaspedido.objects.filter(
-        infmesa_id__in=infmesas
-    )
-
-    # Calcular la suma total para cada estado
-    suma_total_c = lineas_pedido.filter(estado='C').annotate(
-        can=Count('idart'), sub_total=F('can') * F('precio')
-    ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
-
-    suma_total_p = lineas_pedido.filter(estado='P').annotate(
-        can=Count('idart'), sub_total=F('can') * F('precio')
-    ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
-
-    suma_total_n = lineas_pedido.filter(estado='A').annotate(
-        can=Count('idart'), sub_total=F('can') * F('precio')
-    ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
-
-
-    # Crear un JSON con los resultados
-    resultado = {
-        "cobrado": suma_total_c,
-        "pedido": suma_total_p,
-        "borrado": suma_total_n
+    resultado = resultado = {
+        "cobrado": 0,
+        "pedido": 0,
+        "borrado": 0
     }
+
+    try:
+        # Obtener la fecha y hora del último cierre de caja
+        ultimo_cierre = Cierrecaja.objects.latest('pk')
+        con_fecha_hora = ultimo_cierre.fecha.strftime("%Y-%m-%d") +" "+ ultimo_cierre.hora
+        
+
+        # Filtrar las Infmesa que cumplan con la condición
+        infmesas = Infmesa.objects.annotate(
+            datetime_fecha_hora=(Concat(
+                Cast(F('fecha'), CharField()), Value(' '), F('hora')))
+        ).filter(
+            datetime_fecha_hora__gt=con_fecha_hora
+        )
+
+        # Filtrar las Lineaspedido que cumplan con la condición
+        lineas_pedido = Lineaspedido.objects.filter(
+            infmesa_id__in=infmesas
+        )
+
+        # Calcular la suma total para cada estado
+        suma_total_c = lineas_pedido.filter(estado='C').annotate(
+            can=Count('idart'), sub_total=F('can') * F('precio')
+        ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
+
+        suma_total_p = lineas_pedido.filter(estado='P').annotate(
+            can=Count('idart'), sub_total=F('can') * F('precio')
+        ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
+
+        suma_total_n = lineas_pedido.filter(estado='A').annotate(
+            can=Count('idart'), sub_total=F('can') * F('precio')
+        ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
+
+
+        # Crear un JSON con los resultados
+        resultado = {
+            "cobrado": suma_total_c,
+            "pedido": suma_total_p,
+            "borrado": suma_total_n
+        }
+        
+    except Exception as e:
+        print(e)
 
     return JsonResponse(resultado)

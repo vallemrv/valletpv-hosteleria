@@ -35,8 +35,6 @@ def send_cierre_by_id(request):
     else:
         return JsonResponse({'res':"No hay arqueos"})
 
-
-
 @token_required
 def get_datos_empresa(request):
     return JsonResponse({'nombre':settings.BRAND, "email": settings.MAIL})
@@ -99,8 +97,6 @@ def mod_sec(request):
     comunicar_cambios_devices("md", "teclas", obj)
     return JsonResponse(obj)
 
-
-
 @token_required
 def getlistado(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
@@ -117,7 +113,6 @@ def getlistado(request):
 
     return JsonResponse({'tb':tb_name, "regs": regs})
 
-
 @token_required
 def get_listado_compuesto(request):
     tbs = json.loads(request.POST["tbs"])
@@ -128,7 +123,6 @@ def get_listado_compuesto(request):
         tablas.append({"tb": tb_name, "regs": regs})
 
     return JsonResponse(tablas)
-
 
 @token_required
 def add_reg(request):
@@ -255,7 +249,6 @@ def delete_reg(inst):
             }
         send_mensaje_devices(update) 
         obj.delete()
-
 
 def mod_teclados(inst):
     item = inst["reg"]

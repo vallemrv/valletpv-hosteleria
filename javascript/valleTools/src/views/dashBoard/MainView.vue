@@ -1,27 +1,7 @@
 <template>
-    <v-app>
-      <v-navigation-drawer expand-on-hover
-           rail v-model="drawer" >
-        <v-list>
-          <v-list-item
-            prepend-icon="mdi-handshake"
-            :title="empresaStore.empresa.nombre"
-            :subtitle="empresaStore.empresa.url"
-          ></v-list-item>
-        </v-list>
-
-        <v-divider></v-divider>
-
-        <v-list density="compact" nav>
-          <v-list-item prepend-icon="mdi-folder" title="My Files" value="myfiles"></v-list-item>
-          <v-list-item prepend-icon="mdi-account-multiple" title="Shared with me" value="shared"></v-list-item>
-          <v-list-item prepend-icon="mdi-star" title="Starred" value="starred"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
+    
       <v-app-bar app>
-        <v-btn v-if="!drawer" icon @click="drawer = true">
-          <v-icon>mdi-menu</v-icon>
-        </v-btn>
+        
         <v-toolbar-title>{{ empresaStore.empresa.nombre }}</v-toolbar-title>
   
         <v-spacer></v-spacer>
@@ -83,7 +63,7 @@
                        @result="borrarEmpresa"></confirmation-dialog>
       </v-main>
        
-    </v-app>
+   
   </template>
   
 <script>
@@ -110,7 +90,6 @@ export default {
       return {
         tipo: "editar",
         titleDialog: "Editar empresa",
-        drawer: true,
       };
     },
     setup() {
