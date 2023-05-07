@@ -71,10 +71,10 @@
 import { useEmpresaStore } from "@/stores/empresaStore";
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue';
 import EditEmpresaDialog from "@/components/dialogs/EditEmpresaDialog.vue";
-import VentasCard from "@/components/appMain/dashBoard/VentasCard.vue";
-import VentasByCamCard from "../../components/appMain/dashBoard/VentasByCamCard.vue";
-import VentasByIntervalos from "../../components/appMain/dashBoard/VentasByIntervalos.vue";
-import VentasByArt from "../../components/appMain/dashBoard/VentasByArt.vue";
+import VentasCard from "@/components/dashBoard/VentasCard.vue";
+import VentasByCamCard from "@/components/dashBoard/VentasByCamCard.vue";
+import VentasByIntervalos from "@/components/dashBoard/VentasByIntervalos.vue";
+import VentasByArt from "@/components/dashBoard/VentasByArt.vue";
 
 
 export default {
