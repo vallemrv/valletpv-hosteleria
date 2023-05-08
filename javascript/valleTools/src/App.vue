@@ -17,7 +17,7 @@
             <v-divider></v-divider>
 
             <v-list density="compact" nav>
-              <v-list-item prepend-icon="mdi-account-multiple" title="Camareros" value="camareros" to="/gestion/camareros"></v-list-item>
+              <v-list-item prepend-icon="mdi-account-multiple" title="Camareros" value="camareros" to="/gestion/camareros/camareros"></v-list-item>
             </v-list>
         </v-navigation-drawer>
 

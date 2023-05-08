@@ -70,11 +70,10 @@ export default {
   },
   async mounted() {
     await this.fetchData();
-
     // Actualizar datos cada 10 segundos (10000 ms)
     this.interval = setInterval(this.fetchData, 10000);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.destroyInterval();
   },
 

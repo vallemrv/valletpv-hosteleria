@@ -93,7 +93,7 @@ export default {
     // Actualizar datos cada 20 segundos (20000 ms)
     this.interval = setInterval(this.fetchData, 20000);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.destroyInterval();
   },
 };

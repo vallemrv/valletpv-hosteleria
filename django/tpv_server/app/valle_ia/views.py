@@ -1,11 +1,7 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from tokenapi.http import JsonResponse, JsonError
+from tokenapi.decorators import token_required
 from django.core.files.storage import default_storage
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.db import connection
-from .test_promts.structura_info import models_info
 import openai
 import os
 import json
@@ -13,10 +9,11 @@ import re
 
 openai.api_key = os.environ.get("API_KEY")
 
-@api_view(['POST'])
+
+@token_required
 def upload_audio(request):
     if 'audio' not in request.FILES:
-        return Response({"error": "No se subió ningún archivo"}, status=400)
+        return JsonError({"error": "No se subió ningún archivo"})
 
     audio_file = request.FILES['audio']
     file_dir = 'audios/'
@@ -28,28 +25,16 @@ def upload_audio(request):
 
     # Guarda el archivo
     filename = default_storage.save(file_path, audio_file)
-    file_url = request.build_absolute_uri(default_storage.url(filename))
-
+    
     transcript = transcribe_audio(default_storage.path(filename))
     if transcript is None:
-        return Response({"error": "Error al transcribir el audio"}, status=500)
+        return JsonError({"error": "Error al transcribir el audio"})
 
-    return Response({"url": file_url, "transcript": transcript})
+    return JsonResponse({"transcript": transcript})
 
-def transcribe_audio(file_path):
-    try:
-        
-        auido_file = open(file_path, "rb")
-        transcript = openai.Audio.transcribe("whisper-1", auido_file)
-        
-        return transcript.text
 
-    except Exception as e:
-        print("Error al transcribir el audio:", e)
-        return None
 
-@csrf_exempt
-@require_POST
+@token_required
 def gpt3_api(request):
     # Parsear la pregunta de la solicitud POST
     data = json.loads(request.POST["message"])
@@ -58,18 +43,8 @@ def gpt3_api(request):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-           {"role":"user","content": "Only sql answer"},
-           {'role':"user", "content": str(models_info)},
-           {'role':"user", "content": ''' Crea una o mas, si fuera necesario, 
-                                      si hay mas de una consultoa separalas por ';', 
-                                      consultas SQL de: '''
-                                      + question +
-                                      ''' No des ningua explicación jamas, nunca, solo las sql query.
-                                          Si no existe una tabla valida en la pregurnta, jamas des una explicacion, jamas,
-                                          solo contesta False;
-                                          Si en la pregunta no esta relacionada con la base de datso, jamas, jamas,
-                                          des una consulta solo  contesta False. 
-                                         '''}
+           {"role":"user",
+            "content": f"Para la siguiente pregunta, devuelve el modelo, acción y parámetros requeridos: {question}"},
         ],
         max_tokens=150,
         n=1,
@@ -93,6 +68,45 @@ def gpt3_api(request):
         
 
     return JsonResponse({"generated_text": chat_item})
+
+
+def process_user_question(question):
+    gpt_response = send_question_to_gpt(question)
+    database_action = parse_gpt_response(gpt_response)
+    
+    if database_action:
+        result = execute_database_action(database_action)
+        return result
+    else:
+        return "No se encontró una acción relacionada con la base de datos."
+
+def send_question_to_gpt(question):
+    # Configura tus credenciales y parámetros de la API de OpenAI aquí
+    openai.api_key = "your_api_key"
+
+    response = openai.Completion.create(
+        engine="davinci-codex",
+        prompt=question,
+        max_tokens=100,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+
+    return response.choices[0].text
+
+def parse_gpt_response(gpt_response):
+    # Analiza la respuesta de GPT para extraer la información relevante
+    # sobre la acción de la base de datos, como el nombre de la tabla y las operaciones a realizar
+
+    # Retorna la acción o None si no hay una acción relacionada con la base de datos
+    return database_action
+
+def execute_database_action(database_action):
+    # Ejecuta la acción de la base de datos utilizando el ORM de Django
+    # y devuelve el resultado
+    # ...
+    return result
 
 
 
@@ -123,3 +137,18 @@ def execute_update_delete_query(sql_query):
     with connection.cursor() as cursor:
         cursor.execute(sql_query)
         connection.commit()
+
+
+
+
+def transcribe_audio(file_path):
+    try:
+        
+        auido_file = open(file_path, "rb")
+        transcript = openai.Audio.transcribe("whisper-1", auido_file)
+        
+        return transcript.text
+
+    except Exception as e:
+        print("Error al transcribir el audio:", e)
+        return None

@@ -15,4 +15,5 @@ urlpatterns = [
     path("ventas/", include("app.ventas.urls"), name="ventas"),
     path("facturas/", include("app.facturas.urls"), name="facturas"),
     path("dashboard/", include("app.dash_board.urls"), name="dashboard"),
+    path("gestion_ia/", include("app.valle_ia.urls"), name="gestion_ia"),
 ]
