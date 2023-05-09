@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'app',
     'api_android',
     'corsheaders',
-    'valleIA'
 ]
 
 MIDDLEWARE = [
@@ -134,6 +133,10 @@ DATABASES = {
             'init_command': 'SET default_storage_engine=INNODB;' +
                             "SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))",
         },
+    },
+    'gestion_ia': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'gestion_ia.sqlite3'),
     }
 }
 {% else %}
@@ -141,9 +144,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '{{name_db}}.sqlite3',          # Or path to database file if using sqlite3.
+    },
+    'gestion_ia': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'gestion_ia.sqlite3'),
     }
+
 }
 {% endif %}
+
+DATABASE_ROUTERS = ['server_{{name_tpv}}.routers.GestionIARouter', 
+                    'server_{{name_tpv}}.routers.GestionRouter']
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

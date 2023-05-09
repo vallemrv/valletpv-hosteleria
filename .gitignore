@@ -3,6 +3,7 @@ testtpv.back
 aplicaciones_gestion_sueltas
 output.json
 
+
 # Directorios y ficheros no necesarios
 .vscode/
 manage*
@@ -28,6 +29,8 @@ test/
 javascript/**/android/
 dist_electron/
 django/**/valleges
+
+!gestion_ia.sqlite3
 
 #excepciones
 !manage_template.py

@@ -32,7 +32,7 @@
       <v-container>
         <div>
           <v-list two-line>
-            <v-list-item v-for="(item, index) in items" :key="index">
+            <v-list-item v-for="(item, index) in chatStore.items" :key="index">
               <v-card
                 elevation="3"
                 class="ma-2 pa-2"
@@ -133,10 +133,10 @@ export default {
     const chatStore = useChatStore();
     const empresaStore = useEmpresaStore();
     return {
-      items: chatStore.items,
       url: empresaStore.empresa.url,
       token: empresaStore.empresa.token,
       empresaStore,
+      chatStore,
     };
   },
 
@@ -157,7 +157,8 @@ export default {
       localStorage.setItem('valleges_empresa', JSON.stringify(nuevaEmpresa));
     },
     borrarChat() {
-      // Lógica para borrar el chat
+      this.chatStore.items = [];
+      this.message = "";
     },
 
     async toggleRecording() {
@@ -219,8 +220,7 @@ export default {
         const response = await axios.post(this.url+"/app/gestion_ia/", params);
 
         // Aquí puedes procesar la respuesta generada por el modelo GPT-3 y hacer lo que necesites con ella
-        const generated_text = response.data.generated_text;
-        console.log("Respuesta de GPT-3:", generated_text);
+        const generated_text = response.data.result;
         this.chatStore.addItems({
           type: "question",
           text: this.message,
