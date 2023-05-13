@@ -19,3 +19,52 @@ export async function getNewToken(username, password, url) {
     return null;
   }
 }
+
+class ReconnectingWebSocket {
+  constructor(url, onMessageCallback) {
+    this.url = url;
+    this.onMessageCallback = onMessageCallback;
+    this.socket = null;
+    this.reconnectInterval = 1000; // Tiempo de espera antes de intentar la reconexión (en milisegundos)
+    this.connect();
+  }
+
+  connect() {
+    this.socket = new WebSocket(this.url);
+
+    this.socket.addEventListener("open", (event) => {
+      console.log("WebSocket conectado:", event);
+    });
+
+    this.socket.addEventListener("message", (event) => {
+      this.onMessageCallback(event.data);
+    });
+
+    this.socket.addEventListener("close", (event) => {
+      console.log("WebSocket desconectado:", event);
+      setTimeout(() => {
+        console.log("Intentando reconectar...");
+        this.connect();
+      }, this.reconnectInterval);
+    });
+
+    this.socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
+  }
+
+  send(data) {
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(data);
+    } else {
+      console.error("WebSocket no está conectado.");
+    }
+  }
+
+  close() {
+    this.socket.close();
+  }
+}
+
+
+export default ReconnectingWebSocket;
