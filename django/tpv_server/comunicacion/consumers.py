@@ -5,8 +5,6 @@
 # @Last modified time: 2019-01-17T00:43:08+01:00
 # @License: Apache license vesion 2.0
 
-from dis import code_info
-from asgiref.sync import async_to_sync
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json

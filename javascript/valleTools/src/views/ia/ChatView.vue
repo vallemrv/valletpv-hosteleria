@@ -103,7 +103,7 @@
         clear-icon="mdi-close-circle"
         clearable
         :append-inner-icon="message ? 'mdi-send' : (isRecording ? 'mdi-stop': 'mdi-microphone') "
-        @click:append-inner="message ? enviarInst() : toggleRecording()" :disabled="isRecordingDisabled && !message"
+        @click:append-inner="message ? sendMessage() : toggleRecording()" :disabled="isRecordingDisabled && !message"
         append>
       </v-textarea>
     </v-footer>
@@ -111,9 +111,11 @@
 </template>
 
 <script>
+import io from 'socket.io-client';
 import axios from "axios";
 import { useChatStore } from "@/stores/chatStore";
 import { useEmpresaStore } from "@/stores/empresaStore";
+import ReconnectingWebSocket from '@/api/';
 
 export default {
   props: {
@@ -147,6 +149,7 @@ export default {
       isRecordingDisabled: false,
       mediaRecorder: null,
       chunks: [],
+      socket:null
     };
   },
 
@@ -226,13 +229,41 @@ export default {
           text: this.message,
         });
         this.chatStore.addItems(generated_text);
-
         this.message = ""; // Limpiar el mensaje después de enviarlo
+
       } catch (error) {
         console.error("Error al enviar el mensaje a la vista:", error);
       }
     },
+    onMessageCallback(message){
+        console.log("Recibido:", message);
+    },
+    connectSocket() {
+      
+      const websocketUrl = this.url.replace("http://", "ws://") +
+                           "/ws/gestion_ia/"+this.token.user+"/"
+      this.socket =  new ReconnectingWebSocket(websocketUrl, this.onMessageCallback);
+    },
+    disconnectSocket() {
+      if (this.socket) {
+        this.socket.disconnect();
+        this.socket = null;
+      }
+    },
+    sendMessage() {
+      if (this.socket && this.message.trim() !== "") {
+        console.log("hola caracola")
+        this.socket.send(JSON.stringify({message:this.message}));
+        this.message = "";
+      }
+    },
   },
+  mounted(){
+    this.connectSocket()
+  },
+  beforeUnmount(){
+    this.disconnectSocket();
+  }
 };
 </script>
 
