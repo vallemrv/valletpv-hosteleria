@@ -6,7 +6,7 @@ import json
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
        self.user = self.scope['url_route']['kwargs']['user']
-       self.group_name = settings.EMPRESA + "___gestion_ia___" + self.user
+       self.group_name = settings.EMPRESA + "__gestion_ia___" + self.user
        
        await self.channel_layer.group_add(
             self.group_name,
