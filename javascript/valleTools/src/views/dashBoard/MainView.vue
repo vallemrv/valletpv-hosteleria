@@ -123,10 +123,7 @@ export default {
           this.$refs.rmEmpDialog.openDialog();
       },
     },
-    beforeDestroy() {
-    console.log("hollaaal")
-    this.destroyInterval();
-  },
+   
     };
     
   </script>

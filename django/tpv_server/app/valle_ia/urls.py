@@ -3,5 +3,4 @@ from . import views
 
 urlpatterns = [
     path('upload', views.upload_audio, name='upload_audio'),
-    path('', views.gpt3_api),
 ]

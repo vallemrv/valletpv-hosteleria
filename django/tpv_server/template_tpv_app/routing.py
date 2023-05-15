@@ -9,12 +9,14 @@
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import comunicacion.routing
+import app.valle_ia.routing as valle_ia
 
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
     'websocket': AuthMiddlewareStack(
         URLRouter(
             comunicacion.routing.websocket_urlpatterns
+            + valle_ia.websocket_urlpatterns
         )
     ),
 })

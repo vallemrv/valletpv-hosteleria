@@ -37,12 +37,12 @@ class ReconnectingWebSocket {
     });
 
     this.socket.addEventListener("message", (event) => {
-      this.onMessageCallback(event.data);
+      this.onMessageCallback(JSON.parse(event.data));
     });
 
     this.socket.addEventListener("close", (event) => {
       console.log("WebSocket desconectado:", event);
-      setTimeout(() => {
+      this.interval = setTimeout(() => {
         console.log("Intentando reconectar...");
         this.connect();
       }, this.reconnectInterval);
@@ -63,6 +63,9 @@ class ReconnectingWebSocket {
 
   close() {
     this.socket.close();
+    if (this.interval){
+      clearInterval(this.interval);
+    }
   }
 }
 
