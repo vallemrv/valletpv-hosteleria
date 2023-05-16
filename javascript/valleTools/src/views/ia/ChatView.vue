@@ -88,6 +88,10 @@
                   </v-container>
                 </v-card-text>
               </v-card>
+              <div
+              v-if="index == chatStore.items.length - 1"
+              ref="ultimoElemento"
+            > esto es el ultimo illlo que pasa</div>
             </v-list-item>
           </v-list>
         </div>
@@ -103,7 +107,7 @@
         clear-icon="mdi-close-circle"
         clearable
         :append-inner-icon="message ? 'mdi-send' : (isRecording ? 'mdi-stop': 'mdi-microphone') "
-        @click:append-inner="message ? sendMessage() : toggleRecording()" :disabled="isRecordingDisabled && !message"
+        @click:append-inner="message ? enviarInst() : toggleRecording()" :disabled="isRecordingDisabled && !message"
         append>
       </v-textarea>
     </v-footer>
@@ -151,7 +155,11 @@ export default {
       socket:null
     };
   },
-
+  computed:{
+    countItems(){
+      return this.chatStore.items.lenght - 1
+    }
+  },
   methods: {
 
     cambiarEmpresa(nuevaEmpresa) {
@@ -208,14 +216,23 @@ export default {
     async enviarInst() {
       try {
         if (this.socket && this.message.trim() !== "") {
-          var params = new FormData();
           var sendObj = {
             opciones: {},
             query: this.message.trim(),
           };
-          params.append("message", );
+      
           this.socket.send(JSON.stringify({message: sendObj, 
-                            token:this.token.token }));
+                            token:this.token }));
+          const question = {
+            type:"quiestion",
+            text: this.message
+          }
+          this.chatStore.addItems(question);
+          this.$nextTick(() => {
+              if (this.$refs.ultimoElemento) {
+                this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
+              }
+          });
           this.message = "";
         }
       } catch (error) {
@@ -223,8 +240,10 @@ export default {
       }
     },
     onMessageCallback(message){
-      this.chatStore.addItems(generated_text);
-      this.message = ""; // Limpiar el mensaje después de enviarlo
+     this.chatStore.addItems(message);
+     this.$nextTick(() => {
+         this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
+      });
     },
     connectSocket() {
       

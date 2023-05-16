@@ -27,3 +27,6 @@ def preguntar_gpt(messages):
     )
 
     return response.choices[0].message.content  
+
+def create_men(role, content):
+    return {"role": role, "content": content}
