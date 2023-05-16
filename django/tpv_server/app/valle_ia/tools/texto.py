@@ -1,177 +1,102 @@
-estructura_base='''
-Table camareros:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(100)', 1, None, 0)
-(2, 'Apellidos', 'varchar(100)', 1, None, 0)
-(3, 'Email', 'varchar(50)', 0, None, 0)
-(4, 'Pass', 'varchar(100)', 0, None, 0)
-(5, 'Activo', 'INTEGER', 1, None, 0)
-(6, 'Autorizado', 'INTEGER', 1, None, 0)
-(7, 'Permisos', 'varchar(150)', 0, None, 0)
-Table gestion_iconchoices:
-(0, 'id', 'INTEGER', 1, None, 1)
-Table mesas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(50)', 1, None, 0)
-(2, 'Orden', 'INTEGER', 1, None, 0)
-Table gestion_permisoschoices:
-(0, 'id', 'INTEGER', 1, None, 1)
-Table receptores:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(40)', 1, None, 0)
-(2, 'nomImp', 'varchar(40)', 1, None, 0)
-(3, 'Activo', 'bool', 1, None, 0)
-(4, 'Descripcion', 'varchar(200)', 1, None, 0)
-Table secciones:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(50)', 1, None, 0)
-(2, 'RGB', 'varchar(11)', 1, None, 0)
-(3, 'Orden', 'INTEGER', 1, None, 0)
-Table gestion_sync:
-(0, 'id', 'INTEGER', 1, None, 1)
-(1, 'nombre', 'varchar(50)', 1, None, 0)
-(2, 'last', 'varchar(26)', 1, None, 0)
-Table teclas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(50)', 1, None, 0)
-(2, 'P1', 'decimal', 1, None, 0)
-(3, 'P2', 'decimal', 1, None, 0)
-(4, 'Orden', 'INTEGER', 1, None, 0)
-(5, 'Tag', 'varchar(100)', 1, None, 0)
-(6, 'TTF', 'varchar(50)', 1, None, 0)
-(7, 'Descripcion_r', 'varchar(300)', 0, None, 0)
-(8, 'Descripcion_t', 'varchar(300)', 0, None, 0)
-(9, 'tipo', 'varchar(2)', 1, None, 0)
-(10, 'IDFamilia', 'INTEGER', 1, None, 0)
-Table zonas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(50)', 1, None, 0)
-(2, 'Tarifa', 'INTEGER', 1, None, 0)
-(3, 'RGB', 'varchar(50)', 1, None, 0)
-Table ticketlineas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDLinea', 'INTEGER', 1, None, 0)
-(2, 'IDTicket', 'INTEGER', 1, None, 0)
-Table teclaseccion:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDSeccion', 'INTEGER', 1, None, 0)
-(2, 'IDTecla', 'INTEGER', 1, None, 0)
-Table teclascom:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Orden', 'INTEGER', 1, None, 0)
-(2, 'IDSeccion', 'INTEGER', 1, None, 0)
-(3, 'IDTecla', 'INTEGER', 0, None, 0)
-Table sugerencias:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Sugerencia', 'varchar(300)', 1, None, 0)
-(2, 'IDTecla', 'INTEGER', 1, None, 0)
-Table subteclas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'nombre', 'varchar(100)', 0, None, 0)
-(2, 'incremento', 'decimal', 0, None, 0)
-(3, 'Descripcion_r', 'varchar(300)', 0, None, 0)
-(4, 'Descripcion_t', 'varchar(300)', 0, None, 0)
-(5, 'Orden', 'INTEGER', 1, None, 0)
-(6, 'IDTecla', 'INTEGER', 1, None, 0)
-Table servidos:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDLinea', 'INTEGER', 1, None, 0)
-Table gestion_peticionesautoria:
-(0, 'id', 'INTEGER', 1, None, 1)
-(1, 'accion', 'varchar(150)', 1, None, 0)
-(2, 'instrucciones', 'varchar(300)', 1, None, 0)
-(3, 'idautorizado_id', 'INTEGER', 1, None, 0)
-Table pedidos:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Hora', 'varchar(5)', 1, None, 0)
-(2, 'IDCam', 'INTEGER', 1, None, 0)
-(3, 'uid_device', 'varchar(150)', 1, None, 0)
-(4, 'UID', 'varchar(100)', 1, None, 0)
-Table mesaszona:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDMesa', 'INTEGER', 1, None, 0)
-(2, 'IDZona', 'INTEGER', 1, None, 0)
-Table mesasabiertas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'UID', 'varchar(100)', 1, None, 0)
-(2, 'IDMesa', 'INTEGER', 1, None, 0)
-Table lineaspedido:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDArt', 'INTEGER', 1, None, 0)
-(2, 'Estado', 'varchar(1)', 1, None, 0)
-(3, 'Precio', 'decimal', 1, None, 0)
-(4, 'Descripcion', 'varchar(400)', 0, None, 0)
-(5, 'es_compuesta', 'bool', 1, None, 0)
-(6, 'cantidad', 'INTEGER', 1, None, 0)
-(7, 'Descripcion_t', 'varchar(300)', 0, None, 0)
-(8, 'UID', 'varchar(100)', 1, None, 0)
-(9, 'IDPedido', 'INTEGER', 1, None, 0)
-(10, 'tecla_id', 'INTEGER', 0, None, 0)
-Table gestion_lineascompuestas:
-(0, 'id', 'INTEGER', 1, None, 1)
-(1, 'linea_compuesta', 'INTEGER', 1, None, 0)
-(2, 'composicion_id', 'INTEGER', 1, None, 0)
-(3, 'linea_principal_id', 'INTEGER', 1, None, 0)
-Table historialnulos:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Hora', 'varchar(5)', 1, None, 0)
-(2, 'Motivo', 'varchar(200)', 1, None, 0)
-(3, 'IDCam', 'INTEGER', 1, None, 0)
-(4, 'IDLPedido', 'INTEGER', 1, None, 0)
-Table gastos:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Descripcion', 'varchar(100)', 1, None, 0)
-(2, 'Importe', 'decimal', 1, None, 0)
-(3, 'IDArqueo', 'INTEGER', 1, None, 0)
-Table familias:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Nombre', 'varchar(40)', 1, None, 0)
-(2, 'Tipo', 'varchar(150)', 1, None, 0)
-(3, 'NumTapas', 'INTEGER', 0, None, 0)
-(4, 'IDReceptor', 'INTEGER', 1, None, 0)
-Table efectivo:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Can', 'INTEGER', 1, None, 0)
-(2, 'Moneda', 'decimal', 1, None, 0)
-(3, 'IDArqueo', 'INTEGER', 1, None, 0)
-Table composicionteclas:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'composicion', 'varchar(300)', 1, None, 0)
-(2, 'cantidad', 'INTEGER', 1, None, 0)
-(3, 'IDTecla', 'INTEGER', 1, None, 0)
-Table arqueocaja:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'Cambio', 'REAL', 1, None, 0)
-(2, 'Descuadre', 'REAL', 1, None, 0)
-(3, 'IDCierre', 'INTEGER', 1, None, 0)
-Table cierrecaja:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'TicketCom', 'INTEGER', 1, None, 0)
-(2, 'TicketFinal', 'INTEGER', 1, None, 0)
-(3, 'Hora', 'varchar(5)', 1, None, 0)
-(4, 'Fecha', 'date', 1, None, 0)
-Table gestion_historialmensajes:
-(0, 'id', 'INTEGER', 1, None, 1)
-(1, 'mensaje', 'varchar(300)', 1, None, 0)
-(2, 'hora', 'varchar(10)', 1, None, 0)
-(3, 'camarero_id', 'INTEGER', 1, None, 0)
-(4, 'receptor_id', 'INTEGER', 1, None, 0)
-(5, 'fecha', 'date', 1, None, 0)
-Table infmesa:
-(0, 'UID', 'varchar(100)', 1, None, 1)
-(1, 'Hora', 'varchar(5)', 1, None, 0)
-(2, 'NumCopias', 'INTEGER', 1, None, 0)
-(3, 'IDCam', 'INTEGER', 1, None, 0)
-(4, 'Fecha', 'date', 1, None, 0)
-Table ticket:
-(0, 'ID', 'INTEGER', 1, None, 1)
-(1, 'IDCam', 'INTEGER', 1, None, 0)
-(2, 'Hora', 'varchar(5)', 1, None, 0)
-(3, 'Entrega', 'decimal', 1, None, 0)
-(4, 'UID', 'varchar(100)', 1, None, 0)
-(5, 'Mesa', 'varchar(40)', 1, None, 0)
-(6, 'url_factura', 'varchar(140)', 1, None, 0)
-(7, 'Fecha', 'date', 1, None, 0)
+import inflect
+import json
+import os
 
+# Inicializa el objeto de inflect
+p = inflect.engine()
 
-'''
+# Define la lista de modelos
+models = [
+    "camareros", "gestion_iconchoices", "mesas", "gestion_permisoschoices",
+    "receptores", "secciones", "gestion_sync", "teclas", "zonas",
+    "ticketlineas", "teclaseccion", "teclascom", "sugerencias", "subteclas",
+    "servidos", "gestion_peticionesautoria", "pedidos", "mesaszona",
+    "mesasabiertas", "lineaspedido", "gestion_lineascompuestas", "historialnulos",
+    "gastos", "familias", "efectivo", "composicionteclas", "arqueocaja",
+    "cierrecaja", "gestion_historialmensajes", "infmesa", "ticket"
+]
+
+# Crea un diccionario de todas las formas posibles de los modelos (singular y plural)
+all_models = {}
+for model in models:
+    all_models[model] = model  # Añade la versión en plural
+    singular_model = p.singular_noun(model)  # Añade la versión en singular
+    if singular_model:  # La función singular_noun devuelve False si no puede singularizar
+        all_models[singular_model] = model  # Asigna la versión en singular al plural original
+
+# Carga los sinónimos desde el archivo si existe
+synonyms_file = "synonyms.json"
+if os.path.exists(synonyms_file):
+    with open(synonyms_file, "r") as f:
+        synonyms = json.load(f)
+else:
+    synonyms = {}
+
+def save_synonyms():
+    # Guarda los sinónimos en el archivo
+    with open(synonyms_file, "w") as f:
+        json.dump(synonyms, f)
+
+def add_synonym(synonym, model):
+    # Añade un sinónimo a un modelo en el diccionario de sinónimos
+    synonyms[synonym] = model
+    save_synonyms()
+
+def find_models_in_phrase(phrase):
+    # Convertir la frase a minúsculas
+    phrase = phrase.lower()
+    
+    # Inicializar la lista de modelos encontrados
+    found_models = []
+    
+    # Verificar si cada modelo está en la frase
+    for model, original_model in all_models.items():
+        if model in phrase and original_model not in found_models:
+            found_models.append(original_model)
+            
+    # Si no se encontró ningún modelo, buscar en los sinónimos
+    if not found_models:
+        for synonym, model in synonyms.items():
+            if synonym in phrase and model not in found_models:
+                found_models.append(model)
+    
+    # Devolver la lista de modelos encontrados
+    return found_models
+
+estructura_base =   {
+    "camareros": (
+     ["ID(integer)", "Nombre(varchar)", "Apellidos(varchar)", "Email(varchar)", "Pass(varchar)", "Activo(integer)", "Autorizado(integer)", "Permisos(varchar)"]
+        , '''si hablo de pase estoy hablado de autorizados. C
+             uando digo en camareros borra un camarero equivale a ativo=0,
+             los nombres y apellidos tiene que ser caseinsesitive.'''),
+    "gestion_iconchoices": ["id(integer)"],
+    "mesas": ["ID(integer)", "Nombre(varchar)", "Orden(integer)"],
+    "gestion_permisoschoices": ["id(integer)"],
+    "receptores": ["ID(integer)", "Nombre(varchar)", "nomImp(varchar)", "Activo(bool)", "Descripcion(varchar)"],
+    "secciones": ["ID(integer)", "Nombre(varchar)", "RGB(varchar)", "Orden(integer)"],
+    "gestion_sync": ["id(integer)", "nombre(varchar)", "last(varchar)"],
+    "teclas": ["ID(integer)", "Nombre(varchar)", "P1(decimal)", "P2(decimal)", "Orden(integer)", "Tag(varchar)", "TTF(varchar)", "Descripcion_r(varchar)", "Descripcion_t(varchar)", "tipo(varchar)", "IDFamilia(integer, foreing_key(familias))"],
+    "zonas": ["ID(integer)", "Nombre(varchar)", "Tarifa(integer)", "RGB(varchar)"],
+    "ticketlineas": ["ID(integer)", "IDLinea(integer, foreing_key(lineaspedido))", "IDTicket(integer, foreing_key(ticket))"],
+    "teclaseccion": ["ID(integer)", "IDSeccion(integer, foreing_key(secciones))", "IDTecla(integer, foreing_key(teclas))"],
+    "teclascom": ["ID(integer)", "Orden(integer)", "IDSeccion(integer, foreing_key(secciones_com))", "IDTecla(integer, foreing_key(teclas))"],
+    "sugerencias": ["ID(integer)", "Sugerencia(varchar)", "IDTecla(integer, foreing_key(teclas))"],
+    "subteclas": ["ID(integer)", "nombre(varchar)", "incremento(decimal)", "Descripcion_r(varchar)", "Descripcion_t(varchar)", "Orden(integer)", "IDTecla(integer, foreing_key(teclas))"],
+    "servidos": ["ID(integer)", "IDLinea(integer, foreing_key(lineaspedido))"],
+    "gestion_peticionesautoria": ["id(integer)", "accion(varchar)", "instrucciones(varchar)", "idautorizado_id(integer, foreing_key(camareros))"],
+    "pedidos": ["ID(integer)", "Hora(varchar)", "IDCam(integer)", "uid_device(varchar)", "UID(varchar, foreing_key(infmesa))"],
+    "mesaszona": ["ID(integer)", "IDMesa(integer, foreing_key(mesas))", "IDZona(integer, foreing_key(zonas))"],
+    "mesasabiertas": ["ID(integer)", "UID(varchar, foreing_key(infmesa))", "IDMesa(integer, foreing_key(mesas))"],
+    "lineaspedido": ["ID(integer)", "IDArt(integer)", "Estado(varchar)", "Precio(decimal)", "Descripcion(varchar)", "es_compuesta(bool)", "cantidad(integer)", "Descripcion_t(varchar)", "UID(varchar, foreing_key(infmesa))", "IDPedido(integer, foreing_key(pedidos))", "tecla_id(integer, foreing_key(teclas))"],
+    "gestion_lineascompuestas": ["id(integer)", "linea_compuesta(integer)", "composicion_id(integer, foreing_key(composicionteclas))", "linea_principal_id(integer, foreing_key(lineaspedido))"],
+    "historialnulos": ["ID(integer)", "Hora(varchar)", "Motivo(varchar)", "IDCam(integer, foreing_key(camareros))", "IDLPedido(integer, foreing_key(lineaspedido))"],
+    "gastos": ["ID(integer)", "Descripcion(varchar)", "Importe(decimal)", "IDArqueo(integer, foreing_key(arqueocaja))"],
+    "familias": ["ID(integer)", "Nombre(varchar)", "Tipo(varchar)", "NumTapas(integer)", "IDReceptor(integer, foreing_key(receptores))"],
+    "efectivo": ["ID(integer)", "Can(integer)", "Moneda(decimal)", "IDArqueo(integer, foreing_key(arqueocaja))"],
+    "composicionteclas": ["ID(integer)", "composicion(varchar)", "cantidad(integer)", "IDTecla(integer, foreing_key(teclas))"],
+    "arqueocaja": ["ID(integer)", "Cambio(real)", "Descuadre(real)", "IDCierre(integer, foreing_key(cierrecaja))"],
+    "cierrecaja": ["ID(integer)", "TicketCom(integer)", "TicketFinal(integer)", "Hora(varchar)", "Fecha(date)"],
+    "gestion_historialmensajes": ["id(integer)", "mensaje(varchar)", "hora(varchar)", "camarero_id(integer, foreing_key(camareros))", "receptor_id(integer, foreing_key(receptores))", "fecha(date)"],
+    "infmesa": ["UID(varchar)", "Hora(varchar)", "NumCopias(integer)", "IDCam(integer, foreing_key(camareros))", "Fecha(date)"],
+    "ticket": ["ID(integer)", "IDCam(integer)", "Hora(varchar)", "Entrega(decimal)", "UID(varchar)", "Mesa(varchar)", "url_factura(varchar)", "Fecha(date)"]
+}

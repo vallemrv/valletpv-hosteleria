@@ -1,37 +1,47 @@
-from django.apps import apps
+from django.db import connection
+import re
 
+def ejecutar_sql(consulta):
+    with connection.cursor() as cursor:
+        # Dividimos la consulta en varias consultas individuales
+        consultas = consulta.split(';')
 
-def get_models_list(app_name):
-    try:
-        app = apps.get_app_config(app_name)
-    except LookupError:
-        print(f"Error: La aplicación '{app_name}' no existe.")
-        return None
+        resultados = []
 
-    return [model.__name__ for model in app.get_models()]
+        for consulta in consultas:
+            consulta = consulta.strip() # Eliminamos espacios en blanco al inicio y al final
 
-def execute_action(action):
-    try:
-        print(accion)
-        modelo = apps.get_model('gestion', action['modelo'])  # Reemplaza 'your_app_name' con el nombre de tu aplicación Django.
+            if not consulta:  # Ignoramos consultas vacías
+                continue
+ 
+            # Detectamos el tipo de consulta con una expresión regular
+            match = re.match(r"(\w+)", consulta, re.I)
 
-        accion = action['accion']
-
-        if accion == 'SELECT':
-            columnas = action['columnas']
-            params = accion["parametros"]
-           
-
-            if not columnas:
-                # Si no se especifican columnas, seleccionamos todos los campos del modelo.
-                queryset = modelo.objects.all()
+            if match:
+                consulta_tipo = match.group(1).lower()
             else:
-                # Seleccionamos solo las columnas especificadas.
-                queryset = modelo.objects.values(*columnas)
+                resultados.append("No se pudo detectar el tipo de consulta.")
+                continue
 
-            return list(queryset), None
-        else:
-            print("Accion no soportada:", accion)
+            if consulta_tipo == 'select':
+                cursor.execute(consulta)
+                # Obtenemos los nombres de las columnas
+                columnas = [col[0] for col in cursor.description]
+                # Fetch rows
+                filas = [
+                    dict(zip(columnas, fila))
+                    for fila in cursor.fetchall()
+                ]
+                resultados.append({'tabla':filas})
+            elif consulta_tipo in ['update', 'insert', 'delete']:
+                try:
+                    cursor.execute(consulta)
+                    # Commits the changes
+                    connection.commit()
+                    resultados.append("La consulta se ha ejecutado con éxito.")
+                except Exception as e:
+                    resultados.append({'error': str(e)})
+            else:
+                resultados.append({"error" : f"Tipo de consulta no soportado: {consulta_tipo}"})
 
-    except Exception as e:
-        return None, e
+        return resultados
