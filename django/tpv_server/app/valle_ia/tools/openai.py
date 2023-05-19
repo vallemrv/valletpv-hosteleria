@@ -1,8 +1,8 @@
 import openai
 import os
+from django.conf import settings
 
 openai.api_key = os.environ.get("API_KEY")
-
 
 def transcribe_audio(file_path):
     try:

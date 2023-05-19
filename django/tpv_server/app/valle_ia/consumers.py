@@ -5,7 +5,6 @@ from .tools.openai import preguntar_gpt, create_men
 from .tools.texto import estructura_base, find_models_in_phrase
 from .tools.base import (ejecutar_select, get_tipo_consulta, 
                          dividir_consultas, ejecutar_accion)
-from django.db import connection
 from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
 import json
@@ -86,6 +85,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             create_men("user", "Con la cabecera resaltada gris oscuro width 100%. gracias, sin explicacione solo codigo. overflow scroll")
             ]
         return  preguntar_gpt(mensajes)
+    
+    def background_task_dos(self, message):
+        r = chat_chain_agents(message)
+        print(r)
 
     def background_task(self, message):
         modelos = find_models_in_phrase(message)
@@ -110,7 +113,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         mensajes = [
             create_men("system", "Eres un gran traductor del leguaje humano al leguaje SQL, sin explicaciones."),
             create_men("user", f"teniendo en cuenta esta estructua de base de datos {structura}"),   
-            create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por comas. 'NO EXPLICACIONES'. gracias")
+            create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por puno coma. 'NO EXPLICACIONES'. gracias")
         ]
 
         respuesta = preguntar_gpt(mensajes)

@@ -133,10 +133,6 @@ DATABASES = {
             'init_command': 'SET default_storage_engine=INNODB;' +
                             "SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))",
         },
-    },
-    'gestion_ia': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'gestion_ia.sqlite3'),
     }
 }
 {% else %}
@@ -145,11 +141,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '{{name_db}}.sqlite3',          # Or path to database file if using sqlite3.
     },
-    'gestion_ia': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'gestion_ia.sqlite3'),
-    }
-
+    
 }
 {% endif %}
 

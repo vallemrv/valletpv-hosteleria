@@ -69,7 +69,7 @@ estructura_base =   {
         , '''Pase = Autorizado.
              Borrar camareros = Activo = 0.
              Activar camareros o camarero = Activo = 1.
-             En las consultas select mostrar solo las columnas (Nombre, Apellidos y Autorizado) from ...
+             En las consultas select mostrar solo las columnas (Nombre, Apellidos y Autorizado)
              Siempre muestra solo los activos, a no ser que lo especifique implicitamente.'''),
     "gestion_iconchoices": ["id(integer)"],
     "mesas": ["ID(integer)", "Nombre(varchar)", "Orden(integer)"],
