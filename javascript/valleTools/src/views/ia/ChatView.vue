@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-app-bar  color="primary" dark>
-      <v-btn icon @click="disconnectSocket();$router.go(-1)">
+      <v-btn icon @click="disconnectSocket(); borrarChat(); $router.go(-1)">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title class=" text-uppercase text-subtitle-1"> <samp> {{ titulo }}</samp></v-toolbar-title>
@@ -41,57 +41,14 @@
                   'text-success text-right': item.type === 'answer',
                 }"
               >
-                <v-card-text class="text-h6">
-                  {{ item.text }}
-                  <v-container fluid v-if="item.table">
-                    <v-table>
-                      <template v-slot:default>
-                        <thead>
-                          <tr>
-                            <th
-                              class="text-center"
-                              v-for="(header, index) in item.table.headers"
-                              :key="index"
-                            >
-                              {{ header }}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr
-                            v-for="(row, rowIndex) in item.table.data"
-                            :key="rowIndex"
-                          >
-                            <td
-                              class="text-center"
-                              v-for="(cell, cellIndex) in row"
-                              :key="cellIndex"
-                            >
-                              {{ cell }}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </template>
-                    </v-table>
-                  </v-container>
-                  <v-container
-                    class="text-center"
-                    fluid
-                    v-if="item.image"
-                  >
-                    <v-img
-                      :src="item.image"
-                      max-width="300px"
-                      max-height="200px"
-                      contain
-                    ></v-img>
-                  </v-container>
+                <v-card-text class="text-h6" v-if="item.text">{{ item.text }}</v-card-text>
+                <v-card-text v-if="item.tabla">
+                     <Tabla :tabla="item.tabla"></Tabla>
                 </v-card-text>
               </v-card>
               <div
               v-if="index == chatStore.items.length - 1"
-              ref="ultimoElemento"
-            > esto es el ultimo illlo que pasa</div>
+              ref="ultimoElemento"></div>
             </v-list-item>
           </v-list>
         </div>
@@ -118,9 +75,13 @@
 import axios from "axios";
 import { useChatStore } from "@/stores/chatStore";
 import { useEmpresaStore } from "@/stores/empresaStore";
+import Tabla from "@/components/Tabla.vue"
 import ReconnectingWebSocket from '@/api/';
 
 export default {
+  components: {
+    Tabla
+  },
   props: {
     titulo: {
       type: String,
@@ -240,6 +201,7 @@ export default {
       }
     },
     onMessageCallback(message){
+     if (message.tabla) message.tabla = JSON.parse(message.tabla).tabla 
      this.chatStore.addItems(message);
      this.$nextTick(() => {
          this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
@@ -253,6 +215,7 @@ export default {
     },
     disconnectSocket() {
       if (this.socket) {
+        console.log(this.socket)
         this.socket.close();
         this.socket = null;
       }

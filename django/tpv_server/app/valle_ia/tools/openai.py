@@ -4,7 +4,7 @@ import os
 openai.api_key = os.environ.get("API_KEY")
 
 
-def transcribe_audio(file_path, openai):
+def transcribe_audio(file_path):
     try:
         auido_file = open(file_path, "rb")
         transcript = openai.Audio.transcribe("whisper-1", auido_file)

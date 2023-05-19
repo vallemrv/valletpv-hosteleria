@@ -66,9 +66,11 @@ def find_models_in_phrase(phrase):
 estructura_base =   {
     "camareros": (
      ["ID(integer)", "Nombre(varchar)", "Apellidos(varchar)", "Email(varchar)", "Pass(varchar)", "Activo(integer)", "Autorizado(integer)", "Permisos(varchar)"]
-        , '''si hablo de pase estoy hablado de autorizados. C
-             uando digo en camareros borra un camarero equivale a ativo=0,
-             los nombres y apellidos tiene que ser caseinsesitive.'''),
+        , '''Pase = Autorizado.
+             Borrar camareros = Activo = 0.
+             Activar camareros o camarero = Activo = 1.
+             En las consultas select mostrar solo las columnas (Nombre, Apellidos y Autorizado) from ...
+             Siempre muestra solo los activos, a no ser que lo especifique implicitamente.'''),
     "gestion_iconchoices": ["id(integer)"],
     "mesas": ["ID(integer)", "Nombre(varchar)", "Orden(integer)"],
     "gestion_permisoschoices": ["id(integer)"],

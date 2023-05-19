@@ -3,7 +3,8 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .tools.openai import preguntar_gpt, create_men
 from .tools.texto import estructura_base, find_models_in_phrase
-from .tools.base import ejecutar_sql
+from .tools.base import (ejecutar_select, get_tipo_consulta, 
+                         dividir_consultas, ejecutar_accion)
 from django.db import connection
 from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
@@ -13,13 +14,14 @@ import threading
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
-    def enviar_mensaje_texto_sync(self, mensaje):
+    def enviar_mensaje_sync(self, mensaje, tipo="text"):
         # Enviar mensaje al grupo
         async_to_sync(self.channel_layer.group_send)(
             self.group_name,
             {
-                'type': 'send_message_text',
-                'message': mensaje
+                'type': 'send_message',
+                'message': mensaje,
+                "tipo":tipo,
             }
         )
 
@@ -69,40 +71,66 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(0)
              
     # Receive message from room group
-    async def send_message_text(self, event):
-        message = event['message']
-        
+    async def send_message(self, event):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'type': "anwser",
-            'text': message
+             event["tipo"]: event['message'],
         }))
+
+
+    def crear_tabla(self, datos):
+        mensajes = [
+            create_men("user", "Crea una tabla html (solo desde <table> hasta </table>) con los siguientes datos: "+ str(datos)),
+            create_men("user", "Crea la tabla centrada, con el texto wrap y cada linea gris y blanco"),
+            create_men("user", "Con la cabecera resaltada gris oscuro width 100%. gracias, sin explicacione solo codigo. overflow scroll")
+            ]
+        return  preguntar_gpt(mensajes)
 
     def background_task(self, message):
         modelos = find_models_in_phrase(message)
         if (len(modelos) <= 0):
-            # Enviar mensaje al grupo
-            self.enviar_mensaje_texto_sync('''No hay ninguna tabla con este nombre. 
-                                      Si me das mas informacion para la proxima ya sabre como hacerlo.''')
-            return
+            mensajes = [
+                create_men("user",f"en la frase: {message} hay algun nombre de pila o de persona. responde solo con si o no.")
+            ]
+            respuesta = preguntar_gpt(mensajes)
+            if "Sí." in respuesta:
+                modelos = ["camareros"]
+            else:    
+                # Enviar mensaje al grupo
+                self.enviar_mensaje_sync('''No hay ninguna tabla con este nombre. 
+                                            Si me das mas informacion para la 
+                                            proxima ya sabre como hacerlo.''')
+                return
         
         structura = ""
         for m in modelos:
             structura += f" {m}={estructura_base[m]}"
 
-        mesajes = [
+        mensajes = [
             create_men("system", "Eres un gran traductor del leguaje humano al leguaje SQL, sin explicaciones."),
             create_men("user", f"teniendo en cuenta esta estructua de base de datos {structura}"),   
             create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por comas. 'NO EXPLICACIONES'. gracias")
         ]
 
-        respuesta = preguntar_gpt(mesajes)
-        print(respuesta)
-        #resultados = ejecutar_sql(respuesta)
+        respuesta = preguntar_gpt(mensajes)
         
-        #print(resultados)
         
-        # Enviar mensaje al grupo
-        self.enviar_mensaje_texto_sync(respuesta)
+        consultas = dividir_consultas(respuesta)
+        
+        for c in consultas:
+            print(c)
+            tipo = get_tipo_consulta(c)
+            if "select" in tipo:
+                res = ejecutar_select(c)
+                self.enviar_mensaje_sync(json.dumps(res), "tabla")
+            elif tipo in ['update', 'insert']:
+                res = ejecutar_accion(c)
+                self.enviar_mensaje_sync(res, "text") 
+            else:
+                resultado = {"error" : f"Tipo de consulta no soportado: {tipo}"} 
+                self.enviar_mensaje_sync(resultado, "text") 
+        
+        
     
     

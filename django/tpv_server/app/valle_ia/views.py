@@ -1,7 +1,7 @@
 from tokenapi.http import JsonResponse, JsonError
 from tokenapi.decorators import token_required
 from django.core.files.storage import default_storage
-from .tools.openai import transcribe_audio, preguntar_gpt
+from .tools.openai import transcribe_audio
 import os
 
 @token_required
@@ -20,7 +20,7 @@ def upload_audio(request):
     # Guarda el archivo
     filename = default_storage.save(file_path, audio_file)
     
-    transcript = transcribe_audio(default_storage.path(filename), openai)
+    transcript = transcribe_audio(default_storage.path(filename))
     if transcript is None:
         return JsonError({"error": "Error al transcribir el audio"})
 

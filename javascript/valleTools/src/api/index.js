@@ -31,7 +31,7 @@ class ReconnectingWebSocket {
 
   connect() {
     this.socket = new WebSocket(this.url);
-
+    this.closed = false;
     this.socket.addEventListener("open", (event) => {
       console.log("WebSocket conectado:", event);
     });
@@ -42,10 +42,12 @@ class ReconnectingWebSocket {
 
     this.socket.addEventListener("close", (event) => {
       console.log("WebSocket desconectado:", event);
-      this.interval = setTimeout(() => {
-        console.log("Intentando reconectar...");
-        this.connect();
-      }, this.reconnectInterval);
+      if (!this.closed){
+        this.interval = setTimeout(() => {
+          console.log("Intentando reconectar...");
+          if (!this.closed) this.connect();
+        }, this.reconnectInterval);
+      }
     });
 
     this.socket.addEventListener("error", (event) => {
@@ -62,10 +64,11 @@ class ReconnectingWebSocket {
   }
 
   close() {
-    this.socket.close();
-    if (this.interval){
-      clearInterval(this.interval);
-    }
+      this.closed = true;
+      this.socket.close();
+      if (this.interval){
+        clearInterval(this.interval);
+      }
   }
 }
 

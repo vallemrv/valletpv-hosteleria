@@ -1,47 +1,60 @@
-from django.db import connection
 import re
+from django.db import connection
 
 def ejecutar_sql(consulta):
+    consultas = dividir_consultas(consulta)
+    resultados = []
+
+    for consulta in consultas:
+        tipo_consulta = get_tipo_consulta(consulta)
+        if tipo_consulta == 'select':
+            resultado = ejecutar_select(consulta)
+        elif tipo_consulta in ['update', 'insert', 'delete']:
+            resultado = ejecutar_accion(consulta)
+        else:
+            resultado = {"error" : f"Tipo de consulta no soportado: {tipo_consulta}"}
+        
+        resultados.append(resultado)
+
+    return resultados
+
+def dividir_consultas(consulta):
+    # Dividimos la consulta en varias consultas individuales
+    consultas = consulta.split(';')
+    # Eliminamos espacios en blanco al inicio y al final
+    consultas = [c.strip() for c in consultas if c.strip()]
+    return consultas
+
+def get_tipo_consulta(consulta):
+    # Detectamos el tipo de consulta con una expresión regular
+    match = re.match(r"(\w+)", consulta, re.I)
+    if match:
+        return match.group(1).lower()
+    else:
+        return None
+
+def ejecutar_select(consulta):
     with connection.cursor() as cursor:
-        # Dividimos la consulta en varias consultas individuales
-        consultas = consulta.split(';')
+        cursor.execute(consulta)
+        
+        # Obtenemos los nombres de las columnas
+        columnas = [col[0] for col in cursor.description]
 
-        resultados = []
+        # Fetch rows
+        datos = cursor.fetchall()
 
-        for consulta in consultas:
-            consulta = consulta.strip() # Eliminamos espacios en blanco al inicio y al final
+        # Convertimos las filas de los datos a listas (por defecto son tuplas)
+        datos = [list(fila) for fila in datos]
 
-            if not consulta:  # Ignoramos consultas vacías
-                continue
- 
-            # Detectamos el tipo de consulta con una expresión regular
-            match = re.match(r"(\w+)", consulta, re.I)
+        # Devolvemos el resultado en el formato que has especificado
+        return {'tabla': {'columnas': columnas, 'datos': datos}}
 
-            if match:
-                consulta_tipo = match.group(1).lower()
-            else:
-                resultados.append("No se pudo detectar el tipo de consulta.")
-                continue
-
-            if consulta_tipo == 'select':
-                cursor.execute(consulta)
-                # Obtenemos los nombres de las columnas
-                columnas = [col[0] for col in cursor.description]
-                # Fetch rows
-                filas = [
-                    dict(zip(columnas, fila))
-                    for fila in cursor.fetchall()
-                ]
-                resultados.append({'tabla':filas})
-            elif consulta_tipo in ['update', 'insert', 'delete']:
-                try:
-                    cursor.execute(consulta)
-                    # Commits the changes
-                    connection.commit()
-                    resultados.append("La consulta se ha ejecutado con éxito.")
-                except Exception as e:
-                    resultados.append({'error': str(e)})
-            else:
-                resultados.append({"error" : f"Tipo de consulta no soportado: {consulta_tipo}"})
-
-        return resultados
+def ejecutar_accion(consulta):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute(consulta)
+            # Commits the changes
+            connection.commit()
+            return "La consulta se ha ejecutado con éxito."
+        except Exception as e:
+            return {'error': str(e)}
