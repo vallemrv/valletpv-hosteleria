@@ -1,0 +1,2 @@
+SELECT COUNT(UID) AS NumMesasAbiertas FROM mesasabiertas;
+SELECT camareros.Nombre, infmesa.Hora, infmesa.Fecha, Count(pedidos.ID) as Pedidos FROM infmesa inner join camareros ON infmesa.IDCam=camareros.ID inner JOIN pedidos ON infmesa.UID=pedidos.UID WHERE infmesa.UID IN (SELECT UID FROM mesasabiertas) GROUP BY pedidos.UID, infmesa.UID

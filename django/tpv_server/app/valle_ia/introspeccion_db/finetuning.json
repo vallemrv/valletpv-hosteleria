@@ -1,0 +1,274 @@
+[
+    {
+      "prompt": "Obtener los nombres de todos los camareros autorizados",
+      "completion": "SELECT Nombre FROM camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt": "Obtener el nombre, apellido y email de todos los camareros",
+      "completion": "SELECT Nombre, Apellidos, Email FROM camareros"
+    },
+    {
+      "prompt": "Obtener todas las mesas y su orden",
+      "completion": "SELECT Nombre, Orden FROM mesas"
+    },
+    {
+      "prompt": "Obtener los nombres de todos los receptores activos",
+      "completion": "SELECT Nombre FROM receptores WHERE Activo = 1"
+    },
+    {
+      "prompt": "Obtener todas las sugerencias para una tecla específica (por ejemplo, tecla ID = 10)",
+      "completion": "SELECT Sugerencia FROM sugerencias WHERE IDTecla = 10"
+    },
+    {
+      "prompt": "Obtener todos los pedidos hechos por un camarero específico (por ejemplo, camarero ID = 2)",
+      "completion": "SELECT * FROM pedidos WHERE IDCam = 2"
+    },
+    {
+      "prompt": "Obtener todos los gastos relacionados con un arqueo específico (por ejemplo, arqueo ID = 5)",
+      "completion": "SELECT Descripcion, Importe FROM gastos WHERE IDArqueo = 5"
+    },
+    {
+      "prompt": "Obtener la descripción y el importe de todos los gastos",
+      "completion": "SELECT Descripcion, Importe FROM gastos"
+    },
+    {
+      "prompt": "Obtener el nombre y el tipo de todas las familias",
+      "completion": "SELECT Nombre, Tipo FROM familias"
+    },
+    {
+      "prompt": "Obtener el ticket de comienzo y final de todos los cierres de caja",
+      "completion": "SELECT TicketCom, TicketFinal FROM cierrecaja"
+    },
+    {
+      "prompt": "Obtener todos los pedidos realizados en una fecha específica (por ejemplo, 2023-06-01)",
+      "completion": "SELECT * FROM pedidos WHERE Fecha = '2023-06-01'"
+    },
+    {
+      "prompt": "Obtener todas las mesas de una zona específica (por ejemplo, zona ID = 3)",
+      "completion": "SELECT IDMesa FROM mesaszona WHERE IDZona = 3"
+    },
+    {
+      "prompt": "Obtener todas las líneas de pedido para un pedido específico (por ejemplo, pedido ID = 10)",
+      "completion": "SELECT * FROM lineaspedido WHERE IDPedido = 10"
+    },
+    {
+      "prompt": "Obtener todos los gastos asociados con un arqueo de caja específico (por ejemplo, arqueo ID = 4)",
+      "completion": "SELECT * FROM gastos WHERE IDArqueo = 4"
+    },
+    {
+      "prompt": "Obtener el nombre y la descripción de todas las teclas",
+      "completion": "SELECT Nombre, Descripcion_r, Descripcion_t FROM teclas"
+    },
+    {
+      "prompt": "Obtener todos los mensajes del historial de un camarero específico (por ejemplo, camarero ID = 5)",
+      "completion": "SELECT mensaje FROM gestion_historialmensajes WHERE camarero_id = 5"
+    },
+    {
+      "prompt": "Obtener todas las mesas abiertas con su respectiva información de mesa",
+      "completion": "SELECT * FROM mesasabiertas JOIN infmesa ON mesasabiertas.UID = infmesa.UID"
+    },
+    {
+      "prompt": "Obtener todas las lineas de pedido que sean compuestas",
+      "completion": "SELECT * FROM lineaspedido WHERE es_compuesta = 1"
+    },
+    {
+      "prompt": "Obtener todos los arqueos de caja con su cambio y descuadre",
+      "completion": "SELECT Cambio, Descuadre FROM arqueocaja"
+    },
+    {
+      "prompt": "Obtener todos los tickets con su hora, entrega y mesa",
+      "completion": "SELECT Hora, Entrega, Mesa FROM ticket"
+    },
+    
+    {
+      "prompt": "Muestra todas las mesas que se encuentran en la zona de 'terraza izq'",
+      "completion": "SELECT mesas.Nombre FROM mesas JOIN mesaszona ON mesas.ID = mesaszona.IDMesa JOIN zonas ON mesaszona.IDZona = zonas.ID WHERE zonas.Nombre = 'Terraza IZQ'"
+    },
+    
+    {
+      "prompt": "Muestra todos los nombres de las zonas",
+      "completion": "SELECT Nombre FROM zonas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'camareros'",
+      "completion": "SELECT ID, Nombre, Apellidos, Email, Pass, Activo, Autorizado, Permisos FROM camareros"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_iconchoices'",
+      "completion": "SELECT id FROM gestion_iconchoices"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'mesas'",
+      "completion": "SELECT ID, Nombre, Orden FROM mesas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_permisoschoices'",
+      "completion": "SELECT id FROM gestion_permisoschoices"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'receptores'",
+      "completion": "SELECT ID, Nombre, nomImp, Activo, Descripcion FROM receptores"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'secciones'",
+      "completion": "SELECT ID, Nombre, RGB, Orden FROM secciones"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_sync'",
+      "completion": "SELECT id, nombre, last FROM gestion_sync"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'teclas'",
+      "completion": "SELECT ID, Nombre, P1, P2, Orden, Tag, TTF, Descripcion_r, Descripcion_t, tipo, IDFamilia FROM teclas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'zonas'",
+      "completion": "SELECT ID, Nombre, Tarifa, RGB FROM zonas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'ticketlineas'",
+      "completion": "SELECT ID, IDLinea, IDTicket FROM ticketlineas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'teclaseccion'",
+      "completion": "SELECT ID, IDSeccion, IDTecla FROM teclaseccion"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'teclascom'",
+      "completion": "SELECT ID, Orden, IDSeccion, IDTecla FROM teclascom"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'sugerencias'",
+      "completion": "SELECT ID, Sugerencia, IDTecla FROM sugerencias"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'subteclas'",
+      "completion": "SELECT ID, nombre, incremento, Descripcion_r, Descripcion_t, Orden, IDTecla FROM subteclas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'servidos'",
+      "completion": "SELECT ID, IDLinea FROM servidos"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_peticionesautoria'",
+      "completion": "SELECT id, accion, instrucciones, idautorizado_id FROM gestion_peticionesautoria"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'pedidos'",
+      "completion": "SELECT ID, Hora, IDCam, uid_device, UID FROM pedidos"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'mesaszona'",
+      "completion": "SELECT ID, IDMesa, IDZona FROM mesaszona"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'mesasabiertas'",
+      "completion": "SELECT ID, UID, IDMesa FROM mesasabiertas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'lineaspedido'",
+      "completion": "SELECT ID, IDArt, Estado, Precio, Descripcion, es_compuesta, cantidad, Descripcion_t, UID, IDPedido, tecla_id FROM lineaspedido"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_lineascompuestas'",
+      "completion": "SELECT id, linea_compuesta, composicion_id, linea_principal_id FROM gestion_lineascompuestas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'historialnulos'",
+      "completion": "SELECT ID, Hora, Motivo, IDCam, IDLPedido FROM historialnulos"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gastos'",
+      "completion": "SELECT ID, Descripcion, Importe, IDArqueo FROM gastos"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'familias'",
+      "completion": "SELECT ID, Nombre, Tipo, NumTapas, IDReceptor FROM familias"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'efectivo'",
+      "completion": "SELECT ID, Can, Moneda, IDArqueo FROM efectivo"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'composicionteclas'",
+      "completion": "SELECT ID, composicion, cantidad, IDTecla FROM composicionteclas"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'arqueocaja'",
+      "completion": "SELECT ID, Cambio, Descuadre, IDCierre FROM arqueocaja"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'cierrecaja'",
+      "completion": "SELECT ID, TicketCom, TicketFinal, Hora, Fecha FROM cierrecaja"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'gestion_historialmensajes'",
+      "completion": "SELECT id, mensaje, hora, camarero_id, receptor_id, fecha FROM gestion_historialmensajes"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'infmesa'",
+      "completion": "SELECT UID, Hora, NumCopias, IDCam, Fecha FROM infmesa"
+    },
+    {
+      "prompt": "Muestra todos los datos de la tabla 'ticket'",
+      "completion": "SELECT ID, IDCam, Hora, Entrega, UID, Mesa, url_factura, Fecha FROM ticket"
+    },
+    {
+      "prompt": "Muestra las líneas del ticket 1000 con la cantidad, el precio y el total que es la cantidad multiplicada por el precio",
+      "completion": "SELECT COUNT(lineaspedido.idArt) as Can,  lineaspedido.descripcion_t, lineaspedido.Precio, Can*lineaspedido.Precio as Total FROM lineaspedido INNER JOIN ticketlineas ON lineaspedido.ID = ticketlineas.IDLinea INNER JOIN ticket ON ticketlineas.IDTicket = ticket.ID WHERE ticket.ID = 32800 GROUP BY lineaspedido.idArt, lineaspedido.Precio"
+    },
+    {
+      "prompt": "¿Cuál es el ID, nombre, apellido y autorización de los camareros?",
+      "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
+    },
+    {
+      "prompt": "Obtener información de los camareros",
+      "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
+    },
+    {
+      "prompt": "¿Cuántos camareros autorizados hay?",
+      "completion": "SELECT COUNT(*) as Can FROM camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt": "Obten el total vendido del ultimo cierrre. Gracias",
+      "completion": "SELECT SUM(lineaspedido.Precio) as TotalVendido FROM ticketlineas INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID WHERE lineaspedido.Estado='A' AND ticketlineas.IDTicket IN (SELECT ticket.ID FROM ticket INNER JOIN cierrecaja ON ticket.ID >= cierrecaja.TicketCom AND ticket.ID <= cierrecaja.TicketFinal WHERE cierrecaja.ID IN (SELECT ID FROM cierrecaja ORDER BY ID DESC LIMIT 1))"
+    },
+    {
+      "prompt": "Obten el total vendido del cierre del Martes de hace mas de 30 dias",
+      "completion": "SELECT SUM(lineaspedido.Precio) as TotalVendido FROM ticketlineas INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID WHERE lineaspedido.Estado='C' AND ticketlineas.IDTicket IN (SELECT ticket.ID FROM ticket INNER JOIN cierrecaja ON ticket.ID >= cierrecaja.TicketCom AND ticket.ID <= cierrecaja.TicketFinal WHERE strftime('%w', cierrecaja.Fecha) = '6'AND DATE(cierrecaja.Fecha) > DATE('now', '-30 days') ORDER BY cierrecaja.Fecha DESC)"
+    },
+    {
+      "prompt": "Obtener el descuadre y cambio del último arqueo; Obtener los gastos y efectivo del último arqueo.",
+      "completion": "SELECT Descuadre, Cambio FROM arqueocaja ORDER BY ID DESC LIMIT 1; SELECT Descripcion, Importe AS Total FROM gastos WHERE IDArqueo IN (SELECT ID FROM arqueocaja ORDER BY ID DESC LIMIT 1); SELECT Can, Moneda, (Can * Moneda) || ' €' AS Total FROM efectivo WHERE IDArqueo IN (SELECT ID FROM arqueocaja ORDER BY ID DESC LIMIT 1)"
+    },
+    {
+      "prompt": "Borrar a Manuel.",
+      "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+      "prompt": "Borrar al camarero Bart Simsoms.",
+      "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Bart' AND Apellidos='Simsoms'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+      "prompt": "Activar Manuel Rodriguez.",
+      "completion": "UPDATE camareros SET Activo = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+      "prompt": "Mete en el pase a manuel rodriguez.",
+      "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt": "Mete en el pase a Manuel y Cristian solo.",
+      "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre IN ('Manuel', 'Cristian'); UPDATE camareros SET Autorizado = 0 WHERE Nombre NOT IN ('Manuel', 'Cristian'); SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt": "Saca del pase a Cristian.",
+      "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt": "Saca a todos excepto a Cristian.",
+      "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre != 'Cristian'; UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    }
+      
+  ]
+  

@@ -32,5 +32,5 @@ def get_create_table_statements(database_name):
 
 path = os.path.join(os.getcwd(), 
                     "django", "tpv_server", "testtpv.sqlite3")
-print(path)
+
 print(get_create_table_statements(path))
