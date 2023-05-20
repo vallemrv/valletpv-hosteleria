@@ -2,7 +2,7 @@ from django.conf import settings
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .tools.openai import preguntar_gpt, create_men
-from .tools.texto import estructura_base, find_models_in_phrase
+from .tools.texto import identificar_tablas
 from .tools.base import (ejecutar_select, get_tipo_consulta, 
                          dividir_consultas, ejecutar_accion)
 from django.contrib.auth import authenticate
@@ -86,12 +86,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ]
         return  preguntar_gpt(mensajes)
     
-    def background_task_dos(self, message):
-        r = chat_chain_agents(message)
-        print(r)
-
     def background_task(self, message):
-        modelos = find_models_in_phrase(message)
+        modelos = identificar_tablas(message)
         if (len(modelos) <= 0):
             mensajes = [
                 create_men("user",f"en la frase: {message} hay algun nombre de pila o de persona. responde solo con si o no.")
@@ -106,14 +102,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                                             proxima ya sabre como hacerlo.''')
                 return
         
-        structura = ""
-        for m in modelos:
-            structura += f" {m}={estructura_base[m]}"
 
         mensajes = [
             create_men("system", "Eres un gran traductor del leguaje humano al leguaje SQL, sin explicaciones."),
-            create_men("user", f"teniendo en cuenta esta estructua de base de datos {structura}"),   
-            create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por puno coma. 'NO EXPLICACIONES'. gracias")
+            create_men("user", f"teniendo en cuenta esta estructua de base de datos {modelos}"),   
+            create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por puno y coma. 'NO EXPLICACIONES'. gracias")
         ]
 
         respuesta = preguntar_gpt(mensajes)
