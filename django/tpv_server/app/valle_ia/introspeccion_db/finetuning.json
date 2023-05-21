@@ -215,7 +215,7 @@
     },
     {
       "prompt": "Muestra las líneas del ticket 1000 con la cantidad, el precio y el total que es la cantidad multiplicada por el precio",
-      "completion": "SELECT COUNT(lineaspedido.idArt) as Can,  lineaspedido.descripcion_t, lineaspedido.Precio, Can*lineaspedido.Precio as Total FROM lineaspedido INNER JOIN ticketlineas ON lineaspedido.ID = ticketlineas.IDLinea INNER JOIN ticket ON ticketlineas.IDTicket = ticket.ID WHERE ticket.ID = 32800 GROUP BY lineaspedido.idArt, lineaspedido.Precio"
+      "completion": "SELECT COUNT(lineaspedido.idArt) as Can,  lineaspedido.descripcion_t, lineaspedido.Precio, COUNT(lineaspedido.idArt)*lineaspedido.Precio as Total FROM lineaspedido INNER JOIN ticketlineas ON lineaspedido.ID = ticketlineas.IDLinea INNER JOIN ticket ON ticketlineas.IDTicket = ticket.ID WHERE ticket.ID = 32800 GROUP BY lineaspedido.idArt, lineaspedido.Precio"
     },
     {
       "prompt": "¿Cuál es el ID, nombre, apellido y autorización de los camareros?",
@@ -268,7 +268,136 @@
     {
       "prompt": "Saca a todos excepto a Cristian.",
       "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre != 'Cristian'; UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+      "prompt":"Dame informacion de mesas abiertas",
+      "completion": "SELECT COUNT(UID) AS NumMesasAbiertas FROM mesasabiertas; SELECT camareros.Nombre, infmesa.Hora, infmesa.Fecha, Count(pedidos.ID) as Pedidos, nommesas.Nombre  FROM infmesa inner join camareros ON infmesa.IDCam=camareros.ID INNER JOIN pedidos ON infmesa.UID=pedidos.UID INNER JOIN (SELECT Nombre, mesasabiertas.UID  from mesas inner join mesasabiertas on mesas.ID=mesasabiertas.IDMesa) as nommesas on nommesas.UID = infmesa.UID WHERE infmesa.UID IN (SELECT UID FROM mesasabiertas) GROUP BY pedidos.UID, infmesa.UID;"
+    },
+    {
+      "prompt": "Dame las mesas abiertas por Agustin.",
+      "completion": "SELECT infmesa.UID, mesas.Nombre FROM infmesa INNER JOIN mesasabiertas ON infmesa.UID = mesasabiertas.UID INNER JOIN camareros ON infmesa.IDCam = camareros.ID INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID WHERE camareros.Nombre = 'Agustin'"
+    },
+    {
+      "prompt": "Muestrame la informacion completa de la mesa T5",
+      "completion": "SELECT COUNT(lineaspedido.IDArt) AS Cantidad, lineaspedido.Precio, COUNT(lineaspedido.IDArt) * lineaspedido.Precio AS Total, lineaspedido.Descripcion, lineaspedido.Estado, lineaspedido.UID, mesas.Nombre FROM lineaspedido INNER JOIN mesasabiertas ON mesasabiertas.UID = lineaspedido.UID INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID WHERE mesas.Nombre = 'T5' AND mesasabiertas.UID IN (SELECT UID FROM mesasabiertas WHERE IDMesa = (SELECT ID FROM mesas WHERE Nombre = 'T5')) GROUP BY lineaspedido.IDPedido, lineaspedido.IDArt, lineaspedido.Descripcion;"
+    },
+    {
+      "prompt":"Dame la informacion detallada de todas las mesas abiertas",
+      "completion": "SELECT mesas.Nombre AS Mesa, COUNT(lineaspedido.IDArt) AS Cantidad, lineaspedido.Precio, COUNT(lineaspedido.IDArt) * lineaspedido.Precio AS Total, lineaspedido.Descripcion, lineaspedido.Estado, lineaspedido.UID FROM lineaspedido INNER JOIN mesasabiertas ON mesasabiertas.UID = lineaspedido.UID INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID WHERE mesasabiertas.UID IN (SELECT UID FROM mesasabiertas) GROUP BY mesas.Nombre, lineaspedido.IDPedido, lineaspedido.IDArt, lineaspedido.Descripcion;"
+    },
+    {
+      "prompt":"Obtén el total de ingresos por camarero en todas las mesas",
+      "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, SUM(lineaspedido.Precio) AS TotalIngresos FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='A' GROUP BY Camarero"
+    },
+    {
+      "prompt":"Obtén la cantidad total de artículos vendidos por cada camarero y ordena el resultado de mayor a menor",
+      "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, COUNT(lineaspedido.IDArt) AS ArticulosVendidos FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='C' GROUP BY Camarero  ORDER BY ArticulosVendidos DESC"
+    },
+    {
+      "prompt":"Obtén el promedio de precio de los artículos vendidos por cada camarero",
+      "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, AVG(lineaspedido.Precio) AS PrecioPromedio FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='C' GROUP BY Camarero"
+    },
+    {
+      "prompt": "Dame el total de ventas y el precio promedio por zona, redondeado a dos decimales y con el símbolo del euro",
+      "completion": "SELECT zonas.Nombre AS Zona, COUNT(lineaspedido.IDArt) AS TotalVentas, ROUND(AVG(lineaspedido.Precio), 2) AS PrecioPromedio FROM zonas INNER JOIN mesaszona ON zonas.ID = mesaszona.IDZona INNER JOIN mesas ON mesaszona.IDMesa = mesas.ID INNER JOIN infmesa ON CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) = mesas.ID INNER JOIN lineaspedido ON lineaspedido.UID = infmesa.UID WHERE lineaspedido.Estado='C' GROUP BY Zona"
+    },
+    {
+      "prompt":"Obtén la cantidad de artículos vendidos por cada sección y ordena el resultado de mayor a menor",
+      "completion": "SELECT secciones.Nombre AS Seccion, COUNT(lineaspedido.IDArt) AS ArticulosVendidos FROM secciones INNER JOIN teclaseccion ON secciones.ID = teclaseccion.IDSeccion INNER JOIN teclas ON teclaseccion.IDTecla = teclas.ID INNER JOIN lineaspedido ON teclas.ID = lineaspedido.tecla_id WHERE lineaspedido.Estado='C' GROUP BY Seccion ORDER BY ArticulosVendidos DESC"
+    },
+    {
+      "prompt": "Dame el número total de artículos vendidos",
+      "completion": "SELECT COUNT(lineaspedido.IDArt) AS TotalVendidos FROM lineaspedido WHERE lineaspedido.Estado = 'C'"
+    },
+    {
+      "prompt": "Dame el número total de artículos regalados o invitados",
+      "completion": "SELECT COUNT(lineaspedido.IDArt) AS TotalRegalados FROM lineaspedido WHERE lineaspedido.Estado = 'R'"
+    },
+    {
+      "prompt": "Dame los nombres de los artículos vendidos",
+      "completion": "SELECT lineaspedido.Descripcion AS NombreArticulo FROM lineaspedido WHERE lineaspedido.Estado = 'C'"
+    },
+    {
+      "prompt": "Dame los nombres de los artículos regalados o invitados",
+      "completion": "SELECT lineaspedido.Descripcion AS NombreArticulo FROM lineaspedido WHERE lineaspedido.Estado = 'R'"
+    },
+    {
+      "prompt": "Dame la información completa de la última mesa que tuvo un artículo borrado",
+      "completion": "WITH borrado AS (SELECT *, lineaspedido.UID FROM historialnulos INNER JOIN lineaspedido ON historialnulos.IDLPedido=lineaspedido.ID ORDER BY ID DESC LIMIT 1) SELECT COUNT(lineaspedido.IDArt) AS Cantidad, lineaspedido.Precio, COUNT(lineaspedido.IDArt) * lineaspedido.Precio AS Total, lineaspedido.Descripcion, lineaspedido.Estado, lineaspedido.UID, mesas.Nombre FROM lineaspedido INNER JOIN infmesa ON infmesa.UID = lineaspedido.UID INNER JOIN mesas ON CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) = mesas.ID WHERE infmesa.UID IN (SELECT UID FROM borrado) GROUP BY lineaspedido.IDPedido, lineaspedido.IDArt, lineaspedido.Descripcion;"
+    },
+    {
+      "prompt": "Cuando se anula una línea de pedido, ¿qué estado se debe asignar?",
+      "completion": "El estado de una línea de pedido anulada se debe establecer como 'A' según el campo de estado_choices."
+    },
+    {
+      "prompt": "¿Cuál es el estado de una línea de pedido que está activa y pendiente de entrega?",
+      "completion": "El estado de una línea de pedido activa y pendiente de entrega se debe establecer como 'P' según el campo de estado_choices."
+    },
+    {
+      "prompt": "Si una línea de pedido forma parte de una promoción o grupo, ¿cómo se debe indicar su estado?",
+      "completion": "El estado de una línea de pedido que forma parte de una promoción o grupo se debe establecer como 'M' según el campo de estado_choices."
+    },
+    {
+      "prompt": "Cuando se anula una línea de pedido, ¿qué estado se debe asignar?",
+      "completion": "El estado de una línea de pedido anulada se debe establecer como 'A' según el campo de estado_choices.",
+      "estado_choices": [
+        {
+          "valor": "A",
+          "descripcion": "Anulado"
+        },
+        {
+          "valor": "C",
+          "descripcion": "Linea cobrada"
+        },
+        {
+          "valor": "R",
+          "descripcion": "Regalo"
+        },
+        {
+          "valor": "P",
+          "descripcion": "Pedido activo"
+        },
+        {
+          "valor": "M",
+          "descripcion": "Pertenece a promoción o grupo"
+        }
+      ]
+    },
+    {
+        "prompt": "Eres un asistente inteligente que interactúa con una base de datos de pedidos. Cuando se te pide que 'anules un pedido', significa cambiar el estado de ese pedido en la base de datos a 'A', que representa 'Anulado'. Los estados posibles para un pedido son: A = Anulado, C = Cobrado, R = Regalado, P = Pedido activo, M = Pertenece a una promoción o grupo.\n\nUsuario: anula el pedido 2300",
+        "completion": "UPDATE Lineaspedido SET Estado = 'A' WHERE IDPedido = 2300;"
+    },
+    {
+        "prompt": "Eres un asistente inteligente que interactúa con una base de datos de pedidos. Cuando se te pide que 'anules un pedido', significa cambiar el estado de ese pedido en la base de datos a 'A', que representa 'Anulado'. Los estados posibles para un pedido son: A = Anulado, C = Cobrado, R = Regalado, P = Pedido activo, M = Pertenece a una promoción o grupo.\n\nUsuario: ¿Cuál es el estado del pedido 500?",
+        "completion": "SELECT Estado, Precio, Descripcion FROM Lineaspedido WHERE IDPedido = 500;"
+    },
+
+    [
+    {
+        "prompt": "Obtener todas las familias de productos.",
+        "completion": "SELECT * FROM familias;"
+    },
+    {
+        "prompt": "Encontrar todas las teclas asignadas a la familia con ID 5.",
+        "completion": "SELECT * FROM teclas WHERE IDfamilia = 5;"
+    },
+    {
+        "prompt": "Buscar los detalles del receptor con el ID 200.",
+        "completion": "SELECT Nombre, nomImp, Descripcion FROM receptores WHERE ID = 200;"
+    },
+    {
+        "prompt": "Actualizar la descripción de la familia con ID 10 a 'Bebidas frías'.",
+        "completion": "UPDATE familias SET Descripcion = 'Bebidas frías' WHERE ID = 10;"
+    },
+    {
+        "prompt": "Eliminar la tecla con ID 50.",
+        "completion": "DELETE FROM teclas WHERE ID = 50;"
+    },
+    {
+        "prompt": "Insertar un nuevo receptor con ID 400, nombre 'Receptor 400' y dirección 'Dirección 400'.",
+        "completion": "INSERT INTO receptores (ID, Nombre, Direccion) VALUES (400, 'Receptor 400', 'Dirección 400');"
     }
-      
+]
+
   ]
   
