@@ -371,8 +371,6 @@
         "prompt": "Eres un asistente inteligente que interactúa con una base de datos de pedidos. Cuando se te pide que 'anules un pedido', significa cambiar el estado de ese pedido en la base de datos a 'A', que representa 'Anulado'. Los estados posibles para un pedido son: A = Anulado, C = Cobrado, R = Regalado, P = Pedido activo, M = Pertenece a una promoción o grupo.\n\nUsuario: ¿Cuál es el estado del pedido 500?",
         "completion": "SELECT Estado, Precio, Descripcion FROM Lineaspedido WHERE IDPedido = 500;"
     },
-
-    [
     {
         "prompt": "Obtener todas las familias de productos.",
         "completion": "SELECT * FROM familias;"
@@ -396,8 +394,250 @@
     {
         "prompt": "Insertar un nuevo receptor con ID 400, nombre 'Receptor 400' y dirección 'Dirección 400'.",
         "completion": "INSERT INTO receptores (ID, Nombre, Direccion) VALUES (400, 'Receptor 400', 'Dirección 400');"
-    }
-]
-
+    },
+    {
+      "prompt": "Pide dos Fantas de limón, una sin hielo, y dos hamburguesas, una sin tomate.",
+      "completion": {
+        "accion": "pedir",
+        "mesa": "Para que mesa?",
+        "lineas": [
+          {"can": 1, "art": "Fanta de limón", "sugerencias": []},
+          {"can": 1, "art": "Fanta de limón", "sugerencias": ["sin hielo"]},
+          {"can": 1, "art": "hamburguesa", "sugerencias": []},
+          {"can": 1, "art": "hamburguesa", "sugerencias": ["sin tomate"]}
+        ]
+      }
+    },
+    {
+      "prompt": "Dos Fantas de limón, una sin hielo, y dos hamburguesas, una sin tomate. Mesa T10",
+      "completion": {
+        "accion": "pedir",
+        "mesa": "T10",
+        "lineas": [
+          {"can": 1, "art": "Fanta de limón", "sugerencias": []},
+          {"can": 1, "art": "Fanta de limón", "sugerencias": ["sin hielo"]},
+          {"can": 1, "art": "hamburguesa", "sugerencias": []},
+          {"can": 1, "art": "hamburguesa", "sugerencias": ["sin tomate"]}
+        ]
+      }
+    },
+    {
+      "prompt": "Dame dos cocacolas para la S2 y 4 Cervezas para la mesa T7.",
+      "completion": {
+        "accion": "pedir",
+        "ordenes": [
+          {
+            "mesa": "S2",
+            "lineas": [
+              {"can": 2, "art": "CocaCola", "sugerencias": []}
+            ]
+          },
+          {
+            "mesa": "T7",
+            "lineas": [
+              {"can": 4, "art": "Cerveza", "sugerencias": []}
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "prompt": "Dame dos tónicas sin hielo y una sandía para la T25.",
+      "completion": {
+        "accion": "pedir",
+        "ordenes": [
+          {
+            "mesa": "T25",
+            "lineas": [
+              {"can": 2, "art": "Tónica", "sugerencias": ["sin hielo"]},
+              {"can": 1, "art": "Sandía", "sugerencias": []}
+            ]
+          }
+        ]
+      }
+    },{
+      "prompt": "Pide tres cocacolas para la T10 y cuatro pizzas para la S15.",
+      "completion": {
+        "accion": "pedir",
+        "ordenes": [
+          {
+            "mesa": "T10",
+            "lineas": [
+              {"can": 3, "art": "CocaCola", "sugerencias": []}
+            ]
+          },
+          {
+            "mesa": "S15",
+            "lineas": [
+              {"can": 4, "art": "Pizza", "sugerencias": []}
+            ]
+          }
+        ]
+      }
+    },{
+      "prompt": "Pide dos ensaladas sin cebolla y tres hamburguesas sin ketchup para la S1.",
+      "completion": {
+        "accion": "pedir",
+        "mesa": "S1",
+        "lineas": [
+          {"can": 2, "art": "Ensalada", "sugerencias": ["sin cebolla"]},
+          {"can": 3, "art": "Hamburguesa", "sugerencias": ["sin ketchup"]}
+        ]
+      }
+    },
+      {
+        "prompt": "Junta la mesa S2 y T2.",
+        "completion": {
+          "accion": "unir_mesas",
+          "mesas": ["S2", "T2"]
+        }
+      },
+      {
+        "prompt": "Cambiar mesa T2 a la S5.",
+        "completion": {
+          "accion": "cambiar_mesa",
+          "mesa_origen": "T2",
+          "mesa_destino": "S5"
+        }
+      },
+      {
+        "prompt": "Cambia una cocacola, una cerveza y una tapa de calamares de la mesa T3 a la T4.",
+        "completion": {
+          "accion": "cambiar_articulos",
+          "mesa_origen": "T3",
+          "mesa_destino": "T4",
+          "lineas": [
+            {"can": 1, "art": "CocaCola"},
+            {"can": 1, "art": "Cerveza"},
+            {"can": 1, "art": "Tapa de calamares"}
+          ]
+        }
+      },
+      {
+        "prompt": "Media tostada de aceite.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "Para que mesa?",
+          "lineas": [
+            {"can": 1, "art": "Media Tostada", "topics":[ "aceite"], "sugerencias": []}
+          ]
+        }
+      },
+      {
+        "prompt": "Media de churros tostados y un café con leche desnatada largo de café. T6",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "T6",
+          "lineas": [
+            {"can": 1, "art": "Media churros", "sugerencias": ["tostados"]},
+            {"can": 1, "art": "Café", "topics": ["leche desnatada"], "sugerencias": ["largo de café"]}
+          ]
+        }
+      },
+      {
+        "prompt": "Dame media tostada de tomate de la parte de abajo y un café descafeinado con leche templada. Mesa 13.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "13",
+          "lineas": [
+            {"can": 1, "art": "Media tostada", "topics": ["tomate"], "sugerencias": ["parte de abajo"]},
+            {"can": 1, "art": "Café", "topics": ["descafeinado", "leche"], "sugerencias": ["leche templada"]}
+          ]
+        }
+      },
+      {
+        "prompt": "Media integral de tomate y queso, solo largo con hielo.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "Para que mesa?",
+          "lineas": [
+            {"can": 1, "art": "Media tostada", "topics": ["integral", "tomate", "queso"], "sugerencias": []},
+            {"can": 1, "art": "Café solo", "topics": ["largo"], "sugerencias": ["con hielo"]}
+          ]
+        }
+      },
+      {
+        "prompt": "4 cervezas en copa y 4 tapas individuales de arroz. Mesa 5.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "5",
+          "lineas": [
+            {"can": 4, "art": "Cerveza", "topics": [], "sugerencias": ["en copa"]},
+            {"can": 4, "art": "Tapa de arroz", "topics": [""], "sugerencias": ["individual"]}
+          ]
+        }
+      },
+      {
+        "prompt": "4 cervezas en copa y 4 tapas individuales de arroz. Mesa 5.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "5",
+          "lineas": [
+            {"can": 4, "art": "Cerveza", "topics": [], "sugerencias": ["en copa"]},
+            {"can": 4, "art": "Tapa de arroz", "topics": [""], "sugerencias": ["individual"]}
+          ]
+        }
+      },{
+        "prompt": "Unos huevos revueltos.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "Para que mesa?",
+          "lineas": [
+            {"can": 1, "art": "Huevos revueltos", "topics": [], "sugerencias": []}
+          ]
+        }
+      },
+      {
+        "prompt": "4 cocacolas, una sin hielo, 2 tapas de bacalao, una tapa de huevo con jamón y 1 hamburguesa.",
+        "completion": {
+          "accion": "pedir",
+          "mesa": "Para que mesa?",
+          "lineas": [
+            {"can": 3, "art": "Cocacola", "topics": [], "sugerencias": []},
+            {"can": 1, "art": "Cocacola", "topics": [], "sugerencias": ["sin hielo"]},
+            {"can": 2, "art": "Tapa de bacalao", "topics": [], "sugerencias": []},
+            {"can": 1, "art": "Tapa de huevo con jamón", "topics": [], "sugerencias": []},
+            {"can": 1, "art": "Hamburguesa", "topics": [], "sugerencias": []}
+          ]
+        }
+      },
+      {
+        "prompt": "Dame la lista de pedidos pendientes.",
+        "completion": {
+          "accion": "listar_pedidos_pendientes"
+        }
+      },
+      {
+        "prompt": "Dame dos tercios para la 2 y uno para la 5.",
+        "completion": [
+          {
+            "accion": "pedir",
+            "mesa": "2",
+            "lineas": [
+              {"can": 2, "art": "Tercios", "topics": [], "sugerencias": []}
+            ]
+          },
+          {
+            "accion": "pedir",
+            "mesa": "5",
+            "lineas": [
+              {"can": 1, "art": "Tercios", "topics": [], "sugerencias": []}
+            ]
+          },
+          {
+            "prompt": "Una tostada de jamón con filadelfia y un colacao grande.",
+            "completion": {
+              "accion": "pedir",
+              "mesa": "Para que mesa?",
+              "lineas": [
+                {"can": 1, "art": "Tostada", "topics": ["jamon", "filadelfia"], "sugerencias": []},
+                {"can": 1, "art": "Colacao", "topics": [], "sugerencias": ["grande"]}
+              ]
+            }
+          }
+          
+        ]
+      }
+  
   ]
   
