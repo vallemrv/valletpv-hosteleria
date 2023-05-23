@@ -637,7 +637,47 @@
           }
           
         ]
+      },
+      {
+        "prompt": "Dame el ticket número 54344.",
+        "completion": "SELECT IDTicket, ticket.Mesa, camareros.Nombre, ticket.Fecha, ticket.Hora, ticket.Entrega, Count(lineaspedido.IDArt) as Can, lineaspedido.Descripcion_t, Count(lineaspedido.IDArt) * lineaspedido.Precio as total FROM ticketlineas INNER JOIN ticket ON ticket.ID = ticketlineas.IDTicket INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID INNER JOIN camareros ON ticket.IDCam=camareros.ID WHERE IDTicket = 54344 GROUP BY lineaspedido.IDArt;"
+      },
+      {
+        "prompt": "Dame la cuenta de la mesa T12.",
+        "completion": "SELECT Count(lineaspedido.IDArt) as Can, lineaspedido.Descripcion, lineaspedido.Precio, Count(lineaspedido.IDArt) * lineaspedido.Precio as totallinea FROM mesasabiertas INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID INNER JOIN lineaspedido ON mesasabiertas.UID = lineaspedido.UID WHERE mesas.Nombre = 'T12' AND Estado != 'C' GROUP BY lineaspedido.IDArt, lineaspedido.Descripcion; SELECT SUM(lineaspedido.Precio) as totalcuenta FROM mesasabiertas INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID INNER JOIN lineaspedido ON mesasabiertas.UID = lineaspedido.UID WHERE mesas.Nombre = 'T12' AND Estado != 'C';"
+      },
+      {
+        "prompt": "Dame todo lo que ha pedido la mesa S16",
+        "completion": "SELECT lineaspedido.Descripcion, lineaspedido.Estado, Count(lineaspedido.IDArt) as Cantidad, Precio, Count(lineaspedido.IDArt)*Precio AS total FROM mesasabiertas INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID INNER JOIN lineaspedido ON mesasabiertas.UID = lineaspedido.UID WHERE mesas.Nombre = 'S16' GROUP BY lineaspedido.IDArt, lineaspedido.Descripcion, lineaspedido.Estado;"
+      },
+      {
+        "prompt": "Dame todo lo anulado de la mesa T14",
+        "completion": "SELECT lineaspedido.Descripcion, lineaspedido.Estado, Count(lineaspedido.IDArt) as Cantidad, Precio, Count(lineaspedido.IDArt)*Precio AS total FROM mesasabiertas INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID INNER JOIN lineaspedido ON mesasabiertas.UID = lineaspedido.UID WHERE mesas.Nombre = 'T14' AND lineaspedido.Estado = 'A' GROUP BY lineaspedido.IDArt, lineaspedido.Descripcion, lineaspedido.Estado;"
+      },
+      {
+        "prompt": "Dame toda la infomacion de la mesa a la cual pertenece la ultima linea borrada",
+        "completion": "WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa FROM infmesa WHERE UID = (SELECT lineaspedido.UID FROM historialnulos INNER JOIN lineaspedido ON lineaspedido.ID = historialnulos.IDLPedido ORDER BY historialnulos.ID DESC LIMIT  1)) SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
+      },
+      {
+        "prompt": "Lista de las 10 últimas mesas que contienen nulos",
+        "completion": "WITH latest_unique_historialnulos AS (SELECT * FROM (SELECT historialnulos.*, lp.IDArt, lp.Estado, lp.UID FROM historialnulos INNER JOIN lineaspedido as lp ON lp.ID = historialnulos.IDLPedido GROUP BY UID) t ORDER BY ID DESC LIMIT 10) SELECT infmesa.Hora, camareros.Nombre AS camarero_nombre, mesas.Nombre AS mesa_nombre, infmesa.Fecha, COUNT(CASE WHEN lineaspedido.Estado = 'A' THEN 1 END) AS nulos, COUNT(CASE WHEN lineaspedido.Estado = 'P' THEN 1 END) AS pedidos, COUNT(CASE WHEN lineaspedido.Estado = 'C' THEN 1 END) AS cobrados FROM infmesa INNER JOIN latest_unique_historialnulos ON infmesa.UID = latest_unique_historialnulos.UID INNER JOIN pedidos ON pedidos.UID = infmesa.UID INNER JOIN lineaspedido ON lineaspedido.IDPedido = pedidos.ID INNER JOIN camareros ON camareros.ID = infmesa.IDCam INNER JOIN mesas ON mesas.ID = CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) GROUP BY infmesa.UID, infmesa.Hora, camareros.Nombre, mesas.Nombre, infmesa.Fecha;"
+      },
+      {
+        "prompt":"Puedes dadme la informacion completa de la mesa con hora 21:08 y fecha 16 del 4 de 23 por favor. Solo la mesa S12",
+        "completion": "WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa FROM infmesa WHERE Hora = '21:08' AND Fecha = '2023-04-16') SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre AS mesa_nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa AND mesas.Nombre = 'S12' INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
+      },
+      {
+        "prompt":" Dame toda la informacion de la ultima mesa Z1",
+        "completion": "WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa FROM infmesa INNER JOIN mesas ON mesas.ID = CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) WHERE mesas.Nombre = 'Z1' ORDER BY Fecha DESC, Hora DESC LIMIT 1) SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre AS mesa_nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
+        
+      },
+      {
+        "prompt":"Dame toda la informacion de la ultima Z1 que aparezca en nulos",
+        "completion": "WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa FROM infmesa INNER JOIN mesas ON mesas.ID = CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) WHERE mesas.Nombre = 'Z1' AND infmesa.UID IN (SELECT lineaspedido.UID FROM historialnulos INNER JOIN lineaspedido ON lineaspedido.ID = historialnulos.IDLPedido) ORDER BY Fecha DESC, Hora DESC LIMIT 1) SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre AS mesa_nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
+      },
+      {
+        "prompt":"dame la informacion de las ultimas 10 mesas",
+        "completion":"WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa  FROM infmesa ORDER BY Fecha DESC, Hora DESC LIMIT 10) SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre AS mesa_nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
       }
-  
   ]
   
