@@ -46,7 +46,7 @@ def crear_emedings(file_db: str, num_ejemplos=2):
         example_prompt=example_prompt,
         
         # Customizations that will be added to the top and bottom of your prompt
-        prefix="Traduce el texto a una consulta sql.",
+        prefix="Traduce el texto a una consulta sql. Segun los ejemplos que acontinuacion se lista.",
         suffix="Input: {text}\nOutput:",
         
         # What inputs your prompt will receive

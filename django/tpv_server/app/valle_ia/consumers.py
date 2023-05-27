@@ -5,12 +5,16 @@ from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
 from .tools.class_tools import ExecSQLTools, QuerySQLTools
 from .tools.embedings import crear_emedings
-from langchain.agents import initialize_agent
-from langchain.agents.types import AgentType
-from langchain.chains import LLMChain
-from langchain.tools import Tool
+from .tools.agents import SQLAgent
+from langchain.agents import AgentExecutor
 from langchain.prompts import PromptTemplate
 from langchain.chat_models import ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.tools import Tool
+from langchain.schema import (
+    HumanMessage,
+    SystemMessage
+)
 import os
 import json
 import asyncio
@@ -21,26 +25,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         
-        
         path = os.path.join(settings.BASE_DIR, "app", "valle_ia", "LLM_embedings", "ejemplos_sql.json")
         self.prompt = crear_emedings(file_db=path, num_ejemplos=4)
         
-        llm = ChatOpenAI( openai_api_key=os.environ.get("API_KEY"), temperature=0)
+        
+        tools = [ExecSQLTools().set_ws_callback(self), 
+                 QuerySQLTools().set_ws_callback(self)]
+        
+        agent = SQLAgent()
 
-        llm_chain = LLMChain(llm=llm, prompt=PromptTemplate(
-                                input_variables=["query"],
-                                template="{query}"
-                            ))
-
-        llm_tool = Tool(
-            name="Modelo del lenguaje",
-            func=llm_chain.run,
-            description='use this tool for general purpose queries an logic'
-        )
-
-        tools = [ExecSQLTools(ws_callback=self.enviar_mensaje_sync), QuerySQLTools(ws_callback=self.enviar_mensaje_sync), llm_tool]
-        self.agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, max_iterations=3, verbose=True)
-
+        self.agent = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True)
 
         super().__init__(*args, **kwargs)
 
@@ -108,9 +102,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
              event["tipo"]: event['message'],
         }))
 
-
-
     
     def background_task(self, message):
-        self.agent.run(self.prompt.format(message))   
+        '''
+        llm = ChatOpenAI(openai_api_key=os.environ.get("API_KEY"), temperature=0)
+        p = self.prompt.format(text=message)
+        print(p)
+        messages = [
+            SystemMessage(content="Eres especialista en traducir texto a consultas SQL"),
+            HumanMessage(content=p)
+        ]
+        output = llm(messages=messages)
+        print(output.content)
+        '''
+        self.agent.run(self.prompt.format(text=message))   
     
