@@ -1,17 +1,48 @@
 from django.conf import settings
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .tools.openai import preguntar_gpt, create_men
-from .tools.texto import identificar_tablas
-from .tools.base import (ejecutar_select, get_tipo_consulta, 
-                         dividir_consultas, ejecutar_accion)
 from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
+from .tools.class_tools import ExecSQLTools, QuerySQLTools
+from .tools.embedings import crear_emedings
+from langchain.agents import initialize_agent
+from langchain.agents.types import AgentType
+from langchain.chains import LLMChain
+from langchain.tools import Tool
+from langchain.prompts import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+import os
 import json
 import asyncio
 import threading
 
+
 class ChatConsumer(AsyncWebsocketConsumer):
+
+    def __init__(self, *args, **kwargs):
+        
+        
+        path = os.path.join(settings.BASE_DIR, "app", "valle_ia", "LLM_embedings", "ejemplos_sql.json")
+        self.prompt = crear_emedings(file_db=path, num_ejemplos=4)
+        
+        llm = ChatOpenAI( openai_api_key=os.environ.get("API_KEY"), temperature=0)
+
+        llm_chain = LLMChain(llm=llm, prompt=PromptTemplate(
+                                input_variables=["query"],
+                                template="{query}"
+                            ))
+
+        llm_tool = Tool(
+            name="Modelo del lenguaje",
+            func=llm_chain.run,
+            description='use this tool for general purpose queries an logic'
+        )
+
+        tools = [ExecSQLTools(ws_callback=self.enviar_mensaje_sync), QuerySQLTools(ws_callback=self.enviar_mensaje_sync), llm_tool]
+        self.agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, max_iterations=3, verbose=True)
+
+
+        super().__init__(*args, **kwargs)
 
     def enviar_mensaje_sync(self, mensaje, tipo="text"):
         # Enviar mensaje al grupo
@@ -78,55 +109,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
 
-    def crear_tabla(self, datos):
-        mensajes = [
-            create_men("user", "Crea una tabla html (solo desde <table> hasta </table>) con los siguientes datos: "+ str(datos)),
-            create_men("user", "Crea la tabla centrada, con el texto wrap y cada linea gris y blanco"),
-            create_men("user", "Con la cabecera resaltada gris oscuro width 100%. gracias, sin explicacione solo codigo. overflow scroll")
-            ]
-        return  preguntar_gpt(mensajes)
+
     
     def background_task(self, message):
-        modelos = identificar_tablas(message)
-        if (len(modelos) <= 0):
-            mensajes = [
-                create_men("user",f"en la frase: {message} hay algun nombre de pila o de persona. responde solo con si o no.")
-            ]
-            respuesta = preguntar_gpt(mensajes)
-            if "Sí." in respuesta:
-                modelos = ["camareros"]
-            else:    
-                # Enviar mensaje al grupo
-                self.enviar_mensaje_sync('''No hay ninguna tabla con este nombre. 
-                                            Si me das mas informacion para la 
-                                            proxima ya sabre como hacerlo.''')
-                return
-        
-
-        mensajes = [
-            create_men("system", "Eres un gran traductor del leguaje humano al leguaje SQL, sin explicaciones."),
-            create_men("user", f"teniendo en cuenta esta estructua de base de datos {modelos}"),   
-            create_men("user", f"traduce esto {message}, solo las consultas sql serparadas por puno y coma. 'NO EXPLICACIONES'. gracias")
-        ]
-
-        respuesta = preguntar_gpt(mensajes)
-        
-        
-        consultas = dividir_consultas(respuesta)
-        
-        for c in consultas:
-            print(c)
-            tipo = get_tipo_consulta(c)
-            if "select" in tipo:
-                res = ejecutar_select(c)
-                self.enviar_mensaje_sync(json.dumps(res), "tabla")
-            elif tipo in ['update', 'insert']:
-                res = ejecutar_accion(c)
-                self.enviar_mensaje_sync(res, "text") 
-            else:
-                resultado = {"error" : f"Tipo de consulta no soportado: {tipo}"} 
-                self.enviar_mensaje_sync(resultado, "text") 
-        
-        
-    
+        self.agent.run(self.prompt.format(message))   
     
