@@ -2,8 +2,6 @@ from langchain.prompts.example_selector import SemanticSimilarityExampleSelector
 from langchain.vectorstores import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.prompts import FewShotPromptTemplate, PromptTemplate
-
-
 import os
 import json
 
@@ -46,8 +44,8 @@ def crear_emedings(file_db: str, num_ejemplos=2):
         example_prompt=example_prompt,
         
         # Customizations that will be added to the top and bottom of your prompt
-        prefix="Traduce el texto a una consulta sql. Segun los ejemplos que acontinuacion se lista.",
-        suffix="Input: {text}\nOutput:",
+        prefix="Aqui tienes informacion de mi base de dastos. No invetes columnas." ,
+        suffix="Pregunta: {text}",
         
         # What inputs your prompt will receive
         input_variables=["text"],

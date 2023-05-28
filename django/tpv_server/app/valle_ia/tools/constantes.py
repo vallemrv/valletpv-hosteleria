@@ -1,1 +1,0 @@
-estructura_bd = sql_tables = {}

@@ -35,19 +35,22 @@ def get_tipo_consulta(consulta):
 
 def ejecutar_select(consulta):
     with connection.cursor() as cursor:
-        cursor.execute(consulta)
-        
-        # Obtenemos los nombres de las columnas
-        columnas = [col[0] for col in cursor.description]
+        try:
+            cursor.execute(consulta)
+            
+            # Obtenemos los nombres de las columnas
+            columnas = [col[0] for col in cursor.description]
 
-        # Fetch rows
-        datos = cursor.fetchall()
+            # Fetch rows
+            datos = cursor.fetchall()
 
-        # Convertimos las filas de los datos a listas (por defecto son tuplas)
-        datos = [list(fila) for fila in datos]
+            # Convertimos las filas de los datos a listas (por defecto son tuplas)
+            datos = [list(fila) for fila in datos]
 
-        # Devolvemos el resultado en el formato que has especificado
-        return {'tabla': {'columnas': columnas, 'datos': datos}}
+            # Devolvemos el resultado en el formato que has especificado
+            return {'tabla': {'columnas': columnas, 'datos': datos}}
+        except Exception as e:
+            return "Error " + str(e)
 
 def ejecutar_accion(consulta):
     with connection.cursor() as cursor:
@@ -57,4 +60,4 @@ def ejecutar_accion(consulta):
             connection.commit()
             return "La consulta se ha ejecutado con éxito."
         except Exception as e:
-            return {'error': str(e)}
+            return "Error " + str(e)

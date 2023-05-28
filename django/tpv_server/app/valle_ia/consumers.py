@@ -3,18 +3,14 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
-from .tools.class_tools import ExecSQLTools, QuerySQLTools
+from .tools.class_tools import ExecSQLTools
 from .tools.embedings import crear_emedings
-from .tools.agents import SQLAgent
-from langchain.agents import AgentExecutor
-from langchain.prompts import PromptTemplate
+from .tools.prompts import create_customprompt, CustomOutputParser
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
+from langchain.agents import LLMSingleActionAgent, AgentExecutor
 from langchain.tools import Tool
-from langchain.schema import (
-    HumanMessage,
-    SystemMessage
-)
+
 import os
 import json
 import asyncio
@@ -28,13 +24,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
         path = os.path.join(settings.BASE_DIR, "app", "valle_ia", "LLM_embedings", "ejemplos_sql.json")
         self.prompt = crear_emedings(file_db=path, num_ejemplos=4)
         
-        
-        tools = [ExecSQLTools().set_ws_callback(self), 
-                 QuerySQLTools().set_ws_callback(self)]
-        
-        agent = SQLAgent()
+        # Initiate our LLM - default is 'gpt-3.5-turbo'
+        llm = ChatOpenAI(temperature=0)
 
-        self.agent = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True)
+        sql_exc = ExecSQLTools().set_controller(self)
+                  
+        tools = [
+            Tool(
+                name= sql_exc.name,
+                func= sql_exc.run,
+                description=sql_exc.description
+            )
+        ]
+        
+
+        # LLM chain consisting of the LLM and a prompt
+        llm_chain = LLMChain(llm=llm, prompt=create_customprompt(tools))
+
+        # Using tools, the LLM chain and output_parser to make an agent
+        tool_names = [tool.name for tool in tools]
+        
+        single_action = LLMSingleActionAgent(
+            llm_chain=llm_chain, 
+            output_parser=CustomOutputParser(),
+            # We use "Observation" as our stop sequence so it will stop when it receives Tool output
+            # If you change your prompt template you'll need to adjust this as well
+            stop=["\nObservación:"], 
+            allowed_tools=tool_names
+        )
+        
+        # Initiate the agent that will respond to our queries
+        # Set verbose=True to share the CoT reasoning the LLM goes through
+        self.agent = AgentExecutor.from_agent_and_tools(agent=single_action, tools=tools, verbose=True)
 
         super().__init__(*args, **kwargs)
 
@@ -104,16 +125,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     
     def background_task(self, message):
-        '''
-        llm = ChatOpenAI(openai_api_key=os.environ.get("API_KEY"), temperature=0)
-        p = self.prompt.format(text=message)
-        print(p)
-        messages = [
-            SystemMessage(content="Eres especialista en traducir texto a consultas SQL"),
-            HumanMessage(content=p)
-        ]
-        output = llm(messages=messages)
-        print(output.content)
-        '''
-        self.agent.run(self.prompt.format(text=message))   
+        self.enviar_mensaje_sync(self.agent.run(self.prompt.format(text=message)))
     
