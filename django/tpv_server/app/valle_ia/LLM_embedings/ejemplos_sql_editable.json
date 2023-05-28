@@ -1,4 +1,8 @@
-[
+[  
+    {
+       "prompt": "Lista autorizados",
+       "completion":"SELECT Nombre FROM camareros WHERE Autorizado = 1"
+    },
     {
         "prompt": "Obtener los nombres de todos los camareros autorizados",
         "completion": "SELECT Nombre FROM camareros WHERE Autorizado = 1"
@@ -300,36 +304,28 @@
         "completion": "SELECT zonas.Nombre AS Zona, COUNT(lineaspedido.IDArt) AS TotalVentas, ROUND(AVG(lineaspedido.Precio), 2) AS PrecioPromedio FROM zonas INNER JOIN mesaszona ON zonas.ID = mesaszona.IDZona INNER JOIN mesas ON mesaszona.IDMesa = mesas.ID INNER JOIN infmesa ON CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) = mesas.ID INNER JOIN lineaspedido ON lineaspedido.UID = infmesa.UID WHERE lineaspedido.Estado='C' GROUP BY Zona"
     },
     {
-        "prompt": "Obt\u00e9n la cantidad de art\u00edculos vendidos por cada secci\u00f3n y ordena el resultado de mayor a menor",
+        "prompt": "Obten la cantidad de art\u00edculos vendidos por cada sección y ordena el resultado de mayor a menor",
         "completion": "SELECT secciones.Nombre AS Seccion, COUNT(lineaspedido.IDArt) AS ArticulosVendidos FROM secciones INNER JOIN teclaseccion ON secciones.ID = teclaseccion.IDSeccion INNER JOIN teclas ON teclaseccion.IDTecla = teclas.ID INNER JOIN lineaspedido ON teclas.ID = lineaspedido.tecla_id WHERE lineaspedido.Estado='C' GROUP BY Seccion ORDER BY ArticulosVendidos DESC"
     },
     {
-        "prompt": "Dame el n\u00famero total de art\u00edculos vendidos",
+        "prompt": "Dame el númeoro total de aticulos vendidos",
         "completion": "SELECT COUNT(lineaspedido.IDArt) AS TotalVendidos FROM lineaspedido WHERE lineaspedido.Estado = 'C'"
     },
     {
-        "prompt": "Dame el n\u00famero total de art\u00edculos regalados o invitados",
+        "prompt": "Dame el número total de articulos regalados o invitados",
         "completion": "SELECT COUNT(lineaspedido.IDArt) AS TotalRegalados FROM lineaspedido WHERE lineaspedido.Estado = 'R'"
     },
     {
-        "prompt": "Dame los nombres de los art\u00edculos vendidos",
+        "prompt": "Dame los nombres de los articulos vendidos",
         "completion": "SELECT lineaspedido.Descripcion AS NombreArticulo FROM lineaspedido WHERE lineaspedido.Estado = 'C'"
     },
     {
-        "prompt": "Dame los nombres de los art\u00edculos regalados o invitados",
+        "prompt": "Dame los nombres de los articulos regalados o invitados",
         "completion": "SELECT lineaspedido.Descripcion AS NombreArticulo FROM lineaspedido WHERE lineaspedido.Estado = 'R'"
     },
     {
-        "prompt": "Dame la informaci\u00f3n completa de la \u00faltima mesa que tuvo un art\u00edculo borrado",
+        "prompt": "Dame la información completa de la última mesa que tuvo un artículo borrado",
         "completion": "WITH borrado AS (SELECT *, lineaspedido.UID FROM historialnulos INNER JOIN lineaspedido ON historialnulos.IDLPedido=lineaspedido.ID ORDER BY ID DESC LIMIT 1) SELECT COUNT(lineaspedido.IDArt) AS Cantidad, lineaspedido.Precio, COUNT(lineaspedido.IDArt) * lineaspedido.Precio AS Total, lineaspedido.Descripcion, lineaspedido.Estado, lineaspedido.UID, mesas.Nombre FROM lineaspedido INNER JOIN infmesa ON infmesa.UID = lineaspedido.UID INNER JOIN mesas ON CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) = mesas.ID WHERE infmesa.UID IN (SELECT UID FROM borrado) GROUP BY lineaspedido.IDPedido, lineaspedido.IDArt, lineaspedido.Descripcion;"
-    },
-    {
-        "prompt": "Eres un asistente inteligente que interact\u00faa con una base de datos de pedidos. Cuando se te pide que 'anules un pedido', significa cambiar el estado de ese pedido en la base de datos a 'A', que representa 'Anulado'. Los estados posibles para un pedido son: A = Anulado, C = Cobrado, R = Regalado, P = Pedido activo, M = Pertenece a una promoci\u00f3n o grupo.\n\nUsuario: anula el pedido 2300",
-        "completion": "UPDATE Lineaspedido SET Estado = 'A' WHERE IDPedido = 2300;"
-    },
-    {
-        "prompt": "Eres un asistente inteligente que interact\u00faa con una base de datos de pedidos. Cuando se te pide que 'anules un pedido', significa cambiar el estado de ese pedido en la base de datos a 'A', que representa 'Anulado'. Los estados posibles para un pedido son: A = Anulado, C = Cobrado, R = Regalado, P = Pedido activo, M = Pertenece a una promoci\u00f3n o grupo.\n\nUsuario: \u00bfCu\u00e1l es el estado del pedido 500?",
-        "completion": "SELECT Estado, Precio, Descripcion FROM Lineaspedido WHERE IDPedido = 500;"
     },
     {
         "prompt": "Obtener todas las familias de productos.",
@@ -344,19 +340,15 @@
         "completion": "SELECT Nombre, nomImp, Descripcion FROM receptores WHERE ID = 200;"
     },
     {
-        "prompt": "Actualizar la descripci\u00f3n de la familia con ID 10 a 'Bebidas fr\u00edas'.",
-        "completion": "UPDATE familias SET Descripcion = 'Bebidas fr\u00edas' WHERE ID = 10;"
+        "prompt": "Actualizar la descripción de la familia con ID 10 a 'Bocadillos'.",
+        "completion": "UPDATE familias SET Descripcion = 'Bocadillos' WHERE ID = 10;"
     },
     {
         "prompt": "Eliminar la tecla con ID 50.",
         "completion": "DELETE FROM teclas WHERE ID = 50;"
     },
     {
-        "prompt": "Insertar un nuevo receptor con ID 400, nombre 'Receptor 400' y direcci\u00f3n 'Direcci\u00f3n 400'.",
-        "completion": "INSERT INTO receptores (ID, Nombre, Direccion) VALUES (400, 'Receptor 400', 'Direcci\u00f3n 400');"
-    },
-    {
-        "prompt": "Dame el ticket n\u00famero 54344.",
+        "prompt": "Dame el ticket núamero 54344.",
         "completion": "SELECT IDTicket, ticket.Mesa, camareros.Nombre, ticket.Fecha, ticket.Hora, ticket.Entrega, Count(lineaspedido.IDArt) as Can, lineaspedido.Descripcion_t, Count(lineaspedido.IDArt) * lineaspedido.Precio as total FROM ticketlineas INNER JOIN ticket ON ticket.ID = ticketlineas.IDTicket INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID INNER JOIN camareros ON ticket.IDCam=camareros.ID WHERE IDTicket = 54344 GROUP BY lineaspedido.IDArt;"
     },
     {
@@ -376,7 +368,7 @@
         "completion": "WITH ic AS (SELECT Hora, Fecha, IDCam, UID, CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) as IDMesa FROM infmesa WHERE UID = (SELECT lineaspedido.UID FROM historialnulos INNER JOIN lineaspedido ON lineaspedido.ID = historialnulos.IDLPedido ORDER BY historialnulos.ID DESC LIMIT  1)) SELECT ic.Hora, cm.Nombre AS cam_mesa, mesas.Nombre, ic.Fecha, lp.Precio, Count(lp.IDArt) as Can, lp.Descripcion, Count(lp.IDArt) * lp.Precio as Total, lp.Estado, p.ID as IDPedido, cp.Nombre AS cam_pedido, p.Hora as hora_pedidos FROM ic INNER JOIN mesas ON mesas.ID = ic.IDMesa INNER JOIN pedidos p ON p.UID = ic.UID INNER JOIN lineaspedido lp ON  lp.IDPedido = p.ID INNER JOIN camareros cp ON cp.ID = p.IDCam INNER JOIN camareros cm ON cm.ID=ic.IDCam GROUP BY p.ID, lp.IDArt, lp.Descripcion, lp.Estado;"
     },
     {
-        "prompt": "Lista de las 10 \u00faltimas mesas que contienen nulos",
+        "prompt": "Lista de las 10 familias mesas que contienen nulos",
         "completion": "WITH latest_unique_historialnulos AS (SELECT * FROM (SELECT historialnulos.*, lp.IDArt, lp.Estado, lp.UID FROM historialnulos INNER JOIN lineaspedido as lp ON lp.ID = historialnulos.IDLPedido GROUP BY UID) t ORDER BY ID DESC LIMIT 10) SELECT infmesa.Hora, camareros.Nombre AS camarero_nombre, mesas.Nombre AS mesa_nombre, infmesa.Fecha, COUNT(CASE WHEN lineaspedido.Estado = 'A' THEN 1 END) AS nulos, COUNT(CASE WHEN lineaspedido.Estado = 'P' THEN 1 END) AS pedidos, COUNT(CASE WHEN lineaspedido.Estado = 'C' THEN 1 END) AS cobrados FROM infmesa INNER JOIN latest_unique_historialnulos ON infmesa.UID = latest_unique_historialnulos.UID INNER JOIN pedidos ON pedidos.UID = infmesa.UID INNER JOIN lineaspedido ON lineaspedido.IDPedido = pedidos.ID INNER JOIN camareros ON camareros.ID = infmesa.IDCam INNER JOIN mesas ON mesas.ID = CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) GROUP BY infmesa.UID, infmesa.Hora, camareros.Nombre, mesas.Nombre, infmesa.Fecha;"
     },
     {

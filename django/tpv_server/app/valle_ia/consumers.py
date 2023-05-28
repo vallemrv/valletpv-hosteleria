@@ -3,13 +3,14 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import authenticate
 from asgiref.sync import async_to_sync
-from .tools.class_tools import ExecSQLTools
-from .tools.embedings import crear_emedings
+from .tools.class_tools import ExecSQLTools, SearchInfoDBTools
+from .tools.embedings import crear_emeddings_ex
 from .tools.prompts import create_customprompt, CustomOutputParser
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.agents import LLMSingleActionAgent, AgentExecutor
 from langchain.tools import Tool
+
 
 import os
 import json
@@ -22,18 +23,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         
         path = os.path.join(settings.BASE_DIR, "app", "valle_ia", "LLM_embedings", "ejemplos_sql.json")
-        self.prompt = crear_emedings(file_db=path, num_ejemplos=4)
+        rt = crear_emeddings_ex(file_db=path)
         
         # Initiate our LLM - default is 'gpt-3.5-turbo'
         llm = ChatOpenAI(temperature=0)
-
-        sql_exc = ExecSQLTools().set_controller(self)
+        
+        sql_exc = ExecSQLTools()
+        search_info = SearchInfoDBTools().set_embbeding(rt)
                   
         tools = [
             Tool(
                 name= sql_exc.name,
                 func= sql_exc.run,
                 description=sql_exc.description
+            ),
+            Tool(
+                 name=search_info.name,
+                 func=search_info.run,
+                 description=search_info.description
             )
         ]
         
@@ -50,7 +57,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # We use "Observation" as our stop sequence so it will stop when it receives Tool output
             # If you change your prompt template you'll need to adjust this as well
             stop=["\nObservación:"], 
-            allowed_tools=tool_names
+            allowed_tools=tool_names,
+            max_iterations=3
         )
         
         # Initiate the agent that will respond to our queries
@@ -125,5 +133,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     
     def background_task(self, message):
-        self.enviar_mensaje_sync(self.agent.run(self.prompt.format(text=message)))
+        self.enviar_mensaje_sync(self.agent.run(message))
     

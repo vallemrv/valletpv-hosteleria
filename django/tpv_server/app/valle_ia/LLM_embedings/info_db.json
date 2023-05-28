@@ -1,0 +1,52 @@
+[
+    {
+        "tablas": "camareros",
+        "info": {
+            "estructuraTabla": ["ID", "Nombre", "Apellidos", "Email", "Pass", "Activo", "Autorizado", "Permisos"],
+            "consultasSQL": [
+                {
+                    "input": "Mostrar los camareros o lista de camareros",
+                    "output": "SELECT Nombre FROM camareros WHERE Activo = 1"
+                },
+                {
+                    "input": "Obtener el nombre, apellido y email de todos los camareros",
+                    "output": "SELECT Nombre, Apellidos, Email FROM camareros"
+                },
+                {
+                    "input": "Borrar a Manuel",
+                    "output": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+                }
+            ],
+            "instrucciones": [
+                "No enseñar nunca la columna Pass",
+                "Mostrar siempre a no ser que se especifique lo contrario los camareros activos",
+                "Las columnas por defecto a mostrar son Nombre y apellidos",
+                "Nunca se borran los camareros, borrar en la tabla de camareros es sinónimo de Activo = 0",
+                "Cuando mostramos los camareros que hay en el pase queremos decir que Mostrar los autorizados = 1"
+            ]
+        }
+    },
+    
+
+    {
+        "tablas": "todas",
+        "info": {
+            "estructuraTabla": [
+                "camareros(ID, Nombre, Apellidos, Email, Pass, Activo, Autorizado, Permisos)",
+                "mesas(ID, Nombre, Orden)",
+                "receptores(ID, Nombre, nomImp, Activo, Descripcion)",
+                "secciones(ID, Nombre, RGB, Orden)",
+                "teclas(ID, Nombre, P1, P2, Orden, Tag, TTF, Descripcion_r, Descripcion_t, tipo, IDFamilia)",
+                "zonas(ID, Nombre, Tarifa, RGB)",
+                "pedidos(ID, Hora, IDCam, uid_device, UID)",
+                "lineaspedido(ID, IDArt, Estado, Precio, Descripcion, es_compuesta, cantidad, Descripcion_t, UID, IDPedido, tecla_id)",
+                "familias(ID, Nombre, Tipo, NumTapas, IDReceptor)",
+                "infmesa(UID, Hora, NumCopias, IDCam, Fecha)",
+                "ticket(ID, IDCam, Hora, Entrega, UID, Mesa, url_factura, Fecha)"
+            ],
+            "consultasSQL": [],
+            "instrucciones": []
+        }
+    }
+
+]
