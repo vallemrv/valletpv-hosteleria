@@ -1,0 +1,32 @@
+Estruntura de la tabla Camareros
+columnas ("ID" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "Nombre" varchar(100) NOT NULL, 
+"Apellidos" varchar(100) NOT NULL, "Email" varchar(50) NULL, "Pass" varchar(100) NULL, 
+"Activo" integer NOT NULL, "Autorizado" integer NOT NULL, "Permisos" varchar(150) NULL)
+
+Ejemplos de consultas sql
+pregunta: Mostrar los camareros o lista de camareros
+parametro: SELECT Nombre FROM camareros WHERE Activo = 1;
+Obtener el nombre, apellido y email de todos los camareros
+SELECT Nombre, Apellidos, Email FROM camareros;
+Borrar a Manuel
+UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1;
+Cuantos camareros autorizados hay?
+SELECT COUNT(*) as Can FROM camareros WHERE Autorizado = 1;
+Borrar al camarero Bart Simsoms.",
+UPDATE camareros SET Activo = 0 WHERE Nombre = 'Bart' AND Apellidos='Simsoms'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+Activar Manuel Rodriguez.",
+UPDATE camareros SET Activo = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+Mete en el pase a manuel rodriguez.",
+UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+Mete en el pase a Manuel y Cristian solo.
+UPDATE camareros SET Autorizado = 1 WHERE Nombre IN ('Manuel', 'Cristian'); UPDATE camareros SET Autorizado = 0 WHERE Nombre NOT IN ('Manuel', 'Cristian'); SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1;
+
+
+Instrucciones
+No enseñar nunca la culumna Pass.
+los permisos solo puede ser uno o varios de estos ["imprimir_factura", "abrir_cajon", "cobrar_ticket", "borrar_linea", "borrar_mesa"]
+Mostrar siempre a no ser que se epecifique lo contrario los camareros activos
+Las columnas por defecto a mostrar son Nombre y Apellidos  
+Nunca se borran los camareros, borrar en la tabla de camareros es sinonimo de Activo = 0 
+cuando mostramos los camareros que hay en el pase queremos decir que Mostrar los autorizados = 1
+todos los update, insert y delete lleban una consulta SELECT.
