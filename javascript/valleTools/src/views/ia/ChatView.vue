@@ -21,8 +21,6 @@
         </v-list>
       </v-menu>
 
-    
-
       <v-btn icon @click="borrarChat">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
@@ -41,7 +39,7 @@
                   'text-success text-right': item.type === 'answer',
                 }"
               >
-                <v-card-text class="text-h6" v-if="item.text">{{ item.text }}</v-card-text>
+               <v-card-text class="text-h6" v-if="item.text" style="white-space: pre-line;">{{ item.text }}</v-card-text>
                 <v-card-text v-if="item.tabla">
                      <Tabla :tabla="item.tabla"></Tabla>
                 </v-card-text>
@@ -180,6 +178,7 @@ export default {
           var sendObj = {
             opciones: {},
             query: this.message.trim(),
+            tabla: this.titulo
           };
       
           this.socket.send(JSON.stringify({message: sendObj, 
@@ -188,12 +187,11 @@ export default {
             type:"quiestion",
             text: this.message
           }
+          this.borrarChat();
           this.chatStore.addItems(question);
           this.$nextTick(() => {
-              if (this.$refs.ultimoElemento) {
-                this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
-              }
-          });
+               this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
+           });
           this.message = "";
         }
       } catch (error) {
@@ -201,11 +199,39 @@ export default {
       }
     },
     onMessageCallback(message){
-     if (message.tabla) message.tabla = JSON.parse(message.tabla).tabla 
-     this.chatStore.addItems(message);
-     this.$nextTick(() => {
-         this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
-      });
+        const item = {
+            type: message.type,
+            text: "",
+            tabla: [],
+        }
+        var count = 0;
+
+        // Si el mensaje es un array, maneja cada elemento del array
+        if (Array.isArray(message.text)) {
+            message.text.forEach(e => {
+                if (e.tabla) item.tabla = e.tabla;
+                else if (e.sucess) {
+                    count++;
+                } else {
+                    item.text += " " + e;
+                }
+            });
+        }
+        // Si el mensaje no es un array, maneja el objeto individual
+        else {
+            if (message.text.tabla) item.tabla = message.text.tabla;
+            else if (message.text.success) {
+                count++;
+            } else {
+                item.text += " " + message.text;
+            }
+        }
+
+        if (count > 0) item.text += " " + count + " acciones ejecutadas con exito.";
+        this.chatStore.addItems(item);
+        this.$nextTick(() => {
+            this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
+        });
     },
     connectSocket() {
       
@@ -215,7 +241,6 @@ export default {
     },
     disconnectSocket() {
       if (this.socket) {
-        console.log(this.socket)
         this.socket.close();
         this.socket = null;
       }

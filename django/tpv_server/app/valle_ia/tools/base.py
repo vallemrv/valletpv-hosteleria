@@ -7,14 +7,15 @@ def ejecutar_sql(consulta):
 
     for consulta in consultas:
         tipo_consulta = get_tipo_consulta(consulta)
-        if tipo_consulta == 'select':
+        if tipo_consulta == 'select' and "sqlite_master" not in consulta:
             resultado = ejecutar_select(consulta)
         elif tipo_consulta in ['update', 'insert', 'delete']:
             resultado = ejecutar_accion(consulta)
         else:
-            resultado = {"error" : f"Tipo de consulta no soportado: {tipo_consulta}"}
+            resultado = consulta
         
-        resultados.append(resultado)
+        if resultado not in resultados:
+            resultados.append(resultado)
 
     return resultados
 
@@ -61,3 +62,8 @@ def ejecutar_accion(consulta):
             return "La consulta se ha ejecutado con éxito."
         except Exception as e:
             return "Error " + str(e)
+
+def remove_quotes(text):
+    # Remueve las comillas simples y dobles del texto
+    clean_text = text.strip('"')
+    return clean_text

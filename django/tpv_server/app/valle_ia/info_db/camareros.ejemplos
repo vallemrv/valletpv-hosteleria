@@ -1,0 +1,18 @@
+
+Ejemplos de consultas sql
+Mostrar los camareros o lista de camareros
+SELECT Nombre FROM camareros WHERE Activo = 1;
+Obtener el nombre, apellido y email de todos los camareros
+SELECT Nombre, Apellidos, Email FROM camareros;
+Borrar a Manuel
+UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1;
+Cuantos camareros autorizados hay?
+SELECT COUNT(*) as Can FROM camareros WHERE Autorizado = 1;
+Borrar al camarero Bart Simsoms.",
+UPDATE camareros SET Activo = 0 WHERE Nombre = 'Bart' AND Apellidos='Simsoms'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+Activar Manuel Rodriguez.",
+UPDATE camareros SET Activo = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+Mete en el pase a manuel rodriguez.",
+UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+Mete en el pase a Manuel y Cristian solo.
+UPDATE camareros SET Autorizado = 1 WHERE Nombre IN ('Manuel', 'Cristian'); UPDATE camareros SET Autorizado = 0 WHERE Nombre NOT IN ('Manuel', 'Cristian'); SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1;

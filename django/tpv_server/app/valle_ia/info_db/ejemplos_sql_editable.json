@@ -12,6 +12,50 @@
         "completion": "SELECT Nombre, Apellidos, Email FROM camareros"
     },
     {
+        "prompt": "Borrar a Manuel.",
+        "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+        "prompt": "Borrar al camarero Bart Simsoms.",
+        "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Bart' AND Apellidos='Simsoms'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+        "prompt": "Activar Manuel Rodriguez.",
+        "completion": "UPDATE camareros SET Activo = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
+    },
+    {
+        "prompt": "Mete en el pase a manuel rodriguez.",
+        "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+        "prompt": "Mete en el pase a Manuel y Cristian solo.",
+        "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre IN ('Manuel', 'Cristian'); UPDATE camareros SET Autorizado = 0 WHERE Nombre NOT IN ('Manuel', 'Cristian'); SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+        "prompt": "Saca del pase a Cristian.",
+        "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+        "prompt": "Saca a todos excepto a Cristian.",
+        "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre != 'Cristian'; UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
+    },
+    {
+        "prompt": "Muestra todos los datos de la tabla 'camareros'",
+        "completion": "SELECT ID, Nombre, Apellidos, Email, Pass, Activo, Autorizado, Permisos FROM camareros"
+    },
+    {
+        "prompt": "Cual es el ID, nombre, apellido y autorización de los camareros?",
+        "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
+    },
+    {
+        "prompt": "Obtener infromación de los camareros",
+        "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
+    },
+    {
+        "prompt": "Cuantos camareros autorizados hay?",
+        "completion": "SELECT COUNT(*) as Can FROM camareros WHERE Autorizado = 1"
+    },
+    {
         "prompt": "Obtener todas las mesas y su orden",
         "completion": "SELECT Nombre, Orden FROM mesas"
     },
@@ -20,19 +64,19 @@
         "completion": "SELECT Nombre FROM receptores WHERE Activo = 1"
     },
     {
-        "prompt": "Obtener todas las sugerencias para una tecla espec\u00edfica (por ejemplo, tecla ID = 10)",
+        "prompt": "Obtener todas las sugerencias para una tecla especifico (por ejemplo, tecla ID = 10)",
         "completion": "SELECT Sugerencia FROM sugerencias WHERE IDTecla = 10"
     },
     {
-        "prompt": "Obtener todos los pedidos hechos por un camarero espec\u00edfico (por ejemplo, camarero ID = 2)",
+        "prompt": "Obtener todos los pedidos hechos por un camarero especifico (por ejemplo, camarero ID = 2)",
         "completion": "SELECT * FROM pedidos WHERE IDCam = 2"
     },
     {
-        "prompt": "Obtener todos los gastos relacionados con un arqueo espec\u00edfico (por ejemplo, arqueo ID = 5)",
+        "prompt": "Obtener todos los gastos relacionados con un arqueo especifico (por ejemplo, arqueo ID = 5)",
         "completion": "SELECT Descripcion, Importe FROM gastos WHERE IDArqueo = 5"
     },
     {
-        "prompt": "Obtener la descripci\u00f3n y el importe de todos los gastos",
+        "prompt": "Obtener la descripcion y el importe de todos los gastos",
         "completion": "SELECT Descripcion, Importe FROM gastos"
     },
     {
@@ -44,31 +88,31 @@
         "completion": "SELECT TicketCom, TicketFinal FROM cierrecaja"
     },
     {
-        "prompt": "Obtener todos los pedidos realizados en una fecha espec\u00edfica (por ejemplo, 2023-06-01)",
+        "prompt": "Obtener todos los pedidos realizados en una fecha especifico (por ejemplo, 2023-06-01)",
         "completion": "SELECT * FROM pedidos WHERE Fecha = '2023-06-01'"
     },
     {
-        "prompt": "Obtener todas las mesas de una zona espec\u00edfica (por ejemplo, zona ID = 3)",
+        "prompt": "Obtener todas las mesas de una zona especifico (por ejemplo, zona ID = 3)",
         "completion": "SELECT IDMesa FROM mesaszona WHERE IDZona = 3"
     },
     {
-        "prompt": "Obtener todas las l\u00edneas de pedido para un pedido espec\u00edfico (por ejemplo, pedido ID = 10)",
+        "prompt": "Obtener todas las lineas de pedido para un pedido especifico (por ejemplo, pedido ID = 10)",
         "completion": "SELECT * FROM lineaspedido WHERE IDPedido = 10"
     },
     {
-        "prompt": "Obtener todos los gastos asociados con un arqueo de caja espec\u00edfico (por ejemplo, arqueo ID = 4)",
+        "prompt": "Obtener todos los gastos asociados con un arqueo de caja especifico (por ejemplo, arqueo ID = 4)",
         "completion": "SELECT * FROM gastos WHERE IDArqueo = 4"
     },
     {
-        "prompt": "Obtener el nombre y la descripci\u00f3n de todas las teclas",
+        "prompt": "Obtener el nombre y la descripcion de todas las teclas",
         "completion": "SELECT Nombre, Descripcion_r, Descripcion_t FROM teclas"
     },
     {
-        "prompt": "Obtener todos los mensajes del historial de un camarero espec\u00edfico (por ejemplo, camarero ID = 5)",
+        "prompt": "Obtener todos los mensajes del historial de un camarero especifico(por ejemplo, camarero ID = 5)",
         "completion": "SELECT mensaje FROM gestion_historialmensajes WHERE camarero_id = 5"
     },
     {
-        "prompt": "Obtener todas las mesas abiertas con su respectiva informaci\u00f3n de mesa",
+        "prompt": "Obtener todas las mesas abiertas con su respectiva informacion de mesa",
         "completion": "SELECT * FROM mesasabiertas JOIN infmesa ON mesasabiertas.UID = infmesa.UID"
     },
     {
@@ -91,10 +135,7 @@
         "prompt": "Muestra todos los nombres de las zonas",
         "completion": "SELECT Nombre FROM zonas"
     },
-    {
-        "prompt": "Muestra todos los datos de la tabla 'camareros'",
-        "completion": "SELECT ID, Nombre, Apellidos, Email, Pass, Activo, Autorizado, Permisos FROM camareros"
-    },
+    
     {
         "prompt": "Muestra todos los datos de la tabla 'gestion_iconchoices'",
         "completion": "SELECT id FROM gestion_iconchoices"
@@ -216,21 +257,10 @@
         "completion": "SELECT ID, IDCam, Hora, Entrega, UID, Mesa, url_factura, Fecha FROM ticket"
     },
     {
-        "prompt": "Muestra las l\u00edneas del ticket 1000 con la cantidad, el precio y el total que es la cantidad multiplicada por el precio",
+        "prompt": "Muestra las líneas del ticket 1000 con la cantidad, el precio y el total que es la cantidad multiplicada por el precio",
         "completion": "SELECT COUNT(lineaspedido.idArt) as Can,  lineaspedido.descripcion_t, lineaspedido.Precio, COUNT(lineaspedido.idArt)*lineaspedido.Precio as Total FROM lineaspedido INNER JOIN ticketlineas ON lineaspedido.ID = ticketlineas.IDLinea INNER JOIN ticket ON ticketlineas.IDTicket = ticket.ID WHERE ticket.ID = 32800 GROUP BY lineaspedido.idArt, lineaspedido.Precio"
     },
-    {
-        "prompt": "\u00bfCu\u00e1l es el ID, nombre, apellido y autorizaci\u00f3n de los camareros?",
-        "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
-    },
-    {
-        "prompt": "Obtener informaci\u00f3n de los camareros",
-        "completion": "SELECT ID, Nombre, Apellido, Autorizado FROM camareros;"
-    },
-    {
-        "prompt": "\u00bfCu\u00e1ntos camareros autorizados hay?",
-        "completion": "SELECT COUNT(*) as Can FROM camareros WHERE Autorizado = 1"
-    },
+  
     {
         "prompt": "Obten el total vendido del ultimo cierrre. Gracias",
         "completion": "SELECT SUM(lineaspedido.Precio) as TotalVendido FROM ticketlineas INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID WHERE lineaspedido.Estado='A' AND ticketlineas.IDTicket IN (SELECT ticket.ID FROM ticket INNER JOIN cierrecaja ON ticket.ID >= cierrecaja.TicketCom AND ticket.ID <= cierrecaja.TicketFinal WHERE cierrecaja.ID IN (SELECT ID FROM cierrecaja ORDER BY ID DESC LIMIT 1))"
@@ -240,37 +270,10 @@
         "completion": "SELECT SUM(lineaspedido.Precio) as TotalVendido FROM ticketlineas INNER JOIN lineaspedido ON ticketlineas.IDLinea = lineaspedido.ID WHERE lineaspedido.Estado='C' AND ticketlineas.IDTicket IN (SELECT ticket.ID FROM ticket INNER JOIN cierrecaja ON ticket.ID >= cierrecaja.TicketCom AND ticket.ID <= cierrecaja.TicketFinal WHERE strftime('%w', cierrecaja.Fecha) = '6'AND DATE(cierrecaja.Fecha) > DATE('now', '-30 days') ORDER BY cierrecaja.Fecha DESC)"
     },
     {
-        "prompt": "Obtener el descuadre y cambio del \u00faltimo arqueo; Obtener los gastos y efectivo del \u00faltimo arqueo.",
+        "prompt": "Obtener el descuadre y cambio del ultimo arqueo; Obtener los gastos y efectivo del ultimo arqueo.",
         "completion": "SELECT Descuadre, Cambio FROM arqueocaja ORDER BY ID DESC LIMIT 1; SELECT Descripcion, Importe AS Total FROM gastos WHERE IDArqueo IN (SELECT ID FROM arqueocaja ORDER BY ID DESC LIMIT 1); SELECT Can, Moneda, (Can * Moneda) || ' \u20ac' AS Total FROM efectivo WHERE IDArqueo IN (SELECT ID FROM arqueocaja ORDER BY ID DESC LIMIT 1)"
     },
-    {
-        "prompt": "Borrar a Manuel.",
-        "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Manuel'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
-    },
-    {
-        "prompt": "Borrar al camarero Bart Simsoms.",
-        "completion": "UPDATE camareros SET Activo = 0 WHERE Nombre = 'Bart' AND Apellidos='Simsoms'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
-    },
-    {
-        "prompt": "Activar Manuel Rodriguez.",
-        "completion": "UPDATE camareros SET Activo = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Activo = 1"
-    },
-    {
-        "prompt": "Mete en el pase a manuel rodriguez.",
-        "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Manuel' AND Apellidos = 'Rodriguez'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
-    },
-    {
-        "prompt": "Mete en el pase a Manuel y Cristian solo.",
-        "completion": "UPDATE camareros SET Autorizado = 1 WHERE Nombre IN ('Manuel', 'Cristian'); UPDATE camareros SET Autorizado = 0 WHERE Nombre NOT IN ('Manuel', 'Cristian'); SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
-    },
-    {
-        "prompt": "Saca del pase a Cristian.",
-        "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
-    },
-    {
-        "prompt": "Saca a todos excepto a Cristian.",
-        "completion": "UPDATE camareros SET Autorizado = 0 WHERE Nombre != 'Cristian'; UPDATE camareros SET Autorizado = 1 WHERE Nombre = 'Cristian'; SELECT Nombre, Apellidos, Autorizado from camareros WHERE Autorizado = 1"
-    },
+    
     {
         "prompt": "Dame informacion de mesas abiertas",
         "completion": "SELECT COUNT(UID) AS NumMesasAbiertas FROM mesasabiertas; SELECT camareros.Nombre, infmesa.Hora, infmesa.Fecha, Count(pedidos.ID) as Pedidos, nommesas.Nombre  FROM infmesa inner join camareros ON infmesa.IDCam=camareros.ID INNER JOIN pedidos ON infmesa.UID=pedidos.UID INNER JOIN (SELECT Nombre, mesasabiertas.UID  from mesas inner join mesasabiertas on mesas.ID=mesasabiertas.IDMesa) as nommesas on nommesas.UID = infmesa.UID WHERE infmesa.UID IN (SELECT UID FROM mesasabiertas) GROUP BY pedidos.UID, infmesa.UID;"
@@ -288,23 +291,23 @@
         "completion": "SELECT mesas.Nombre AS Mesa, COUNT(lineaspedido.IDArt) AS Cantidad, lineaspedido.Precio, COUNT(lineaspedido.IDArt) * lineaspedido.Precio AS Total, lineaspedido.Descripcion, lineaspedido.Estado, lineaspedido.UID FROM lineaspedido INNER JOIN mesasabiertas ON mesasabiertas.UID = lineaspedido.UID INNER JOIN mesas ON mesasabiertas.IDMesa = mesas.ID WHERE mesasabiertas.UID IN (SELECT UID FROM mesasabiertas) GROUP BY mesas.Nombre, lineaspedido.IDPedido, lineaspedido.IDArt, lineaspedido.Descripcion;"
     },
     {
-        "prompt": "Obt\u00e9n el total de ingresos por camarero en todas las mesas",
+        "prompt": "Obten el total de ingresos por camarero en todas las mesas",
         "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, SUM(lineaspedido.Precio) AS TotalIngresos FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='A' GROUP BY Camarero"
     },
     {
-        "prompt": "Obt\u00e9n la cantidad total de art\u00edculos vendidos por cada camarero y ordena el resultado de mayor a menor",
+        "prompt": "Obten la cantidad total de articulos vendidos por cada camarero y ordena el resultado de mayor a menor",
         "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, COUNT(lineaspedido.IDArt) AS ArticulosVendidos FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='C' GROUP BY Camarero  ORDER BY ArticulosVendidos DESC"
     },
     {
-        "prompt": "Obt\u00e9n el promedio de precio de los art\u00edculos vendidos por cada camarero",
+        "prompt": "Obten el promedio de precio de los articulos vendidos por cada camarero",
         "completion": "SELECT camareros.Nombre || ' ' || camareros.Apellidos AS Camarero, AVG(lineaspedido.Precio) AS PrecioPromedio FROM camareros INNER JOIN pedidos ON camareros.ID = pedidos.IDCam INNER JOIN lineaspedido ON pedidos.ID = lineaspedido.IDPedido WHERE lineaspedido.Estado='C' GROUP BY Camarero"
     },
     {
-        "prompt": "Dame el total de ventas y el precio promedio por zona, redondeado a dos decimales y con el s\u00edmbolo del euro",
+        "prompt": "Dame el total de ventas y el precio promedio por zona, redondeado a dos decimales y con el simbolo del euro",
         "completion": "SELECT zonas.Nombre AS Zona, COUNT(lineaspedido.IDArt) AS TotalVentas, ROUND(AVG(lineaspedido.Precio), 2) AS PrecioPromedio FROM zonas INNER JOIN mesaszona ON zonas.ID = mesaszona.IDZona INNER JOIN mesas ON mesaszona.IDMesa = mesas.ID INNER JOIN infmesa ON CAST(SUBSTR(infmesa.UID, 1, INSTR(infmesa.UID, '-') - 1) AS INT) = mesas.ID INNER JOIN lineaspedido ON lineaspedido.UID = infmesa.UID WHERE lineaspedido.Estado='C' GROUP BY Zona"
     },
     {
-        "prompt": "Obten la cantidad de art\u00edculos vendidos por cada sección y ordena el resultado de mayor a menor",
+        "prompt": "Obten la cantidad de articulos vendidos por cada sección y ordena el resultado de mayor a menor",
         "completion": "SELECT secciones.Nombre AS Seccion, COUNT(lineaspedido.IDArt) AS ArticulosVendidos FROM secciones INNER JOIN teclaseccion ON secciones.ID = teclaseccion.IDSeccion INNER JOIN teclas ON teclaseccion.IDTecla = teclas.ID INNER JOIN lineaspedido ON teclas.ID = lineaspedido.tecla_id WHERE lineaspedido.Estado='C' GROUP BY Seccion ORDER BY ArticulosVendidos DESC"
     },
     {
