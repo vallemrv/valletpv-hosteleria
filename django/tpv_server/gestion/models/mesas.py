@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
-from .mesasabiertas import Mesasabiertas
+
 
 
 class Mesas(models.Model):
@@ -23,6 +23,7 @@ class Mesas(models.Model):
         return lsMesas
 
     def serialize(self):
+        from .mesasabiertas import Mesasabiertas
         mz = self.mesaszona_set.first()
         obj = {
         'ID': self.id,

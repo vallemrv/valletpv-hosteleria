@@ -1,7 +1,7 @@
 from django.db import models
 from django.forms.models import model_to_dict
-from gestion.models import (Mesasabiertas,Infmesa, 
-                            Mesas, Historialnulos, Mesaszona)
+from gestion.models.tools import get_lineas_by_mesasabiertas
+from gestion.models import (Infmesa, Mesas, Historialnulos, Mesaszona)
 from comunicacion.tools import comunicar_cambios_devices
 from datetime import datetime
 from uuid import uuid4
@@ -138,14 +138,9 @@ class Lineaspedido(models.Model):
    
     @staticmethod
     def update_for_devices():
-        mesas = Mesasabiertas.objects.all()
-        lineas = []
-        for m in mesas:
-            lineas = [*lineas, *m.get_lineaspedido()]
-                
-        return lineas
+        return get_lineas_by_mesasabiertas()
     
-    @staticmethod
+    
     def is_equals(self, linea):
         equal = True
         if int(linea["servido"]) != Servidos.objects.filter(linea__pk=self["ID"]).count() :

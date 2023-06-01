@@ -1,14 +1,14 @@
 from django.db import models
 from django.db.models import Q
-from datetime import datetime
 from comunicacion.tools import comunicar_cambios_devices 
-from gestion.models import (Infmesa, Mesas, Pedidos, 
-                            Historialnulos, Lineaspedido)
+from gestion.models.tools import borrar_mesa_abierta
+
 
 class Mesasabiertas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
-    mesa = models.ForeignKey(Mesas, on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
+    infmesa = models.ForeignKey('Infmesa', on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
+    mesa = models.ForeignKey('Mesas', on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
+    borrar_mesa_abierta = borrar_mesa_abierta
 
     @staticmethod
     def update_for_devices():
@@ -20,27 +20,8 @@ class Mesasabiertas(models.Model):
 
     @staticmethod
     def borrar_mesa_abierta(idm, idc, motivo):
-        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-        if mesa:
-            uid = mesa.infmesa.pk
-            reg = Lineaspedido.objects.filter((Q(estado="P") | Q(estado="M") | Q(estado="R")) & Q(infmesa__pk=uid))
-            for r in reg:
-                historial = Historialnulos()
-                historial.lineapedido_id = r.pk
-                historial.camarero_id = idc
-                historial.motivo = motivo
-                historial.hora = datetime.now().strftime("%H:%M")
-                historial.save()
-                r.estado = 'A'
-                r.save()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "borrado", "precio": float(r.precio)})
+        borrar_mesa_abierta(idm, idc, motivo)
 
-
-            obj = mesa.serialize()
-            obj["abierta"] = 0
-            obj["num"] = 0
-            comunicar_cambios_devices("md", "mesasabiertas", obj)
-            mesa.delete()
 
     @staticmethod
     def cambiar_mesas_abiertas(idp, ids):
@@ -61,6 +42,7 @@ class Mesasabiertas(models.Model):
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):
+        
         if idp != ids:
             mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
             mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
