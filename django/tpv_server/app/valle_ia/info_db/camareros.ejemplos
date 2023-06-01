@@ -1,7 +1,7 @@
 
 Ejemplos de consultas sql
-Mostrar los camareros o lista de camareros
-SELECT Nombre FROM camareros WHERE Activo = 1;
+pregunta: Mostrar los camareros o lista de camareros
+parametro: SELECT Nombre FROM camareros WHERE Activo = 1;
 Obtener el nombre, apellido y email de todos los camareros
 SELECT Nombre, Apellidos, Email FROM camareros;
 Borrar a Manuel

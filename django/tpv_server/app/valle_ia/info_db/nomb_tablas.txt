@@ -1,7 +1,0 @@
-"camareros", "gestion_iconchoices", "mesas", "gestion_permisoschoices",
-"receptores", "secciones", "gestion_sync", "teclas", "zonas",
-"ticketlineas", "teclaseccion", "teclascom", "sugerencias", "subteclas",
-"servidos", "gestion_peticionesautoria", "pedidos", "mesaszona",
-"mesasabiertas", "lineaspedido", "gestion_lineascompuestas", "historialnulos",
-"gastos", "familias", "efectivo", "composicionteclas", "arqueocaja",
-"cierrecaja", "gestion_historialmensajes", "infmesa", "ticket"

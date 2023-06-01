@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync
 from .tools.embeddings import crear_embeddings_docs
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.schema import HumanMessage,AIMessage
+from langchain.schema import HumanMessage
 from .tools.base import ejecutar_sql
 import os
 import json
@@ -14,14 +14,11 @@ import asyncio
 import threading
 
 
-
-
 class ChatConsumer(AsyncWebsocketConsumer):
-
-    
 
     def __init__(self, *args, **kwargs):
         self.sql_prompt = """Eres un experto en convertir texto a SQL.
+        No des niguna explicación solo la consulta o consultas sql.
         {contexto}
         Pregunta:{input}
         """
@@ -106,7 +103,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         respuesta = ejecutar_sql(respuesta.content)
         print("Respuesa ord ", respuesta)
         respuesta = self.llm(messages=[
-            HumanMessage(content=f"Imagina que a la pregunta {message} tu respuesta ha sido {respuesta}. Podrias darme una respuesta mas facilita?"),
+            HumanMessage(content=f"""Imagina que a la pregunta {message} la respuesta de un ordenado ha sido {respuesta}. 
+                                     Podrias darme una respuesta simplifícada?. Muchisimas gracias."""),
             ])
         self.enviar_mensaje_sync(respuesta.content)
     
