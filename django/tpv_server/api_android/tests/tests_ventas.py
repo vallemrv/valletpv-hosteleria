@@ -1,6 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from gestion.models import Arqueocaja, Sync
+from gestion.models import Arqueocaja
 from api_android.tools.mails import getUsuariosMail, send_cierre
 
 

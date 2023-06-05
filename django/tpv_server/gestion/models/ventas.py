@@ -1,15 +1,15 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.db.models import Count, Sum, F
 from django.db.models.fields import DecimalField
-from gestion.models import Ticket
-
+from gestion.models import Ticket, Ticketlineas
 
 
 class HorarioUsr(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     hora_ini = models.CharField(db_column='Hora_ini', max_length=5)  # Field name made lowercase.
     hora_fin = models.CharField(db_column='Hora_fin', max_length=5)  # Field name made lowercase.
-    usurario = models.ForeignKey('User',  on_delete=models.CASCADE, db_column='IDUsr')  # Field name made lowercase.
+    usurario = models.ForeignKey(User,  on_delete=models.CASCADE, db_column='IDUsr')  # Field name made lowercase.
 
     class Meta:
         db_table = 'horario_usr'
@@ -128,6 +128,23 @@ class Cierrecaja(models.Model):
     class Meta:
         db_table = 'cierrecaja'
         ordering = ['-id']
+    
+
+    @staticmethod
+    def get_last_id_linea():
+        cierre = Cierrecaja.objects.first()
+        last_ticket = 0
+        if (cierre):
+            last_ticket = cierre.ticketfinal
+
+
+        t = Ticketlineas.objects.filter(ticket__id__lte=last_ticket).order_by("-linea_id").first()
+        last_id = 0
+        if  (t):
+            last_id = t.linea.id 
+
+        return last_id  
+
 
 
     def get_efectivo_tickado(self):

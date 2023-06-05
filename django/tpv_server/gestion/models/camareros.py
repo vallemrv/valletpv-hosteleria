@@ -1,22 +1,30 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.db import models
 from django.forms.models import model_to_dict
 from comunicacion.tools import comunicar_cambios_devices
-from gestion.models import Mesas
-import json
 
 
 class CamareroManager(BaseUserManager):
-    def create_camarero(self, nombre, apellidos, password=None, **extra_fields):
+    def create_camarero(self, nombre, apellidos, password=None,  **extra_fields):
         if not nombre or not apellidos:
-            raise ValueError('Los campos nombre y apellidos son obligatorios')
+            raise ValueError('Los campos Nombre y Apellidos son obligatorios')
 
+        # Generar un user_name único y automático
         user_name = f'{nombre.lower()}_{apellidos.lower()}'
         user_name = user_name.replace(' ', '_')
-        camarero = self.model(user_name=user_name, nombre=nombre, apellidos=apellidos, **extra_fields)
-        
-        camarero.set_password(password)
+
+        # Comprobar la unicidad del user_name
+        if Camareros.objects.filter(user_name=user_name).exists():
+            raise ValueError('El user_name generado ya existe, por favor, proporcione un Nombre y Apellidos únicos')
+
+        camarero = self.model(nombre=nombre, apellidos=apellidos, user_name=user_name, **extra_fields)
+
+        # Si no se proporciona una contraseña, asignar una contraseña aleatoria
+        if password is None:
+            camarero.password = "nuevo"
+        else:
+            camarero.set_password(password)
         camarero.save(using=self._db)
         
         return camarero
@@ -27,10 +35,26 @@ class Camareros(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True, db_column="ID")
     nombre = models.CharField(max_length=100, db_column="Nombre")
     apellidos = models.CharField(max_length=100, db_column="Apellidos")
-    user_name = models.EmailField(unique=True)
+    user_name = models.CharField(max_length=200)
     activo = models.BooleanField(default=False, db_column="Activo")
     autorizado = models.BooleanField(default=False, db_column="Autorizado")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=('groups'),
+        blank=True,
+        related_name="camarero_groups",
+        related_query_name="camarero",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=('user permissions'),
+        blank=True,
+        related_name="camarero_permissions",
+        related_query_name="camarero",
+    )
+
 
     objects = CamareroManager()
 
@@ -81,44 +105,3 @@ class Camareros(AbstractBaseUser, PermissionsMixin):
         return data
     
 
-class PeticionesAutoria(models.Model):
-    idautorizado = models.ForeignKey("Camareros", on_delete=models.CASCADE)
-    accion = models.CharField(max_length=150)
-    instrucciones = models.CharField(max_length=300)
-
-
-    def serialize(self):
-        inst = json.loads(self.instrucciones)
-        if self.accion == "borrar_mesa":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            motivo = inst["motivo"]
-            return {"tipo": "peticion", "idautorizado":self.idautorizado.pk, "idpeticion": self.pk, "mensaje":camarero.nombre+ " "
-            + camarero.apellidos+" solicita permiso para borrar la mesa completa "
-            + mesa.nombre +" por el motivo:  "+ motivo}
-        elif self.accion == "borrar_linea":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            nombre = inst["Descripcion"]
-            can = inst["can"]
-            motivo = inst["motivo"]
-            return {"tipo": "peticion", "idautorizado":self.idautorizado.pk, "idpeticion": self.pk, "mensaje":camarero.nombre+ " "
-            + camarero.apellidos+" solicita permiso para borrar " + can +" "+nombre + " de la mesa "
-            + mesa.nombre +" por el motivo:  "+ motivo}
-        elif self.accion == "informacion":
-            return {"tipo": "informacion", "idautorizado":self.idautorizado.pk, "idpeticion": self.pk, "mensaje": "Mensaje de "+inst["autor"]+": \n "+ inst["mensaje"]}
-        elif self.accion == "cobrar_ticket":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            mesa = Mesas.objects.get(id=inst["idm"])
-            return {"tipo":"peticion","idautorizado":self.idautorizado.pk, "idpeticion": self.pk, "mensaje": camarero.nombre + " "
-            + camarero.apellidos+" solicita permiso para cobrar "+ mesa.nombre}
-        elif self.accion == "abrir_cajon":
-            camarero = Camareros.objects.get(id=inst["idc"])
-            return {"tipo":"peticion","idautorizado":self.idautorizado.pk, "idpeticion": self.pk, "mensaje": camarero.nombre + " "
-            + camarero.apellidos+" solicita permiso para abrir cajon" }
-
-
-    class Meta:
-        ordering = ['-id']
-
-    

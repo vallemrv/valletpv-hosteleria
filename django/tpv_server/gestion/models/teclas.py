@@ -63,7 +63,29 @@ class Familias(models.Model):
         ordering = ['-id']
 
 
+class Secciones(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
+    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
+    
+    @staticmethod
+    def update_for_devices():
+        rows = Secciones.objects.all()
+        objs = []
+        for r in rows:
+            objs.append(model_to_dict(r))
+        return objs
 
+    def __unicode__(self):
+        return self.nombre
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = 'secciones'
+        ordering = ['-orden']
 
 ICON_CHOICES = (
     ("bar", "Bar"),

@@ -1,14 +1,14 @@
 from django.db import models
 from django.db.models import Q
 from comunicacion.tools import comunicar_cambios_devices 
-from gestion.models.tools import borrar_mesa_abierta
-
+from gestion.models import Historialnulos
+from datetime import datetime
 
 class Mesasabiertas(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     infmesa = models.ForeignKey('Infmesa', on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     mesa = models.ForeignKey('Mesas', on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
-    borrar_mesa_abierta = borrar_mesa_abierta
+ 
 
     @staticmethod
     def update_for_devices():
@@ -20,7 +20,29 @@ class Mesasabiertas(models.Model):
 
     @staticmethod
     def borrar_mesa_abierta(idm, idc, motivo):
-        borrar_mesa_abierta(idm, idc, motivo)
+        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        if mesa:
+            uid = mesa.infmesa.pk
+            reg = mesa.infmesa.lineaspedido_set.filter((Q(estado="P") | Q(estado="M") | Q(estado="R")))
+            for r in reg:
+                historial = Historialnulos()
+                historial.lineapedido_id = r.pk
+                historial.camarero_id = idc
+                historial.motivo = motivo
+                historial.hora = datetime.now().strftime("%H:%M")
+                historial.save()
+                r.estado = 'A'
+                r.save()
+                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "borrado", "precio": float(r.precio)})
+
+
+            obj = mesa.serialize()
+            obj["abierta"] = 0
+            obj["num"] = 0
+            comunicar_cambios_devices("md", "mesasabiertas", obj)
+            mesa.delete()
+            
+
 
 
     @staticmethod
@@ -48,7 +70,7 @@ class Mesasabiertas(models.Model):
             mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
             if mesaS:
                 infmesa = mesaS.infmesa
-                pedidos = Pedidos.objects.filter(infmesa__pk=infmesa.pk)
+                pedidos = infmesa.pedidos_set.all()
                 for pedido in pedidos:
                     pedido.infmesa_id = mesaP.infmesa.pk
                     pedido.save()
@@ -71,7 +93,7 @@ class Mesasabiertas(models.Model):
 
     def get_lineaspedido(self):
         lineas = []
-        for l in Lineaspedido.objects.filter(Q(infmesa__pk=self.infmesa.pk) 
+        for l in self.infmesa.lineaspedido_set.filter(Q(infmesa__pk=self.infmesa.pk) 
                     & (Q(estado='P') | Q(estado="R") | Q(estado="M"))):
             lineas.append(l.serialize())
         return lineas

@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Q
-from gestion.models import Mesasabiertas, Lineaspedido, Cierrecaja
+from gestion.models import Mesasabiertas, Lineaspedido
 from comunicacion.tools import comunicar_cambios_devices
 from datetime import datetime
 
@@ -13,6 +13,10 @@ class Ticket(models.Model):
     uid = models.CharField(db_column='UID', max_length=100)  # Field name made lowercase.
     mesa = models.CharField(db_column='Mesa', max_length=40)  # Field name made lowercase.
     url_factura = models.CharField(max_length=140, default="")  # Field name made lowercase.
+    
+    class Meta:
+        db_table = 'ticket'
+
 
     @staticmethod
     def cerrar_cuenta(idm, idc, entrega, art):
@@ -62,26 +66,6 @@ class Ticket(models.Model):
       
 
         return (total, id)
-
-
-    @staticmethod
-    def get_last_id_linea():
-        cierre = Cierrecaja.objects.first()
-        last_ticket = 0
-        if (cierre):
-            last_ticket = cierre.ticketfinal
-
-
-        t = Ticketlineas.objects.filter(ticket__id__lte=last_ticket).order_by("-linea_id").first()
-        last_id = 0
-        if  (t):
-            last_id = t.linea.id 
-
-        return last_id  
-
-    class Meta:
-        db_table = 'ticket'
-
 
 
 

@@ -1,7 +1,6 @@
 from django.db import models
 from django.forms.models import model_to_dict
-from gestion.models.tools import get_lineas_by_mesasabiertas
-from gestion.models import (Infmesa, Mesas, Historialnulos, Mesaszona)
+from gestion.models import (Infmesa, Mesas, Historialnulos, Mesasabiertas, Mesaszona)
 from comunicacion.tools import comunicar_cambios_devices
 from datetime import datetime
 from uuid import uuid4
@@ -88,32 +87,6 @@ class Pedidos(models.Model):
         ordering = ['-id']
 
 
-class Secciones(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
-    rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
-    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
-    
-    @staticmethod
-    def update_for_devices():
-        rows = Secciones.objects.all()
-        objs = []
-        for r in rows:
-            objs.append(model_to_dict(r))
-        return objs
-
-    def __unicode__(self):
-        return self.nombre
-
-    def __str__(self):
-        return self.nombre
-
-    class Meta:
-        db_table = 'secciones'
-        ordering = ['-orden']
-
-
-
 ESTADO_CHOICES=[
     ("A", "Anulado"),
     ("P", "Pedido activo"),
@@ -133,12 +106,19 @@ class Lineaspedido(models.Model):
     descripcion = models.CharField(db_column='Descripcion', default=None,  max_length=400, null=True)  # Field name made lowercase.
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
     es_compuesta = models.BooleanField("Grupo o simple", default=False)
-    cantidad = models.IntegerField("Cantidad de articulos que lo compone", default=0)
+    can_composicion = models.IntegerField("Cantidad de articulos que lo compone", default=0)
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
    
     @staticmethod
     def update_for_devices():
-        return get_lineas_by_mesasabiertas()
+        mesas = Mesasabiertas.objects.all()
+        lineas = []
+        for m in mesas:
+            lineas = [*lineas, *m.get_lineaspedido()]
+                
+        return lineas
+
+
     
     
     def is_equals(self, linea):

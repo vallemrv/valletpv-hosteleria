@@ -9,7 +9,7 @@ from api_android.tools import (send_imprimir_ticket, send_mensaje_impresora)
 from tokenapi.http import  JsonResponse
 from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Pedidos, Teclas, Receptores,
-                            Mesasabiertas, Camareros, Sync)
+                            Mesasabiertas, Camareros)
 from django.http import HttpResponse
 from django.db.models import Count, Sum
 from django.views.decorators.csrf import csrf_exempt
@@ -24,7 +24,7 @@ def preimprimir(request):
         infmesa = mesa_abierta.infmesa
         infmesa.numcopias = infmesa.numcopias + 1
         infmesa.save()
-        Sync.actualizar("mesasabiertas")
+        
         camareo = infmesa.camarero
         mesa = mesa_abierta.mesa
         lineas = infmesa.lineaspedido_set.filter(estado="P")

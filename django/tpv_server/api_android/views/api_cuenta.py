@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from api_android.tools import (send_imprimir_ticket)
 from comunicacion.tools import comunicar_cambios_devices
 from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
-                            Infmesa,  Sync, Ticket)
+                            Infmesa, Ticket)
 from datetime import datetime
 from uuid import uuid4
 import json
@@ -91,7 +91,7 @@ def mvlinea(request):
                 obj["num"] = 0
                 comunicar_cambios_devices("md", "mesasabiertas", obj, {"op": "mv_linea"})
                 m.delete()
-            Sync.actualizar(Mesasabiertas._meta.db_table)
+           
          
 
     return HttpResponse('success')

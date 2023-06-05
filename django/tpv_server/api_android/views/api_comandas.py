@@ -11,8 +11,7 @@ from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import (Mesasabiertas, Sync,
-                             Pedidos)
+from gestion.models import (Mesasabiertas, Pedidos)
 
 
 import json
@@ -25,7 +24,6 @@ def marcar_rojo(request):
     infmesa = mesa_abierta.infmesa
     infmesa.numcopias = infmesa.numcopias + 1
     infmesa.save()
-    Sync.actualizar("mesasabiertas")
     if infmesa.numcopias <= 1:
         comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize())
     return JsonResponse("success")
