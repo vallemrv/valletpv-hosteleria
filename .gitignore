@@ -1,7 +1,11 @@
+sl_dump.js
+
+
 # Directorios y ficheros no necesarios
 .vscode/
 manage*
 media*/
+
 server_*
 *.sqlite3
 node_*/
