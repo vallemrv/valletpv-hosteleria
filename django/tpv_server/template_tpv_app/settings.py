@@ -56,11 +56,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
-    'comunicacion',
-    'gestion',
-    'app',
-    'api_android',
     'corsheaders',
+    'valle_tpv',
+    'tokenapi',
 ]
 
 MIDDLEWARE = [
@@ -145,8 +143,6 @@ DATABASES = {
 }
 {% endif %}
 
-DATABASE_ROUTERS = ['server_{{name_tpv}}.routers.GestionIARouter', 
-                    'server_{{name_tpv}}.routers.GestionRouter']
 
 
 # Password validation

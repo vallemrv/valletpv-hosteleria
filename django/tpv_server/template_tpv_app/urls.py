@@ -27,8 +27,7 @@ from django.views.generic.base import RedirectView
 
 
 urlpatterns = [
-    path('api/', include('api_android.urls'), name="api"),
     path('token/', include('tokenapi.urls')),
-    path("app/", include("app.urls"), name="app"),
+    path('valle_tpv/', include('valle_tpv.urls'))
     re_path(r'^.*$', RedirectView.as_view(url="http://valletpv.es"))
 ]
