@@ -1,82 +1,111 @@
 <template>
   <v-app>
-      <v-container  class="pt-16" v-if="!empresaStore.empresa" fluid fill-height>
-         <FormEmpresa  title="Crear una empresa"  tipo="nuevo"/>
-      </v-container>
-      <v-container v-else >
-        <v-navigation-drawer expand-on-hover
-          rail v-model="drawer" app >
-            <v-list>
-              <v-list-item
-                  prepend-icon="mdi-handshake"
-                  :title="empresaStore.empresa.nombre"
-                  :subtitle="empresaStore.empresa.url"
-                ></v-list-item>
-            </v-list>
-
-            <v-divider></v-divider>
-
-            <v-list density="compact" nav>
-              <v-list-item prepend-icon="mdi-account-multiple" title="Camareros" value="camareros" to="/gestion/camareros/camareros"></v-list-item>
-            </v-list>
-        </v-navigation-drawer>
-
-        <!-- Floating Action Button -->
-        <router-view />
-
-      </v-container>
-      <div class="div-fixed" v-if="!drawer">
-          <v-btn
-            relative
-            elevation="8"
-            icon
-            large
-            color="primary"
-            @click="drawer = true"
-          >
-            <v-icon>mdi-menu</v-icon>
-          </v-btn>
-      </div>
-
+    <router-view />
+    <MenuPrincipal  v-if="userStore.user"/>
   </v-app>
-  
-    
- 
 </template>
   
-  <script>
-  import FormEmpresa from "@/components/appMain/FormEmpresa.vue";
-  import { useEmpresaStore } from "@/stores/empresaStore";
-  
-  export default {
-    components: {
-      FormEmpresa,
-    },
-    setup() {
-      const empresaStore = useEmpresaStore();
-      return {
-        empresaStore
-      };
-    },
-    data(){
-      return{
-        drawer: true,
+<script>
+import { useUserStore } from "@/stores/userStore";
+import { useEmpresasStore } from "@/stores/empresasStore";
+import MenuPrincipal from "./components/tools/MenuPrincipal.vue";
+import { auth } from "@/firebase";
+import { watch } from "vue";
+import { useRouter } from "vue-router";
+
+export default {
+  components: {
+    MenuPrincipal,
+  },
+  setup() {
+    const userStore = useUserStore();
+    const empStore = useEmpresasStore();
+    const router = useRouter();
+   
+    watch(() => userStore.user, (user) => {
+      if (user) {
+        empStore.userId = user.id;
+        empStore.suscribirAEmpresas();
       }
-    },
-    mounted(){
-      this.empresaStore.cargarEmpresas();
-    }
-  };
-  </script>
+    });
+
+
+    //Comprobar si el usuario está logueado con firebase
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // Creamos un usuario con nuestra api para poder usarlo en toda la app
+        userStore.set(user);
+      } else {
+        empStore.unsuscribirAEmpresas();
+        userStore.set(null);
+        router.push({ name: "Login" });
+      }
+    });
+
+    return {
+      userStore,
+    };
+  },
+
+};
+</script>
   
 
-  <style scoped>
-    .div-fixed {
-      position: fixed;
-      bottom: 10px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      text-align: center;
-    }
-  </style>
+<style >
+.div-fixed {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+}
+
+.dash-board {
+  width: 100%;
+  max-height: 300px;
+  margin-bottom: 5px;
+  overflow: scroll;
+}
+
+text-center th,
+.text-center td {
+  text-align: center;
+}
+
+.bg-color {
+  background-color: #f2f2f2;
+}
+
+.column-authorize {
+  width: 5%;
+  /* Ajusta este valor según lo que necesites */
+}
+
+.column-authorize>.v-input__control {
+  display: flex;
+  justify-content: center;
+}
+
+/* CSS para pantallas pequeñas (mobile) */
+@media (max-width: 600px) {
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: table-cell;
+  }
+}
+
+/* CSS para pantallas grandes (desktop) */
+@media (min-width: 601px) {
+  .desktop {
+    display: table-cell;
+  }
+
+  .mobile {
+    display: none;
+  }
+}
+</style>

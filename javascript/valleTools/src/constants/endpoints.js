@@ -1,0 +1,14 @@
+export const BASE_ENDPOINT = 'valle_tpv/';
+export const VENTAS_BY_ARTICULO = BASE_ENDPOINT + 'api/dash_board/articulos_vendidos/';
+export const VENTAS_BY_CAMARERO = BASE_ENDPOINT + 'api/dash_board/get_estado_ventas_by_cam/';
+export const VENTAS_BY_INTERVALOS = BASE_ENDPOINT + 'api/dash_board/ventas_por_intervalos/';
+export const VENTAS_SIN_CIERRE = BASE_ENDPOINT + 'api/dash_board/get_estado_ventas/';
+export const LISTADO_SIMPLE = BASE_ENDPOINT + 'api/listados/simple/';
+export const LISTADO_MULTIPLE = BASE_ENDPOINT + 'api/listados/multiple/';
+export const LISTADO_PERMISOS = BASE_ENDPOINT + 'api/camareros/permisos/';
+export const ADD_REG = BASE_ENDPOINT + 'api/acciones/add/';
+export const DELETE_REG = BASE_ENDPOINT + 'api/acciones/delete/';
+export const UPDATE_REG = BASE_ENDPOINT + 'api/sync/update_from_devices/';
+export const EXEC_INST = BASE_ENDPOINT + 'api/acciones/exec_inst/';
+export const USER_PROFILE = BASE_ENDPOINT + 'api/user/get_profile/';
+export const USER_PROFILE_UPDATE = BASE_ENDPOINT + 'api/user/update_profile/';

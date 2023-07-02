@@ -1,22 +1,25 @@
 <template>
   <v-container fluid>
     <v-app-bar  color="primary" dark>
-      <v-btn icon @click="disconnectSocket(); borrarChat(); $router.go(-1)">
+      <v-btn @click="$router.go(-1)" >
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
-      <v-toolbar-title class=" text-uppercase text-subtitle-1"> <samp> {{ titulo }}</samp></v-toolbar-title>
+      <v-toolbar-title > Asistente </v-toolbar-title>
       <v-spacer></v-spacer>
       
        <!-- Agregando menú desplegable de empresas -->
        <v-menu offset-y>
         <template v-slot:activator="{ props }">
           <v-btn  v-bind="props">
-            {{ empresaStore.empresa.nombre }} <v-icon>mdi-chevron-down</v-icon>
+            {{ empStore.getDisplayName() }} <v-icon>mdi-chevron-down</v-icon>
           </v-btn>
         </template>
         <v-list>
-          <v-list-item v-for="(empresa, index) in empresaStore.empresas" :key="index" @click="cambiarEmpresa(empresa)">
-            <v-list-item-title>{{ empresa.nombre }}</v-list-item-title>
+          <v-list-item v-for="(empresa, index) in empStore.empresas" :key="index" 
+          @click="empStore.cambiarEmpresa(empresa)">
+            <v-list-item-title>{{ empresa.alias }}
+              <v-icon v-if="empresa.checked">mdi-check</v-icon>
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -70,36 +73,21 @@
 </template>
 
 <script>
-import axios from "axios";
+
 import { useChatStore } from "@/stores/chatStore";
-import { useEmpresaStore } from "@/stores/empresaStore";
+import { useEmpresasStore } from "@/stores/empresasStore";
 import Tabla from "@/components/Tabla.vue"
-import ReconnectingWebSocket from '@/api/';
+
 
 export default {
   components: {
-    Tabla
-  },
-  props: {
-    titulo: {
-      type: String,
-      required: true,
-    },
-    tipo: {
-      type: String,
-      required: true,
-    },
-    opciones: {
-      type: String,
-    },
+    Tabla,
   },
   setup() {
     const chatStore = useChatStore();
-    const empresaStore = useEmpresaStore();
+    const empStore = useEmpresasStore();
     return {
-      url: empresaStore.empresa.url,
-      token: empresaStore.empresa.token,
-      empresaStore,
+      empStore,
       chatStore,
     };
   },
@@ -120,11 +108,6 @@ export default {
     }
   },
   methods: {
-
-    cambiarEmpresa(nuevaEmpresa) {
-      this.empresaStore.empresa = nuevaEmpresa;
-      localStorage.setItem('valleges_empresa', JSON.stringify(nuevaEmpresa));
-    },
     borrarChat() {
       this.chatStore.items = [];
       this.message = "";
@@ -197,61 +180,8 @@ export default {
       } catch (error) {
         console.error("Error al enviar el mensaje a la vista:", error);
       }
-    },
-    onMessageCallback(message){
-        const item = {
-            type: message.type,
-            text: "",
-            tabla: [],
-        }
-        var count = 0;
-
-        // Si el mensaje es un array, maneja cada elemento del array
-        if (Array.isArray(message.text)) {
-            message.text.forEach(e => {
-                if (e.tabla) item.tabla = e.tabla;
-                else if (e.sucess) {
-                    count++;
-                } else {
-                    item.text += " " + e;
-                }
-            });
-        }
-        // Si el mensaje no es un array, maneja el objeto individual
-        else {
-            if (message.text.tabla) item.tabla = message.text.tabla;
-            else if (message.text.success) {
-                count++;
-            } else {
-                item.text += " " + message.text;
-            }
-        }
-
-        if (count > 0) item.text += " " + count + " acciones ejecutadas con exito.";
-        this.chatStore.addItems(item);
-        this.$nextTick(() => {
-            this.$refs.ultimoElemento[0].scrollIntoView({ behavior: 'smooth' });
-        });
-    },
-    connectSocket() {
-      
-      const websocketUrl = this.url.replace("http://", "ws://") +
-                           "/ws/gestion_ia/"+this.token.user+"/"
-      this.socket =  new ReconnectingWebSocket(websocketUrl, this.onMessageCallback);
-    },
-    disconnectSocket() {
-      if (this.socket) {
-        this.socket.close();
-        this.socket = null;
-      }
-    },
+    },  
   },
-  mounted(){
-    this.connectSocket()
-  },
-  beforeUnmount(){
-    this.disconnectSocket();
-  }
 };
 </script>
 
