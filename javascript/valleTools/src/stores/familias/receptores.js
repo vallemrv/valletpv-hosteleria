@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { fb_getAll, fb_create, fb_delete, fb_update } from "@/api";
+
 
 // Definimos el store Receptores
 export const ReceptoresStore = defineStore({

@@ -39,7 +39,7 @@ class HistorialMensajes(models.Model):
 
    
     class Meta:
-        tb_name = 'historialmensajes'
+        db_table = 'historialmensajes'
         ordering = ['-id']
 
 class Historialnulos(models.Model):
@@ -59,5 +59,5 @@ class Historialnulos(models.Model):
 
 
     class Meta:
-        tb_name = 'historialnulos'
+        db_table = 'historialnulos'
         ordering = ['-id']

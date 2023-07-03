@@ -1,6 +1,4 @@
 import { defineStore } from "pinia";
-import { onSnapshot, collection } from "firebase/firestore";
-import { db, fb_pathDoc, fb_update } from "@/api";
 
 export const useEmpresasStore = defineStore({
     id: 'empresas',

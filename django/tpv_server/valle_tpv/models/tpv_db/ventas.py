@@ -12,7 +12,7 @@ class HorarioUsr(models.Model):
     usurario = models.ForeignKey(User,  on_delete=models.CASCADE, db_column='IDUsr')  # Field name made lowercase.
 
     class Meta:
-        default_permissions = ()
+        db_table = 'horario_usr'
 
 
 
@@ -126,7 +126,7 @@ class Cierrecaja(models.Model):
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
 
     class Meta:
-        default_permissions = ()
+        db_table = 'cierrecaja'
         ordering = ['-id']
     
 
@@ -194,7 +194,7 @@ class Efectivo(models.Model):
     moneda = models.DecimalField(db_column='Moneda', max_digits=5, decimal_places=2)  # Field name made lowercase.
 
     class Meta:
-       default_permissions = ()
+       db_table = 'efectivo'
 
 class Gastos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -212,4 +212,4 @@ class Gastos(models.Model):
     
 
     class Meta:
-        default_permissions = ()
+        db_table = 'gastos'

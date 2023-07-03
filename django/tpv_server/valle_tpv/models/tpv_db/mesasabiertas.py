@@ -91,6 +91,6 @@ class Mesasabiertas(models.Model):
 
 
     class Meta:
-        tb_name = 'mesasabiertas'
+        db_table = 'mesasabiertas'
         ordering = ['-id']
 

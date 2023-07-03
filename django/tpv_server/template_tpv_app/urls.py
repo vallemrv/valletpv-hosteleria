@@ -28,6 +28,6 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('token/', include('tokenapi.urls')),
-    path('valle_tpv/', include('valle_tpv.urls'))
+    path('valle_tpv/', include('valle_tpv.urls')),
     re_path(r'^.*$', RedirectView.as_view(url="http://valletpv.es"))
 ]

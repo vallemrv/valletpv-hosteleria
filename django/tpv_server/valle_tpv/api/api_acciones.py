@@ -7,8 +7,6 @@ from valle_tpv.tools.acciones import add_handler, modifcar_handler, delete_handl
 import json
 
 
-
-
 @token_required
 def add_reg(request):
     app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
@@ -18,7 +16,7 @@ def add_reg(request):
     if hasattr(model, "add_handler"):
         obj = model.add_handler(reg)
     else:
-        obj = add_handler(model, tb_name, reg);
+        obj = add_handler(model, tb_name, reg)
 
     return JsonResponse(obj)
 
@@ -31,9 +29,24 @@ def delete_reg(request):
     if hasattr(model, "delete_handler"):
         obj = model.delete_handler(filter)
     else:
-        obj = delete_handler(model, tb_name, filter);
+        obj = delete_handler(model, tb_name, filter)
 
     return JsonResponse(obj)
+
+@token_required
+def update_reg(request):
+    app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
+    tb_name = request.POST["tb_name"]
+    filter = json.loads(request.POST["filter"])
+    model = apps.get_model(app_name,  tb_name)
+    if hasattr(model, "modifcar_handler"):
+        obj = model.modifcar_handler(filter)
+    else:
+        obj = modifcar_handler(model, tb_name, filter)
+
+    return JsonResponse(obj)
+
+
 
 
 @token_required

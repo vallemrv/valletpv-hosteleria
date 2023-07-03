@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-import { fb_getAll, fb_create, fb_delete, fb_update } from "@/api";
-import { fb_getByFilter } from "../../api";
+
 
 // Definimos el store Familias
 export const FamiliasStore = defineStore({

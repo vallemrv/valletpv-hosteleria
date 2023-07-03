@@ -1,5 +1,5 @@
 from django.db import models
-from valle_tpv.models import (Infmesa, Mesas, Historialnulos, Mesasabiertas, Mesaszona)
+from valle_tpv.models import (Infmesa, Mesas, Historialnulos, Mesasabiertas)
 from valle_tpv.tools.ws import comunicar_cambios_devices
 from datetime import datetime
 from uuid import uuid4
@@ -9,7 +9,7 @@ class Servidos(models.Model):
     linea = models.ForeignKey('Lineaspedido',  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
 
     class Meta:
-        tb_name = 'servidos'
+        db_table = 'servidos'
         ordering = ['-id']
 
 
@@ -81,7 +81,7 @@ class Pedidos(models.Model):
 
 
     class Meta:
-        tb_name = 'pedidos'
+        db_table = 'pedidos'
         ordering = ['-id']
 
 
@@ -140,7 +140,7 @@ class Lineaspedido(models.Model):
     def lrToP(self, mesa_a):
         tarifa = 1
         if mesa_a:
-            mz = Mesaszona.objects.filter(mesa__pk=mesa_a.mesa_id).first()
+            mz = mesa_a.mesa.zona
             if mz:
                 tarifa = mz.zona.tarifa
             
@@ -166,7 +166,7 @@ class Lineaspedido(models.Model):
             'descripcion': self.descripcion,
             'mesa_id': mesa.pk if mesa else -1,
             'nomMesa': mesa.nombre if mesa else "",
-            'IDZona': mesa.mesaszona_set.all().first().zona.pk if mesa else -1,
+            'zona_id': mesa.zona.pk if mesa else -1,
             'servido': Servidos.objects.filter(linea__pk=self.pk).count(),
             'descripcion_t': self.descripcion_t,
             'receptor': self.tecla.familia.receptor.pk if self.tecla else "",
@@ -214,5 +214,5 @@ class Lineaspedido(models.Model):
         return num
 
     class Meta:
-        tb_name = 'lineaspedido'
+        db_table = 'lineaspedido'
 

@@ -6,44 +6,25 @@
 </template>
   
 <script>
-import { useUserStore } from "@/stores/userStore";
-import { useEmpresasStore } from "@/stores/empresasStore";
+
 import MenuPrincipal from "./components/tools/MenuPrincipal.vue";
-import { auth } from "@/firebase";
-import { watch } from "vue";
 import { useRouter } from "vue-router";
+import { loginsStore } from "./stores/loginsStore";
+import { ref } from "vue";
 
 export default {
   components: {
     MenuPrincipal,
   },
   setup() {
-    const userStore = useUserStore();
-    const empStore = useEmpresasStore();
+    const logins = loginsStore();
     const router = useRouter();
-   
-    watch(() => userStore.user, (user) => {
-      if (user) {
-        empStore.userId = user.id;
-        empStore.suscribirAEmpresas();
-      }
-    });
-
-
-    //Comprobar si el usuario está logueado con firebase
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // Creamos un usuario con nuestra api para poder usarlo en toda la app
-        userStore.set(user);
-      } else {
-        empStore.unsuscribirAEmpresas();
-        userStore.set(null);
-        router.push({ name: "Login" });
-      }
-    });
+    const isLogin = ref(logins.empresa && logins.empresa.user && logins.empresa.token);
+    if (!isLogin.value) router.push("/login");
 
     return {
-      userStore,
+      logins,
+      isLogin
     };
   },
 

@@ -25,16 +25,6 @@ IVA = 10
 BRAND_TITLE = "{{nombre_empresa}}"
 BRAND = "{{nombre_empresa}}"
 EMPRESA = "{{name_tpv}}"
-MAIL = "{{email}}"
-RAZON_SOCIAL = "{{razon_social}}."
-NIF = "{{nif}}"
-DIRECCION = "{{direccion}}"
-TELEFONO = "{{telefono}}"
-POBLACION= "{{poblacion}}"
-PROVINCIA= "{{provincia}}"
-CP="{{cp}}"
-
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/

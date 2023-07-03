@@ -58,7 +58,7 @@ class Secciones(models.Model):
         return self.nombre
 
     class Meta:
-        tb_table = 'secciones'
+        db_table = 'secciones'
         ordering = ['-orden']
 
 
@@ -70,7 +70,7 @@ class Sugerencias(models.Model):
     orden = models.IntegerField(default=0, blank=True) 
     
     class Meta:
-        tb_name = 'sugerencias'
+        db_table = 'sugerencias'
 
 class Teclas(models.Model):
     id = models.AutoField(primary_key=True)  # Field name made lowercase.
@@ -104,7 +104,7 @@ class Teclas(models.Model):
         return self.nombre
 
     class Meta:
-        tb_name = 'teclas'
+        db_table = 'teclas'
         ordering = ['-orden']
 
 class ComposicionTeclas(models.Model):
@@ -123,7 +123,7 @@ class ComposicionTeclas(models.Model):
 
     
     class Meta:
-        tb_name = 'composicion_teclas'
+        db_table = 'composicion_teclas'
         ordering = ['id']
 
 class LineasCompuestas(models.Model):
@@ -134,5 +134,5 @@ class LineasCompuestas(models.Model):
 
 
     class Meta:
-        tb_name = 'lineas_compuestas'
+        db_table = 'lineas_compuestas'
         ordering = ['id']

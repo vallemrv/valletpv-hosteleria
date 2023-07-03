@@ -49,7 +49,6 @@
 </template>
   
 <script>
-import { ref, uploadBytes, getDownloadURL } from '@firebase/storage';
 
 export default {
     data() {

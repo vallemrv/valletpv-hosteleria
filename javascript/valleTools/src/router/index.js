@@ -2,18 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import HomeView from '@/views/dashboard/HomeView.vue';
 import LoginView from '@/views/formlogin/LoginView.vue';
-import RegistroView from '@/views/formlogin/RegistroView.vue';
 import TecladosView from "@/views/gestion/TecladosView.vue";
 import ChatView from '@/views/ia/ChatView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/signup',
-      name: 'RegistroView',
-      component: RegistroView,
-    },
+  
     {
       path: '/login',
       name: 'Login',

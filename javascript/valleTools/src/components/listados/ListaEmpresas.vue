@@ -45,7 +45,7 @@
 import DialogFormDinamico from "@/components/dialogs/DialogFormDinamico.vue";
 import DialogConfirm from "@/components/dialogs/DialogConfirm.vue";
 import { useEmpresasStore } from '@/stores/empresasStore';
-import { fb_create, fb_delete, fb_update, fb_pathDoc, storage} from '@/api';
+
 
 
 export default {

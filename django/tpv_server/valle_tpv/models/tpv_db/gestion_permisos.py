@@ -41,6 +41,6 @@ class PeticionesAutoria(models.Model):
 
     class Meta:
         ordering = ['-id']
-        default_permissions = ()
+        db_table = 'peticiones_autoria'
 
     

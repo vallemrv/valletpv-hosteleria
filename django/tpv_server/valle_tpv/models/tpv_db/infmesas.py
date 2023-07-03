@@ -142,5 +142,5 @@ class Infmesa(models.Model):
         return pedidos
 
     class Meta:
-        tb_name = 'infmesa'
+        db_table = 'infmesa'
         ordering = ['-fecha']
