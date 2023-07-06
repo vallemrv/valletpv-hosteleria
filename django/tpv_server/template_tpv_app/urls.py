@@ -21,13 +21,9 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.urls import  include, path, re_path
-from django.views.generic.base import RedirectView
-
-
+from django.urls import  include, path
 
 urlpatterns = [
     path('token/', include('tokenapi.urls')),
-    path('valle_tpv/', include('valle_tpv.urls')),
-    re_path(r'^.*$', RedirectView.as_view(url="http://valletpv.es"))
+    path('/', include('valle_tpv.urls')),
 ]
