@@ -38,6 +38,7 @@ export default {
             familias.load(empresaStore, receptores.items);
         }
         watch(() => receptores.items.length, (e) => {
+            familias.empresaStore = empresaStore;
             familias.loadReceptores(receptores.items);
         });
         return { receptores };

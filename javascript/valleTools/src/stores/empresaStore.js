@@ -15,12 +15,12 @@ export const EmpresaStore = defineStore('empresaStore', {
       formData.append('token', this.empresa.token);
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
-          //comprobamos is es un array o un objeto
-         //Si es asi lo convertimos a string
-          if (typeof obj[key] === 'object') {
-            obj[key] = JSON.stringify(obj[key]);
-          }
-          formData.append(key, obj[key]);
+           if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
+              obj[key] = JSON.stringify(obj[key]);
+            } else if (obj[key] instanceof File) {
+              console.log("Agregando archivo al FormData: ", obj[key]);
+            }
+           formData.append(key, obj[key]);
         }
       }
       return formData;

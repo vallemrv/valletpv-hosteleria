@@ -31,7 +31,7 @@
                                         <!-- Si item.icono está presente, muestra la imagen -->
                                         <div class="text-center flex-grow-1">
                                             <img v-if="item.icono && item.icono.length > 0" width="40" height="40"
-                                                :src="item.icono[0].url" class="mx-3" :alt="item.icono[0].name">
+                                                :src="item.icono_url" class="mx-3" :alt="item.icono">
                                         </div>
 
                                         <div class="text-h5 flex-grow-1 text-center d-none d-lg-flex">
@@ -92,19 +92,12 @@
                                         <v-icon>mdi-file-multiple</v-icon>
                                     </v-btn>
                                 </v-badge>
-
-
-
                                 <v-badge v-else color="red" overlap bordered class="pa-2">
                                     <template v-slot:badge>
                                         {{ item.child }}
                                     </template>
                                     <v-icon>mdi-folder-multiple-outline</v-icon>
                                 </v-badge>
-
-
-
-
                             </v-card>
                         </v-col>
                     </v-row>
@@ -162,7 +155,7 @@ export default {
 
         const load_init = async () => {
             await storeSecciones.load(empresasStore);
-            storeTeclas.empresaStore = empresasStore;
+            storeTeclas.loadFamilias(empresasStore);
             if (props.seccion_id) {
                 seccionSelected.value = Number(props.seccion_id);
                 seccionSel.value = storeSecciones.items.find((item) => item.id == props.seccion_id);

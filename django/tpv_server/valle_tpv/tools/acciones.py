@@ -1,7 +1,8 @@
 # Version: 0.1
 # Date: 2019-11-25
 # importaciones
-
+import os
+from django.conf import settings
 from django.forms import model_to_dict
 from valle_tpv.tools.ws import send_mensaje_devices
 
@@ -45,7 +46,13 @@ def modifcar_handler(model, tb_name, reg, filter):
             attr = reg[key]
             if hasattr(obj, k_lower):
                 field = getattr(model, k_lower)
-                if "ForwardManyToOneDescriptor" in field.__class__.__name__:
+                if "FileField" in field.__class__.__name__:
+                    file = getattr(obj, k_lower)
+                    if file:
+                        if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
+                            os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
+
+                elif "ForwardManyToOneDescriptor" in field.__class__.__name__:
                     k_lower =  k_lower+"_id"
                 
             setattr(obj, k_lower, attr)        
@@ -72,6 +79,7 @@ def delete_handler(model, tb_name, filter):
     for obj in objs:
         result.append(obj.pk)
         obj.delete()
+        
     update = {
         "op": "rm",
         "device": "",

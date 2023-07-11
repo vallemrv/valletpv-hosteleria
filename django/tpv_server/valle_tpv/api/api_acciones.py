@@ -13,9 +13,9 @@ def add_reg(request):
     tb_name = request.POST["tb_name"]
     reg = json.loads(request.POST["reg"])
     model = apps.get_model(app_name, tb_name)
-    print(request.FILES)
-    if 'icono' in request.FILES:
-        reg['icono'] = request.FILES['icono']
+   
+    for k, v in request.FILES.items():
+        reg[k] = v
      
     if hasattr(model, "add_handler"):
         obj = model.add_handler(reg)
@@ -44,6 +44,10 @@ def update_reg(request):
     filter = json.loads(request.POST["filter"])
     reg = json.loads(request.POST["reg"])
     model = apps.get_model(app_name,  tb_name)
+
+    for k, v in request.FILES.items():
+        reg[k] = v
+        
     if hasattr(model, "modifcar_handler"):
         obj = model.modifcar_handler(filter)
     else:

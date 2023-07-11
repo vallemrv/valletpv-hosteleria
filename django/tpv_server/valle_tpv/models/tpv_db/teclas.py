@@ -1,6 +1,8 @@
 from django.db import models
 from django.forms.models import model_to_dict
-
+import os
+from django.conf import settings
+from valle_tpv.tools.ws import send_mensaje_devices
 
 
 class Receptores(models.Model):
@@ -70,11 +72,39 @@ class Secciones(models.Model):
     orden = models.IntegerField( default=0) 
     icono = models.FileField(upload_to='iconos_secciones', blank=True, null=True)
     
+    @staticmethod
+    def delete_handler(filter):
+        objs = Secciones.objects.filter(**filter)
+        result = []
+        for obj in objs:
+            file = obj.icono
+            if file:
+                if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
+                    os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
+            result.append(obj.pk)
+            obj.delete()
+            
+        update = {
+            "op": "rm",
+            "device": "",
+            "tb": "secciones",
+            "obj": result,
+            "receptor": "devices",
+        }
+        send_mensaje_devices(update) 
+        return result
+    
     def __unicode__(self):
         return self.nombre
 
     def __str__(self):
         return self.nombre
+    
+    def serialize(self):
+        data = model_to_dict(self)
+        data["icono_url"] = self.icono.url if self.icono else ""
+        data["icono"] = self.icono.name if self.icono else ""
+        return data
 
     class Meta:
         db_table = 'secciones'

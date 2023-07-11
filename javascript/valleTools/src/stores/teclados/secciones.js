@@ -44,14 +44,21 @@ export const SeccionesStore = defineStore({
             let data = response.data;
 
             if (data.success) {
-              this.items = data.regs;
+              this.items = data.regs.map((item) => {
+                return {
+                  ...item,
+                  icono_url: buildUrl(this.empresaStore.empresa.url, item.icono_url),
+                };
+              });
             } else {
               console.error("Error al cargar las secciones:", data.error);
             }
         },
         async add(item) {
-            item.icono = item.icono.length > 0 ? item.icono[0].files[0] : null;
+            const icono = item.icono[0];
+            delete item.icono;
             const obj = {
+              icono: icono,
               reg: item,
               tb_name: this.modelo,
             }
