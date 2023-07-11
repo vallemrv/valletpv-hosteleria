@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row class="ma-auto" :class="(logins.empresa ? 'w-100' : 'w-lg-75')" justify="center">
+    <v-row class="ma-auto" :class="(empresaStore.empresa ? 'w-100' : 'w-lg-75')" justify="center">
       <v-col cols="12" sm="8" md="6">
         <v-card>
           <v-card-title >
@@ -26,14 +26,14 @@
               <v-text-field label="Nombre de usuario" v-model="username"></v-text-field>
               <v-text-field label="Contraseña" v-model="password" type="password"></v-text-field>
             </v-form>
-            <v-alert v-if="logins.error" type="error">
+            <v-alert v-if="empresaStore.error" type="error">
               {{ empresaStore.error }}
             </v-alert>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="red" @click="cancel" v-if="logins.empresa">Cancelar</v-btn>
-            <v-btn color="green" @click="submit">Enviar</v-btn>
+            <v-btn color="red" @click="cancel" v-if="empresaStore.empresa">Cancelar</v-btn>
+            <v-btn color="green" @click.prevent="submit">Enviar</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -43,7 +43,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import { loginsStore } from "../../stores/loginsStore";
+import { EmpresaStore } from "@/stores/empresaStore";
 
 export default defineComponent({
   props: {
@@ -58,8 +58,8 @@ export default defineComponent({
     },
   },
   setup() {
-    const logins = loginsStore();
-    return { logins };
+    const empresaStore = EmpresaStore();
+    return { empresaStore };
   },
   data() {
     return {
@@ -72,38 +72,39 @@ export default defineComponent({
   computed:{
     companyName: {
       get() {
-        return this.tipo === "editar" ? this.logins.empresa.nombre : this.myCompanyName;
+        return this.tipo === "editar" ? this.empresaStore.empresa.nombre : this.myCompanyName;
       },
       set(value) {
         if (this.tipo === "editar") {
-          this.logins.empresa.nombre = value;
+          this.empresaStore.empresa.nombre = value;
         }else this.myCompanyName = value;
       },
     },
     url: {
       get() {
-        return this.tipo === "editar" ? this.logins.empresa.url : this.myUrl;
+        return this.tipo === "editar" ? this.empresaStore.empresa.url : this.myUrl;
       },
       set(value) {
         if (this.tipo === "editar") {
-          this.logins.empresa.url = value;
+          this.empresaStore.empresa.url = value;
         }else this.myUrl = value
       },
     },
   },
   methods: {
-    submit() {
+    async submit() {
       if (this.tipo === "nuevo") {
         const newEmpresa = {
           id: Date.now(),
           nombre: this.myCompanyName,
           url: this.myUrl,
         };
-        this.logins.addEmpresa(newEmpresa, this.username, this.password);
+        await this.empresaStore.addEmpresa(newEmpresa, this.username, this.password);
       } else if (this.tipo === "editar") {
-        this.logins.upEmpresa(this.username, this.password);
+        await this.empresaStore.upEmpresa(this.username, this.password);
       }
-      if (!this.logins.error) this.$emit("close");
+      console.log(this.empresaStore.error);
+      if (!this.empresaStore.error) this.$emit("close");
     },
     cancel() {
       this.$emit("close");

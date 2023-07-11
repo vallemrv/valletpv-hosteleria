@@ -1,34 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-import HomeView from '@/views/dashboard/HomeView.vue';
-import LoginView from '@/views/formlogin/LoginView.vue';
-import TecladosView from "@/views/gestion/TecladosView.vue";
-import ChatView from '@/views/ia/ChatView.vue';
+import MainView from '@/views/dashBoard/MainView.vue';
+import CamarerosView from '@/views/gestion/CamarerosView.vue';
+import FamiliasView from '@/views/gestion/FamiliasView.vue';
+import TecladosView from '@/views/gestion/TecladosView.vue';
+import MesasView from '@/views/gestion/MesasView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-  
-    {
-      path: '/login',
-      name: 'Login',
-      component: LoginView,
-    },
     {
       path: '/',
-      component: HomeView,
-      name: 'HomeView',
+      component: MainView,
+      name: 'dashBoard',
     },
     {
-      path: '/:view',
-      component: HomeView,
-      name: 'view',
-      props: true
+      path: '/camareros',
+      component: CamarerosView,
+      name: 'camareros',
     },
     {
-      path: '/chat',
-      component: ChatView,
-      name: 'ChatView',
+      path: '/familias',
+      component: FamiliasView,
+      name: 'familias',
     },
     {
       path: '/teclados/:seccion_id/:tecla_id/:nivel/',
@@ -52,10 +45,26 @@ const router = createRouter({
       path: '/teclados',
       name: 'TecladosView',
       component: TecladosView,
+    },
+    {
+      path: '/mesas/:zona_id/:mesa_id',
+      name: 'mesas_detalle', // nombre único
+      component: MesasView,
+      props: true // Añadido props: true
+    },
+    {
+      path: '/mesas/:zona_id',
+      name: 'mesas_zona', // nombre único
+      component: MesasView,
+      props: true 
+    },
+    {
+      path: '/mesas',
+      name: 'MesasView',
+      component: MesasView,
     }
-  
+    
   ]
-});
-
+})
 
 export default router

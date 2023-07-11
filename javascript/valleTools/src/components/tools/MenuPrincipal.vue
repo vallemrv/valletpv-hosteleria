@@ -2,8 +2,8 @@
   <v-navigation-drawer expand-on-hover rail v-model="drawer" app @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave">
     <v-list>
-      <v-list-item v-if="empresa" prepend-icon="mdi-handshake" :title="empresa.empresa"
-        :subtitle="empresa.alias"></v-list-item>
+      <v-list-item v-if="empresa" prepend-icon="mdi-handshake" :title="empresa.nombre"
+        :subtitle="empresa.nombre"></v-list-item>
     </v-list>
 
     <v-divider></v-divider>
@@ -18,27 +18,7 @@
 
     </v-list>
 
-    <template v-slot:append>
-      <v-menu offset-y>
-            <template v-slot:activator="{ props }">
-              <div class="pa-2">
-              <v-btn color="primary" block>
-                 <v-icon>mdi-account</v-icon>
-                 <div v-if="isExpanded" v-bind="props">{{ userStore.getDisplayName() }} </div>
-                </v-btn>
-              </div>
-            </template>
-            <v-list>
-                <v-list-item @click="goToProfile">
-                    <v-list-item-title>Profile</v-list-item-title>
-                </v-list-item>
-                <v-list-item @click="logout">
-                    <v-list-item-title>Logout</v-list-item-title>
-                </v-list-item>
-            </v-list>
-        </v-menu>
-      
-    </template>
+    
   </v-navigation-drawer>
 
 
@@ -50,21 +30,18 @@
 </template>
   
 <script>
-import { useEmpresasStore } from '@/stores/empresasStore';
-import { useUserStore } from '@/stores/userStore';
+import { EmpresaStore } from '@/stores/empresaStore';
 import { ConfigStore } from '@/stores/configStore';
-import { auth } from '@/firebase';
+
 
 export default {
   setup() {
-    const empresasStore = useEmpresasStore();
-    const userStore = useUserStore();
+    const empresaStore = EmpresaStore();
     const configStore = ConfigStore();
 
     return {
       configStore,
-      empresasStore,
-      userStore,
+      empresaStore,
       isExpanded: false
     };
   },
@@ -75,7 +52,7 @@ export default {
   },
   computed: {
     empresa() {
-      return this.empresasStore.empresaSel
+      return this.empresaStore.empresa
     }
   },
   methods: {
@@ -90,13 +67,6 @@ export default {
     },
     handleMouseLeave() {
       this.isExpanded = false;
-    },
-    goToProfile() {
-      this.$router.push({ name: "profile" });
-    }, 
-    logout() {
-      auth.signOut();
-      this.$router.push( "/login" );
     },
   },
 };

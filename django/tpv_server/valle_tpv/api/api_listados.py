@@ -2,7 +2,13 @@ from tokenapi.decorators import token_required
 from tokenapi.http import JsonResponse
 from django.apps import apps
 from django.forms import model_to_dict
+from valle_tpv.models import Camareros
 import json
+
+
+@token_required
+def permissions_list(request):
+   return JsonResponse(Camareros.permisos_list())
 
 
 

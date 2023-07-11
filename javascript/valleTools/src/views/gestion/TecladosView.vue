@@ -1,7 +1,7 @@
 <template>
     <MainToolBar />
     <v-main>
-        <v-container fluid>
+        <v-container >
             <v-card>
                 <v-card-title class="pa-0">
                     <v-card-title class="pa-0">
@@ -30,7 +30,7 @@
 
                                         <!-- Si item.icono está presente, muestra la imagen -->
                                         <div class="text-center flex-grow-1">
-                                            <img v-if="item.icono.length > 0" width="40" height="40"
+                                            <img v-if="item.icono && item.icono.length > 0" width="40" height="40"
                                                 :src="item.icono[0].url" class="mx-3" :alt="item.icono[0].name">
                                         </div>
 
@@ -86,23 +86,23 @@
 
                                 <v-badge v-if="showDown(item)" color="red" overlap bordered class="pa-2">
                                     <template v-slot:badge>
-                                        {{ item.child  }}
+                                        {{ item.child }}
                                     </template>
                                     <v-btn icon @click.stop="downLevel">
-                                    <v-icon>mdi-file-multiple</v-icon>
-                                </v-btn>
+                                        <v-icon>mdi-file-multiple</v-icon>
+                                    </v-btn>
                                 </v-badge>
 
-                               
-                                
+
+
                                 <v-badge v-else color="red" overlap bordered class="pa-2">
                                     <template v-slot:badge>
-                                        {{ item.child  }}
+                                        {{ item.child }}
                                     </template>
                                     <v-icon>mdi-folder-multiple-outline</v-icon>
                                 </v-badge>
 
-                                
+
 
 
                             </v-card>
@@ -121,13 +121,12 @@
 
 <script>
 import MainToolBar from "@/components/tools/MainToolBar.vue";
-import { useEmpresasStore } from '@/stores/empresasStore';
+import { EmpresaStore } from '@/stores/empresaStore';
 import { ConfigStore } from '@/stores/configStore';
 import { SeccionesStore } from '@/stores/teclados/secciones';
 import { TeclasStore } from '@/stores/teclados/teclas';
 import DialogFormDinamico from '@/components/dialogs/DialogFormDinamico.vue';
 import DialogConfirm from '@/components/dialogs/DialogConfirm.vue';
-import { storage } from '@/firebase';
 import { ref, watch } from 'vue';
 
 export default {
@@ -153,7 +152,7 @@ export default {
         MainToolBar,
     },
     setup(props) {
-        const empresasStore = useEmpresasStore();
+        const empresasStore = EmpresaStore();
         const configStore = ConfigStore();
         const storeSecciones = SeccionesStore();
         const storeTeclas = TeclasStore();
@@ -161,36 +160,35 @@ export default {
         const seccionSel = ref(null);
         const teclaSel = ref(null);
 
-        watch(() => empresasStore.empresaSel, async (empresa) => {
-
-            if (empresa) {
-                await storeSecciones.load(empresasStore.getPathDoc(storeSecciones.collectionName));
-                await storeTeclas.loadFamilias(empresasStore.getPathDoc(storeTeclas.collectionName));
-
-                if (props.seccion_id) {
-                    seccionSelected.value = props.seccion_id;
-                    seccionSel.value = storeSecciones.items.find((item) => item.id == props.seccion_id);
-                    if (props.nivel > 0) {
-                        let tecla = await storeTeclas.getItemByID(props.tecla_id);
-                        await storeTeclas.setParent(tecla);
-                        teclaSel.value = tecla
-                    } else {
-                        await storeTeclas.setSeccion(props.seccion_id);
-                        if (props.tecla_id) {
-                            teclaSel.value = storeTeclas.items.find((item) => item.id == props.tecla_id);
-                        }
+        const load_init = async () => {
+            await storeSecciones.load(empresasStore);
+            storeTeclas.empresaStore = empresasStore;
+            if (props.seccion_id) {
+                seccionSelected.value = Number(props.seccion_id);
+                seccionSel.value = storeSecciones.items.find((item) => item.id == props.seccion_id);
+                if (props.nivel > 0) {
+                    let tecla = await storeTeclas.getItemByID(props.tecla_id);
+                    await storeTeclas.setParent(tecla);
+                    teclaSel.value = tecla
+                } else {
+                    await storeTeclas.setSeccion(props.seccion_id);
+                    if (props.tecla_id) {
+                        teclaSel.value = storeTeclas.items.find((item) => item.id == props.tecla_id);
                     }
-
                 }
+            }
+        }
 
+        watch(() => empresasStore.empresa, async (empresa) => {
+            if (empresa) {
+                load_init()
             }
         });
 
-        setTimeout(() => {
-            if (empresasStore.empresaSel && storeSecciones.items.length < 1)
-                empresasStore.empresaSel = { ...empresasStore.empresaSel };
-        }, 100);
 
+        setTimeout(() => {
+            if (empresasStore.empresa && storeSecciones.items.length == 0) load_init()
+        }, 500);
 
         return {
             empresasStore,
@@ -313,9 +311,7 @@ export default {
             this.store = this.storeSecciones;
             this.$refs.editDialog.openDialog(this.storeSecciones.newItem,
                 "Crear una Seccion",
-                this.storeSecciones.fields,
-                storage,
-                "/resources/logos/");
+                this.storeSecciones.fields);
         },
         upSeccion() {
             this.isNew = false;
@@ -329,6 +325,15 @@ export default {
         async guardarItem(item) {
             let error = null;
             if (this.store) {
+                if (this.store == this.storeTeclas) {
+                    if (this.nivel > 0) {
+                        this.teclaSelChild = item;
+                    } else {
+                        this.teclaSel = item;
+                    }
+                } else {
+                    this.seccionSel = item;
+                }
                 if (this.isNew) {
                     error = await this.store.add(item);
 

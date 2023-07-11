@@ -19,6 +19,6 @@ urlpatterns = [
     path("send_cierre", views.send_cierre_by_id, name="send_cierre_by_id" ),
     path("ventas/", include("valle_tpv.ventas.urls"), name="ventas"),
     path("facturas/", include("valle_tpv.facturas.urls"), name="facturas"),
-    path("dashboard/", include("valle_tpv.dash_board.urls"), name="dashboard"),
+    
     path("gestion_ia/", include("valle_tpv.ws.valle_ia.urls"), name="gestion_ia"),
 ]'''

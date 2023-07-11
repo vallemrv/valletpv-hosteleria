@@ -8,7 +8,6 @@
 from django.urls import path, include
 
 urlpatterns = [
-    path("camareros/", include('valle_tpv.urls.api_urls.camareros'), name="api_android_camareros"),
     path('sync/', include("valle_tpv.urls.api_urls.sync"), name="api_android_sync"),
     path('pedidos/', include("valle_tpv.urls.api_urls.pedidos"), name="api_android_pedidos"),
     path('cuenta/', include("valle_tpv.urls.api_urls.cuenta"), name="api_android_cuenta"),

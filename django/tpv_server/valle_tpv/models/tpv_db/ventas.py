@@ -6,10 +6,10 @@ from valle_tpv.models import Ticket, Ticketlineas
 
 
 class HorarioUsr(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    hora_ini = models.CharField(db_column='Hora_ini', max_length=5)  # Field name made lowercase.
-    hora_fin = models.CharField(db_column='Hora_fin', max_length=5)  # Field name made lowercase.
-    usurario = models.ForeignKey(User,  on_delete=models.CASCADE, db_column='IDUsr')  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    hora_ini = models.CharField(db_column='Hora_ini', max_length=5) 
+    hora_fin = models.CharField(db_column='Hora_fin', max_length=5) 
+    usurario = models.ForeignKey(User,  on_delete=models.CASCADE, db_column='IDUsr') 
 
     class Meta:
         db_table = 'horario_usr'
@@ -17,10 +17,10 @@ class HorarioUsr(models.Model):
 
 
 class Arqueocaja(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre')  # Field name made lowercase.
-    cambio = models.FloatField(db_column='Cambio')  # Field name made lowercase.
-    descuadre = models.FloatField(db_column='Descuadre')  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre') 
+    cambio = models.FloatField(db_column='Cambio') 
+    descuadre = models.FloatField(db_column='Descuadre') 
 
     class Meta:
         db_table = 'arqueocaja'
@@ -119,11 +119,11 @@ class Arqueocaja(models.Model):
 
 
 class Cierrecaja(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    ticketcom = models.IntegerField(db_column='TicketCom')  # Field name made lowercase.
-    ticketfinal = models.IntegerField(db_column='TicketFinal')  # Field name made lowercase.
-    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
-    hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    ticketcom = models.IntegerField(db_column='TicketCom') 
+    ticketfinal = models.IntegerField(db_column='TicketFinal') 
+    fecha = models.DateField(db_column='Fecha') 
+    hora = models.CharField(db_column='Hora', max_length=5) 
 
     class Meta:
         db_table = 'cierrecaja'
@@ -188,19 +188,19 @@ class Cierrecaja(models.Model):
         return list(lineas)
  
 class Efectivo(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo')  # Field name made lowercase.
-    can = models.IntegerField(db_column='Can')  # Field name made lowercase.
-    moneda = models.DecimalField(db_column='Moneda', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo') 
+    can = models.IntegerField(db_column='Can') 
+    moneda = models.DecimalField(db_column='Moneda', max_digits=5, decimal_places=2) 
 
     class Meta:
        db_table = 'efectivo'
 
 class Gastos(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo')  # Field name made lowercase.
-    descripcion = models.CharField(db_column='Descripcion', max_length=100)  # Field name made lowercase.
-    importe = models.DecimalField(db_column='Importe', max_digits=6, decimal_places=2)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo') 
+    descripcion = models.CharField(db_column='Descripcion', max_length=100) 
+    importe = models.DecimalField(db_column='Importe', max_digits=6, decimal_places=2) 
 
     def serialize(self):
         return {

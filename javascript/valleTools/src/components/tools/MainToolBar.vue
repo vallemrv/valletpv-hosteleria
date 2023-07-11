@@ -11,10 +11,10 @@
             </template>
             <v-list>
                 <v-list-item v-for="(item, index) in empStore.empresas" :key="index" @click="empStore.selEmpresa(item)">
-                    <template v-slot:append v-if="item.selected">
+                    <template v-slot:append v-if="item.id == empStore.empresa.id">
                         <v-icon color="green" >mdi-check</v-icon>
                     </template>
-                    <v-list-item-title>{{ item.alias }}</v-list-item-title>
+                    <v-list-item-title>{{ item.nombre }}</v-list-item-title>
 
                 </v-list-item>
 
@@ -24,10 +24,10 @@
 </template>
 
 <script>
-import { useEmpresasStore } from '@/stores/empresasStore';
+import { EmpresaStore } from '@/stores/empresaStore';
 export default {
     setup() {
-        const empStore = useEmpresasStore();
+        const empStore = EmpresaStore();
         return { empStore };
     },
 

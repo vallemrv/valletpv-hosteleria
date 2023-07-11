@@ -4,7 +4,7 @@
 <script>
 import TablasDatos from '@/components/tools/TablasDatos.vue';
 import { FamiliasStore } from '@/stores/familias/familias';
-import { useEmpresasStore } from '@/stores/empresasStore';
+import { EmpresaStore } from '@/stores/empresaStore';
 import { watch } from 'vue';
 
 export default {
@@ -13,21 +13,14 @@ export default {
     },
     setup() {
         const store = FamiliasStore();
-        const empresasStore = useEmpresasStore();
-        watch(() => empresasStore.empresaSel, (empresaSel) => {
-            if (empresaSel) {
-                store.load(empresasStore.getPathDoc(store.collectionName));
+        const empresaStore = EmpresaStore();
+        watch(() => empresaStore.empresa, (empresa) => {
+            if (empresa) {
+                store.load(empresaStore);
             }
         }   );
          
-        return { store , empresasStore };
+        return { store , empresaStore };
     },
-    mounted() {
-        if (this.empresasStore.empresaSel) {
-            this.store.load(this.empresasStore.getPathDoc(this.store.collectionName));
-        }
-       
-    }
-
 };
 </script>

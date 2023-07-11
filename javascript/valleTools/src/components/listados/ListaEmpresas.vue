@@ -27,7 +27,7 @@
                     </td>
                     <td>
                         <v-switch :disabled="empresa.selected" v-model="empresa.selected" color="primary"
-                            @change="empresasStore.selEmpresa(empresa)"></v-switch>
+                            @change="selEmpresa(empresa)"></v-switch>
                     </td>
                 </tr>
             </tbody>
@@ -45,7 +45,7 @@
 import DialogFormDinamico from "@/components/dialogs/DialogFormDinamico.vue";
 import DialogConfirm from "@/components/dialogs/DialogConfirm.vue";
 import { useEmpresasStore } from '@/stores/empresasStore';
-
+import { fb_create, fb_delete, fb_update, fb_pathDoc, storage} from '@/api';
 
 
 export default {
@@ -158,6 +158,11 @@ export default {
 
     },
     methods: {
+        selEmpresa(empresa) {
+            // Aquí va el código para seleccionar la empresa
+            console.log("Seleccionada la empresa: ", empresa);
+            this.empresasStore.selEmpresa(empresa);
+        },
         mostrarMensaje(mensaje, color) {
             this.snackbarText = mensaje;
             this.snackbarColor = color;

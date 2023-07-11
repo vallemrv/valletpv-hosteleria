@@ -7,10 +7,10 @@ from valle_tpv.models import (Camareros, Mesas, Mesasabiertas,
 
 
 class Infmesa(models.Model):
-    uid = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100)  # Field name made lowercase.
-    camarero = models.ForeignKey(Camareros,  on_delete=models.CASCADE, db_column='IDCam')  # Field name made lowercase.
-    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
-    hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
+    uid = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100) 
+    camarero = models.ForeignKey(Camareros,  on_delete=models.CASCADE, db_column='IDCam') 
+    fecha = models.DateField(db_column='Fecha') 
+    hora = models.CharField(db_column='Hora', max_length=5) 
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase
 
     def unir_en_grupos(self):

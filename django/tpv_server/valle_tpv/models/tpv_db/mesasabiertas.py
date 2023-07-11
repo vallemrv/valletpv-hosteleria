@@ -5,9 +5,9 @@ from valle_tpv.models import Historialnulos
 from datetime import datetime
 
 class Mesasabiertas(models.Model):
-    id = models.AutoField(primary_key=True)  # Field name made lowercase.
-    infmesa = models.ForeignKey('Infmesa', on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
-    mesa = models.ForeignKey('Mesas', on_delete=models.CASCADE)  # Field name made lowercase.
+    id = models.AutoField(primary_key=True) 
+    infmesa = models.ForeignKey('Infmesa', on_delete=models.CASCADE, db_column='UID') 
+    mesa = models.ForeignKey('Mesas', on_delete=models.CASCADE) 
  
 
     @staticmethod

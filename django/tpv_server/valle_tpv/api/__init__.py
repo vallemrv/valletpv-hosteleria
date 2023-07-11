@@ -6,7 +6,6 @@
 # @License: Apache License v2.0
 
 from .api_sync import *
-from .api_camareros import *
 from .api_pedidos import *
 from .api_comandas import *
 from .api_cuenta import *

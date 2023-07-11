@@ -19,19 +19,19 @@ def articulos_vendidos(request):
         infmesa_id__fecha__month=current_month,
         infmesa_id__fecha__year=current_year,
         estado="C",
-    ).values("idart")
+    ).values("tecla_id")
 
     # Si no hay ventas en este mes, devolver un error
     if not ventas:
         return JsonError("No hay ventas en este mes")
 
     # Contar y agrupar por idart
-    ventas = ventas.annotate(can=Count("idart")).order_by("-can")
+    ventas = ventas.annotate(can=Count("tecla_id")).order_by("-can")
 
     # Limitar los resultados a 25 y obtener nombres de los artículos
     resultado = []
     for venta in ventas[:25]:
-        tecla = Teclas.objects.filter(pk=venta["idart"]).first()
+        tecla = Teclas.objects.filter(pk=venta["tecla_id"]).first()
         if tecla:
             resultado.append({"can": venta["can"], "nombre": tecla.nombre})
 
@@ -71,7 +71,7 @@ def ventas_por_intervalos(request):
                 pedido_id__infmesa__hora__range=(hora_start_str, hora_end_str),
                 estado=estado
             ).annotate(
-                can=Count("idart"), sub=(F("can")*F("precio"))
+                can=Count("tecla_id"), sub=(F("can")*F("precio"))
             ).aggregate(
                 total=Sum("sub")
             )["total"]
@@ -120,7 +120,7 @@ def get_estado_ventas_by_cam(request):
             total_vendido = Lineaspedido.objects.filter(
             Q(pedido_id__in=pedidos_camarero) & (Q(estado='P') | Q(estado='C'))
             ).annotate(
-                can=Count('idart'),
+                can=Count('tecla_id'),
                 subtotal=F('can') * F('precio')
             ).aggregate(total=Sum('subtotal'))['total'] or 0
             
@@ -165,15 +165,15 @@ def get_estado_ventas(request):
 
         # Calcular la suma total para cada estado
         suma_total_c = lineas_pedido.filter(estado='C').annotate(
-            can=Count('idart'), sub_total=F('can') * F('precio')
+            can=Count('tecla_id'), sub_total=F('can') * F('precio')
         ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
 
         suma_total_p = lineas_pedido.filter(estado='P').annotate(
-            can=Count('idart'), sub_total=F('can') * F('precio')
+            can=Count('tecla_id'), sub_total=F('can') * F('precio')
         ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
 
         suma_total_n = lineas_pedido.filter(estado='A').annotate(
-            can=Count('idart'), sub_total=F('can') * F('precio')
+            can=Count('tecla_id'), sub_total=F('can') * F('precio')
         ).aggregate(total=Sum('sub_total', output_field=FloatField()))['total'] or 0
 
 

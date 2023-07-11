@@ -25,5 +25,5 @@ from django.urls import  include, path
 
 urlpatterns = [
     path('token/', include('tokenapi.urls')),
-    path('/', include('valle_tpv.urls')),
+    path('', include('valle_tpv.urls')),
 ]

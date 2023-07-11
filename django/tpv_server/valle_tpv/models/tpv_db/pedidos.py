@@ -5,8 +5,8 @@ from datetime import datetime
 from uuid import uuid4
 
 class Servidos(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    linea = models.ForeignKey('Lineaspedido',  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    linea = models.ForeignKey('Lineaspedido',  on_delete=models.CASCADE, db_column='IDLinea') 
 
     class Meta:
         db_table = 'servidos'
@@ -14,10 +14,10 @@ class Servidos(models.Model):
 
 
 class Pedidos(models.Model):
-    id = models.AutoField( primary_key=True)  # Field name made lowercase.
-    hora = models.CharField( max_length=5)  # Field name made lowercase.
-    infmesa = models.ForeignKey('Infmesa',  on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
-    camarero_id = models.IntegerField()  # Field name made lowercase.
+    id = models.AutoField( primary_key=True) 
+    hora = models.CharField( max_length=5) 
+    infmesa = models.ForeignKey('Infmesa',  on_delete=models.CASCADE, db_column='UID') 
+    camarero_id = models.IntegerField() 
     uid_device = models.CharField(max_length=150, default="")
     
    
@@ -95,13 +95,13 @@ ESTADO_CHOICES=[
 
 
 class Lineaspedido(models.Model):
-    id = models.AutoField(primary_key=True)  # Field name made lowercase.
-    pedido = models.ForeignKey('Pedidos',  on_delete=models.CASCADE)  # Field name made lowercase.
-    infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
-    estado = models.CharField( choices=ESTADO_CHOICES,  max_length=1, default="P")  # Field name made lowercase.
-    precio = models.DecimalField( max_digits=6, decimal_places=2)  # Field name made lowercase.
-    descripcion = models.CharField( default=None,  max_length=400, null=True)  # Field name made lowercase.
-    tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True)  # Field name made lowercase.
+    id = models.AutoField(primary_key=True) 
+    pedido = models.ForeignKey('Pedidos',  on_delete=models.CASCADE) 
+    infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID') 
+    estado = models.CharField( choices=ESTADO_CHOICES,  max_length=1, default="P") 
+    precio = models.DecimalField( max_digits=6, decimal_places=2) 
+    descripcion = models.CharField( default=None,  max_length=400, null=True) 
+    tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True) 
     es_compuesta = models.BooleanField("Grupo o simple", default=False)
     can_composicion = models.IntegerField("Cantidad de articulos que lo compone", default=0)
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)

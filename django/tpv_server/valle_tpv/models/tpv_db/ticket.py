@@ -5,14 +5,14 @@ from valle_tpv.tools.ws import comunicar_cambios_devices
 from datetime import datetime
 
 class Ticket(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    fecha = models.DateField(db_column='Fecha')  # Field name made lowercase.
-    camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
-    hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
-    entrega = models.DecimalField(db_column='Entrega', max_digits=6, decimal_places=2)  # Field name made lowercase.
-    uid = models.CharField(db_column='UID', max_length=100)  # Field name made lowercase.
-    mesa = models.CharField(db_column='Mesa', max_length=40)  # Field name made lowercase.
-    url_factura = models.CharField(max_length=140, default="")  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    fecha = models.DateField(db_column='Fecha') 
+    camarero_id = models.IntegerField(db_column='IDCam') 
+    hora = models.CharField(db_column='Hora', max_length=5) 
+    entrega = models.DecimalField(db_column='Entrega', max_digits=6, decimal_places=2) 
+    uid = models.CharField(db_column='UID', max_length=100) 
+    mesa = models.CharField(db_column='Mesa', max_length=40) 
+    url_factura = models.CharField(max_length=140, default="") 
     
     class Meta:
         default_permissions = ()
@@ -70,9 +70,9 @@ class Ticket(models.Model):
 
 
 class Ticketlineas(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE, db_column='IDTicket')  # Field name made lowercase.
-    linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea')  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE, db_column='IDTicket') 
+    linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea') 
 
     class Meta:
         default_permissions = ()

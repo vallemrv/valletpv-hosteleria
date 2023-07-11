@@ -15,8 +15,7 @@
                                 item-value="value" :multiple="field.multiple" return-object
                                 v-model="formObject[field.key]"></v-select>
                             <v-file-input :ref="field.key" hide-details="auto" v-else-if="field.type === 'file'"
-                                :label="field.label" :rules="field.rules" v-model="formObject[field.key]"
-                                @change="(event) => handleFileUpload(event, field.key)"></v-file-input>
+                                :label="field.label" :rules="field.rules" v-model="formObject[field.key]"></v-file-input>
                             <v-text-field :ref="field.key" hide-details="auto" v-else-if="field.type === 'number'"
                                 v-model="formObject[field.key]" :label="field.label" :rules="field.rules"
                                 type="number"></v-text-field>
@@ -50,6 +49,7 @@
   
 <script>
 
+
 export default {
     data() {
         return {
@@ -66,28 +66,7 @@ export default {
         }
     },
     methods: {
-        async handleFileUpload(event, fieldKey) {
-            if (this.storage && this.url.length > 0) {
-
-                const file = event.target.files[0];
-                const storageRef = ref(this.storage, this.url + file.name);
-                try {
-                    const snapshot = await uploadBytes(storageRef, file);
-                    console.log('Archivo subido exitosamente.');
-
-                    // Aquí está el cambio, obtén la URL directamente de storageRef
-                    const downloadURL = await getDownloadURL(storageRef);
-
-                    if (this.formObject[fieldKey].length > 0) {
-                        this.formObject[fieldKey][0] = { name: file.name, url: downloadURL };
-                    }
-
-                } catch (error) {
-                    console.error('Error al subir el archivo:', error);
-                    // Maneja el error de carga del archivo si es necesario
-                }
-            }
-        },
+        // Abrir el diálogo para crear un nuevo registro
         openDialog(formObject, title, fields, storage = null, url = null) {
             this.storage = storage;
             this.url = url;
@@ -106,10 +85,10 @@ export default {
                         if (rule(this.formObject[field.key]) !== true) {
                             valid = false;
                             this.$refs[field.key][0].validate().then(
-                                    (isValid) => {
-                                       valid = valid && isValid;
-                                    }
-                                );
+                                (isValid) => {
+                                    valid = valid && isValid;
+                                }
+                            );
                         }
                     });
                 }
