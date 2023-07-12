@@ -24,12 +24,14 @@
                         <v-row class="mt-2">
                             <v-col cols="4" v-for="(item, index) in storeZonas.items" :key="index">
                                 <v-item :value="item.id" v-slot="{ isSelected, selectedClass, toggle }">
-                                    <v-card :class="['d-flex align-center ', selectedClass]"
-                                        :style="{ backgroundColor: isSelected ? '' : item.color }" dark height="90"
+                                    <v-card :class="['d-flex align-center ']"
+                                        :style="{ backgroundColor: item.color }" dark height="90"
                                         style="width: 100%;" @click="(e) => { toggle(e); sel_zona(item, isSelected) }">
                                         <div class="text-h5 flex-grow-1 text-center ">
                                             {{ item.nombre }}
+                                            <v-icon v-if="isSelected" color="green" >mdi-check</v-icon>
                                         </div>
+                                      
                                     </v-card>
                                 </v-item>
                             </v-col>
@@ -61,10 +63,11 @@
                     <v-row>
                         <v-col cols="4" v-for="(item, index) in storeMesas.items" :key="index">
                             <v-card class="pa-2 d-flex align-center "
-                                :style="{ backgroundColor: mesaSel && mesaSel.id == item.id ? 'blue' : zonaSel.color, width: '100%' }" height="90"
+                                :style="{ backgroundColor: zonaSel.color, width: '100%' }" height="90"
                                 @click="sel_mesa(item)">
                                 <div class="text-h5 text-sm-subtitle-1 flex-grow-1 text-center">
                                     {{ item.nombre }}
+                                    <v-icon color="green" v-if="mesaSel && mesaSel.id == item.id ">mdi-check</v-icon>
                                 </div>
                             </v-card>
                         </v-col>

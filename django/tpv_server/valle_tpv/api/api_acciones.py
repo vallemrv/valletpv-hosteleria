@@ -58,7 +58,7 @@ def update_reg(request):
         reg[k] = v
 
     if hasattr(model, "modifcar_handler"):
-        obj = model.modifcar_handler(filter)
+        obj = model.modifcar_handler(reg, filter)
     else:
         obj = modifcar_handler(model, tb_name, reg, filter)
 

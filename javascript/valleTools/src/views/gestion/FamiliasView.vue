@@ -33,14 +33,19 @@ export default {
         const empresaStore = EmpresaStore();
         const familias = FamiliasStore();
         const receptores = ReceptoresStore();
-        receptores.load(empresaStore);
-        if (receptores.items.length > 0 && empresaStore.empresa) {
-            familias.load(empresaStore, receptores.items);
+        async function load() {
+            await receptores.load(empresaStore);
+            if (receptores.items.length > 0 && empresaStore.empresa) {
+                await familias.load(empresaStore, receptores.items);
+            }
         }
+
         watch(() => receptores.items.length, (e) => {
             familias.empresaStore = empresaStore;
             familias.loadReceptores(receptores.items);
         });
+
+        load();
         return { receptores };
     }
 }

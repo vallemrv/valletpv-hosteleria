@@ -66,7 +66,7 @@ class Secciones(models.Model):
     nombre = models.CharField(max_length=50) 
     color = models.CharField( max_length=11, default="#FFC0CB") 
     orden = models.IntegerField( default=0) 
-    icono = models.FileField(upload_to='iconos_secciones', blank=True, null=True)
+    icono = models.FileField(upload_to='iconos_secciones/', blank=True, null=True)
     
     
     def __unicode__(self):
@@ -77,8 +77,11 @@ class Secciones(models.Model):
     
     def serialize(self):
         data = model_to_dict(self)
-        data["icono_url"] = self.icono.url if self.icono else ""
-        data["icono"] = self.icono.name if self.icono else ""
+        data["icono"] = {
+            'url': self.icono.url if self.icono else "",
+            'name': self.icono.name.replace("iconos_secciones/", "") if self.icono else "",
+            'size': self.icono.size if self.icono else 0,
+        }
         return data
 
     class Meta:

@@ -13,18 +13,26 @@ class Empresa(models.Model):
     localidad = models.CharField(max_length=100,    default="")
     provincia = models.CharField(max_length=100,   default="")
     telefono = models.CharField(max_length=20,  default="")
-    logo = models.ImageField(upload_to="logos", null=True, blank=True)
-    logo_small = models.ImageField(upload_to="logos", null=True, blank=True)
+    logo = models.ImageField(upload_to="logos/", null=True, blank=True)
+    logo_small = models.ImageField(upload_to="logos/", null=True, blank=True)
     email = models.CharField(max_length=100)
     iva = models.FloatField(default=10)
    
 
     def serialize(self):
         data = model_to_dict(self)
-        data["logo_url"] = self.logo.url if self.logo else ""
-        data["logo"] = self.logo.name if self.logo else ""
-        data["logo_small_url"] = self.logo_small.url if self.logo_small else ""
-        data["logo_small"] = self.logo_small.name if self.logo_small else ""
+       
+        data["logo"] = {
+            'name': self.logo.name.replace("logos/","") if self.logo else "",
+            'url': self.logo.url if self.logo else "",
+            'size': self.logo.size if self.logo else 0,
+        }
+
+        data["logo_small"] = {
+            'name': self.logo_small.name.replace("logos/","") if self.logo_small else "",
+            'url': self.logo_small.url if self.logo_small else "",
+            'size': self.logo_small.size if self.logo_small else 0,
+        }
         return data
 
     @staticmethod
@@ -33,11 +41,11 @@ class Empresa(models.Model):
 
 
     @staticmethod
-    def modifcar_handler(data):
+    def modifcar_handler(data, filter=None):
         empresa = Empresa.objects.first()
-        if empresa is None:
+        if not empresa:
             empresa = Empresa()
-
+    
         if "nombre" in data:
             empresa.nombre = data["nombre"]
         if "razonsocial" in data:
@@ -73,7 +81,7 @@ class Empresa(models.Model):
             empresa.iva = data["iva"]
 
         empresa.save()
-        return empresa
+        return empresa.serialize()
 
     def __str__(self):
         return self.nombre

@@ -4,6 +4,7 @@ import CamarerosView from '@/views/gestion/CamarerosView.vue';
 import FamiliasView from '@/views/gestion/FamiliasView.vue';
 import TecladosView from '@/views/gestion/TecladosView.vue';
 import MesasView from '@/views/gestion/MesasView.vue';
+import PreciosView from '@/views/gestion/PreciosView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,11 @@ const router = createRouter({
       path: '/familias',
       component: FamiliasView,
       name: 'familias',
+    },
+    { 
+      path: '/precios',
+      component: PreciosView,
+      name: 'precios',
     },
     {
       path: '/teclados/:seccion_id/:tecla_id/:nivel/',

@@ -4,6 +4,7 @@ import { buildUrl } from "@/api";
 import {
   UPDATE_REG, LISTADO_SIMPLE
 } from "@/endpoints";
+import axios from 'axios';
 
 export const EmpresaStore = defineStore('empresaStore', {
   state: () => ({
@@ -47,30 +48,54 @@ export const EmpresaStore = defineStore('empresaStore', {
       let response = await axios.post(url, params);
       let data = response.data;
       if (data.success) {
-        this.profile = data.regs.length > 0 ? data.regs[0] : this.profile;
+        this.profile = data.regs.length > 0 ? {
+          ...data.regs[0],
+          logo: data.regs[0].logo.url != "" ?
+            [{
+              name: data.regs[0].logo.name,
+              url: buildUrl(this.empresa.url, data.regs[0].logo.url)
+            }] : [],
+          logo_small: data.regs[0].logo_small.url != "" ? [{
+            name: data.regs[0].logo_small.name,
+            url: buildUrl(this.empresa.url, data.regs[0].logo_small.url)
+          }] : [],
+
+        }
+          : this.profile;
       }
     },
     async update(item) {
       if (!this.empresa) return;
 
-      const obj = { tb_name: this.modelo,  filter: {} };    
-      if (item.logo && item.logo.length > 0)   {
+      const obj = { tb_name: this.modelo, filter: {} };
+      if (item.logo && item.logo.length > 0) {
         obj.logo = item.logo[0];
         delete item.logo;
       }
-      if (item.logo_small && item.logo_small.length > 0)   {
+      if (item.logo_small && item.logo_small.length > 0) {
         obj.logo_small = item.logo_small[0];
         delete item.logo_small;
       }
       obj.reg = item;
 
-      
+
       let url = buildUrl(this.empresa.url, UPDATE_REG);
       let params = this.createFormData(obj);
       let response = await axios.post(url, params);
       let data = response.data;
       if (data.success) {
-        this.profile = data;
+        this.profile = data.length > 0 ? {
+          ...data,
+          logo: data.logo.url != "" ? [{
+            name: data.logo.name,
+            url: buildUrl(this.empresa.url, data.logo.url)
+          }] : [],
+          logo_small: data.logo_small.url != "" ? [{
+            name: data.logo_small.name,
+            url: buildUrl(this.empresa.url, data.logo_small.url)
+          }] : [],
+        }
+          : this.profile;
       }
     },
     createFormData(obj) {
@@ -96,6 +121,7 @@ export const EmpresaStore = defineStore('empresaStore', {
     selEmpresa(empresa) {
       this.empresa = empresa;
       localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
+      this.load();
     },
     cargarEmpresas() {
       const empresasJSON = localStorage.getItem('valleges_empresas');
@@ -107,6 +133,7 @@ export const EmpresaStore = defineStore('empresaStore', {
       if (empresaActivaJSON) {
         this.empresa = JSON.parse(empresaActivaJSON);
       }
+      this.load();
     },
     async addEmpresa(nuevaEmpresa, username, password) {
       const token = await getNewToken(username, password, nuevaEmpresa.url);
@@ -120,6 +147,7 @@ export const EmpresaStore = defineStore('empresaStore', {
         localStorage.setItem('valleges_empresas', JSON.stringify(this.empresas));
         localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
         this.error = null;
+        this.load();
       } else {
         this.error = "Datos incorrectos."
       }

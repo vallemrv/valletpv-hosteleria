@@ -56,6 +56,21 @@ export const TeclasStore = defineStore({
       });
       this.items = [];
     },
+    async getTeclaByID(id) {
+      let url = buildUrl(this.empresaStore.empresa.url, LISTADO_SIMPLE);
+      let params = this.empresaStore.createFormData({
+        tb_name: this.modelo,
+        filter: { id: id }
+      });
+      let response = await axios.post(url, params);
+      let data = response.data;
+
+      if (data.success) {
+        return data.regs[0];
+      } else {
+        console.error("Error al cargar las teclas:", data.error);
+      }
+    },
     async setParent(parent_id) {
       if (this.seccion_id === null && parent_id === null) {
         this.parent_id = null;

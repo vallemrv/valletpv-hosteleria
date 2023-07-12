@@ -58,7 +58,6 @@ export const MesasStore = defineStore({
     },
 
     async add(item) {
-      console.log(this.empresaStore)
       item.zona_id = this.zona_id;
       const obj = {
         reg: item,

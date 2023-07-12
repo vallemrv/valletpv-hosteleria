@@ -1,4 +1,5 @@
 
+from valle_tpv.models.tpv_db.empresa import Empresa 
 from valle_tpv.models.tpv_db.mesas import Mesas, Zonas
 from valle_tpv.models.tpv_db.camareros import Camareros
 from valle_tpv.models.tpv_db.historiales import HistorialMensajes, Historialnulos

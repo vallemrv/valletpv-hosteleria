@@ -11,7 +11,9 @@
       
   </v-app>
   
-    
+  <v-snackbar v-model="empresaStore.error" color="error" timeout="3000" top>
+      {{ empresaStore.error }}
+  </v-snackbar>
  
 </template>
   

@@ -1,5 +1,6 @@
 <template>
     <MainToolBar />
+   
     <v-main>
         <v-container >
             <v-card>
@@ -23,19 +24,20 @@
                     <v-item-group selected-class="bg-primary" v-model="seccionSelected">
                         <v-row class="mt-2">
                             <v-col cols="4" v-for="(item, index) in   storeSecciones.items  " :key="index">
-                                <v-item :value="item.id" v-slot="{ isSelected, selectedClass, toggle }">
-                                    <v-card :class="['d-flex align-center ', selectedClass]"
-                                        :style="{ backgroundColor: isSelected ? '' : item.color }" dark height="90"
+                                <v-item :value="item.id" v-slot="{ isSelected, toggle }">
+                                    <v-card :class="['d-flex align-center ']"
+                                        :style="{ backgroundColor: item.color }" dark height="90"
                                         style="width: 100%;" @click="(e) => { toggle(e); sel_seccion(item, isSelected) }">
 
                                         <!-- Si item.icono está presente, muestra la imagen -->
                                         <div class="text-center flex-grow-1">
-                                            <img v-if="item.icono && item.icono.length > 0" width="40" height="40"
-                                                :src="item.icono_url" class="mx-3" :alt="item.icono">
+                                            <img v-if="item.icono && item.icono.length > 0"  width="40"
+                                                :src="item.icono[0].url" class="mx-3" :alt="item.icono[0].name">
                                         </div>
 
                                         <div class="text-h5 flex-grow-1 text-center d-none d-lg-flex">
                                             {{ item.nombre }}
+                                            <v-icon v-if="isSelected" color="green">mdi-check</v-icon>
                                         </div>
                                     </v-card>
                                 </v-item>
@@ -75,11 +77,12 @@
                     <v-row>
                         <v-col cols="4" v-for="(item, index) in storeTeclas.items " :key="index">
                             <v-card class="pa-2 d-flex align-center "
-                                :style="{ backgroundColor: getBackgroud(item), width: '100%' }" height="90"
+                                :style="{ backgroundColor: item.color, width: '100%' }" height="90"
                                 @click="sel_tecla(item)">
 
                                 <div class="text-h5 text-sm-subtitle-1 flex-grow-1 text-center">
                                     {{ item.nombre }}
+                                    <v-icon color="green" v-if="teclaSel && teclaSel.id == item.id ">mdi-check</v-icon>
                                     <p class="text-h6" v-if="item.p1">{{ item.p1 }} €</p>
 
                                 </div>
@@ -160,8 +163,8 @@ export default {
                 seccionSelected.value = Number(props.seccion_id);
                 seccionSel.value = storeSecciones.items.find((item) => item.id == props.seccion_id);
                 if (props.nivel > 0) {
-                    let tecla = await storeTeclas.getItemByID(props.tecla_id);
-                    await storeTeclas.setParent(tecla);
+                    let tecla = await storeTeclas.getTeclaByID(props.tecla_id);
+                    await storeTeclas.setParent(tecla.id);
                     teclaSel.value = tecla
                 } else {
                     await storeTeclas.setSeccion(props.seccion_id);
@@ -205,10 +208,6 @@ export default {
         }
     },
     methods: {
-        getBackgroud(item) {
-            let itemSel = this.nivel > 0 ? this.teclaSelChild : this.teclaSel;
-            return itemSel && itemSel.id == item.id ? 'blue' : item.color
-        },
         showDown(item) {
             //Si en nivel cero comparamas el item con teclaSel si no con teclaSelChild
             let itemSel = this.nivel == 0 ? this.teclaSel : this.teclaSelChild;
@@ -312,7 +311,6 @@ export default {
             this.$refs.editDialog.openDialog(this.seccionSel,
                 "Ecitar Seccion",
                 this.storeSecciones.fields,
-                storage,
                 "/resources/logos/");
         },
         async guardarItem(item) {
