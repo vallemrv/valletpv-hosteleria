@@ -2,7 +2,7 @@ sl_dump.json
 testtpv.back
 aplicaciones_gestion_sueltas
 output.json
-
+.DS_Store
 
 # Directorios y ficheros no necesarios
 .vscode/

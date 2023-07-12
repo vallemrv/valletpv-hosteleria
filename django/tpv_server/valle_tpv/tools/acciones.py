@@ -51,6 +51,11 @@ def modifcar_handler(model, tb_name, reg, filter):
                     if file:
                         if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
                             os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
+                elif "ImageField" in field.__class__.__name__:
+                    file = getattr(obj, k_lower)
+                    if file:
+                        if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
+                            os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
 
                 elif "ForwardManyToOneDescriptor" in field.__class__.__name__:
                     k_lower =  k_lower+"_id"
@@ -77,6 +82,17 @@ def delete_handler(model, tb_name, filter):
     objs = model.objects.filter(**filter)
     result = []
     for obj in objs:
+        for k, v in obj.__dict__.items():
+            if "FileField" in v.__class__.__name__:
+                file = getattr(obj, k)
+                if file:
+                    if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
+                        os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
+            elif "ImageField" in v.__class__.__name__:
+                file = getattr(obj, k)
+                if file:
+                    if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
+                        os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
         result.append(obj.pk)
         obj.delete()
         

@@ -7,7 +7,7 @@
 
 from tokenapi.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Sum
+from django.db.models import Sum, F
 from valle_tpv.tools.impresion import send_mensaje_impresora
 from valle_tpv.tools.mails import send_cierre, getUsuariosMail
 from valle_tpv.models import (Arqueocaja, Cierrecaja, Efectivo, Gastos,

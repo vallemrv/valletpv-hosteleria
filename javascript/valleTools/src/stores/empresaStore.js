@@ -1,13 +1,78 @@
 import { defineStore } from 'pinia';
 import { getNewToken } from "@/api";
+import { buildUrl } from "@/api";
+import {
+  UPDATE_REG, LISTADO_SIMPLE
+} from "@/endpoints";
 
 export const EmpresaStore = defineStore('empresaStore', {
   state: () => ({
     empresa: null,
+    modelo: "empresa",
+    fields: [
+      { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"], },
+      { key: 'razonsocial', label: 'Razón Social', type: 'text', },
+      { key: 'cif', label: 'CIF', type: 'text', },
+      { key: 'direccion', label: 'Dirección', type: 'text', },
+      { key: 'cp', label: 'Código Postal', type: 'text', },
+      { key: 'localidad', label: 'Localidad', type: 'text', },
+      { key: 'provincia', label: 'Provincia', type: 'text', },
+      { key: 'telefono', label: 'Teléfono', type: 'text', },
+      { key: 'email', label: 'Email', type: 'text', },
+      { key: 'iva', label: 'IVA', type: 'number', },
+      { key: 'logo', label: 'Logo', type: 'file', },
+      { key: 'logo_small', label: 'Logo pequeño', type: 'file', },
+    ],
+    profile: {
+      nombre: "",
+      razonsocial: "",
+      cif: "",
+      direccion: "",
+      cp: "",
+      localidad: "",
+      provincia: "",
+      telefono: "",
+      email: "",
+      iva: 10,
+    },
+
     empresas: [],
     error: null
   }),
   actions: {
+    async load() {
+      if (!this.empresa) return;
+      let url = buildUrl(this.empresa.url, LISTADO_SIMPLE);
+      let params = this.createFormData({ tb_name: this.modelo });
+      let response = await axios.post(url, params);
+      let data = response.data;
+      if (data.success) {
+        this.profile = data.regs.length > 0 ? data.regs[0] : this.profile;
+      }
+    },
+    async update(item) {
+      if (!this.empresa) return;
+
+      const obj = { tb_name: this.modelo,  filter: {} };    
+      if (item.logo && item.logo.length > 0)   {
+        obj.logo = item.logo[0];
+        delete item.logo;
+      }
+      if (item.logo_small && item.logo_small.length > 0)   {
+        obj.logo_small = item.logo_small[0];
+        delete item.logo_small;
+      }
+      obj.reg = item;
+
+      
+      let url = buildUrl(this.empresa.url, UPDATE_REG);
+      let params = this.createFormData(obj);
+      let response = await axios.post(url, params);
+      let data = response.data;
+      if (data.success) {
+        this.profile = data;
+      }
+    },
     createFormData(obj) {
       if (!this.empresa) return;
       let formData = new FormData();
@@ -15,12 +80,12 @@ export const EmpresaStore = defineStore('empresaStore', {
       formData.append('token', this.empresa.token);
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
-           if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
-              obj[key] = JSON.stringify(obj[key]);
-            } else if (obj[key] instanceof File) {
-              console.log("Agregando archivo al FormData: ", obj[key]);
-            }
-           formData.append(key, obj[key]);
+          if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
+            obj[key] = JSON.stringify(obj[key]);
+          } else if (obj[key] instanceof File) {
+            console.log("Agregando archivo al FormData: ", obj[key]);
+          }
+          formData.append(key, obj[key]);
         }
       }
       return formData;

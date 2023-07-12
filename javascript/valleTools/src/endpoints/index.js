@@ -10,6 +10,7 @@ export const LISTADO_PERMISOS = BASE_ENDPOINT + 'api/listados/permisos_camareros
 export const ADD_REG = BASE_ENDPOINT + 'api/acciones/add/';
 export const DELETE_REG = BASE_ENDPOINT + 'api/acciones/delete/';
 export const UPDATE_REG = BASE_ENDPOINT + 'api/acciones/update/';
+export const COUNT = BASE_ENDPOINT + 'api/acciones/count/';
 export const EXEC_INST = BASE_ENDPOINT + 'api/acciones/exec_inst/';
 export const USER_PROFILE = BASE_ENDPOINT + 'api/user/get_profile/';
 export const USER_PROFILE_UPDATE = BASE_ENDPOINT + 'api/user/update_profile/';

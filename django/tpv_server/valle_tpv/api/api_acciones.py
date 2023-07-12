@@ -8,6 +8,15 @@ import json
 
 
 @token_required
+def count(request):
+    app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
+    tb_name = request.POST["tb_name"]
+    model = apps.get_model(app_name, tb_name)
+    filter = json.loads(request.POST["filter"]) if "filter" in request.POST else {}
+    count = model.objects.filter(**filter).count()
+    return JsonResponse({"count": count})
+
+@token_required
 def add_reg(request):
     app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
     tb_name = request.POST["tb_name"]
@@ -47,7 +56,7 @@ def update_reg(request):
 
     for k, v in request.FILES.items():
         reg[k] = v
-        
+
     if hasattr(model, "modifcar_handler"):
         obj = model.modifcar_handler(filter)
     else:

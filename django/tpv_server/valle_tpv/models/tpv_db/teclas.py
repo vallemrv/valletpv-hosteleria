@@ -1,9 +1,5 @@
 from django.db import models
 from django.forms.models import model_to_dict
-import os
-from django.conf import settings
-from valle_tpv.tools.ws import send_mensaje_devices
-
 
 class Receptores(models.Model):
     id = models.AutoField(primary_key=True) 
@@ -72,27 +68,6 @@ class Secciones(models.Model):
     orden = models.IntegerField( default=0) 
     icono = models.FileField(upload_to='iconos_secciones', blank=True, null=True)
     
-    @staticmethod
-    def delete_handler(filter):
-        objs = Secciones.objects.filter(**filter)
-        result = []
-        for obj in objs:
-            file = obj.icono
-            if file:
-                if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
-            result.append(obj.pk)
-            obj.delete()
-            
-        update = {
-            "op": "rm",
-            "device": "",
-            "tb": "secciones",
-            "obj": result,
-            "receptor": "devices",
-        }
-        send_mensaje_devices(update) 
-        return result
     
     def __unicode__(self):
         return self.nombre
@@ -147,7 +122,7 @@ class Teclas(models.Model):
         row["p1"] = float(r.p1)
         row["p2"] = float(r.p2)
         row["precio"] = float(r.p1) 
-        row['rgb'] = r.familia.rgb 
+        row['color'] = r.familia.color  if r.familia else "#FFC0CB" 
         row["nombreFam"] = r.familia.nombre
         
         return row

@@ -207,7 +207,7 @@ export default {
     methods: {
         getBackgroud(item) {
             let itemSel = this.nivel > 0 ? this.teclaSelChild : this.teclaSel;
-            return itemSel && itemSel.id == item.id ? 'blue' : item.familia.color
+            return itemSel && itemSel.id == item.id ? 'blue' : item.color
         },
         showDown(item) {
             //Si en nivel cero comparamas el item con teclaSel si no con teclaSelChild
@@ -218,7 +218,7 @@ export default {
             this.nivel += 1;
             if (this.nivel > 1)
                 this.teclaSel = this.teclaSelChild;
-            await this.storeTeclas.setParent(this.teclaSel);
+            await this.storeTeclas.setParent(this.teclaSel.id);
             this.teclaSelChild = null;
             this.$router.push("/teclados/" + this.seccionSel.id + "/" + this.teclaSel.id + "/" + this.nivel);
         },
