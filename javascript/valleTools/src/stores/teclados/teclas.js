@@ -11,6 +11,7 @@ export const TeclasStore = defineStore({
   state: () => ({
     seccion_id: null,
     parent_id: null,
+    empresaStore: null,
     modelo: "teclas",
     // Array de teclas
     items: [],

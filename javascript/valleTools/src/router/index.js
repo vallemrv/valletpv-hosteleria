@@ -25,7 +25,13 @@ const router = createRouter({
       name: 'familias',
     },
     { 
-      path: '/modificar',
+      path: '/modificar/:tipo',
+      component: ModificarTeclas,
+      name: 'modificar_tipo',
+      props: true
+    },
+    { 
+      path: '/modificar/',
       component: ModificarTeclas,
       name: 'modificar',
     },

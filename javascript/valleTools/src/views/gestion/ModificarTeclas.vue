@@ -1,12 +1,12 @@
 <template>
     <MainToolbar titulo="Modificar teclas">
-        <v-icon class="pl-2" @click="tipo = 'precios'">mdi-cash</v-icon>
-        <v-icon class="pl-2" @click="tipo = 'texto'">mdi-text-box-multiple-outline</v-icon>
-        <v-icon class="pl-2" @click="tipo = 'tag'">mdi-magnify</v-icon>
+        <v-icon class="pl-2" @click="$router.push('/modificar/precios')">mdi-cash</v-icon>
+        <v-icon class="pl-2" @click="$router.push('/modificar/texto')">mdi-text-box-multiple-outline</v-icon>
+        <v-icon class="pl-2" @click="$router.push('/modificar/tag')">mdi-magnify</v-icon>
     </MainToolbar>
     <v-main>
         <v-container>
-            <BuscadorTeclas :titulo="datos.titulo" />
+            <BuscadorTeclas :titulo="datos ? datos.titulo: ''" />
             <v-expansion-panels class="mt-4">
                 <v-expansion-panel v-for="item in store.items" :key="item.id" @click="fetchChildren(item)">
                     <v-expansion-panel-title>
@@ -22,9 +22,9 @@
                                     </v-toolbar-title>
                                 </v-toolbar>
                             </v-col>
-                            <v-col  v-for="(field, ns) in datos.fields" :key="ns" cols="4">
-                                <EditFloatVue :value="item" :field="field" :titulo="datos.labels[ns]" :type="datos.types[ns]"
-                                    @change="change" />
+                            <v-col v-for="(field, ns) in datos.fields" :key="ns" cols="4">
+                                <EditFloatVue :value="item" :field="field" :titulo="datos.labels[ns]"
+                                    :type="datos.types[ns]" @change="change" />
                             </v-col>
 
                         </v-row>
@@ -61,17 +61,21 @@ import { TeclasStore } from "@/stores/teclados/teclas.js";
 import { EmpresaStore } from "@/stores/empresaStore.js";
 import BuscadorTeclas from "../../components/tools/BuscadorTeclas.vue";
 export default {
+    props: {
+        tipo: {
+            type: String,
+            default: "precios",
+        },
+    },
     setup() {
         const store = TeclasStore();
         const empresaStore = EmpresaStore();
         store.loadFamilias(empresaStore);
-        store.load({ parent_id: null });
         return { store }
     },
     data() {
         return {
             children: [],
-            tipo: 'precios',
             precios: {
                 titulo: 'Precios',
                 fields: ['p1', 'p2', 'incremento'],
@@ -101,11 +105,13 @@ export default {
     computed: {
         datos() {
             const datos = this[this.tipo];
+            if (this.store.empresaStore) {
+                this.store.load({ parent_id: null });
+            }
             return datos
         },
     },
     methods: {
-
         change(item) {
             this.store.update(item);
         },
@@ -114,6 +120,9 @@ export default {
                 this.children = await this.store.getChilds(item.id);
             }
         }
+    },
+    unmounted() {
+        this.store.items = [];
     }
 }
 </script>

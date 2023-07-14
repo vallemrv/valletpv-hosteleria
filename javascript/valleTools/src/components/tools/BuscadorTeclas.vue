@@ -2,7 +2,7 @@
     <v-toolbar>
                 <v-row>
                     <v-col cols="8">
-                        <v-toolbar-title class="ml-3 mt-3">Cambiar precios</v-toolbar-title>
+                        <v-toolbar-title class="ml-3 mt-3">Cambiar {{ titulo }}</v-toolbar-title>
                     </v-col>
                     <v-col cols="4">
                         <v-text-field v-model="str_buscar" @change.prepend="buscar" variant="outlined" hide-details="auto"
@@ -18,6 +18,7 @@
 <script>
 import {TeclasStore} from "@/stores/teclados/teclas.js";
 export default{
+    props:['titulo'],
     setup(){
         const store = TeclasStore();
         return { store }

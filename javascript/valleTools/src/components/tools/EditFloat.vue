@@ -3,9 +3,10 @@
     <v-row class="pa-2">
       <v-col cols="12" class="text-caption pa-0 ma-0">{{displayName}}</v-col>
       <v-col cols="12" class="pa-0 ma-0">
-        <v-menu v-model="menuVisible" :close-on-content-click="false" location="end">
+        <v-menu v-model="menuVisible" :close-on-content-click="false" width="200px">
           <template #activator="{ props }">
-            <v-btn text block v-bind="props" @clickk.stop="menuVisible = true">{{ tempValue }}</v-btn>
+            <v-btn text block v-bind="props" class="text-none" >
+              {{ tempValue }}</v-btn>
           </template>
           <v-card>
             <v-card-text>
