@@ -21,8 +21,7 @@
     
   </v-navigation-drawer>
 
-
-  <div class="div-fixed" v-if="!drawer">
+  <div style="position: fixed; bottom: 20px; right: 20px;" v-if="!drawer">
     <v-btn relative elevation="8" icon large color="primary" @click="drawer = true">
       <v-icon>mdi-menu</v-icon>
     </v-btn>

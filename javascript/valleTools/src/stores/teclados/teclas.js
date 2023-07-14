@@ -24,9 +24,9 @@ export const TeclasStore = defineStore({
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
       { key: 'descripcion_receptor', label: 'Descripción Receptor', type: 'text', },
       { key: 'descripcion_ticket', label: 'Descripción Ticket', type: 'text', },
-      { key: 'p1', label: 'P1', type: 'number' },
-      { key: 'p2', label: 'P2', type: 'number' },
-      { key: 'p3', label: 'P3', type: 'number' },
+      { key: 'p1', label: 'Precio 1', type: 'number' },
+      { key: 'p2', label: 'Precio 2', type: 'number' },
+      { key: 'incremento', label: 'Incremento', type: 'number' },
       { key: 'orden', label: 'Orden', type: 'number', },
       { key: 'familia', label: 'Familia', options: [], type: "select", rules: [v => !!v || "La familia es requerida"] },
       { key: 'tag', label: 'Tag', type: 'text', },
@@ -35,7 +35,7 @@ export const TeclasStore = defineStore({
     newItem: {
       p1: 0,
       p2: 0,
-      p3: 0,
+      incremento: 0,
       nombre: "",
       orden: 0,
       tag: "",
@@ -86,11 +86,27 @@ export const TeclasStore = defineStore({
         this.items = [];
         return;
       }
-
       this.seccion_id = seccion_id;
       await this.load({ seccion_id: seccion_id });
     },
-    async load(filter) {
+    async getChilds(id) {
+      let url = buildUrl(this.empresaStore.empresa.url, LISTADO_SIMPLE);
+      let params = this.empresaStore.createFormData({
+        tb_name: this.modelo,
+        filter:  { parent_id: id }
+      });
+      let response = await axios.post(url, params);
+      let data = response.data;
+      let childs = [];
+      if (data.success) {
+        childs = data.regs.map((item) => {
+          item.familia = this.fields[7].options.find((f) => f.value === item.familia);
+          return item;
+        }).sort((a, b) => b.orden - a.orden);
+      }
+      return childs;
+    },
+    async load(filter={}) {
       this.items = [];
       let url = buildUrl(this.empresaStore.empresa.url, LISTADO_SIMPLE);
       let params = this.empresaStore.createFormData({
@@ -101,18 +117,11 @@ export const TeclasStore = defineStore({
       let data = response.data;
 
       if (data.success) {
-        this.items = data.regs.map(async (item) => {
-          const url_count = buildUrl(this.empresaStore.empresa.url, COUNT);
-          const params_count = this.empresaStore.createFormData({
-            tb_name: this.modelo,
-            filter: { parent_id: item.id }
-          });
-          const response_count = await axios.post(url_count, params_count);
-          item.child = response_count.data.count;
+        this.items = data.regs.map((item) => {
           item.familia = this.fields[7].options.find((f) => f.value === item.familia);
           return item;
         }).sort((a, b) => b.orden - a.orden);
-        this.items = await Promise.all(this.items);
+        
       } else {
         console.error("Error al cargar las teclas:", data.error);
       }
@@ -170,16 +179,9 @@ export const TeclasStore = defineStore({
       }
       const index = this.items.findIndex((i) => i.id === item.id);
       const newItems = [...this.items];
-      const url_count = buildUrl(this.empresaStore.empresa.url, COUNT);
-      const params_count = this.empresaStore.createFormData({
-        tb_name: this.modelo,
-        filter: { parent_id: response.data.id }
-      });
-      const response_count = await axios.post(url_count, params_count);
       newItems[index] = {
         ...response.data,
         familia: this.fields[7].options.find((f) => f.value === item.familia_id),
-        child: response_count.data.count,
       };
       this.items = newItems.sort((a, b) => b.orden - a.orden);
     },

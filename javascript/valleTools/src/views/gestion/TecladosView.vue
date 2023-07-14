@@ -1,5 +1,5 @@
 <template>
-    <MainToolBar />
+    <MainToolBar titulo="Teclados"/>
    
     <v-main>
         <v-container >

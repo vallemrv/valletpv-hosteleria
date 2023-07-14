@@ -1,5 +1,5 @@
 <template>
-    <MainToolBar />
+    <MainToolBar  titulo="Mesas"/>
     <v-main>
         <v-container>
             <v-card>

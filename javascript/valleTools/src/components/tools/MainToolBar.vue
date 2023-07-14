@@ -1,7 +1,10 @@
 <template>
     <v-app-bar color="indigo darken-1">
-        <v-toolbar-title>{{ empStore.getDisplayName() }}</v-toolbar-title>
-        <v-toolbar-subtitle>{{ titulo }}</v-toolbar-subtitle>
+        <v-toolbar-title>
+            {{ empStore.getDisplayName() }}
+            <p class="text-caption">{{ titulo }}</p>
+        </v-toolbar-title>
+        
         <v-spacer></v-spacer>
         <slot></slot>
         <v-menu>
@@ -33,7 +36,7 @@ import { EmpresaStore } from '@/stores/empresaStore';
 import DialogFormDinamico from '@/components/dialogs/DialogFormDinamico.vue';
 
 export default {
-    props:["titulo"],
+    props:['titulo'],
     components: {
         DialogFormDinamico
     },

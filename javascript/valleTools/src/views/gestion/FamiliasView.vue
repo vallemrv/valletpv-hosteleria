@@ -1,5 +1,5 @@
 <template>
-    <MainToolBar />
+    <MainToolBar  titulo="Familias y receptores"/>
     <v-main>
         <v-container>
             <v-row>

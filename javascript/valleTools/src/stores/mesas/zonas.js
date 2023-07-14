@@ -23,7 +23,7 @@ export const ZonasStore = defineStore({
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
       { key: 'color', label: 'Color', type: 'color', rules: [v => !!v || "El color es requerido"] },
       { key: 'orden', label: 'Orden', type: 'number' },
-      { key: 'tarifa', label: 'Tarifa', type: 'number', rules: [v => [1, 2, 3].includes(Number(v)) || 'La tarifa solo puede ser 1, 2 o 3'] },
+      { key: 'tarifa', label: 'Tarifa', type: 'number', rules: [v => [1, 2].includes(Number(v)) || 'La tarifa solo puede ser 1, 2'] },
     ],
     // Nuevo elemento
     newItem: {

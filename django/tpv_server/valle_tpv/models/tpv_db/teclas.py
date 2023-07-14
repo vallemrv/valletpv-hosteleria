@@ -108,9 +108,9 @@ class Sugerencias(models.Model):
 class Teclas(models.Model):
     id = models.AutoField(primary_key=True) 
     nombre = models.CharField( max_length=50) 
-    p1 = models.DecimalField( max_digits=6, decimal_places=2) 
-    p2 = models.DecimalField(max_digits=6, decimal_places=2) 
-    p2 = models.DecimalField( max_digits=6, decimal_places=2) 
+    p1 = models.DecimalField( max_digits=6, decimal_places=2, default=0) 
+    p2 = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    incremento = models.DecimalField( max_digits=6, decimal_places=2, default=0)
     orden = models.IntegerField(default=0, blank=True) 
     familia = models.ForeignKey(Familias,  on_delete=models.SET_NULL, null=True, blank=True) 
     tag = models.CharField( max_length=100, default='', blank=True) 
@@ -124,9 +124,12 @@ class Teclas(models.Model):
         row = model_to_dict(r)
         row["p1"] = float(r.p1)
         row["p2"] = float(r.p2)
+        row["incremento"] = float(r.incremento)
         row["precio"] = float(r.p1) 
         row['color'] = r.familia.color  if r.familia else "#FFC0CB" 
-        row["nombreFam"] = r.familia.nombre
+        row["nombreFam"] = r.familia.nombre if r.familia else None
+        row["seccion_nombre"] = r.seccion.nombre if r.seccion else None
+        row["child"] = Teclas.objects.filter(parent=r.id).count()
         
         return row
    

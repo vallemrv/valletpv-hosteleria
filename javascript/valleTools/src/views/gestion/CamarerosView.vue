@@ -1,5 +1,5 @@
 <template>
-    <MainToolBar titulo="Camareros"/>
+    <MainToolBar titulo="Camareros" />
     <v-main>
         <v-container>
             <v-row>

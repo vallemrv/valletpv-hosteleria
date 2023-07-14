@@ -7,7 +7,7 @@ export const ConfigStore = defineStore({
         listaComponentes:[
             { icon: "mdi-store", titulo: "Dash Board", name: "dashBoard"},
             { icon: "mdi-account", titulo: "Camareros", name: "camareros"},
-            { icon: "mdi-cash", titulo: "Precios", name: "precios"},
+            { icon: "mdi-pencil", titulo: "Modificar Teclas", name: "modificar"},
             { icon: "mdi-keyboard", titulo: "Teclados", name: "TecladosView"},
             { icon: "mdi-package-variant-closed", titulo: "Familias", name: "familias" },
             { 

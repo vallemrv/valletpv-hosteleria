@@ -1,5 +1,5 @@
 <template>
-      <MainToolBar >
+      <MainToolBar titulo="Dash Board" >
         <v-btn icon @click="addEmpresa">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
