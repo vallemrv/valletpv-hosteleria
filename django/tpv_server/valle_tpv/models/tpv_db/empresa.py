@@ -2,7 +2,54 @@
 import django.db.models as models
 from django.forms.models import model_to_dict
 from django.conf import settings
+from uuid import uuid4
 import os
+import random
+
+
+class Dispositivos(models.Model):
+    nombre = models.CharField(max_length=100, default="")
+    UID = models.CharField(max_length=100, default="")
+    codigo = models.CharField(max_length=6, default="")
+    descripcion = models.CharField(max_length=100, default="")
+
+    def serialize(self):
+        return {
+            "nombre": self.nombre,
+            "UID": self.UID,
+            "codigo": self.codigo,
+            "descripcion": self.descripcion,
+        }
+
+    def __str__(self):
+        return self.nombre
+    
+    def __unicode__(self):
+        return self.nombre
+    
+    @staticmethod
+    def add_handler(data):
+        dispositivo = Dispositivos()
+        dispositivo.nombre = data["nombre"]
+        #crear un codigo de UID unico para cada dispositivo
+        dispositivo.UID = uuid4().hex
+        
+       
+        #buscar un codigo de 6 digitos que no exista
+        codigo = ""
+        while True:
+            codigo = str(random.randint(100000, 999999))
+            if not Dispositivos.objects.filter(codigo=codigo).exists():
+                break
+        dispositivo.codigo = codigo
+        dispositivo.descripcion = data["descripcion"]
+        dispositivo.save()
+        return dispositivo.serialize()
+
+    
+    class Meta:
+        db_table = 'dispositivos'
+        ordering = ['-id']
 
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100, default="")

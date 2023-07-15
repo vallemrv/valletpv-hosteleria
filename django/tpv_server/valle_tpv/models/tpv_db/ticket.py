@@ -5,13 +5,13 @@ from valle_tpv.tools.ws import comunicar_cambios_devices
 from datetime import datetime
 
 class Ticket(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True) 
-    fecha = models.DateField(db_column='Fecha') 
-    camarero_id = models.IntegerField(db_column='IDCam') 
-    hora = models.CharField(db_column='Hora', max_length=5) 
-    entrega = models.DecimalField(db_column='Entrega', max_digits=6, decimal_places=2) 
-    uid = models.CharField(db_column='UID', max_length=100) 
-    mesa = models.CharField(db_column='Mesa', max_length=40) 
+    id = models.AutoField(primary_key=True) 
+    fecha = models.DateField() 
+    camarero = models.ForeignKey("Camareros", on_delete=models.SET_NULL, null=True, blank=True) 
+    hora = models.CharField( max_length=5) 
+    entrega = models.DecimalField( max_digits=6, decimal_places=2) 
+    uid = models.CharField( max_length=100) 
+    mesa = models.CharField( max_length=40) 
     url_factura = models.CharField(max_length=140, default="") 
     
     class Meta:
@@ -70,9 +70,9 @@ class Ticket(models.Model):
 
 
 class Ticketlineas(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True) 
-    ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE, db_column='IDTicket') 
-    linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE, db_column='IDLinea') 
+    id = models.AutoField( primary_key=True) 
+    ticket = models.ForeignKey(Ticket,  on_delete=models.CASCADE) 
+    linea = models.ForeignKey(Lineaspedido,  on_delete=models.CASCADE) 
 
     class Meta:
         default_permissions = ()

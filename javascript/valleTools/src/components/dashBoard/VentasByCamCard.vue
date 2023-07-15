@@ -91,7 +91,6 @@ export default {
   },
   async mounted() {
     await this.fetchData();
-
     // Actualizar datos cada 20 segundos (20000 ms)
     //this.interval = setInterval(this.fetchData, 20000);
   },

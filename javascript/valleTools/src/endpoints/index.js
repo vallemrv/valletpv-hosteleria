@@ -1,5 +1,5 @@
 export const BASE_ENDPOINT = '/';
-export const NEWTOKEN = BASE_ENDPOINT + 'token/new.json';
+export const NEWTOKEN =  '/token/new.json';
 export const VENTAS_BY_ARTICULO = BASE_ENDPOINT + 'api/dash_board/articulos_vendidos/';
 export const VENTAS_BY_CAMARERO = BASE_ENDPOINT + 'api/dash_board/get_estado_ventas_by_cam/';
 export const VENTAS_BY_INTERVALOS = BASE_ENDPOINT + 'api/dash_board/ventas_por_intervalos/';
@@ -14,3 +14,4 @@ export const COUNT = BASE_ENDPOINT + 'api/acciones/count/';
 export const EXEC_INST = BASE_ENDPOINT + 'api/acciones/exec_inst/';
 export const USER_PROFILE = BASE_ENDPOINT + 'api/user/get_profile/';
 export const USER_PROFILE_UPDATE = BASE_ENDPOINT + 'api/user/update_profile/';
+export const USER_CREATE= BASE_ENDPOINT + 'api/user/create/';
