@@ -5,7 +5,7 @@ import FamiliasView from '@/views/gestion/FamiliasView.vue';
 import TecladosView from '@/views/gestion/TecladosView.vue';
 import MesasView from '@/views/gestion/MesasView.vue';
 import ModificarTeclas from '@/views/gestion/ModificarTeclas.vue';
-import Profile from '@/views/Profile.vue';
+import Profile from '@/views/ProfileUserView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

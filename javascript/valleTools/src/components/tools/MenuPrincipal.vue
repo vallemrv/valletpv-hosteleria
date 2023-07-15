@@ -15,10 +15,35 @@
 
       <v-spacer></v-spacer>
 
+    <template v-slot:append>
+      <v-menu offset-y>
+        <template v-slot:activator="{ props }">
+          <div class="pa-2">
+            <v-btn color="primary" block>
+              <v-icon>mdi-account</v-icon>
+              <div v-if="isExpanded" v-bind="props">{{ userStore.getDisplayName() }} </div>
+            </v-btn>
+          </div>
+        </template>
+        <v-list>
+          <v-list-item @click="goToProfile">
+            <v-list-item-title>Profile</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="logout">
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
+    </template>
     </v-list>
 
-    
+
+  
+
+
+
+
   </v-navigation-drawer>
 
   <div style="position: fixed; bottom: 20px; right: 20px;" v-if="!drawer">
