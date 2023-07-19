@@ -15,7 +15,7 @@ def permissions_list(request):
 @token_required
 def listado_compuesto(request):
     tbs = json.loads(request.POST["tbs"])
-    app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
+    app_name = request.POST.get("app", "valle_tpv")
    
     tablas = []
     for modelo in tbs:
@@ -32,20 +32,26 @@ def listado_compuesto(request):
 
 @token_required
 def listado(request):
+    
     app_name = request.POST.get("app", "valle_tpv")
     tb_name = request.POST.get("tb_name")
     filter = json.loads(request.POST.get("filter", "{}"))
     limit = int(request.POST.get("limit", -1))
     offset = int(request.POST.get("offset", 0))
     
-    model = apps.get_model(app_name, tb_name)
-    objs = model.objects.filter(**filter)[offset:offset+limit] if limit > 0 else model.objects.filter(**filter)
-    
-    regs = []
-    for obj in objs:
-        if hasattr(obj, "serialize"):
-            regs.append(obj.serialize())
-        else:
-            regs.append(model_to_dict(obj))
+    try:
+        model = apps.get_model(app_name, tb_name)
+        objs = model.objects.filter(**filter)[offset:offset+limit] if limit > 0 else model.objects.filter(**filter)
         
+        regs = []
+        for obj in objs:
+            if hasattr(obj, "serialize"):
+                regs.append(obj.serialize())
+            else:
+                regs.append(model_to_dict(obj))
+
+    except Exception as e:
+        print(app_name, tb_name, e)
+        regs = []
+            
     return JsonResponse({"tb": tb_name, "regs": regs})

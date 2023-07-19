@@ -8,16 +8,19 @@
                 <v-container>
                     <v-row>
                         <v-col cols="12" sm="6" v-for="field in  fields " :key="field.key">
-                            <v-text-field :ref="field.key" hide-details="auto" v-if="field.type === 'text'"
-                                v-model="formObject[field.key]" :label="field.label" :rules="field.rules"></v-text-field>
+                            <v-text-field :ref="field.key" hide-details="auto"
+                                 v-if="['text', 'number', 'password', 'time'].includes(field.type)"
+                                :type="field.type" v-model="formObject[field.key]" :label="field.label"
+                                :rules="field.rules"></v-text-field>
                             <v-select :ref="field.key" v-if="field.type === 'select'" hide-details="auto"
                                 :items="field.options" :label="field.label" :rules="field.rules" item-title="text"
                                 item-value="value" :multiple="field.multiple" return-object
                                 v-model="formObject[field.key]"></v-select>
                             <div v-else-if="field.type === 'file'">
                                 <v-row>
-                                    <v-col cols="12" v-if="formObject[field.key] && formObject[field.key].length > 0">  
-                                        <v-img :src="formObject[field.key][0].url" :alt="formObject[field.key].name" height="40"></v-img>
+                                    <v-col cols="12" v-if="formObject[field.key] && formObject[field.key].length > 0">
+                                        <v-img :src="formObject[field.key][0].url" :alt="formObject[field.key].name"
+                                            height="40"></v-img>
                                     </v-col>
                                     <v-col cols="12">
                                         <v-file-input :ref="field.key" hide-details="auto" :label="field.label"
@@ -25,15 +28,10 @@
 
                                         </v-file-input>
                                     </v-col>
-                                    
+
                                 </v-row>
 
                             </div>
-
-
-                            <v-text-field :ref="field.key" hide-details="auto" v-else-if="field.type === 'number'"
-                                v-model="formObject[field.key]" :label="field.label" :rules="field.rules"
-                                type="number"></v-text-field>
                             <v-checkbox :ref="field.key" hide-details="auto" v-else-if="field.type === 'checkbox'"
                                 v-model="formObject[field.key]" :label="field.label" :rules="field.rules"
                                 :value="field.value"></v-checkbox>

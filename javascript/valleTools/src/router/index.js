@@ -5,7 +5,9 @@ import FamiliasView from '@/views/gestion/FamiliasView.vue';
 import TecladosView from '@/views/gestion/TecladosView.vue';
 import MesasView from '@/views/gestion/MesasView.vue';
 import ModificarTeclas from '@/views/gestion/ModificarTeclas.vue';
-import Profile from '@/views/ProfileUserView.vue';
+import UserView from '@/views/UserView.vue'
+import DispositivosView from '@/views/DispositivosView.vue';
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -77,11 +79,16 @@ const router = createRouter({
       component: MesasView,
     },
     {
-      path: '/profile',
-      name: 'Profile',
-      component: Profile,
+      path: '/usuarios',
+      name: 'usuarios',
+      component: UserView,
+    },
+    {
+      path: '/dispositivos',
+      name: 'dispositivos',
+      component: DispositivosView,
+    },
 
-    }
     
   ]
 })

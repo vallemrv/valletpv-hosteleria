@@ -14,8 +14,9 @@ export const ConfigStore = defineStore({
                 icon: "mdi-table-furniture", 
                 titulo: "Mesas", 
                 name: "MesasView" 
-              }
-              
+              },
+            { icon: "mdi-devices", titulo: "Dispositivos", name: "dispositivos" } ,
+            { icon: "mdi-account-multiple", titulo: "Usuarios", name: "usuarios" },
         ]
     }),
     actions: {

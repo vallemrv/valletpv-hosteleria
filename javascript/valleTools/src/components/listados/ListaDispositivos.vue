@@ -3,7 +3,7 @@
 </template>
 <script>
 import TablasDatos from '@/components/tools/TablasDatos.vue';
-import { CamarerosStore } from '@/stores/camareros';
+import { UserStore } from '@/stores/usuarios';
 import { EmpresaStore } from '@/stores/empresaStore';
 import { watch } from 'vue';
 export default {
@@ -11,18 +11,18 @@ export default {
         TablasDatos
     },
     setup() {
-        const store = CamarerosStore();
+        const store = UserStore();
         const empresaStore = EmpresaStore();
         watch(() => empresaStore.empresa, (empresa) => {
             if(empresa)
-                store.load(empresaStore);
+                store.loadDispositivos(empresaStore);
         });
         
         return { store, empresaStore };
     },
     mounted() {
         if(this.empresaStore.empresa && this.store.items.length == 0){
-            this.store.load(this.empresaStore);
+            this.store.loadDispositivos(this.empresaStore);
         }
     },
     

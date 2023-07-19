@@ -14,40 +14,25 @@
         :title="item.titulo" @click="navigateToRoute(item)"></v-list-item>
 
       <v-spacer></v-spacer>
-
-    <template v-slot:append>
-      <v-menu offset-y>
-        <template v-slot:activator="{ props }">
-          <div class="pa-2">
-            <v-btn color="primary" block>
-              <v-icon>mdi-account</v-icon>
-              <div v-if="isExpanded" v-bind="props">{{ userStore.getDisplayName() }} </div>
-            </v-btn>
-          </div>
-        </template>
-        <v-list>
-          <v-list-item @click="goToProfile">
-            <v-list-item-title>Profile</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="logout">
-            <v-list-item-title>Logout</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-
-    </template>
     </v-list>
 
-
-  
-
-
-
+    <template v-slot:append>
+    
+        
+          <div class="pa-2">
+            <v-btn color="primary" @click="update()" block>
+              <v-icon>mdi-account</v-icon>
+              <div v-if="isExpanded">{{ empresaStore.getUserName() }} </div>
+            </v-btn>
+          </div>
+       
+        
+    </template>
 
   </v-navigation-drawer>
-
+  <DialogFormDinamico ref="dialogFormDinamico" @save="save"/>
   <div style="position: fixed; bottom: 20px; right: 20px;" v-if="!drawer">
-    <v-btn relative elevation="8" icon large color="primary" @click="drawer = true">
+    <v-btn relative elevation="8" icon large color="primary" @click="drawer = true;">
       <v-icon>mdi-menu</v-icon>
     </v-btn>
   </div>
@@ -55,18 +40,25 @@
   
 <script>
 import { EmpresaStore } from '@/stores/empresaStore';
+import { UserStore } from '@/stores/usuarios';
 import { ConfigStore } from '@/stores/configStore';
-
+import DialogFormDinamico from '@/components/dialogs/DialogFormDinamico.vue';
 
 export default {
+  components: {
+    DialogFormDinamico
+  },
   setup() {
     const empresaStore = EmpresaStore();
     const configStore = ConfigStore();
+    const usuarios = UserStore();
+    usuarios.empresaStore = empresaStore;
 
     return {
       configStore,
       empresaStore,
-      isExpanded: false
+      isExpanded: false,
+      usuarios,
     };
   },
   data() {
@@ -80,6 +72,20 @@ export default {
     }
   },
   methods: {
+    update(){
+      this.$refs.dialogFormDinamico.openDialog(
+        this.empresaStore.getUserProfile(),
+        "Modifiar usuario",
+        this.usuarios.fields
+      )
+    },
+    async save(item){
+      const data =  await this.usuarios.update(item);
+      const profile = data.data.profile;
+      const user = data.data.user; 
+      const token = data.data.token;
+      this.empresaStore.setUserProfile(profile, user, token);
+    },
     navigateToRoute(item) {
       if (item.name) {
         this.$router.push({ name: item.name, params: item.params });

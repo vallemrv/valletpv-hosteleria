@@ -2,7 +2,9 @@ import { defineStore } from 'pinia';
 import { getNewToken } from "@/api";
 import { buildUrl } from "@/api";
 import {
-  UPDATE_REG, LISTADO_SIMPLE
+  UPDATE_REG, 
+  LISTADO_SIMPLE,
+  USER_PROFILE
 } from "@/endpoints";
 import axios from 'axios';
 
@@ -36,13 +38,58 @@ export const EmpresaStore = defineStore('empresaStore', {
       email: "",
       iva: 10,
     },
-
+    userProfile: null,
     empresas: [],
     error: null
   }),
   actions: {
+    upToken(token) {
+      this.empresa.token = token.token;
+      this.empresa.user = token.user;
+      const index = this.empresas.findIndex((emp) => emp.id === this.empresa.id);
+      this.empresas[index] = this.empresa;
+      localStorage.setItem('valleges_empresas', JSON.stringify(this.empresas));
+      localStorage.setItem('valleges_empresa', JSON.stringify(this.empresa));
+    },
+    getUserProfile(){
+      return {
+        ...this.userProfile,
+        hora_ini: this.userProfile.horario.hora_ini ,
+        hora_fin: this.userProfile.horario.hora_fin ,
+        password: "",
+      }
+    },
+    setUserProfile(item, user, token){ 
+      this.userProfile = item;
+      this.userProfile.horario = {
+        hora_ini: item.horario.hora_ini,
+        hora_fin: item.horario.hora_fin,
+      }
+      this.upToken({user, token});
+    },
+    getUserName(){
+      let user_name = "";
+       if (this.userProfile)
+        user_name =  !this.userProfile.first_name ? this.userProfile.username :
+                 this.userProfile.first_name + " " + this.userProfile.last_name;
+        
+       return user_name;
+    },
+    async loadUserProfile() {
+      if (!this.empresa) return;
+      let url = buildUrl(this.empresa.url, USER_PROFILE);
+      let params = this.createFormData();
+      let response = await axios.post(url, params);
+      let data = response.data;
+      if (data.success) {
+        this.userProfile= {...data};
+      }
+      
+    },
+
     async load() {
       if (!this.empresa) return;
+      this.loadUserProfile();
       let url = buildUrl(this.empresa.url, LISTADO_SIMPLE);
       let params = this.createFormData({ tb_name: this.modelo });
       let response = await axios.post(url, params);
@@ -77,7 +124,6 @@ export const EmpresaStore = defineStore('empresaStore', {
         delete item.logo_small;
       }
       obj.reg = item;
-
 
       let url = buildUrl(this.empresa.url, UPDATE_REG);
       let params = this.createFormData(obj);

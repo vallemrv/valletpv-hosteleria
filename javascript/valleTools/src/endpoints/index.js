@@ -15,3 +15,4 @@ export const EXEC_INST = BASE_ENDPOINT + 'api/acciones/exec_inst/';
 export const USER_PROFILE = BASE_ENDPOINT + 'api/user/get_profile/';
 export const USER_PROFILE_UPDATE = BASE_ENDPOINT + 'api/user/update_profile/';
 export const USER_CREATE= BASE_ENDPOINT + 'api/user/create/';
+export const USER_GET_LIST = BASE_ENDPOINT + 'api/user/get_list/';
