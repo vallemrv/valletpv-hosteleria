@@ -87,16 +87,22 @@ export const UserStore = defineStore({
             let data = response.data;
             if (data.success) {
                 this.items.push({...data, hora_ini: item.horario.hora_ini, hora_fin: item.horario.hora_fin });
+            }else{
+                return data.errors
             }
         },
         async delete(item) {
             let url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
-            let params = this.empresaStore.createFormData({ tb_name: this.modelo, reg: item });
+            let params = this.empresaStore.createFormData({app:'auth', tb_name: 'User', filter: {
+                id: item.id
+            } });
             let response = await axios.post(url, params);
             let data = response.data;
             if (data.success) {
                 const index = this.items.findIndex(p => p.id === item.id);
                 this.items.splice(index, 1);
+            }else{
+                return data.errors
             }
         },
     }

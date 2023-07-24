@@ -90,7 +90,8 @@ export const CamarerosStore = defineStore({
             }
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
-            await axios.post(url, params);
+            const response  = await axios.post(url, params);
+            
         },
         async add(item) {
             item.permisos = item.permisos.map((item) => item.value).join(",");
@@ -101,7 +102,7 @@ export const CamarerosStore = defineStore({
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
             const response = await axios.post(url, params);
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
                 return "Error al añadir el camarero: " + response.data.error;
             }
             const newItem = { ...response.data, 

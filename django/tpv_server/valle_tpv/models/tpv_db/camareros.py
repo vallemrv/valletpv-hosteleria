@@ -17,36 +17,6 @@ class Camareros(models.Model):
     def __str__(self):  
         return self.nombre + " " + self.apellidos
 
-    @staticmethod
-    def update_from_device(row):
-        
-        id = row.get("ID", row.get("id"))
-        
-        if id is None:
-            return 
-
-        c = Camareros.objects.filter(id=id).first()
-        
-        if c:
-            # Solo actualiza los campos si existen en el diccionario
-            if "autorizado" in row:
-                c.autorizado = int(row["autorizado"])
-            if "activo" in row:
-                c.activo = int(row["activo"])
-            if "nombre" in row:
-                c.nombre = row["nombre"]
-            if "apellidos" in row:
-                c.apellidos = row["apellidos"]
-            if "permisos" in row:
-                c.permisos = row["permisos"]    
-            if "password" in row:
-                c.password = row["password"]
-
-            c.save()
-            comunicar_cambios_devices("md", "camareros", c.serialize())
-            
-
-
             
     @staticmethod
     def delete_handler(filter):
@@ -66,7 +36,7 @@ class Camareros(models.Model):
         nombre = reg["nombre"]
         apellido = reg["apellidos"]
         permisos = reg["permisos"]
-        print(reg)
+      
     
         c = Camareros()
         c.nombre = nombre

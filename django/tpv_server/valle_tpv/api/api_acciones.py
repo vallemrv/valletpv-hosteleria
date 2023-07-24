@@ -1,7 +1,7 @@
 ## impotar librerias
 from django.apps import apps
 from tokenapi.decorators import token_required
-from tokenapi.http import  JsonResponse
+from tokenapi.http import  JsonResponse, JsonError
 from django.forms import model_to_dict
 from valle_tpv.tools.acciones import add_handler, modifcar_handler, delete_handler
 import json
@@ -37,14 +37,18 @@ def add_reg(request):
 def delete_reg(request):
     app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
     tb_name = request.POST["tb_name"]
-    filter = json.loads(request.POST["filter"])
+    if "filter" in request.POST:
+        filter = json.loads(request.POST["filter"]) 
+    else:
+        return JsonError("No se ha especificado filtro")
     model = apps.get_model(app_name,  tb_name)
     if hasattr(model, "delete_handler"):
         obj = model.delete_handler(filter)
     else:
         obj = delete_handler(model, tb_name, filter)
-
-    return JsonResponse(obj)
+    
+    
+    return JsonResponse({'ids':obj})
 
 @token_required
 def update_reg(request):

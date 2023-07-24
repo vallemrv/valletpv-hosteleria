@@ -12,6 +12,7 @@ class Dispositivos(models.Model):
     UID = models.CharField(max_length=100, default="")
     codigo = models.CharField(max_length=6, default="")
     descripcion = models.CharField(max_length=100, default="")
+    activo = models.BooleanField(default=False)
    
     def serialize(self):
         return {

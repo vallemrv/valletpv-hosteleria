@@ -27,7 +27,7 @@ def get_datos_empresa(request):
 
 @csrf_exempt
 def get_uuid_factura(request, num):
-    from gestion.models import Ticket
+    from valle_tpv.models import Ticket
     ticket = Ticket.objects.filter(id=num).first()
     if ticket:
         return JsonResponse({'id':ticket.id,'uid':ticket.uid})
