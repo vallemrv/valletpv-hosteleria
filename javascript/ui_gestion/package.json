@@ -25,7 +25,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^3.5.1",
+    "@capacitor/cli": "^5.2.2",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-pwa": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",

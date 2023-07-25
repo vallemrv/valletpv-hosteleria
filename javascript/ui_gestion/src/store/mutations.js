@@ -94,14 +94,14 @@ export default {
     [types.ADD_ITEM] (state, {item, tb_name}){
         state.ocupado = false
         state.error = null
-        var result = Object.assign({}, state[tb_name])
+        var result = [...state[tb_name]]
         result.push(JSON.parse(item))
         state[tb_name] = result
     },
     [types.MOD_SEC] (state, {item}){
         state.ocupado = false
         state.error = null
-        var result = Object.assign({}, state.teclas)
+        var result = [...state.teclas]
         result.forEach((e,i) => {
             if (parseInt(e.id) == parseInt(item.id)){
                 result[i] = item;

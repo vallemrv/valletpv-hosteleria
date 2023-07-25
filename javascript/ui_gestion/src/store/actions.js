@@ -126,7 +126,10 @@ export default {
         params.append("token", state.empresa.token)
         params.append("reg", JSON.stringify(item))
         params.append("tb_name", tb_name)
-        API.addItem(state.empresa.url, params).then(r=> commit(types.ADD_ITEM, {item:r.reg, tb_name:tb_name}))
+        API.addItem(state.empresa.url, params)
+        .then(r =>{
+            commit(types.ADD_ITEM, {item:r.reg, tb_name:tb_name})
+        } )
         .catch(error => {
            commit(types.ERROR_REQUEST, {error: error})
         })
