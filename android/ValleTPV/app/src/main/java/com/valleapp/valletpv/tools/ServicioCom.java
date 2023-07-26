@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
@@ -20,18 +19,11 @@ import com.valleapp.valletpv.db.DBTeclas;
 import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IBaseSocket;
+import com.valleapp.valletpv.tareas.IController;
 import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
-
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.Framedata;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.net.URI;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -40,7 +32,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ServicioCom extends Service {
+public class ServicioCom extends Service implements IController {
 
 
     final IBinder myBinder = new MyBinder();
@@ -51,7 +43,6 @@ public class ServicioCom extends Service {
 
     Timer timerUpdateLow = new Timer();
     Timer timerManejarInstrucciones = new Timer();
-    Timer checkWebsocket = new Timer();
 
 
     Map<String, Handler> exHandler = new HashMap<>();
@@ -60,8 +51,8 @@ public class ServicioCom extends Service {
     final Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
     String[] tbNameUpdateLow;
 
-    WebSocketClient client;
-    boolean isWebsocketClose = false;
+    WSClient client;
+
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -85,66 +76,7 @@ public class ServicioCom extends Service {
         }
     };
 
-
-    public void crearWebsocket() {
-        super.onCreate();
-        try {
-            client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
-                    "/comunicacion/devices")) {
-
-                @Override
-                public void onWebsocketPong(WebSocket conn, Framedata f) {
-                    super.onWebsocketPong(conn, f);
-                }
-
-                @Override
-                public void onOpen(ServerHandshake serverHandshake) {
-                    // Devolución de llamada después de que se abre la conexión
-                    isWebsocketClose = false;
-                    Log.i("WEBSOCKET_INFO", "Websocket open.....");
-                    sync_device(new String[]{"mesasabiertas", "lineaspedido", "camareros"}, 500);
-                }
-
-
-                @Override
-                public void onMessage(String message) {
-                    try {
-                        JSONObject o = new JSONObject(message);
-                        updateTables(o);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(Exception ex) {
-                    // devolución de llamada por error de conexión
-                    Log.i("Websocket", "Error de conexion....");
-                    isWebsocketClose = true;
-                }
-
-                @Override
-                public void onClose(int code, String reason, boolean remote) {
-                    // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
-                    Log.i("Websocket", "Websocket close....");
-                    isWebsocketClose = true;
-                }
-
-                @Override
-                public void onMessage(ByteBuffer bytes) {
-                    // El mensaje de flujo de bytes devuelto
-                    Log.i("Websocket","socket bytebuffer bytes");
-                }
-            };
-
-            client.connect();
-        } catch (Exception ignored) {
-
-        }
-    }
-
-
-    private void sync_device(String[] tbs, long timeout) {
+    public void sync_device(String[] tbs, long timeout) {
 
         try {
             Timer t = new Timer();
@@ -174,7 +106,7 @@ public class ServicioCom extends Service {
 
 
 
-    private void updateTables(JSONObject o){
+    public void updateTables(JSONObject o){
         try {
             String tb = o.getString("tb");
             String op = o.getString("op");
@@ -219,23 +151,21 @@ public class ServicioCom extends Service {
         if (url != null){
             server = url;
             IniciarDB();
-            crearWebsocket();
+            try {
+                client = new WSClient(url, "/ws/", this);
+                client.connect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             timerUpdateLow.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    sync_device(tbNameUpdateLow, 1000);
+                    sync_device(tbNameUpdateLow, 500);
                 }
             },1000, 290000);
             timerManejarInstrucciones.schedule(
-                    new TareaManejarInstrucciones(colaInstrucciones, 1000), 2000, 1);
-            checkWebsocket.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (isWebsocketClose && client!= null){
-                        client.reconnect();
-                    }
-                }
-            }, 2000, 5000);
+                    new TareaManejarInstrucciones(colaInstrucciones, 50), 2000, 1);
+
             return START_STICKY;
         }
         return START_NOT_STICKY;

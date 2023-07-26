@@ -40,13 +40,13 @@ public class HTTPRequest {
     }
 
 
-    public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler handlerExternal){
+    public HTTPRequest(String strUrl,  ContentValues params, final String op, final Handler handlerExternal){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;
 
         try {
 
-            if(!strUrl.contains("http://")) strUrl = "http://"+ strUrl;
+            if(!strUrl.contains("http://") && !strUrl.contains("https://")) strUrl = "http://"+ strUrl;
             URL url = new URL(strUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -77,8 +77,12 @@ public class HTTPRequest {
                         if(handlerExternal!= null) sendMessage(handlerExternal, "no_connexion", null);
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
-                        if(handlerExternal!= null && statusCode==500) sendMessage(handlerExternal, "ERROR", null);
-
+                        if(handlerExternal!= null ){
+                            if (statusCode==500) sendMessage(handlerExternal, "ERROR", null);
+                            else if (statusCode==403) sendMessage(handlerExternal, "no_autorizado", null);
+                        } else {
+                            Log.e("ERROR", e.getMessage());
+                        }
                     }
                 }
             }.start();
