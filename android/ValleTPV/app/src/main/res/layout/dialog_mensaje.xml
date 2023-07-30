@@ -44,7 +44,7 @@
             android:contentDescription="@string/borrar_salir"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/salir"
+            app:srcCompat="@drawable/salir"
             android:text="@string/salir"
             android:textSize="32sp" />
     </FrameLayout>

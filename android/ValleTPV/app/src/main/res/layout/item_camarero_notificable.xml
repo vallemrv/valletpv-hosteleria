@@ -33,7 +33,7 @@
             android:contentDescription="@string/mensaje"
             android:padding="10sp"
             android:scaleType="fitCenter"
-            android:src="@drawable/enviar" />
+            app:srcCompat="@drawable/enviar" />
     </FrameLayout>
 
 </LinearLayout>

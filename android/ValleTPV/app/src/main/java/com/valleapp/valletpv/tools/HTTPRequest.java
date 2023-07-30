@@ -45,8 +45,6 @@ public class HTTPRequest {
         HttpURLConnection conn = null;
 
         try {
-
-            if(!strUrl.contains("http://") && !strUrl.contains("https://")) strUrl = "http://"+ strUrl;
             URL url = new URL(strUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -74,12 +72,13 @@ public class HTTPRequest {
                         if(handlerExternal!= null) sendMessage(handlerExternal, op, result.toString());
 
                     } catch ( ConnectException e){
-                        if(handlerExternal!= null) sendMessage(handlerExternal, "no_connexion", null);
+                        if(handlerExternal!= null) sendMessage(handlerExternal, "ERROR", "Fallo en la conexion");
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         if(handlerExternal!= null ){
-                            if (statusCode==500) sendMessage(handlerExternal, "ERROR", null);
-                            else if (statusCode==403) sendMessage(handlerExternal, "no_autorizado", null);
+                            if (statusCode==500) sendMessage(handlerExternal, "ERROR", "El servidor no responde");
+                            else if (statusCode==403) sendMessage(handlerExternal, "ERROR", "Dispositivo no autorizado");
+                            else sendMessage(handlerExternal, "ERROR", "Error desconocido");
                         } else {
                             Log.e("ERROR", e.getMessage());
                         }

@@ -10,6 +10,7 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -112,7 +113,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/cobrar"
+                    app:srcCompat="@drawable/cobrar"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
                     android:text="New Button" />
@@ -124,7 +125,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/tarjeta"
+                    app:srcCompat="@drawable/tarjeta"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
                     />
@@ -136,7 +137,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/salir"
+                    app:srcCompat="@drawable/salir"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
                     android:text="New Button" />

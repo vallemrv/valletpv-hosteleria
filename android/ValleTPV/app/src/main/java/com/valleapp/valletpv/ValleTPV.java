@@ -1,6 +1,5 @@
 package com.valleapp.valletpv;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,20 +12,22 @@ import android.os.Message;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpv.db.DBCamareros;
-import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
 import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpv.tools.ServerConfig;
 import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ValleTPV extends Activity {
+public class ValleTPV extends AppCompatActivity {
 
     final Context cx = this;
 
-    private String server = "";
+    private ServerConfig server;
 
     ServicioCom myServicio;
     DBCamareros dbCamareros;
@@ -71,10 +72,10 @@ public class ValleTPV extends Activity {
             rellenarListas();
         });
 
-         findViewById(R.id.btn_add_nuevo_camarero).setOnClickListener(view -> {
+        /* findViewById(R.id.btn_add_nuevo_camarero).setOnClickListener(view -> {
              DlgAddNuevoCamarero dlg = new DlgAddNuevoCamarero(cx, myServicio);
              dlg.show();
-         });
+         });*/
 
 
         lstautorizados.setOnItemClickListener((adapterView, view, i, l) -> {
@@ -103,9 +104,9 @@ public class ValleTPV extends Activity {
             myServicio.setExHandler("camareros", handleHttp);
             rellenarListas();
         }
-        if (server != null && !server.equals("") && myServicio == null) {
+        if (server != null && myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
-            intent.putExtra("url", server);
+            intent.putExtra("server_config", server.toJson());
             startService(intent);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         }
@@ -128,7 +129,10 @@ public class ValleTPV extends Activity {
                 Intent intent = new Intent(this, PreferenciasTPV.class);
                 startActivity(intent);
             }else{
-                server = pref.getString("URL");
+                String url = pref.getString("URL");
+                String code = pref.getString("CODE");
+                String UID = pref.getString("UID");
+                server = new ServerConfig(url, code, UID);
             }
 
         } catch (Exception e) {

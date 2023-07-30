@@ -8,7 +8,6 @@
  */
 package com.valleapp.valletpv;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -19,13 +18,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.tools.ServicioCom;
@@ -36,7 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class Camareros extends Activity {
+public class Camareros extends AppCompatActivity {
 
 
     final Context cx = this;

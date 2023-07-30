@@ -1,6 +1,5 @@
 package com.valleapp.valletpv;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,6 +16,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
 import com.valleapp.valletpv.db.DBZonas;
@@ -27,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class OpMesas extends Activity {
+public class OpMesas extends AppCompatActivity {
 
     DBMesas dbMesas=new DBMesas(this);
     DBZonas dbZonas= new DBZonas(this);

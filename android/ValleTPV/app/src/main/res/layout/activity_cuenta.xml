@@ -1,5 +1,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pnePrincipal"
     android:layout_width="match_parent"
@@ -37,7 +38,7 @@
             android:onClick="abrirCajon"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/abrircajon" />
+            app:srcCompat="@drawable/abrircajon" />
 
 
         <ImageButton
@@ -55,7 +56,7 @@
             android:onClick="cobrarMesa"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/cobrar"
+            app:srcCompat="@drawable/cobrar"
             android:text="@string/cobrar" />
 
         <EditText
@@ -87,7 +88,7 @@
             android:onClick="mostrarVarios"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/varios"
+            app:srcCompat="@drawable/varios"
             android:text="@string/varios" />
 
         <ImageButton
@@ -105,7 +106,7 @@
             android:onClick="preImprimir"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/imprimirticket"
+            app:srcCompat="@drawable/imprimirticket"
             android:text="@string/imprimir" />
 
         <ImageButton
@@ -123,7 +124,7 @@
             android:onClick="mostrarSeparados"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/separarticket" />
+            app:srcCompat="@drawable/separarticket" />
 
         <TextView
             android:id="@+id/lblCantida"

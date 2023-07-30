@@ -74,7 +74,7 @@
             android:contentDescription="@string/salir"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/salir" />
+            fab:srcCompat="@drawable/salir" />
 
         <ImageButton
             android:id="@+id/aceptar"
@@ -87,13 +87,13 @@
             android:contentDescription="@string/ok"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/check"
+            fab:srcCompat="@drawable/check"
             android:text="@string/ok"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textSize="34sp"
             tools:text="@string/ok" />
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btn_add_nuevo_camarero"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,10 +102,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="22dp"
             android:contentDescription="@string/agregar_camarero"
-            fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"
-            fab:fab_icon="@drawable/mas"
-            tools:ignore="ImageContrastCheck" />
+            android:src="@drawable/mas"
+            />
 
 
 

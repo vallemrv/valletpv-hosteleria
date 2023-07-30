@@ -5,7 +5,6 @@ import json
 
 @csrf_exempt 
 def add(request):
-    reg = json.loads(request.POST["reg"])
-    obj = Dispositivos.add_handler(reg)
+    obj = Dispositivos.add_handler()
     return JsonResponse(obj)
 

@@ -1,7 +1,6 @@
 package com.valleapp.valletpv;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -18,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.valleapp.valletpv.tools.HTTPRequest;
 import com.valleapp.valletpv.tools.JSON;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Arqueo extends Activity {
+public class Arqueo extends AppCompatActivity {
 
     String server;
     LinearLayout pneGastos;

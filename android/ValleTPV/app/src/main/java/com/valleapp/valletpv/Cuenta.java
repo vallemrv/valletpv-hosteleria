@@ -1,7 +1,6 @@
 package com.valleapp.valletpv;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -27,6 +26,8 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.db.DBCamareros;
@@ -55,7 +56,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Cuenta extends Activity implements TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
+public class Cuenta extends AppCompatActivity implements TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
 
     private String server = "";
     DBSecciones dbSecciones;

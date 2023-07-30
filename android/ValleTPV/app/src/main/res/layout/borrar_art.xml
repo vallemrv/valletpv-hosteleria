@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="560sp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -57,7 +58,7 @@
             android:contentDescription="@string/borrar_editar"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/editar" />
+            app:srcCompat="@drawable/editar" />
 
         <ImageButton
             android:id="@+id/btn_salir_monedas"
@@ -69,7 +70,7 @@
             android:contentDescription="@string/borrar_salir"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/salir" />
+            app:srcCompat="@drawable/salir" />
 
 
     </LinearLayout>
@@ -103,7 +104,7 @@
             android:contentDescription="@string/ok"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/check"
+            app:srcCompat="@drawable/check"
             android:text="@string/ok" />
 
     </LinearLayout>

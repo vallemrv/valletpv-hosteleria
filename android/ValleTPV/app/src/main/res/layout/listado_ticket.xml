@@ -10,6 +10,7 @@
 
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,7 +30,7 @@
         android:contentDescription="@string/salir"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/salir" />
+        app:srcCompat="@drawable/salir" />
 
     <ImageButton
         android:id="@+id/btnImprimir"
@@ -45,7 +46,7 @@
         android:contentDescription="@string/imprimir"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/imprimirticket"
+        app:srcCompat="@drawable/imprimirticket"
        />
 
     <ImageButton
@@ -62,7 +63,7 @@
         android:contentDescription="@string/imprimir_factura"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/factura" />
+        app:srcCompat="@drawable/factura" />
 
     <ImageButton
         android:id="@+id/btnListado"
@@ -78,7 +79,7 @@
         android:contentDescription="@string/lista_nticket"
         android:padding="10dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/listaticket" />
+        app:srcCompat="@drawable/listaticket" />
 
     <ScrollView
         android:id="@+id/scrollView"

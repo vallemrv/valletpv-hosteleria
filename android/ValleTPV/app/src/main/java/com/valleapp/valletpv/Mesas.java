@@ -1,7 +1,6 @@
 package com.valleapp.valletpv;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -15,7 +14,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -28,6 +26,8 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
 import com.valleapp.valletpv.db.DBCamareros;
@@ -52,7 +52,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Mesas extends Activity implements IAutoFinish, IControladorAutorizaciones, IControlMensajes {
+public class Mesas extends AppCompatActivity implements IAutoFinish, IControladorAutorizaciones, IControlMensajes {
 
     final Context cx = this;
     final long periodFinish = 5000;

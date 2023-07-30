@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
@@ -69,7 +70,7 @@
             android:contentDescription="@string/borrar"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/papelera"
+            app:srcCompat="@drawable/papelera"
             android:text="@string/borrar" />
     </FrameLayout>
 

@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -42,7 +43,7 @@
             android:onClick="clickAddCamareros"
             android:padding="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/add_camareros" />
+            app:srcCompat="@drawable/add_camareros" />
 
         <ImageButton
             android:id="@+id/btn_mensajes"
@@ -57,7 +58,7 @@
             android:onClick="clickSendMensajes"
             android:padding="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/sobre" />
+            app:srcCompat="@drawable/sobre" />
 
         <ImageButton
             android:id="@+id/btnSettings"
@@ -72,7 +73,7 @@
             android:onClick="clickSettings"
             android:padding="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/settings"
+            app:srcCompat="@drawable/settings"
             android:text="@string/settings" />
 
         <ImageButton
@@ -92,7 +93,7 @@
             android:onClick="clickAbrirCaja"
             android:padding="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/abrircajon"
+            app:srcCompat="@drawable/abrircajon"
             android:text="@string/abrir_ncajon" />
 
         <ImageButton
@@ -111,7 +112,7 @@
             android:onClick="clickListaTicket"
             android:padding="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/listaticket"
+            app:srcCompat="@drawable/listaticket"
             android:text="@string/lista_nticket" />
 
 

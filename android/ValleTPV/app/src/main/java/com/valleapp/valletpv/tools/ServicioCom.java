@@ -1,14 +1,22 @@
 package com.valleapp.valletpv.tools;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
+import androidx.core.app.NotificationCompat;
+
+import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
@@ -35,11 +43,11 @@ import java.util.TimerTask;
 public class ServicioCom extends Service implements IController {
 
 
+    private static final int NOTIFICATION_ID = 10001;
+    private static final String CHANNEL_ID = "com.valleapp.valletpv";
     final IBinder myBinder = new MyBinder();
     private JSONObject zn;
     private JSONObject mesa_abierta;
-
-    String server = null;
 
     Timer timerUpdateLow = new Timer();
     Timer timerManejarInstrucciones = new Timer();
@@ -52,7 +60,7 @@ public class ServicioCom extends Service implements IController {
     String[] tbNameUpdateLow;
 
     WSClient client;
-
+    ServerConfig server;
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -144,33 +152,41 @@ public class ServicioCom extends Service implements IController {
         }
     }
 
+    private Notification getNotification() {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "ValleTPV",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.app_icon)
+                .setContentTitle("ValleTPV")
+                .setContentText("Listo para recibir pedidos");
+
+        return builder.build();
+    }
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null) return START_NOT_STICKY;
-        String url = intent.getStringExtra("url");
-        if (url != null){
-            server = url;
-            IniciarDB();
-            try {
-                client = new WSClient(url, "/ws/", this);
-                client.connect();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            timerUpdateLow.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    sync_device(tbNameUpdateLow, 500);
-                }
-            },1000, 290000);
-            timerManejarInstrucciones.schedule(
-                    new TareaManejarInstrucciones(colaInstrucciones, 50), 2000, 1);
 
-            return START_STICKY;
+        // Comenzar el servicio en primer plano.
+        startForeground(NOTIFICATION_ID, this.getNotification());
+        String server_config = intent.getStringExtra("server_config");
+        if (server_config == null) {
+            server = ServerConfig.loadJSON(server_config);
         }
-        return START_NOT_STICKY;
 
+        // Si el sistema mata este servicio, una vez que haya suficientes recursos, lo reiniciará.
+        return START_STICKY;
     }
+
 
     @Override
     public void onCreate() {
@@ -241,115 +257,115 @@ public class ServicioCom extends Service implements IController {
     }
 
     public void getLineasTicket(Handler mostrarLsTicket, String IDTicket) {
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         p.put("id", IDTicket);
-        new HTTPRequest(server + "/cuenta/lslineas", p,
+        new HTTPRequest(server.getUrl("/cuenta/lslineas") , p,
                 "get_lineas_ticket", mostrarLsTicket);
     }
 
     public void getListaTickets(Handler hLsTicket) {
-        new HTTPRequest(server+"/cuenta/lsticket", new ContentValues(),
+        new HTTPRequest(server.getUrl("/cuenta/lsticket"), server.getParams(),
                 "get_lista_ticket", hLsTicket);
     }
 
     public void imprimirTicket(String idTicket) {
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         p.put("id", idTicket);
         p.put("abrircajon", "False");
         p.put("receptor_activo", "True");
-        new HTTPRequest(server + "/impresion/imprimir_ticket", p, "", controller_http);
+        new HTTPRequest(server.getUrl ("/impresion/imprimir_ticket"), p, "", controller_http);
     }
 
     public void imprimirFactura(String idTicket) {
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         p.put("id", idTicket);
         p.put("abrircajon", "False");
         p.put("receptor_activo", "True");
-        new HTTPRequest(server + "/impresion/imprimir_factura", p, "", controller_http);
+        new HTTPRequest(server.getUrl("/impresion/imprimir_factura"), p, "", controller_http);
     }
 
     public void getSettings(Handler controller) {
-        new HTTPRequest(server + "/receptores/get_lista", new ContentValues(),
+        new HTTPRequest(server.getUrl(""), server.getParams(),
                 "get_lista_receptores", controller);
     }
 
     public void setSettings(String lista) {
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         p.put("lista", lista);
-        new HTTPRequest(server + "/receptores/set_settings", p,
+        new HTTPRequest(server.getUrl( "/receptores/set_settings"), p,
                 "set_settings", controller_http);
     }
 
     public void rmMesa(ContentValues params) {
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(params, server+"/cuenta/rm"));
+            colaInstrucciones.add(new Instrucciones(params, server.getUrl("/cuenta/rm")));
         }
     }
 
     public void opMesas(ContentValues params, String op) {
         synchronized (colaInstrucciones){
             String url = Objects.equals(op, "juntarmesas") ? "/cuenta/juntarmesas" : "/cuenta/cambiarmesas";
-            colaInstrucciones.add(new Instrucciones(params, server + url));
+            colaInstrucciones.add(new Instrucciones(params, server.getUrl(url)));
         }
     }
 
     public void rmLinea(ContentValues params) {
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(params, server+"/cuenta/rmlinea"));
+            colaInstrucciones.add(new Instrucciones(params, server.getUrl("/cuenta/rmlinea")));
         }
     }
 
     public void nuevoPedido(ContentValues params) {
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(params, server+"/cuenta/add"));
+            colaInstrucciones.add(new Instrucciones(params, server.getUrl("/cuenta/add")));
         }
     }
 
     public void cobrarCuenta(ContentValues params) {
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(params, server+"/cuenta/cobrar"));
+            colaInstrucciones.add(new Instrucciones(params, server.getUrl("/cuenta/cobrar")));
         }
     }
 
     public void preImprimir(final ContentValues p) {
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(p, server+"/impresion/preimprimir"));
+            colaInstrucciones.add(new Instrucciones(p, server.getUrl("/impresion/preimprimir")));
         }
     }
 
     public void get_cuenta(Handler controller, String mesa_id) {
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         p.put("mesa_id", mesa_id);
-        new HTTPRequest(server + "/cuenta/get_cuenta", p, "", controller);
+        new HTTPRequest(server.getUrl("/cuenta/get_cuenta"), p, "", controller);
     }
 
     public void addCamNuevo(String n, String a) {
-        ContentValues p = new ContentValues();
+        ContentValues p =server.getParams();
         p.put("nombre", n);
         p.put("apellido", a);
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(p, server+"/camareros/camarero_add"));
+            colaInstrucciones.add(new Instrucciones(p, server.getUrl("/camareros/camarero_add")));
         }
     }
 
     public void autorizarCam(JSONObject obj){
-        ContentValues p = new ContentValues();
+        ContentValues p = server.getParams();
         JSONArray o = new JSONArray();
         o.put(obj);
         p.put("rows", o.toString());
         p.put("tb", "camareros");
         synchronized (colaInstrucciones){
-            colaInstrucciones.add(new Instrucciones(p, server+"/sync/update_from_devices"));
+            colaInstrucciones.add(new Instrucciones(p, server.getUrl("/sync/update_from_devices")));
         }
     }
 
     public void pedirAutorizacion(ContentValues p) {
-       new HTTPRequest(server + "/autorizaciones/pedir_autorizacion",
+       new HTTPRequest(server.getUrl("/autorizaciones/pedir_autorizacion"),
                p, "", null);
     }
 
     public void sendMensaje(ContentValues p) {
-        new HTTPRequest(server + "/autorizaciones/send_informacion",
+        new HTTPRequest(server.getUrl("/autorizaciones/send_informacion"),
                 p, "", null);
     }
 

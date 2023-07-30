@@ -22,6 +22,7 @@ public class WSClient extends WebSocketClient {
     }
 
     static String urlParse(String url) {
+        if ( url.contains("/api") ) url = url.substring(0, url.indexOf("/api"));
         if ( url.startsWith("http://") ) {
             url = url.replace("http://", "ws://");
         } else if ( url.startsWith("https://") ) {

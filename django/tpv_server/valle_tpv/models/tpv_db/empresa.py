@@ -12,7 +12,6 @@ class Dispositivos(models.Model):
     UID = models.CharField(max_length=100, default="")
     codigo = models.CharField(max_length=6, default="")
     descripcion = models.CharField(max_length=100, default="")
-    activo = models.BooleanField(default=False)
    
     def serialize(self):
         return {
@@ -29,9 +28,8 @@ class Dispositivos(models.Model):
         return self.nombre
     
     @staticmethod
-    def add_handler(data):
+    def add_handler():
         dispositivo = Dispositivos()
-        dispositivo.nombre = data["nombre"]
         #crear un codigo de UID unico para cada dispositivo
         dispositivo.UID = uuid4().hex
         
@@ -43,7 +41,6 @@ class Dispositivos(models.Model):
             if not Dispositivos.objects.filter(codigo=codigo).exists():
                 break
         dispositivo.codigo = codigo
-        dispositivo.descripcion = data["descripcion"]
         dispositivo.save()
         return dispositivo.serialize()
 

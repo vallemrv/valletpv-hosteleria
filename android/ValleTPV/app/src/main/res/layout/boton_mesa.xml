@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -29,7 +30,7 @@
             android:id="@+id/btnBorrarMesa"
             android:onClick="clickBorrarMesa"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/papelera"
+            app:srcCompat="@drawable/papelera"
             android:padding="10dp"
             android:scaleType="fitCenter"
             android:layout_margin="5dp"
@@ -41,7 +42,7 @@
             android:id="@+id/btnCambiarMesa"
             android:onClick="clickCambiarMesa"
             android:background="@drawable/fondo_btn_xml"
-            android:src="@drawable/cambiarmesa"
+            app:srcCompat="@drawable/cambiarmesa"
             android:padding="10dp"
             android:scaleType="fitCenter"
             android:layout_margin="5dp" />
@@ -56,7 +57,7 @@
             android:onClick="clickCobrarMesa"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/cobrar" />
+            app:srcCompat="@drawable/cobrar" />
 
 
     </LinearLayout>

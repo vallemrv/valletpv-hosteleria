@@ -88,5 +88,7 @@
     <string name="texto_euros_cero">0.00€</string>
     <string name="texto_cambio">Cambio:</string>
     <string name="gastos_arqueo">Gastos:</string>
+    <string name="codigo" />
+    <string name="validar_codgio">Validar Código</string>
 
 </resources>

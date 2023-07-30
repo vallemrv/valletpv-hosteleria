@@ -8,6 +8,7 @@
 from django.urls import path, include
 
 urlpatterns = [
+    path('dispositivos/', include("valle_tpv.urls.api_urls.dispositivos"), name="api_android_dispositivos"),
     path('sync/', include("valle_tpv.urls.api_urls.sync"), name="api_android_sync"),
     path('pedidos/', include("valle_tpv.urls.api_urls.pedidos"), name="api_android_pedidos"),
     path('cuenta/', include("valle_tpv.urls.api_urls.cuenta"), name="api_android_cuenta"),
