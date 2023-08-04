@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ValleTPV</string>
+    <string name="entrega">Entrega:</string>
+    <string name="camibo">camibo:</string>
+    <string name="texto_prueba_euros">0.00 €</string>
 </resources>
