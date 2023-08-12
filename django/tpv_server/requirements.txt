@@ -1,7 +1,8 @@
 Django
 channels
 channels-redis
-django-tokenapi
+git+https://github.com/vallemrv/django-tokenapi.git
 Jinja2
 django-cors-headers
 trml2pdf
+daphne
