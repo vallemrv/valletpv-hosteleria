@@ -41,16 +41,18 @@ android {
         compose = true
     }
 
+     composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
+
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.ui:ui-android:1.6.0-alpha02")
     implementation("androidx.compose.material:material:1.6.0-alpha02")
     implementation("androidx.compose.ui:ui-tooling:1.6.0-alpha02")
-    implementation (project(":ValleTPVLib"))
     implementation("androidx.activity:activity-compose:1.4.0-alpha01")
     implementation("androidx.compose.runtime:runtime:1.6.0-alpha02")
-
-
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+    implementation (project(":ValleTPVLib"))
 }
