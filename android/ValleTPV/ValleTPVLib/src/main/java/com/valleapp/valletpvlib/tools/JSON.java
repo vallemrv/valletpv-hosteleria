@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 
 public class JSON {
 
-    public void serializar(String file, JSONObject obj, Context context){
+    public static void serializar(String file, JSONObject obj, Context context){
         try{
             OutputStreamWriter fos = new OutputStreamWriter(context.openFileOutput(file, Context.MODE_PRIVATE));
             fos.write(obj.toString());
@@ -22,7 +22,7 @@ public class JSON {
         }
     }
 
-    public JSONObject deserializar(String file, Context context) throws JSONException {
+    public static JSONObject deserializar(String file, Context context) throws JSONException {
         String strJSON = "";
 
         try{

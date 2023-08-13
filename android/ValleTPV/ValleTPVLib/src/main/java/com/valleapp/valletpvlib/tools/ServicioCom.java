@@ -14,8 +14,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
-import androidx.core.app.NotificationCompat;
-
 
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpvlib.db.DBCuenta;
@@ -28,6 +26,7 @@ import com.valleapp.valletpvlib.db.DBZonas;
 import com.valleapp.valletpvlib.interfaces.IBaseDatos;
 import com.valleapp.valletpvlib.interfaces.IBaseSocket;
 import com.valleapp.valletpvlib.interfaces.IController;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +60,7 @@ public class ServicioCom extends Service implements IController {
     String[] tbNameUpdateLow;
 
     WSClient client;
-    ServerConfig server;
+    ServerConfig server = null;
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -153,34 +152,16 @@ public class ServicioCom extends Service implements IController {
         }
     }
 
-    private Notification getNotification() {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "ValleTPV",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("ValleTPV")
-                .setContentText("Listo para recibir pedidos");
-
-        return builder.build();
-    }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         // Comenzar el servicio en primer plano.
-        startForeground(NOTIFICATION_ID, this.getNotification());
+        //startForeground(NOTIFICATION_ID, this.getNotification());
         String server_config = intent.getStringExtra("server_config");
         if (server_config == null) {
-            server = ServerConfig.loadJSON(server_config);
+            // server = ServerConfig.loadJSON(server_config);
         }
 
         // Si el sistema mata este servicio, una vez que haya suficientes recursos, lo reiniciará.

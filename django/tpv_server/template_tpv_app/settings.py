@@ -70,6 +70,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+APPEND_SLASH=False
+
 ROOT_URLCONF = 'server_{{name_tpv}}.urls'
 
 STATICFILES_DIRS = (
