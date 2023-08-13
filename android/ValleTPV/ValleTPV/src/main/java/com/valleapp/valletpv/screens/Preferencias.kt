@@ -12,29 +12,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.valleapp.valletpv.R
 import com.valleapp.valletpv.models.PreferenciasModel
+import com.valleapp.valletpv.ui.theme.Purple40
 
 
 @Composable
 fun Preferencias(vModel: PreferenciasModel) {
 
-    val pinkColor = colorResource(id = R.color.pink)
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -70,7 +68,8 @@ fun Preferencias(vModel: PreferenciasModel) {
                     modifier = Modifier
                         .width(80.dp)
                         .fillMaxHeight(),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = pinkColor)
+
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40)
                 ) {
                     Text(text = "OK")
                 }
@@ -81,7 +80,7 @@ fun Preferencias(vModel: PreferenciasModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    elevation = 10.dp
+
 
                 ) {
                     Column(
@@ -118,7 +117,7 @@ fun Preferencias(vModel: PreferenciasModel) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(70.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = pinkColor)
+
                         ) {
                             Text(text = "Validar Código")
                         }

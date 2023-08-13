@@ -11,8 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.valleapp.valletpvlib.tools.HTTPRequest
-import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.JSON
+import com.valleapp.valletpvlib.tools.ServerConfig
 
 class PreferenciasModel(val context: Context) : ViewModel() {
 
@@ -53,13 +53,13 @@ class PreferenciasModel(val context: Context) : ViewModel() {
             serverConfig = ServerConfig(url)
             var strUrl = serverConfig.getUrl("dispositivos/new/")
 
-            if (strUrl != null) HTTPRequest(strUrl.toString(), serverConfig.getParams(), "GETCONFIG", handler)
+            HTTPRequest(strUrl, serverConfig.getParams(), "GETCONFIG", handler)
         }
     }
 
     fun onValidarClick(){
         if (url.isNotEmpty() && codigo.isNotEmpty()) {
-            Log.d("PreferenciasModel", "$codigo")
+            Log.d("PreferenciasModel", codigo)
             Log.d("PreferenciasModel", "${serverConfig.codigo}")
             if (codigo.equals(serverConfig.codigo)) {
                 Toast.makeText(context, "Código correcto", Toast.LENGTH_LONG).show()
