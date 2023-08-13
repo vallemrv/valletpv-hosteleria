@@ -3,9 +3,8 @@ package com.valleapp.valletpv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.ui.platform.LocalContext
 import com.valleapp.valletpv.models.PreferenciasModel
-import com.valleapp.valletpv.ui.Preferencias
+import com.valleapp.valletpv.screens.Preferencias
 
 class ValleTPV : ComponentActivity() {
 
