@@ -9,14 +9,6 @@ data class ServerConfig(
     var url: String? = null
 ) {
 
-    constructor(url: String) : this() {
-        this.url = url
-    }
-
-    constructor(codigo: String, UID: String?) : this() {
-        this.codigo = codigo
-        this.UID = UID
-    }
 
 
     fun loadJSON(json: String?): Boolean {
@@ -53,7 +45,7 @@ data class ServerConfig(
 
     fun toJson(): JSONObject? {
         return if (url != null && codigo != null && UID != null)
-            JSONObject("{\"code\":\"$codigo\",\"UID\":\"$UID\",\"url\":\"$url\"}")
+            JSONObject("{\"codigo\":\"$codigo\",\"UID\":\"$UID\",\"url\":\"$url\"}")
         else null
     }
 }

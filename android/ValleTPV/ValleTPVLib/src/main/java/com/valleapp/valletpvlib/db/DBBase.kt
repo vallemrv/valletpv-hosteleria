@@ -6,14 +6,13 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import com.valleapp.valletpvlib.interfaces.IBaseDatos
 import com.valleapp.valletpvlib.interfaces.IBaseSocket
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-abstract class DBBase(context: Context?, protected val tb_name: String) :
+abstract class DBBase(context: Context?, val tb_name: String) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), IBaseDatos, IBaseSocket {
     abstract override fun onCreate(sqLiteDatabase: SQLiteDatabase)
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -35,10 +34,7 @@ abstract class DBBase(context: Context?, protected val tb_name: String) :
     protected abstract fun caragarValues(o: JSONObject?): ContentValues
     override fun filter(cWhere: String): JSONArray {
         val db = this.readableDatabase
-        var w = ""
-        if (cWhere != null) {
-            w = " WHERE $cWhere"
-        }
+        val w = " WHERE $cWhere"
         val res = db.rawQuery("select * from $tb_name $w", null)
         res.moveToFirst()
         val list = JSONArray()
@@ -70,8 +66,7 @@ abstract class DBBase(context: Context?, protected val tb_name: String) :
         val db = writableDatabase
         try {
             synchronized(db) {
-                val id: String
-                id = if (o.has("ID")) {
+                val id: String = if (o.has("ID")) {
                     o.getString("ID")
                 } else {
                     o.getString("id")
@@ -115,7 +110,7 @@ abstract class DBBase(context: Context?, protected val tb_name: String) :
         }
     }
 
-    protected fun count(db: SQLiteDatabase, cWhere: String?): Int {
+    private fun count(db: SQLiteDatabase, cWhere: String?): Int {
         var w = ""
         if (cWhere != null) {
             w = " WHERE $cWhere"
@@ -123,24 +118,6 @@ abstract class DBBase(context: Context?, protected val tb_name: String) :
         @SuppressLint("Recycle") val mCount = db.rawQuery("select count(*) from  $tb_name $w", null)
         mCount.moveToFirst()
         return mCount.getInt(0)
-    }
-
-    fun showDatos(cWhere: String?) {
-        val db = readableDatabase
-        var w = ""
-        if (cWhere != null) {
-            w = " WHERE $cWhere"
-        }
-        @SuppressLint("Recycle") val res = db.rawQuery("select * from  $tb_name $w", null)
-        res.moveToFirst()
-        while (!res.isAfterLast) {
-            val dta = StringBuilder()
-            for (i in 0 until res.columnCount) {
-                dta.append(res.getColumnName(i)).append("=").append(res.getString(i)).append(" - ")
-            }
-            Log.i("SHOWDATA", dta.toString())
-            res.moveToNext()
-        }
     }
 
     companion object {

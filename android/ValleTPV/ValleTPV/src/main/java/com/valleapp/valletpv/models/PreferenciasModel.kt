@@ -16,25 +16,42 @@ import com.valleapp.valletpvlib.tools.ServerConfig
 
 class PreferenciasModel(val context: Context) : ViewModel() {
 
+
+
     var url by mutableStateOf("")
     var codigo by mutableStateOf("")
+    var UID by mutableStateOf("")
     var isCardVisible by mutableStateOf(false)
-    private lateinit var serverConfig: ServerConfig
+    var serverConfig: ServerConfig? by mutableStateOf(null)
+
+    init {
+        JSON.deserializar("preferencias.dat", context)?.let {
+            if (it.has("url")) {
+                url = it.getString("url")
+            }
+            if (it.has("codigo")) {
+                codigo = it.getString("codigo")
+            }
+            if (it.has("UID")) {
+                UID = it.getString("UID")
+            }
+            // ... y cualquier otra clave que quieras verificar.
+            isCardVisible = true
+        }
+    }
 
     private val handler = Handler(Looper.getMainLooper()) { message ->
         val response: String? = message.data.getString("RESPONSE")
         val op = message.data.getString("op")
-        Log.d("PreferenciasModel", "handler: $op")
-        Log.d("PreferenciasModel", "handler: $response")
         when (op) {
             "ERROR" -> {
                 isCardVisible = false
                 Toast.makeText(context, response, Toast.LENGTH_LONG).show()
             }
             "GETCONFIG" -> {
-                if (::serverConfig.isInitialized) {
+                serverConfig?.let{
                     isCardVisible = true
-                    val isLoad = serverConfig.loadJSON(response)
+                    val isLoad = it.loadJSON(response)
                     if (!isLoad) {
                        Toast.makeText(context, "Error al cargar la configuración", Toast.LENGTH_LONG).show()
                     }
@@ -50,20 +67,21 @@ class PreferenciasModel(val context: Context) : ViewModel() {
     fun onOkClick() {
 
         if (url.isNotEmpty()) {
-            serverConfig = ServerConfig(url)
-            var strUrl = serverConfig.getUrl("dispositivos/new/")
+            serverConfig = ServerConfig(url=url)
+            var strUrl = serverConfig?.getUrl("dispositivos/new/")
+            Log.d("PreferenciasModel", "onOkClick: $strUrl")
+            strUrl?.let {
+                HTTPRequest(it, serverConfig!!.getParams(), "GETCONFIG", handler)
+            }
 
-            HTTPRequest(strUrl, serverConfig.getParams(), "GETCONFIG", handler)
         }
     }
 
     fun onValidarClick(){
         if (url.isNotEmpty() && codigo.isNotEmpty()) {
-            Log.d("PreferenciasModel", codigo)
-            Log.d("PreferenciasModel", "${serverConfig.codigo}")
-            if (codigo.equals(serverConfig.codigo)) {
+            if (codigo.equals(serverConfig?.codigo)) {
                 Toast.makeText(context, "Código correcto", Toast.LENGTH_LONG).show()
-                JSON.serializar("preferencias.dat", serverConfig.toJson(), context)
+                serverConfig?.toJson()?.let { JSON.serializar("preferencias.dat", it, context) }
             } else {
                 Toast.makeText(context, "Error código incorrecto", Toast.LENGTH_LONG).show()
             }

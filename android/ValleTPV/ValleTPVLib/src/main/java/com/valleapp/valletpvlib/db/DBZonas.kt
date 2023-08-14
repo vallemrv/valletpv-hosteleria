@@ -45,4 +45,24 @@ class DBZonas(context: Context?) : DBBase(context, "zonas") {
         }
         return values
     }
+
+    override fun filter(cWhere: String?): JSONArray {
+        TODO("Not yet implemented")
+    }
+
+    override fun rellenarTabla(objs: JSONArray?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun insert(o: JSONObject?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(o: JSONObject?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun rm(o: JSONObject?) {
+        TODO("Not yet implemented")
+    }
 }
