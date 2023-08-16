@@ -11,7 +11,7 @@ import org.json.JSONObject
 /**
  * Created by valle on 13/10/14.
  */
-open class DBMesas(context: Context?) : DBBase(context, "mesas") {
+abstract class DBMesas(context: Context?) : DBBase(context, "mesas") {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS mesas " +
@@ -79,7 +79,7 @@ open class DBMesas(context: Context?) : DBBase(context, "mesas") {
     }
 
     @SuppressLint("Range")
-    override fun filter(cWhere: String): JSONArray {
+    override fun filter(cWhere: String?): JSONArray {
         val lista = JSONArray()
         val db = this.readableDatabase
         var strWhere = ""

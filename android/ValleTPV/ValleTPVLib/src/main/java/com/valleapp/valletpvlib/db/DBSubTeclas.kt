@@ -11,7 +11,7 @@ import org.json.JSONObject
 /**
  * Created by valle on 13/10/14.
  */
-class DBSubTeclas(context: Context?) : DBBase(context, "subteclas") {
+abstract class DBSubTeclas(context: Context?) : DBBase(context, "subteclas") {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS subteclas (ID INTEGER PRIMARY KEY, " +

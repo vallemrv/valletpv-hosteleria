@@ -44,18 +44,54 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.routers.Routers
+import com.valleapp.valletpv.ui.AddCamarero
 import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.tools.ServiceCom
 import com.valleapp.valletpvlib.ui.ValleTopBar
 
 @Composable
+fun handleServiceBinding(
+    vModel: CamarerosModel,
+    context: Context
+) {
+    DisposableEffect(Unit) {
+        if (!vModel.mBound) {
+            Intent(context, ServiceCom::class.java).also { intent ->
+                vModel.connection?.let {
+                    context.bindService(intent, it, Context.BIND_AUTO_CREATE)
+                }
+            }
+        }
+
+        // Desenlazar el servicio cuando el composable ya no esté activo
+        onDispose {
+            println("Desenlazando servicio")
+            if (vModel.mBound) {
+                vModel.connection?.let { context.unbindService(it) }
+                vModel.mBound = false
+            }
+        }
+    }
+}
+
+
+
+@Composable
 fun PaseCamareros(navController: NavController? = null) {
+
+    val context = LocalContext.current
+    val vModel: CamarerosModel by remember {
+        mutableStateOf(CamarerosModel(context))
+    }
+    if (vModel.serverConfig == null) navController?.navigate(Routers.Preferencias.route)
+
+    handleServiceBinding(vModel, context)
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { vModel.showDialog.value = true },
                 containerColor = Pink00,
                 modifier = Modifier
                     .padding(10.dp)
@@ -100,7 +136,8 @@ fun PaseCamareros(navController: NavController? = null) {
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                PaseCamarerosScreen(navController)
+                PaseCamarerosScreen(vModel = vModel)
+                AddCamarero(model = vModel)
             }
         }
     )
@@ -109,31 +146,7 @@ fun PaseCamareros(navController: NavController? = null) {
 
 
 @Composable
-fun PaseCamarerosScreen(navController: NavController? = null) {
-    val context = LocalContext.current
-    val vModel: CamarerosModel by remember {
-        mutableStateOf(CamarerosModel(context))
-    }
-    if (vModel.serverConfig == null) navController?.navigate(Routers.Preferencias.route)
-
-
-    DisposableEffect(Unit) {
-
-        if (!vModel.mBound) {
-            Intent(context, ServiceCom::class.java).also { intent ->
-                vModel.connection?.let { context.bindService(intent, it, Context.BIND_AUTO_CREATE) }
-            }
-        }
-
-        // Desenlazar el servicio cuando el composable ya no esté activo
-        onDispose {
-            println("Desenlazando servicio")
-            if (vModel.mBound) {
-                vModel.connection?.let { context.unbindService(it) }
-                vModel.mBound = false
-            }
-        }
-    }
+fun PaseCamarerosScreen(vModel: CamarerosModel ) {
 
     Row(
         modifier = Modifier.fillMaxSize(),
@@ -206,16 +219,16 @@ fun PaseCamarerosScreen(navController: NavController? = null) {
                     .clickable {
                         // Salir de la aplicación
                         if (vModel.mBound) {
-                            vModel.connection?.let { context.unbindService(it) }
+                            vModel.connection?.let { vModel.context.unbindService(it) }
                             vModel.mBound = false
                         }
-                        val intent = Intent(context, ServiceCom::class.java)
-                        context.stopService(intent)
+                        val intent = Intent(vModel.context, ServiceCom::class.java)
+                        vModel.context.stopService(intent)
 
                         Intent(Intent.ACTION_MAIN).apply {
                             addCategory(Intent.CATEGORY_HOME)
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            context.startActivity(this)
+                            vModel.context.startActivity(this)
                         }
                     }
             )

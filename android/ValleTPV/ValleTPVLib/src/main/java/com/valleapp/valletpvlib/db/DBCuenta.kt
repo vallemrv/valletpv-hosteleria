@@ -15,7 +15,7 @@ import java.util.UUID
 /**
  * Created by valle on 13/10/14.
  */
-class DBCuenta(context: Context?) : DBBase(context, "cuenta") {
+abstract class DBCuenta(context: Context?) : DBBase(context, "cuenta") {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
             "CREATE TABLE IF NOT EXISTS cuenta " +
@@ -29,15 +29,17 @@ class DBCuenta(context: Context?) : DBBase(context, "cuenta") {
         )
     }
 
-    override fun rellenarTabla(objs: JSONArray) {
+    override fun rellenarTabla(objs: JSONArray?) {
         val db = writableDatabase
         db.execSQL("DELETE FROM $tb_name WHERE Estado != 'N'")
-        for (i in 0 until objs.length()) {
-            // Create a new map of values, where column names are the keys
-            try {
-                insert(objs.getJSONObject(i))
-            } catch (e: JSONException) {
-                e.printStackTrace()
+        if (objs != null) {
+            for (i in 0 until objs.length()) {
+                // Create a new map of values, where column names are the keys
+                try {
+                    insert(objs.getJSONObject(i))
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
             }
         }
     }

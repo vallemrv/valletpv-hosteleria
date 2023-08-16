@@ -11,7 +11,7 @@ import org.json.JSONObject
 /**
  * Created by valle on 13/10/14.
  */
-class DBZonas(context: Context?) : DBBase(context, "zonas") {
+abstract class DBZonas(context: Context?) : DBBase(context, "zonas") {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS  zonas (ID INTEGER PRIMARY KEY, Nombre TEXT, RGB TEXT, Tarifa INTEGER)")
     }
@@ -46,23 +46,5 @@ class DBZonas(context: Context?) : DBBase(context, "zonas") {
         return values
     }
 
-    override fun filter(cWhere: String?): JSONArray {
-        TODO("Not yet implemented")
-    }
 
-    override fun rellenarTabla(objs: JSONArray?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun insert(o: JSONObject?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun update(o: JSONObject?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun rm(o: JSONObject?) {
-        TODO("Not yet implemented")
-    }
 }

@@ -32,7 +32,7 @@ abstract class DBBase(context: Context?, val tb_name: String) :
 
     protected abstract fun cursorToJSON(res: Cursor?): JSONObject?
     protected abstract fun caragarValues(o: JSONObject?): ContentValues
-    override fun filter(cWhere: String): JSONArray {
+   override fun filter(cWhere: String?): JSONArray {
         val db = this.readableDatabase
         val w = " WHERE $cWhere"
         val res = db.rawQuery("select * from $tb_name $w", null)
@@ -49,24 +49,24 @@ abstract class DBBase(context: Context?, val tb_name: String) :
         return list
     }
 
-    override fun rellenarTabla(objs: JSONArray) {
+    override fun rellenarTabla(objs: JSONArray?) {
         val db = writableDatabase
         db.execSQL("DELETE FROM $tb_name")
-        for (i in 0 until objs.length()) {
+        for (i in 0 until (objs?.length() ?:0 )) {
             // Create a new map of values, where column names are the keys
             try {
-                insert(objs.getJSONObject(i))
+                insert(objs?.getJSONObject(i))
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
         }
     }
 
-    override fun insert(o: JSONObject) {
+    override fun insert(o: JSONObject?) {
         val db = writableDatabase
         try {
             synchronized(db) {
-                val id: String = if (o.has("ID")) {
+                val id: String = if (o!!.has("ID")) {
                     o.getString("ID")
                 } else {
                     o.getString("id")
@@ -91,18 +91,18 @@ abstract class DBBase(context: Context?, val tb_name: String) :
         }
     }
 
-    override fun update(o: JSONObject) {
+    override fun update(o: JSONObject?) {
         insert(o)
     }
 
-    override fun rm(o: JSONObject) {
+    override fun rm(o: JSONObject?) {
         val db = writableDatabase
         try {
             synchronized(db) {
-                if (o.has("ID")) {
+                if (o?.has("ID") == true) {
                     db.delete(tb_name, "ID=?", arrayOf(o.getString("ID")))
                 } else {
-                    db.delete(tb_name, "ID=?", arrayOf(o.getString("id")))
+                    db.delete(tb_name, "ID=?", o?.let { arrayOf(it.getString("id")) })
                 }
             }
         } catch (e: Exception) {

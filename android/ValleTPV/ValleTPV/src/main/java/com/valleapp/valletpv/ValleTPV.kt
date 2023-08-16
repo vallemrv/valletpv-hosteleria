@@ -29,6 +29,14 @@ class ValleTPV : ComponentActivity() {
         val intent = Intent(this, ServiceCom::class.java)
         stopService(intent)
     }
+
+
+    override fun onStart() {
+        super.onStart()
+        val intent = Intent(this, ServiceCom::class.java)
+        startForegroundService(intent)
+      }
+
 }
 
 

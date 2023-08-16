@@ -7,8 +7,8 @@ import android.database.Cursor
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DBMesasAbiertas(context: Context?) : DBMesas(context) {
-    override fun filter(cWhere: String): JSONArray {
+abstract class DBMesasAbiertas(context: Context?) : DBMesas(context) {
+    override fun filter(cWhere: String?): JSONArray {
         var cWhere: String? = cWhere
         if (cWhere != null && cWhere != "") {
             cWhere += " and abierta=1"
@@ -18,20 +18,22 @@ class DBMesasAbiertas(context: Context?) : DBMesas(context) {
         return super.filter(cWhere)
     }
 
-    override fun rellenarTabla(objs: JSONArray) {
+    override fun rellenarTabla(objs: JSONArray?) {
         val sqlDb = writableDatabase
         try {
             var initialValues = ContentValues()
             initialValues.put("abierta", 0)
             initialValues.put("num", "0") //Cerramos todas las mesas
             sqlDb.update("mesas", initialValues, null, null)
-            for (i in 0 until objs.length()) {
-                val o = objs.getJSONObject(i)
-                initialValues = ContentValues()
-                val id = o.getString("ID")
-                initialValues.put("abierta", 1)
-                initialValues.put("num", o.getString("num"))
-                sqlDb.update("mesas", initialValues, "ID=?", arrayOf(id))
+            if (objs != null) {
+                for (i in 0 until objs.length()) {
+                    val o = objs.getJSONObject(i)
+                    initialValues = ContentValues()
+                    val id = o.getString("ID")
+                    initialValues.put("abierta", 1)
+                    initialValues.put("num", o.getString("num"))
+                    sqlDb.update("mesas", initialValues, "ID=?", arrayOf(id))
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -53,20 +55,26 @@ class DBMesasAbiertas(context: Context?) : DBMesas(context) {
     }
 
     override fun inicializar() {}
-    override fun rm(o: JSONObject) {}
-    override fun insert(o: JSONObject) {}
-    override fun update(o: JSONObject) {
+    override fun rm(o: JSONObject?) {}
+    override fun insert(o: JSONObject?) {}
+    override fun update(o: JSONObject?) {
         try {
-            val id: String
-            id = if (o.has("ID")) {
-                o.getString("ID")
-            } else {
-                o.getString("id")
+            var id: String? = null
+            if (o != null) {
+                id = if (o.has("ID")) {
+                    o.getString("ID")
+                } else {
+                    o.getString("id")
+                }
             }
             val dbsql = writableDatabase
             val values = ContentValues()
-            values.put("abierta", o.getString("abierta"))
-            values.put("num", o.getInt("num"))
+            if (o != null) {
+                values.put("abierta", o.getString("abierta"))
+            }
+            if (o != null) {
+                values.put("num", o.getInt("num"))
+            }
             dbsql.update("mesas", values, "ID=?", arrayOf(id))
         } catch (e: Exception) {
             e.printStackTrace()

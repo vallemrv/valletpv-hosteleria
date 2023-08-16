@@ -11,7 +11,7 @@ import org.json.JSONObject
 /**
  * Created by valle on 13/10/14.
  */
-class DBTeclas(context: Context?) : DBBase(context, "teclas") {
+abstract class DBTeclas(context: Context?) : DBBase(context, "teclas") {
     private var tarifa = 0
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(

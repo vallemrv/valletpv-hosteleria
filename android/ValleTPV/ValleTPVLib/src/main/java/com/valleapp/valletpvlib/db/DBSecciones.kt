@@ -19,7 +19,7 @@ class DBSecciones(context: Context?) : DBBase(context, "secciones") {
     val all: JSONArray
         get() = filter(null)
 
-    fun filter(cWhere: String?): JSONArray {
+    override fun filter(cWhere: String?): JSONArray {
         val db = this.readableDatabase
         var w = ""
         if (cWhere != null) {

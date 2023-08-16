@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DBCamareros(context: Context) : DBBase(context, "camareros") {
+abstract class DBCamareros(context: Context) : DBBase(context, "camareros") {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
