@@ -1,6 +1,9 @@
+import org.gradle.api.JavaVersion.VERSION_17
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -24,13 +27,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = VERSION_17
+        targetCompatibility = VERSION_17
     }
 
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -43,7 +46,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("androidx.compose.ui:ui-android:1.6.0-alpha03")
     implementation("androidx.compose.material3:material3:1.1.1")
     implementation("androidx.compose.ui:ui-tooling-android:1.5.0")
@@ -51,6 +54,13 @@ dependencies {
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("org.jetbrains.kotlin:kotlin-coroutines-android:1.5.0")
+    implementation("androidx.room:room-common:2.5.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.1")
+    val room_version = "2.5.0"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+
+    ksp("androidx.room:room-compiler:$room_version")
 
 }

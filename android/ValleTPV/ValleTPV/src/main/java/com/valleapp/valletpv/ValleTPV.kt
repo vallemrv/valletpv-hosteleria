@@ -26,6 +26,7 @@ class ValleTPV : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        println("ValleTPV: onDestroy")
         val intent = Intent(this, ServiceCom::class.java)
         stopService(intent)
     }
@@ -33,7 +34,12 @@ class ValleTPV : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        val intent = Intent(this, ServiceCom::class.java)
+        val intent = Intent(this, ServiceCom::class.java).apply {
+            putExtra("res_id", R.mipmap.ic_launcher)
+            putExtra("chanel_id", "valle_tpv_channel")
+            putExtra("titulo", "ValleTPV")
+            putExtra("texto", "Servicio de comunicación")
+        }
         startForegroundService(intent)
       }
 

@@ -9,13 +9,15 @@ data class ServerConfig(
     var url: String? = null
 ) {
 
-
-
     fun loadJSON(json: String?): Boolean {
         return try {
-            val obj = JSONObject(json)
-            codigo = obj.getString("codigo")
-            UID = obj.getString("UID")
+            val obj = json?.let { JSONObject(it) }
+            if (obj != null) {
+                codigo = obj.getString("codigo")
+            }
+            if (obj != null) {
+                UID = obj.getString("UID")
+            }
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -23,29 +25,49 @@ data class ServerConfig(
         }
     }
 
-
-    fun getParams(): ContentValues {
-        val params = ContentValues()
-        if (codigo != null && UID != null) {
-            params.put("code", codigo)
-            params.put("UID", UID)
-        }
-        return params
+    fun isEmpty(): Boolean {
+        return codigo.isNullOrEmpty() || UID.isNullOrEmpty() || url.isNullOrEmpty()
     }
 
-    fun getUrl(endPoint: String): String {
-        if (url == null || url!!.isEmpty()) return ""
-        var strUrl = ""
-        if (!url!!.contains("http://") && !url!!.contains("https://")) strUrl = "http://$url"
-        var adjustedEndpoint = if (!endPoint.startsWith("/")) "/$endPoint" else endPoint
-        if (strUrl.endsWith("/")) strUrl = strUrl.substring(0, strUrl.length - 1)
-        if (!strUrl.endsWith("api")) strUrl += "/api"
-        return strUrl + adjustedEndpoint
+    fun getParams(args: Map<String, Any>? = null): ContentValues {
+        val aux = ContentValues()
+        if (args != null && !isEmpty()) {
+            aux.put("codigo", codigo)
+            aux.put("UID", UID)
+            for((k, v) in args){
+                aux.put(k, v.toString())
+            }
+        }
+        return aux
     }
 
     fun toJson(): JSONObject? {
         return if (url != null && codigo != null && UID != null)
             JSONObject("{\"codigo\":\"$codigo\",\"UID\":\"$UID\",\"url\":\"$url\"}")
         else null
+    }
+
+    fun isEqualsCode(c: String): Boolean {
+        return codigo == c
+    }
+
+    fun getFullUrl(endpoint: String): String {
+           return parseUrl(url!!) + endpoint
+    }
+
+    companion object{
+        fun parseUrl(url: String): String {
+            var aux = url
+            if (!aux.startsWith("https://") && !aux.startsWith("http://")) {
+                aux = "http://$aux"
+            }
+            if (!aux.endsWith("/")) {
+                aux += "/"
+            }
+            if (!aux.endsWith("/api/")) {
+                aux += "api/"
+            }
+            return aux
+        }
     }
 }

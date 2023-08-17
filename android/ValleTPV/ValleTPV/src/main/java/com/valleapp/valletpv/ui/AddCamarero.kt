@@ -18,12 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.ui.theme.Pink00
+import com.valleapp.valletpvlib.tools.ServerConfig
+
 @Composable
 fun AddCamarero(model: CamarerosModel) {
-    if (model.showDialog.value) {
+    if (model.showDialog) {
         AlertDialog(
             onDismissRequest = {
-                model.showDialog.value = false
+                model.showDialog = false
             },
             title = {
                 Text(text = "Agregar camarero")
@@ -32,14 +34,14 @@ fun AddCamarero(model: CamarerosModel) {
 
                 Column {
                     TextField(
-                        value = model.nombre.value,
-                        onValueChange = { newValue -> model.nombre.value = newValue },
+                        value = model.nombre,
+                        onValueChange = { newValue -> model.nombre = newValue },
                         label = { Text("Nombre") }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     TextField(
-                        value = model.apellido.value,
-                        onValueChange = { newValue -> model.apellido.value = newValue },
+                        value = model.apellido,
+                        onValueChange = { newValue -> model.apellido = newValue },
                         label = { Text("Apellido") }
                     )
                 }
@@ -47,7 +49,7 @@ fun AddCamarero(model: CamarerosModel) {
             confirmButton = {
                 Button(onClick = {
                     // Aquí puedes manejar la acción al presionar el botón confirmar
-                    model.showDialog.value = false
+                    model.showDialog = false
                     model.add_camrarero()
                 },
                     colors = ButtonDefaults.buttonColors(containerColor = Pink00)) {
@@ -64,5 +66,5 @@ fun AddCamarero(model: CamarerosModel) {
 @Composable
 fun DefaultPreview() {
     val showDialog = remember { mutableStateOf(true) }
-    AddCamarero(CamarerosModel(LocalContext.current))
+    AddCamarero(CamarerosModel(LocalContext.current, ServerConfig()))
 }

@@ -5,39 +5,41 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.valleapp.valletpvlib.db.AppDatabase
+import com.valleapp.valletpvlib.tools.tareas.TareaManejarInstrucciones
+import java.util.Queue
+import java.util.Timer
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class ServiceCom : Service() {
 
     private val binder = LocalBinder()
-    var serverConfig: ServerConfig? = null
+    private var serverConfig: ServerConfig? = null
+    private var appDatabase: AppDatabase? = null
+    private val cola: Queue<Instrucciones> = ConcurrentLinkedQueue()
+    private val timer = Timer()
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        appDatabase = AppDatabase.getDatabase(this)
         intent?.let {
-            var url = it.getStringExtra("url")
-            var codigo = it.getStringExtra("codigo")
-            var UID = it.getStringExtra("UID")
-            var res_id = it.getIntExtra("res_id", 0)
-            var chanel_id = it.getStringExtra("chanel_id")
-            var titulo = it.getStringExtra("titulo")
-            var texto = it.getStringExtra("texto")
-            if (url != null && codigo != null && UID != null)
-                serverConfig = ServerConfig(url = url, codigo = codigo, UID = UID)
+            val resId = it.getIntExtra("res_id", 0)
+            val chanelId = it.getStringExtra("chanel_id")
+            val titulo = it.getStringExtra("titulo")
+            val texto = it.getStringExtra("texto")
 
 
-            println("url: $url  codigo: $codigo  UID: $UID  res_id: $res_id  chanel_id: $chanel_id  titulo: $titulo  texto: $texto")
-            if (chanel_id != null && texto != null && titulo != null && res_id != 0) {
-                createNotificationChannel(chanel_id, texto)
-                val notification = NotificationCompat.Builder(this, chanel_id )
+             if (chanelId != null && texto != null && titulo != null && resId != 0) {
+                createNotificationChannel(chanelId, texto)
+                val notification = NotificationCompat.Builder(this, chanelId )
                     .setContentTitle(titulo)
                     .setContentText(texto)
-                    .setSmallIcon(res_id)
+                    .setSmallIcon(resId)
                     .build()
 
                 startForeground(1, notification)
@@ -46,20 +48,43 @@ class ServiceCom : Service() {
         return START_STICKY
     }
 
-    private fun createNotificationChannel(id: String, name: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                id,
-                name,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
+    override fun onDestroy() {
+        super.onDestroy()
+        println("ServiceCom: onDestroy")
+        timer.cancel()
+    }
 
-            val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(serviceChannel)
-        }
+    private fun createNotificationChannel(id: String, name: String) {
+        val serviceChannel = NotificationChannel(
+            id,
+            name,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        val manager = getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(serviceChannel)
     }
 
     inner class LocalBinder : Binder() {
         fun getService(): ServiceCom = this@ServiceCom
+    }
+
+    fun setServerConfig(serverConfig: ServerConfig) {
+        if (this.serverConfig == null) {
+            this.serverConfig = serverConfig
+            timer.schedule(TareaManejarInstrucciones(cola, 500), 2000, 1)
+            println("ServiceCom: setServerConfig")
+        }
+    }
+
+
+
+    fun getDB(): AppDatabase? {
+        return appDatabase
+    }
+
+    fun addInstruccion(inst: Instrucciones) {
+        cola.add(inst)
+        println("ServiceCom: addInstruccion")
     }
 }
