@@ -7,6 +7,9 @@ import android.os.Message
 import android.util.Log
 import com.valleapp.valletpvlib.tools.HTTPRequest
 import com.valleapp.valletpvlib.tools.Instrucciones
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.Queue
 import java.util.TimerTask
 
@@ -14,10 +17,11 @@ import java.util.TimerTask
 class TareaManejarInstrucciones(
     private val cola: Queue<Instrucciones>,
     private val timeout: Long
-) : TimerTask() {
+) {
 
     private var procesado = true
     private var count = 0
+    private val mutex = Mutex(true)
 
     private val handleHttp = object : Handler(Looper.myLooper()!!) {
         override fun handleMessage(msg: Message) {
@@ -34,8 +38,7 @@ class TareaManejarInstrucciones(
                                 val handlerInst = it.handler
                                 handlerInst?.let { handler ->
                                     val msgInst = handler.obtainMessage()
-                                    var bundle = msg.data
-                                    if (bundle == null) bundle = Bundle()
+                                    var bundle =  Bundle()
                                     bundle.putString("RESPONSE", res)
                                     bundle.putString("op", inst.op)
                                     msgInst.data = bundle
@@ -54,13 +57,24 @@ class TareaManejarInstrucciones(
         }
     }
 
-    override fun run() {
+    suspend fun startProcessing() {
+        while (true) {
+            mutex.withLock {  // Se bloqueará aquí si el mutex está bloqueado
+                if (cola.isEmpty()) {
+                    break
+                }
+                delay(timeout)
+                processInstruction()
+            }
+        }
+    }
+    private suspend fun processInstruction() {
         try {
             if (procesado) {
-                synchronized(cola) {
+                mutex.withLock {
                     val inst = cola.peek()
                     inst?.let {
-                        HTTPRequest(it.url, it.params, "", handleHttp)
+                        it.params?.let { it1 -> HTTPRequest(it.url, it1, "", handleHttp) }
                         procesado = false
                     }
                 }
@@ -72,8 +86,6 @@ class TareaManejarInstrucciones(
                 count = 0
                 procesado = true
             }
-
-            Thread.sleep(timeout)
 
         } catch (e: Exception) {
             e.printStackTrace()

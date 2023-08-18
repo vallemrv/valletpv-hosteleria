@@ -9,8 +9,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,7 +19,7 @@ import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.tools.ServerConfig
 
 @Composable
-fun AddCamarero(model: CamarerosModel) {
+fun AddCamareroDialog(model: CamarerosModel) {
     if (model.showDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -50,7 +48,7 @@ fun AddCamarero(model: CamarerosModel) {
                 Button(onClick = {
                     // Aquí puedes manejar la acción al presionar el botón confirmar
                     model.showDialog = false
-                    model.add_camrarero()
+                    model.addCamarero()
                 },
                     colors = ButtonDefaults.buttonColors(containerColor = Pink00)) {
                     Text("Confirmar", color = Color.Black)
@@ -65,6 +63,5 @@ fun AddCamarero(model: CamarerosModel) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    val showDialog = remember { mutableStateOf(true) }
-    AddCamarero(CamarerosModel(LocalContext.current, ServerConfig()))
+    AddCamareroDialog(CamarerosModel(LocalContext.current, ServerConfig()))
 }
