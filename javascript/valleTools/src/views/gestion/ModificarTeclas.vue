@@ -56,10 +56,11 @@
 
 <script>
 import EditFloatVue from "@/components/tools/EditFloat.vue";
-import MainToolbar from "@/components/tools/MainToolbar.vue";
+import MainToolbar from "@/components/tools/MainToolBar.vue";
 import { TeclasStore } from "@/stores/teclados/teclas.js";
 import { EmpresaStore } from "@/stores/empresaStore.js";
-import BuscadorTeclas from "../../components/tools/BuscadorTeclas.vue";
+import BuscadorTeclas from "@/components/tools/BuscadorTeclas.vue";
+
 export default {
     props: {
         tipo: {

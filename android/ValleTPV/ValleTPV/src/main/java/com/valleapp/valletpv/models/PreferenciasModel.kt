@@ -1,70 +1,35 @@
 package com.valleapp.valletpv.models
 
 
-import android.content.ContentValues
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.valleapp.valletpvlib.tools.HTTPRequest
+import com.valleapp.valletpvlib.tools.ApiEndPoints
+import com.valleapp.valletpvlib.tools.ApiRequest
+import com.valleapp.valletpvlib.tools.ApiResponse
 import com.valleapp.valletpvlib.tools.JSON
 import com.valleapp.valletpvlib.tools.ServerConfig
+import com.valleapp.valletpvlib.tools.safeApiCall
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
-class PreferenciasModel(cx: Context) : ViewModel() {
+class PreferenciasModel(private val app: Application) : AndroidViewModel(app) {
 
     var url by mutableStateOf("")
     var codigo by mutableStateOf("")
     var isCardVisible by mutableStateOf(false)
-    var serverConfig: ServerConfig by mutableStateOf(ServerConfig())
+    var serverConfig: ServerConfig = ServerConfig()
     var preferenciasCargadas by mutableStateOf(false)
     var error: Boolean by mutableStateOf(false)
     var strError: String by mutableStateOf("")
-    private val context: Context = cx
 
-    val hanler: Handler = Handler(Looper.getMainLooper()){
-        val respose = it.data.getString("response") ?: ""
-        val op = it.data.getString("op") ?: ""
-        try {
-            when(op){
-                "ERROR" -> {
-                    error = true
-                    strError = respose
-                }
-                "GET_CODIGO" -> {
-                    val obj = JSONObject(respose)
-                    if (obj.has("codigo")) {
-                        codigo = ""
-                        serverConfig.codigo = obj.getString("codigo")
-                        serverConfig.UID = obj.getString("UID")
-                        isCardVisible = true
-                        error = false
-                        preferenciasCargadas = true
-                        serverConfig.toJson()?.let { json ->
-                            JSON.serializar("preferencias.dat", json, context.applicationContext)
-                        }
-                    }
-                }
-                else -> {
-                    error = true
-                    strError = "Operación no soportada"
-                }
-            }
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
-       true
-    }
 
     init {
 
         if (!preferenciasCargadas) {
-            JSON.deserializar("preferencias.dat", cx.applicationContext)?.let {
+            JSON.deserializar("preferencias.dat", app.applicationContext)?.let {
                 if (it.has("url")) {
                     url = it.getString("url")
                     serverConfig.url = url
@@ -74,7 +39,7 @@ class PreferenciasModel(cx: Context) : ViewModel() {
                     serverConfig.codigo = codigo
                 }
                 if (it.has("UID")) {
-                   serverConfig.UID = it.getString("UID")
+                    serverConfig.uid = it.getString("UID")
                 }
                 preferenciasCargadas = !serverConfig.isEmpty()
                 isCardVisible = preferenciasCargadas
@@ -86,34 +51,59 @@ class PreferenciasModel(cx: Context) : ViewModel() {
         }
     }
 
+    private fun mostrarError(msg: String, isCardVisible: Boolean = false){
+        error = true
+        strError = msg
+        this.isCardVisible = isCardVisible
+        preferenciasCargadas = false
+    }
+
 
     fun onOkClick() {
-        if (!serverConfig.isEmpty()) serverConfig.url = ServerConfig.parseUrl(serverConfig.url!!)
-        viewModelScope.launch {
-            HTTPRequest(
-                serverConfig.getFullUrl("/dispositivos/new/"),
-                ContentValues(),
-                "GET_CODIGO",
-                hanler
-            )
+        if (url.isNotEmpty()) {
+            codigo = ""
+            serverConfig.url = url
+            ApiRequest.init(serverConfig.getParseUrl())
+            viewModelScope.launch {
+                val result = safeApiCall {
+                    ApiRequest.service.post(ApiEndPoints.DISPOSITIVO_NUEVO, mapOf())
+                }
+                when (result) {
+                    is ApiResponse.Success -> {
+                        serverConfig.loadJSON(result.data)
+                        isCardVisible = true
+                        error = false
+                        preferenciasCargadas = true
+                        serverConfig.toJson()?.let {
+                            JSON.serializar("preferencias.dat", it, app.applicationContext)
+                        }
+                    }
+
+                    is ApiResponse.Error -> {
+                        mostrarError(result.errorMessage)
+                    }
+
+                    else -> {
+                        mostrarError("Error desconocido")
+                    }
+                }
+            }
+
         }
     }
 
     fun onValidarClick() {
-        if (!serverConfig.isEmpty() && !serverConfig.isEqualsCode(codigo)) {
+        if (!serverConfig.isEmpty() && serverConfig.isEqualsCode(codigo)) {
             serverConfig.toJson()?.let {
-                JSON.serializar("preferencias.dat", it, context.applicationContext)
+                JSON.serializar("preferencias.dat", it, app.applicationContext)
                 error = false
                 preferenciasCargadas = true
             } ?: run {
-                error = true
-                strError = "Error al guardar preferencias"
-                preferenciasCargadas = false
+               mostrarError("Error al guardar preferencias")
             }
         } else {
-            error = true
-            strError = "Código incorrecto"
-            preferenciasCargadas = false
+            mostrarError("Codigo inválido", true)
+            codigo  = ""
         }
     }
 }

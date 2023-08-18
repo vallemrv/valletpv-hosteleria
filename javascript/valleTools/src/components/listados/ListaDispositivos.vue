@@ -3,26 +3,26 @@
 </template>
 <script>
 import TablasDatos from '@/components/tools/TablasDatos.vue';
-import { UserStore } from '@/stores/usuarios';
 import { EmpresaStore } from '@/stores/empresaStore';
 import { watch } from 'vue';
+import { DispositivosStore } from '@/stores/dispositivos';
 export default {
     components:{
         TablasDatos
     },
     setup() {
-        const store = UserStore();
+        const store = DispositivosStore();
         const empresaStore = EmpresaStore();
         watch(() => empresaStore.empresa, (empresa) => {
             if(empresa)
-                store.loadDispositivos(empresaStore);
+                store.load(empresaStore);
         });
         
         return { store, empresaStore };
     },
     mounted() {
         if(this.empresaStore.empresa && this.store.items.length == 0){
-            this.store.loadDispositivos(this.empresaStore);
+            this.store.load(this.empresaStore);
         }
     },
     

@@ -43,13 +43,13 @@
   
 import { EmpresaStore } from "@/stores/empresaStore";
 import { DashBoard } from "@/stores/dashBoard";
-import DialogConfirm from "../../components/dialogs/DialogConfirm.vue";
+import DialogConfirm from "@/components/dialogs/DialogConfirm.vue";
 import EditEmpresaDialog from "@/components/dialogs/EditEmpresaDialog.vue";
 import VentasCard from "@/components/dashBoard/VentasCard.vue";
-import VentasByCamCard from "../../components/dashBoard/VentasByCamCard.vue";
-import VentasByIntervalos from "../../components/dashBoard/VentasByIntervalos.vue";
-import VentasByArt from "../../components/dashBoard/VentasByArt.vue";
-import MainToolBar from "../../components/tools/MainToolBar.vue";
+import VentasByCamCard from "@/components/dashBoard/VentasByCamCard.vue";
+import VentasByIntervalos from "@/components/dashBoard/VentasByIntervalos.vue";
+import VentasByArt from "@/components/dashBoard/VentasByArt.vue";
+import MainToolBar from "@/components/tools/MainToolBar.vue";
 
 
 export default {

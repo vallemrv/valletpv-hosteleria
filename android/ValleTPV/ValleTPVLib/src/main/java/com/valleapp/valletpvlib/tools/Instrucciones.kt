@@ -1,11 +1,13 @@
 package com.valleapp.valletpvlib.tools;
 
-import android.content.ContentValues
-import android.os.Handler
+data class Mensaje(
+    var mensaje: String,
+    var tipo: String,
+    val data: Map<String, String>? = null,
+)
 
 data class Instrucciones(
-    val params: ContentValues,
-    val url: String,
-    val handler: Handler? = null,
-    val op: String,
+    val endPoint: String,
+    val mensaje: Mensaje? = null,
+    val params: Map<String, String>? = null,
 )

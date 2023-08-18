@@ -58,9 +58,13 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
     implementation("androidx.navigation:navigation-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.dagger:hilt-android:2.44")
+
 
     implementation(project(":ValleTPVLib"))
-    val room_version = "2.5.0"
+    val room_version = "2.5.2"
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")

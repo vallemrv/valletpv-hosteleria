@@ -1,49 +1,45 @@
 package com.valleapp.valletpvlib.tools
 
-import android.content.ContentValues
 import org.json.JSONObject
 
 data class ServerConfig(
     var codigo: String? = null,
-    var UID: String? = null,
+    var uid: String? = null,
     var url: String? = null
 ) {
 
-    fun loadJSON(json: String?): Boolean {
-        return try {
-            val obj = json?.let { JSONObject(it) }
-            if (obj != null) {
-                codigo = obj.getString("codigo")
-            }
-            if (obj != null) {
-                UID = obj.getString("UID")
-            }
-            true
+    fun getParseUrl(): String {
+        return parseUrl(url ?: "")
+    }
+
+    fun loadJSON(obj: Map<String, Any>) {
+         try {
+             codigo = obj["codigo"].toString()
+             uid = obj["UID"].toString()
         } catch (e: Exception) {
             e.printStackTrace()
-            false
         }
     }
 
     fun isEmpty(): Boolean {
-        return codigo.isNullOrEmpty() || UID.isNullOrEmpty() || url.isNullOrEmpty()
+        return codigo.isNullOrEmpty() || uid.isNullOrEmpty() || url.isNullOrEmpty()
     }
 
-    fun getParams(args: Map<String, Any>? = null): ContentValues {
-        val aux = ContentValues()
+    fun getParams(args: Map<String, Any>? = null): Map<String, String> {
+        val aux = HashMap<String, String>()
         if (args != null && !isEmpty()) {
-            aux.put("codigo", codigo)
-            aux.put("UID", UID)
+            codigo?.let { aux.put("codigo", it) }
+            uid?.let { aux.put("UID", it) }
             for((k, v) in args){
-                aux.put(k, v.toString())
+                aux[k] = v.toString()
             }
         }
         return aux
     }
 
     fun toJson(): JSONObject? {
-        return if (url != null && codigo != null && UID != null)
-            JSONObject("{\"codigo\":\"$codigo\",\"UID\":\"$UID\",\"url\":\"$url\"}")
+        return if (url != null && codigo != null && uid != null)
+            JSONObject("{\"codigo\":\"$codigo\",\"UID\":\"$uid\",\"url\":\"$url\"}")
         else null
     }
 
@@ -51,9 +47,8 @@ data class ServerConfig(
         return codigo == c
     }
 
-    fun getFullUrl(endpoint: String): String {
-           return parseUrl(url!!) + endpoint
-    }
+
+
 
     companion object{
         fun parseUrl(url: String): String {

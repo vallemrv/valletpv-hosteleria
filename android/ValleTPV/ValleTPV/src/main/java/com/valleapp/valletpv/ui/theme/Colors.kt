@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.Color
 val Pink00 = Color(0xFFD0B8D5)
 
 val DarkColorPalette = lightColorScheme(
-    primary = Color(0xFFBBDEFB),
-    primaryContainer = Color(0xFFD1C4E9),
-    secondary = Color(0xFFF0F4C3),
-    surface = Color(0xFFE0E0E0),
+    primary = Color(0xFF9ECBF1),
+    primaryContainer = Color(0xFFB292EC),
+    secondary = Color(0xFF81F5E4),
+    surface = Color(0xFF917B96),
 )

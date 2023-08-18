@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.screens
 
+import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,10 +63,10 @@ fun Preferencias(navController: NavController? = null) {
 
 @Composable
 fun PreferenciasScreen() {
-    val cx = LocalContext.current
-
-    val vModel: PreferenciasModel by remember  {
-       mutableStateOf( PreferenciasModel(cx))
+    val context = LocalContext.current
+    val app = context.applicationContext as Application
+    val vModel: PreferenciasModel by remember {
+        mutableStateOf(PreferenciasModel(app))
     }
 
     Column(
@@ -111,62 +112,66 @@ fun PreferenciasScreen() {
                 )
             }
         }
+        Box {
+            if (vModel.isCardVisible) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
 
-        ComposableToast(message = vModel.strError, show = vModel.error) {
-            vModel.error = false
-        }
-
-        if (vModel.isCardVisible) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 12.dp,
-                    pressedElevation = 12.dp
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 12.dp,
+                        pressedElevation = 12.dp
+                    )
                 ) {
-                    Text(
-                        text = "Código", fontSize = 24.sp
-                    )
-
-                    TextField(
-                        value = vModel.codigo, // Variable que guarda el valor del TextField
-                        onValueChange = {
-                            if (it.length <= 6) vModel.codigo = it
-                        }, // Función que se llama al cambiar el valor
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textStyle = TextStyle(fontSize = 100.sp, textAlign = TextAlign.Center),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        placeholder = {
-                            Text(
-                                text = "Código aqui",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    )
-
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    ExtendedFloatingActionButton(
-                        onClick = { vModel.onValidarClick() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(70.dp),
-                        containerColor = Pink00,
+                    Column(
+                        modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(text = "Validar Código", color = Color.Black, fontSize = 24.sp)
+                        Text(
+                            text = "Código", fontSize = 24.sp
+                        )
+
+                        TextField(
+                            value = vModel.codigo, // Variable que guarda el valor del TextField
+                            onValueChange = {
+                                if (it.length <= 6) vModel.codigo = it
+                            }, // Función que se llama al cambiar el valor
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textStyle = TextStyle(fontSize = 100.sp, textAlign = TextAlign.Center),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            placeholder = {
+                                Text(
+                                    text = "Código aqui",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        )
+
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        ExtendedFloatingActionButton(
+                            onClick = { vModel.onValidarClick() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(70.dp),
+                            containerColor = Pink00,
+                        ) {
+                            Text(text = "Validar Código", color = Color.Black, fontSize = 24.sp)
+                        }
                     }
                 }
             }
+            ComposableToast(message = vModel.strError, show = vModel.error, 3000) {
+                vModel.error = false
+            }
+        }
+
+        ComposableToast(message = "Preferecias cargadas con exito", show = vModel.preferenciasCargadas, timeout = 3000 ) {
+            println("Preferecias cargadas con exito")
         }
     }
 }
@@ -175,7 +180,7 @@ fun PreferenciasScreen() {
 @Preview(
     showBackground = true,
     widthDp = 600,
-    )
+)
 fun PreferenciasPreview() {
     Preferencias(null)
 }

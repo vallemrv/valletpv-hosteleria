@@ -1,5 +1,7 @@
 package com.valleapp.valletpv.ui
 
+import android.app.Application
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -14,12 +16,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.tools.ServerConfig
 
 @Composable
 fun AddCamareroDialog(model: CamarerosModel) {
+
     if (model.showDialog) {
         AlertDialog(
             onDismissRequest = {
@@ -51,7 +55,7 @@ fun AddCamareroDialog(model: CamarerosModel) {
                     model.addCamarero()
                 },
                     colors = ButtonDefaults.buttonColors(containerColor = Pink00)) {
-                    Text("Confirmar", color = Color.Black)
+                    Text("Confirmar", color = Color.Black, fontSize = 30.sp)
                 }
             }
         )
@@ -63,5 +67,14 @@ fun AddCamareroDialog(model: CamarerosModel) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    AddCamareroDialog(CamarerosModel(LocalContext.current, ServerConfig()))
+    val cx = LocalContext.current
+    val app = if (isSystemInDarkTheme()) {
+        null
+    } else {
+        cx.applicationContext as Application
+    }
+    app?.let{
+        CamarerosModel(app, ServerConfig())
+    }
+
 }

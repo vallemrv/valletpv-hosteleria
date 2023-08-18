@@ -50,6 +50,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-android:1.6.0-alpha03")
     implementation("androidx.compose.material3:material3:1.1.1")
     implementation("androidx.compose.ui:ui-tooling-android:1.5.0")
+    implementation("androidx.activity:activity-compose:1.8.0-alpha06")
     implementation("androidx.compose.runtime:runtime:1.6.0-alpha03")
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

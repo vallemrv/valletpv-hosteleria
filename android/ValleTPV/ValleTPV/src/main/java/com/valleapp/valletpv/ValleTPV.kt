@@ -14,7 +14,6 @@ class ValleTPV : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-
               setContent {
                   ValleTheme {
                       Surface {

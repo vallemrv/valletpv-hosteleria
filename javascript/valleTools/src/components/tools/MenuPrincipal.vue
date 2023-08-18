@@ -39,6 +39,7 @@
 </template>
   
 <script>
+
 import { EmpresaStore } from '@/stores/empresaStore';
 import { UserStore } from '@/stores/usuarios';
 import { ConfigStore } from '@/stores/configStore';

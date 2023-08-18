@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.screens
 
+import android.app.Application
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,7 +46,7 @@ import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.models.PreferenciasModel
 import com.valleapp.valletpv.routers.Routers
-import com.valleapp.valletpv.ui.AddCamarero
+import com.valleapp.valletpv.ui.AddCamareroDialog
 import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.db.Camarero
@@ -58,13 +59,14 @@ import com.valleapp.valletpvlib.ui.ValleTopBar
 fun PaseCamareros(navController: NavController? = null) {
 
     val cx = LocalContext.current
-    val preferencias: PreferenciasModel = viewModel(initializer = { PreferenciasModel(cx) })
+    val app = cx.applicationContext as Application
+    val preferencias: PreferenciasModel = viewModel(initializer = { PreferenciasModel(app) })
     if (!preferencias.preferenciasCargadas) {
         navController?.navigate(Routers.Preferencias.route)
     }
 
     val serverConfig = preferencias.serverConfig
-    val vModel: CamarerosModel = viewModel(initializer = { CamarerosModel(cx, serverConfig) })
+    val vModel: CamarerosModel = viewModel(initializer = { CamarerosModel(app, serverConfig) })
 
     DisposableEffect(Unit) {
         vModel.bindService()
@@ -126,7 +128,7 @@ fun PaseCamareros(navController: NavController? = null) {
         content = {
             Box(modifier = Modifier.padding(it)) {
                 PaseCamarerosScreen(vModel = vModel)
-                AddCamarero(model = vModel)
+                AddCamareroDialog(model = vModel)
             }
         }
     )

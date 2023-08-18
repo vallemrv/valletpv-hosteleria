@@ -14,9 +14,9 @@
     </v-main>
 </template>
 <script>
-import ListaFamilias from '../../components/listados/ListaFamilias.vue';
-import ListaReceptores from '../../components/listados/ListaReceptores.vue';
-import MainToolBar from '../../components/tools/MainToolBar.vue';
+import ListaFamilias from '@/components/listados/ListaFamilias.vue';
+import ListaReceptores from '@/components/listados/ListaReceptores.vue';
+import MainToolBar from '@/components/tools/MainToolBar.vue';
 import { ReceptoresStore } from '@/stores/familias/receptores.js';
 import { FamiliasStore } from '@/stores/familias/familias.js';
 import { EmpresaStore } from '@/stores/empresaStore';

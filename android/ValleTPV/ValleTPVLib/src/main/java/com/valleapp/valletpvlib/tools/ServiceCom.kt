@@ -8,18 +8,17 @@ import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.valleapp.valletpvlib.db.AppDatabase
-import com.valleapp.valletpvlib.tools.tareas.TareaManejarInstrucciones
-import java.util.Queue
-import java.util.Timer
-import java.util.concurrent.ConcurrentLinkedQueue
+import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ServiceCom : Service() {
 
     private val binder = LocalBinder()
     private var serverConfig: ServerConfig? = null
     private var appDatabase: AppDatabase? = null
-    private val cola: Queue<Instrucciones> = ConcurrentLinkedQueue()
-    private val timer = Timer()
+    private val procesarCola = InstruccionesManager()
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -50,8 +49,7 @@ class ServiceCom : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        println("ServiceCom: onDestroy")
-        timer.cancel()
+        procesarCola.stopProcesarCola()
     }
 
     private fun createNotificationChannel(id: String, name: String) {
@@ -69,10 +67,14 @@ class ServiceCom : Service() {
         fun getService(): ServiceCom = this@ServiceCom
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun setServerConfig(serverConfig: ServerConfig) {
         if (this.serverConfig == null) {
             this.serverConfig = serverConfig
-            timer.schedule(TareaManejarInstrucciones(cola, 500), 2000, 1)
+            ApiRequest.init(serverConfig.getParseUrl())
+            GlobalScope.launch {
+                procesarCola.procesarCola()
+            }
             println("ServiceCom: setServerConfig")
         }
     }
@@ -84,7 +86,7 @@ class ServiceCom : Service() {
     }
 
     fun addInstruccion(inst: Instrucciones) {
-        cola.add(inst)
+        procesarCola.addInstruccion(inst)
         println("ServiceCom: addInstruccion")
     }
 }
