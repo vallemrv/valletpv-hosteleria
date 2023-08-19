@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import com.valleapp.valletpv.routers.Navegador
-import com.valleapp.valletpv.ui.theme.ValleTheme
+import com.valleapp.valletpvlib.ui.theme.ValleTheme
 import com.valleapp.valletpvlib.tools.ServiceCom
 
 class ValleTPV : ComponentActivity() {

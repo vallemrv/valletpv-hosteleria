@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.valleapp.valletpv.models.CamarerosModel
-import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.tools.ServerConfig
+import com.valleapp.valletpvlib.ui.theme.Pink00
 
 @Composable
 fun AddCamareroDialog(model: CamarerosModel) {

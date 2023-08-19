@@ -37,8 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,11 +45,12 @@ import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.models.PreferenciasModel
 import com.valleapp.valletpv.routers.Routers
 import com.valleapp.valletpv.ui.AddCamareroDialog
-import com.valleapp.valletpv.ui.theme.Pink00
 import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.db.Camarero
+import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.tools.ServiceCom
 import com.valleapp.valletpvlib.ui.ValleTopBar
+import com.valleapp.valletpvlib.ui.theme.Pink00
 
 
 
@@ -107,7 +106,7 @@ fun PaseCamareros(navController: NavController? = null) {
             ValleTopBar(
                 title = "Pase de Camareros"
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {              }) {
                     Icon(
                         painter = painterResource(id = ExtendIcons.arqueo),
                         contentDescription = "Preferencias",
@@ -127,7 +126,7 @@ fun PaseCamareros(navController: NavController? = null) {
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                PaseCamarerosScreen(vModel = vModel)
+                PaseCamarerosScreen(vModel = vModel, navController = navController)
                 AddCamareroDialog(model = vModel)
             }
         }
@@ -137,7 +136,7 @@ fun PaseCamareros(navController: NavController? = null) {
 
 
 @Composable
-fun PaseCamarerosScreen(vModel: CamarerosModel) {
+fun PaseCamarerosScreen(vModel: CamarerosModel, navController: NavController? = null) {
     val cx = LocalContext.current
     var autorizados: List<Camarero> = mutableListOf()
     var noAutorizados: List<Camarero> = mutableListOf()
@@ -180,7 +179,7 @@ fun PaseCamarerosScreen(vModel: CamarerosModel) {
                                 vModel.setAutorizado(camarero.id, true)
                             }
                             .padding(5.dp),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
@@ -214,7 +213,7 @@ fun PaseCamarerosScreen(vModel: CamarerosModel) {
                                 vModel.setAutorizado(camarero.id, false)
                             }
                             .padding(5.dp),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
@@ -258,7 +257,13 @@ fun PaseCamarerosScreen(vModel: CamarerosModel) {
                     .height(100.dp)
                     .background(Pink00)
                     .padding(10.dp)
-                    .clickable { /* Acción para el botón aceptar */ }
+                    .clickable {
+                        navController?.navigate(RoutersBase.Camareros.route) {
+                            popUpTo(RoutersBase.Camareros.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
             )
 
         }
@@ -267,11 +272,3 @@ fun PaseCamarerosScreen(vModel: CamarerosModel) {
     }
 }
 
-
-@Preview(
-    device = Devices.TABLET
-)
-@Composable
-fun PreviewCamarerosLayout() {
-    PaseCamareros()
-}

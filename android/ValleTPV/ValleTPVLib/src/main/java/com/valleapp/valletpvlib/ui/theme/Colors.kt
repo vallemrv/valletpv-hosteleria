@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui.theme
+package com.valleapp.valletpvlib.ui.theme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 

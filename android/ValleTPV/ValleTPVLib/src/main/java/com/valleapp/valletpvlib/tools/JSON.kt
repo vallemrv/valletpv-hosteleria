@@ -17,7 +17,7 @@ object JSON {
                 it.write(obj.toString())
             }
         } catch (e: Exception) {
-            Log.e("JSON", e.message ?: "Error serializing JSON")
+            println("JSON: ${e.message ?: "Error deserializing JSON"}")
         }
     }
 
@@ -35,7 +35,7 @@ object JSON {
                 }
             }
         } catch (e: Exception) {
-            Log.e("JSON", e.message ?: "Error deserializing JSON")
+            println("JSON: ${e.message ?: "Error deserializing JSON"}")
         }
 
         return if (strJSON.isEmpty()) null else JSONObject(strJSON)

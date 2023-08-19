@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui.theme
+package com.valleapp.valletpvlib.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes

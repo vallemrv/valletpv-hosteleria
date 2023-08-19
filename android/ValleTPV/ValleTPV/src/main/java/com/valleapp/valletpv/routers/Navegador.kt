@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.valleapp.valletpv.screens.PaseCamareros
 import com.valleapp.valletpv.screens.Preferencias
+import com.valleapp.valletpvlib.routers.RoutersBase
+import com.valleapp.valletpvlib.ui.screens.CamarerosGrid
 
 @Composable
 fun Navegador() {
@@ -16,6 +18,9 @@ fun Navegador() {
         }
         composable(Routers.Preferencias.route) {
             Preferencias(navController)
+        }
+        composable(RoutersBase.Camareros.route) {
+            CamarerosGrid(navController)
         }
     }
 }

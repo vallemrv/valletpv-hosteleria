@@ -12,11 +12,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
 @Composable
-fun ComposableToast(message: String, show: Boolean, timeout: Long, onHide: () -> Unit) {
+fun ToastComposable(
+    message: String, show: Boolean,
+    timeout: Long,
+    fontSize: TextUnit = 20.sp,
+    onHide: () -> Unit = {}
+) {
 
     if (show) {
         Box(
@@ -35,7 +42,8 @@ fun ComposableToast(message: String, show: Boolean, timeout: Long, onHide: () ->
                 Text(
                     text = message,
                     color = Color.White,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = fontSize,
                 )
             }
         }
@@ -44,6 +52,7 @@ fun ComposableToast(message: String, show: Boolean, timeout: Long, onHide: () ->
         LaunchedEffect(key1 = show) {
             delay(timeout)
             onHide()
+
         }
     }
 }

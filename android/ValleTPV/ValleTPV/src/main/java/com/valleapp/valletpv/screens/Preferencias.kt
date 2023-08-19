@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.PreferenciasModel
-import com.valleapp.valletpv.ui.theme.Pink00
-import com.valleapp.valletpvlib.ui.ComposableToast
+import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleTopBar
+import com.valleapp.valletpvlib.ui.theme.Pink00
 
 
 @Composable
@@ -165,12 +165,12 @@ fun PreferenciasScreen() {
                     }
                 }
             }
-            ComposableToast(message = vModel.strError, show = vModel.error, 3000) {
+            ToastComposable(message = vModel.strError, show = vModel.error, 3000) {
                 vModel.error = false
             }
         }
 
-        ComposableToast(message = "Preferecias cargadas con exito", show = vModel.preferenciasCargadas, timeout = 3000 ) {
+        ToastComposable(message = "Preferecias cargadas con exito", show = vModel.preferenciasCargadas, timeout = 3000 ) {
             println("Preferecias cargadas con exito")
         }
     }
