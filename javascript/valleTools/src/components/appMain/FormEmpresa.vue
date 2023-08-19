@@ -103,7 +103,7 @@ export default defineComponent({
       } else if (this.tipo === "editar") {
         await this.empresaStore.upEmpresa(this.username, this.password);
       }
-      console.log(this.empresaStore.error);
+      
       if (!this.empresaStore.error) this.$emit("close");
     },
     cancel() {

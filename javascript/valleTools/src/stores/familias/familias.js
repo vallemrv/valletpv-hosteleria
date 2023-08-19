@@ -104,7 +104,7 @@ export const FamiliasStore = defineStore({
         
             item.receptor_id = item.receptor_id.value;
             item.compuesto_por = item.compuesto_por.map(f => f.text).join(",");
-            console.log(item);
+            
             const obj = {
                 filter: { id: item.id },
                 reg: item,

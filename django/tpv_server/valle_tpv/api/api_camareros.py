@@ -10,10 +10,9 @@ def add(request):
         apellido = request.POST.get('apellido', None)
         if Camareros.objects.filter(nombre=nombre, apellidos=apellido).exists():
             return JsonError( 'Ya existe un camarero con ese nombre y apellido')
-        camarero = Camareros(nombre=nombre, apellidos=apellido)
+        camarero = Camareros(nombre=nombre, apellidos=apellido, autorizado=True, activo=True)
         camarero.save()
         comunicar_cambios_devices("insert", "camareros", camarero.serialize())
-        print(camarero.serialize())
         return JsonResponse({})
     except:
         print("Error al crear el camarero")

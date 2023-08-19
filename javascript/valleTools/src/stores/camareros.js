@@ -83,7 +83,7 @@ export const CamarerosStore = defineStore({
                     }).filter((item) => item !== undefined);
                     return item;
                 });
-                console.log(this.items);
+                
             }
             this.fields[2].options = this.permisos;
         },

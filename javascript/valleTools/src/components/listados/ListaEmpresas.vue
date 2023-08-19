@@ -160,7 +160,6 @@ export default {
     methods: {
         selEmpresa(empresa) {
             // Aquí va el código para seleccionar la empresa
-            console.log("Seleccionada la empresa: ", empresa);
             this.empresasStore.selEmpresa(empresa);
         },
         mostrarMensaje(mensaje, color) {
