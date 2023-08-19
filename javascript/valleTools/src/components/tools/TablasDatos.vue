@@ -13,7 +13,7 @@
                 <tr>
                     <th v-for="(title, index) in store.headers" :key="index">{{ title }}</th>
                     <th>Acciones</th>
-                    <th v-if="store.switchKey"></th>
+                    <th v-if="store.switchKey">{{ capitalize }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,14 +26,13 @@
                         <v-icon small @click="borrarItem(item)">
                             mdi-delete
                         </v-icon>
-                         <v-icon  v-for="(action, index) in store.extraAcitons" small  :key="index"
-                         @click="store.execAction(item, action.action)">
-                            {{action.icon}}   
+                        <v-icon v-for="(action, index) in store.extraAcitons" small :key="index"
+                            @click="store.execAction(item, action.action)">
+                            {{ action.icon }}
                         </v-icon>
                     </td>
                     <td v-if="store.switchKey">
-                        <v-switch  v-model="item[store.switchKey]"  color="primary"
-                            @change="store.switchCh(item)"></v-switch>
+                        <v-switch v-model="item[store.switchKey]" color="primary" @change="store.switchCh(item)"></v-switch>
                     </td>
                 </tr>
             </tbody>
@@ -50,6 +49,7 @@
 <script>
 import DialogFormDinamico from "@/components/dialogs/DialogFormDinamico.vue";
 import DialogConfirm from "@/components/dialogs/DialogConfirm.vue";
+import { capitalize } from "vue";
 
 export default {
     props: {
@@ -69,6 +69,12 @@ export default {
             isNew: false,
         };
     },
+    computed:{
+        capitalize(){
+            var string = this.store.switchKey;
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+    },
     methods: {
         mostrarMensaje(mensaje, color) {
             this.snackbarText = mensaje;
@@ -77,17 +83,17 @@ export default {
         },
         async guardarItem(formObject) {
             let error = null;
-            if (this.isNew) 
+            if (this.isNew)
                 error = await this.store.add(formObject);
-            else 
+            else
                 error = await this.store.update(formObject);
 
             if (!error) {
                 this.mostrarMensaje("Item creado correctamente", "success");
-            }else{
+            } else {
                 this.mostrarMensaje(error, "error");
             }
-    
+
         },
         crearItem() {
             this.isNew = true;

@@ -18,8 +18,9 @@ export const TeclasStore = defineStore({
     // Titulo del store
     titulo: 'Teclas',
     // Cabecera de la tabla
-    headers: ["Nombre",],
-    showKeys: ["nombre",],
+    headers: ["Nombre"],
+    showKeys: ["nombre"],
+    displayName: "nombre",
     // Array de objetos con los datos de la tabla
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
@@ -142,8 +143,9 @@ export const TeclasStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
-        return "Error al añadir la tecla: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al añadir la tecla: " + error;
       }
       const newItems = [...this.items];
       const url_count = buildUrl(this.empresaStore.empresa.url, COUNT);
@@ -175,8 +177,9 @@ export const TeclasStore = defineStore({
       const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
       const response = await axios.post(url, params);
 
-      if (response.data.error) {
-        return "Error al actualizar la tecla: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al actualizar la tecla: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);
       const newItems = [...this.items];
@@ -197,8 +200,9 @@ export const TeclasStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
-        return "Error al eliminar la tecla: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al eliminar la tecla: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);
       this.items.splice(index, 1);

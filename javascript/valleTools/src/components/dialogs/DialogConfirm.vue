@@ -19,7 +19,7 @@
   </template>
   
   <script>
-import { TransitionGroup } from 'vue';
+
 
   export default {
     props: {

@@ -34,7 +34,7 @@ def set_password(request):
 def set_autorizado(request):
     try:
         camarero = Camareros.objects.get(pk=request.POST.get('id', None))
-        camarero.autorizado = request.POST.get('autorizado', None)
+        camarero.autorizado = True if request.POST.get('autorizado', None).lower() == "true" else False
         camarero.save()
         return JsonResponse({})
     except:

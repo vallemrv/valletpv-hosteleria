@@ -7,11 +7,16 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.google.gson.Gson
 import com.valleapp.valletpvlib.db.AppDatabase
+import com.valleapp.valletpvlib.db.Camarero
+import com.valleapp.valletpvlib.db.IBaseDao
+import com.valleapp.valletpvlib.db.IBaseEntity
 import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class ServiceCom : Service() {
 
@@ -33,9 +38,9 @@ class ServiceCom : Service() {
             val texto = it.getStringExtra("texto")
 
 
-             if (chanelId != null && texto != null && titulo != null && resId != 0) {
+            if (chanelId != null && texto != null && titulo != null && resId != 0) {
                 createNotificationChannel(chanelId, texto)
-                val notification = NotificationCompat.Builder(this, chanelId )
+                val notification = NotificationCompat.Builder(this, chanelId)
                     .setContentTitle(titulo)
                     .setContentText(texto)
                     .setSmallIcon(resId)
@@ -63,6 +68,85 @@ class ServiceCom : Service() {
         manager?.createNotificationChannel(serviceChannel)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun syncDevice(lista: List<String>) {
+        GlobalScope.launch {
+            val gson = Gson()
+
+            for (item in lista) {
+                val tb = getDB(item)
+                val datos = tb.getAll()
+
+                // Convertir datos a JSON
+                val jsonData = gson.toJson(datos)
+
+                // Construir el objeto que quieres enviar al servidor
+                val dataToSend = mapOf(
+                    "tb_name" to item,
+                    "regs" to jsonData
+                )
+
+                val result = safeApiCall {
+                    ApiRequest.service.post(
+                        ApiEndPoints.SYNC_DEVICES,
+                        serverConfig?.getParams(dataToSend)
+                    )
+                }
+                when (result) {
+                    is ApiResponse.Success -> {
+                        val obj = result.data["sync"]?.let { JSONObject(it) }
+                        if (obj != null) {
+                            handleSync(tb, obj, item)
+                        }
+                    }
+
+                    is ApiResponse.Error -> {
+                        println("Error: ${result.errorMessage}")
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun handleSync(tb: IBaseDao<*>, obj: JSONObject, tb_name: String) {
+        println(obj.toString())
+        val up = obj?.getJSONArray("update")
+
+        if (up != null) {
+            for (i in 0 until up.length()) {
+                val reg = up.getJSONObject(i)
+                val entity =  getEntity(tb_name)
+                entity.executeAccion(reg, tb, "UP")
+            }
+        }
+        val insert = obj?.getJSONArray("create")
+        if (insert != null) {
+            for (i in 0 until insert.length()) {
+                val reg = insert.getJSONObject(i)
+                val entity =  getEntity(tb_name)
+                entity.executeAccion(reg, tb, "INS")
+            }
+        }
+        val delete = obj?.getJSONArray("delete")
+        if (delete != null) {
+            for (i in 0 until delete.length()) {
+                val id = delete.getLong(i)
+                tb.deleteById(id)
+            }
+        }
+
+    }
+
+
+
+    private fun getEntity(name: String): IBaseEntity {
+        when (name) {
+            "camareros" -> return Camarero()
+            else -> throw IllegalArgumentException("Entity no encontrado para: $name")
+        }
+    }
+
     inner class LocalBinder : Binder() {
         fun getService(): ServiceCom = this@ServiceCom
     }
@@ -72,6 +156,7 @@ class ServiceCom : Service() {
         if (this.serverConfig == null) {
             this.serverConfig = serverConfig
             ApiRequest.init(serverConfig.getParseUrl())
+            syncDevice(listOf("camareros"))
             GlobalScope.launch {
                 procesarCola.procesarCola()
             }
@@ -80,9 +165,11 @@ class ServiceCom : Service() {
     }
 
 
-
-    fun getDB(): AppDatabase? {
-        return appDatabase
+    fun getDB(tb_name: String): IBaseDao<*> {
+        when (tb_name) {
+            "camareros" -> return appDatabase?.camareroDao() as IBaseDao<*>
+            else -> throw IllegalArgumentException("DAO no encontrado para: $tb_name")
+        }
     }
 
     fun addInstruccion(inst: Instrucciones) {

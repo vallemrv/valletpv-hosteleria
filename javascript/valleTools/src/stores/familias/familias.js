@@ -22,6 +22,7 @@ export const FamiliasStore = defineStore({
         // Cabecera de la tabla
         headers: ["Nombre"],
         showKeys: ["nombre"],
+        displayName: "nombre",
         // Array de objetos con los datos de la tabla
         fields: [
             { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
@@ -86,8 +87,9 @@ export const FamiliasStore = defineStore({
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
             const response = await axios.post(url, params);
-            if (response.data.error) {
-                return "Error al añadir la familia: " + response.data.error;
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
+                return "Error al añadir la familia: " + error;
             }
             const it = response.data;
             this.items.push({
@@ -112,7 +114,8 @@ export const FamiliasStore = defineStore({
             const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
             const response = await axios.post(url, params);
 
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
                 return "Error al actualizar la familia: " + error;
             }
             const index = this.items.findIndex((i) => i.id === item.id);
@@ -134,7 +137,8 @@ export const FamiliasStore = defineStore({
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
             const response = await axios.post(url, params);
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
                 return "Error al eliminar la familia: " + error;
             }
 

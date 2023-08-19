@@ -12,6 +12,7 @@ export const UserStore = defineStore({
         titulo: "Usuarios",
         headers: ["Nombre", "Email"],
         showKeys: ["username", "email"],
+        displayName: "username",
         is_dispositivo: false,
         fields: [
             { key: 'username', label: 'Usuario', type: 'text', rules: [v => !!v || "El usuario es requerido"], },

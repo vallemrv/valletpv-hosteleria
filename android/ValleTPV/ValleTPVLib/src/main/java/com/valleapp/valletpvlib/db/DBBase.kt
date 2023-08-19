@@ -1,24 +1,33 @@
 package com.valleapp.valletpvlib.db
 
 import android.content.Context
-import androidx.room.Dao
 import androidx.room.Database
-import androidx.room.Delete
+import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import org.json.JSONObject
 
 
-open class BaseEntity {
-    @PrimaryKey(autoGenerate = true) var id: Long = 0
+interface IBaseEntity {
+
+    fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String)
+
 }
 
+@Entity
+open class BaseEntity: IBaseEntity {
+    @PrimaryKey(autoGenerate = true) var id: Long = 0
+    override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
+        TODO("Not yet implemented")
+    }
 
-@Dao
-interface BaseDao<T : BaseEntity> {
+}
+
+interface IBaseDao<T: BaseEntity> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: T)
@@ -26,8 +35,10 @@ interface BaseDao<T : BaseEntity> {
     @Update
     fun update(entity: T)
 
-    @Delete
-    fun delete(entity: T)
+    fun deleteById(id: Long)
+
+    fun getAll(): List<T>
+
 }
 
 

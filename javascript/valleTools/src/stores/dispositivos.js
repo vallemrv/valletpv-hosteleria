@@ -54,7 +54,8 @@ export const DispositivosStore = defineStore({
             const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
             const response = await axios.post(url, params);
 
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
                 return "Error al actualizar el dispositivo: " + error;
             }
             const index = this.items.findIndex((i) => i.id === item.id);

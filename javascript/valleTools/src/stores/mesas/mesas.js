@@ -20,6 +20,7 @@ export const MesasStore = defineStore({
     // Cabecera de la tabla
     headers: ["Nombre", "Orden"],
     showKeys: ["nombre", "orden"],
+    displayName: "nombre",
     // Array de objetos con los datos de la tabla
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
@@ -66,7 +67,8 @@ export const MesasStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
         return "Error al añadir la mesa: " + response.data.error;
       }
       const newItems = [...this.items];
@@ -86,7 +88,8 @@ export const MesasStore = defineStore({
       const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
       const response = await axios.post(url, params);
 
-      if (response.data.error) {
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
         return "Error al actualizar la mesa: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);
@@ -105,7 +108,8 @@ export const MesasStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
         return "Error al eliminar la mesa: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);

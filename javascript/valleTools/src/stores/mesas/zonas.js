@@ -18,6 +18,7 @@ export const ZonasStore = defineStore({
     // Cabecera de la tabla
     headers: ["Nombre", "Color", "Orden"],
     showKeys: ["nombre", "color", "orden"],
+    displayName: "nombre",
     // Array de objetos con los datos de la tabla
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
@@ -56,7 +57,8 @@ export const ZonasStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
         return "Error al añadir la zona: " + response.data.error;
       }
       const newItems = [...this.items];
@@ -73,8 +75,9 @@ export const ZonasStore = defineStore({
       const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
       const response = await axios.post(url, params);
 
-      if (response.data.error) {
-        return "Error al actualizar la zona: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al actualizar la zona: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);
       const newItems = [...this.items];

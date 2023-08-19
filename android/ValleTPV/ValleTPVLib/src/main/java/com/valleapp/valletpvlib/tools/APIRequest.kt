@@ -15,6 +15,7 @@ object ApiEndPoints {
     const val CAMAREROS_ADD = "camareros/add"
     const val CAMAREROS_SET_PASSWORD = "camareros/set_password"
     const val CAMAREROS_SET_AUTORIZADO = "camareros/set_autorizado"
+    const val SYNC_DEVICES = "sync/sync_devices"
 }
 
 object ApiErrorMessages {
@@ -28,6 +29,7 @@ object ApiErrorMessages {
 interface ApiService {
     @POST
     suspend fun post(@Url url: String, @Body params: Map<String, String>? = null): Response<Map<String, String>>
+
 }
 
 
@@ -48,7 +50,7 @@ object ApiRequest {
 
 sealed class ApiResponse<T> {
     data class Success<T>(val data: T) : ApiResponse<T>()
-    data class Error<T>(val errorMessage: String) : ApiResponse<T>()
+    data class Error<T>(val errorMessage: Any) : ApiResponse<T>()
 }
 
 
@@ -56,7 +58,7 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<
     return try {
         val response = call()
         if (response.isSuccessful) {
-            val responseBody = response.body() as Map<String, String>?
+            val responseBody = response.body() as Map<*, *>?
             if (responseBody != null){
                 responseBody["success"]?.let {
                     if (it == "false") {
@@ -75,7 +77,7 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<
             }
         }
     } catch (e: Exception) {
-
+        println(e)
         when (e) {
             is UnknownHostException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)
             is SocketTimeoutException -> ApiResponse.Error(ApiErrorMessages.TIMEOUT)

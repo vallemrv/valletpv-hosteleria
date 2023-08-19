@@ -12,6 +12,7 @@ export const EmpresaStore = defineStore('empresaStore', {
   state: () => ({
     empresa: null,
     modelo: "empresa",
+    displayName: "nombre",
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"], },
       { key: 'razonsocial', label: 'Razón Social', type: 'text', },

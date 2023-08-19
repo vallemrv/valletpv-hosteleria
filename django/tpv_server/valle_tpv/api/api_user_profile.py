@@ -1,7 +1,7 @@
 from tokenapi.http import JsonResponse
 from tokenapi.tokens import PasswordResetTokenGenerator
 from tokenapi.decorators import token_required
-from valle_tpv.tools.decorators import superuser_required, superuser_or_staff_required
+from valle_tpv.decorators import superuser_required, superuser_or_staff_required
 from valle_tpv.models import HorarioUsr
 from django.contrib.auth.models import User
 import json
@@ -78,7 +78,7 @@ def update_profile(request):
             user = request.user
             is_me = True
 
-        print(user)
+       
         username = reg.get('username') if 'username' in reg else ''
         password = reg.get('password') if 'password' in reg else ''
         email = reg.get('email') if 'email' in reg else ''

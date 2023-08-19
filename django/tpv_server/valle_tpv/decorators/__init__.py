@@ -5,6 +5,26 @@ from tokenapi.http import JsonError, JsonResponseUnauthorized
 from valle_tpv.models import Dispositivos
 import json
 
+
+def superuser_or_staff_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.is_superuser or request.user.is_staff:
+                return view_func(request, *args, **kwargs)
+        return JsonError('Permisos insuficientes')
+    return _wrapped_view
+
+def superuser_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
+        return JsonError('Permisos insuficientes')
+    return _wrapped_view
+
+
 def check_dispositivo(view_func):
     @csrf_exempt
     @wraps(view_func)
@@ -12,7 +32,7 @@ def check_dispositivo(view_func):
         # Si no es un método POST
         
         if request.method != "POST":
-            return JsonError({'error': 'Tiene que ser POST'})
+            return JsonError('Tiene que ser POST')
 
         try:
             data = json.loads(request.body.decode('utf-8'))
@@ -29,11 +49,13 @@ def check_dispositivo(view_func):
             uid = request.POST['UID']
             codigo = request.POST['codigo']
         except json.JSONDecodeError:
-            return JsonError({'error': 'El cuerpo de la solicitud no es JSON válido'})
+            return JsonError( 'El cuerpo de la solicitud no es JSON válido')
+        except KeyError:
+            return JsonError( 'La cosulsta ha de contener UID y codigo del dispositivo')
 
         # Verificar en la base de datos
         if not Dispositivos.objects.filter(UID=uid, codigo=codigo).exists():
-            return JsonResponseUnauthorized({'error': 'Permiso denegado'})
+            return JsonResponseUnauthorized('Permiso denegado')
         
         # Si todo está bien, procede a la vista
         return view_func(request, *args, **kwargs)

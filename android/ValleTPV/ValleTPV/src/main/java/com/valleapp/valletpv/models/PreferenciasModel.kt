@@ -51,9 +51,9 @@ class PreferenciasModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun mostrarError(msg: String, isCardVisible: Boolean = false){
+    private fun mostrarError(msg: Any, isCardVisible: Boolean = false){
         error = true
-        strError = msg
+        strError = msg.toString()
         this.isCardVisible = isCardVisible
         preferenciasCargadas = false
     }

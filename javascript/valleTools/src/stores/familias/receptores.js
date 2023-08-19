@@ -66,8 +66,9 @@ export const ReceptoresStore = defineStore({
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, ADD_REG);
             const response = await axios.post(url, params);
-            if (response.data.error) {
-                return "Error al añadir el receptor: " + response.data.error;
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
+                return "Error al añadir el receptor: " + error;
             }
             this.items.push(response.data);
         },
@@ -81,7 +82,8 @@ export const ReceptoresStore = defineStore({
             const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
             const response = await axios.post(url, params);
 
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
                 return "Error al actualizar el receptor: " + error;
             }
             const index = this.items.findIndex((i) => i.id === item.id);
@@ -96,7 +98,8 @@ export const ReceptoresStore = defineStore({
             const params = this.empresaStore.createFormData(obj);
             const url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
             const response = await axios.post(url, params);
-            if (response.data.error) {
+            if (response.data.error || response.success === false) {
+                error = response.data.error ? response.data.error : response.data.errors;
                 return "Error al eliminar el receptor: " + error;
             }
 

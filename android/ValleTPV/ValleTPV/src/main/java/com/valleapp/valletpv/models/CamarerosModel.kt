@@ -36,7 +36,7 @@ class CamarerosModel(private val app: Application, private val serverConfig: Ser
     var showDialog: Boolean by mutableStateOf(false)
     var nombre: String by mutableStateOf("")
     var apellido: String by mutableStateOf("")
-    var mensaje: Mensaje by mutableStateOf(Mensaje("", ""))
+    private var mensaje: Mensaje by mutableStateOf(Mensaje("", ""))
 
 
     fun bindService() {
@@ -49,7 +49,7 @@ class CamarerosModel(private val app: Application, private val serverConfig: Ser
                 println("Servicio enlazado")
                 if (mService != null) {
                     mService!!.setServerConfig(serverConfig)
-                    db = mService!!.getDB()?.camareroDao()
+                    db = mService!!.getDB("camareros") as CamareroDao
                 }
             }
 
@@ -88,11 +88,7 @@ class CamarerosModel(private val app: Application, private val serverConfig: Ser
                 db!!.insertCamarero(
                     Camarero(
                         nombre = nombre,
-                        apellidos = apellido,
-                        activo = true,
-                        passField = "",
-                        permisos = "",
-                        autorizado = true
+                        apellidos = apellido
                     )
                 )
                 nombre = ""

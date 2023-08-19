@@ -7,6 +7,12 @@ import { CamarerosStore } from '@/stores/camareros';
 import { EmpresaStore } from '@/stores/empresaStore';
 import { watch } from 'vue';
 export default {
+    props: {
+        showActivos: {
+            type: Boolean,
+            default: true
+        }
+    },
     components:{
         TablasDatos
     },
@@ -14,15 +20,22 @@ export default {
         const store = CamarerosStore();
         const empresaStore = EmpresaStore();
         watch(() => empresaStore.empresa, (empresa) => {
-            if(empresa)
+            if(empresa){
                 store.load(empresaStore);
+                store.setShowActivos(this.showActivos);
+            }
         });
-        
         return { store, empresaStore };
+    },
+    watch: {
+        showActivos(showActivos){
+            this.store.setShowActivos(showActivos);
+        }
     },
     mounted() {
         if(this.empresaStore.empresa && this.store.items.length == 0){
             this.store.load(this.empresaStore);
+            this.store.setShowActivos(this.showActivos);
         }
     },
     

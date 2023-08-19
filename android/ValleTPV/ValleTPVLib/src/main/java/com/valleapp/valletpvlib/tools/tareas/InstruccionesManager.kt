@@ -39,7 +39,7 @@ class InstruccionesManager {
                                 cola.poll()
                             }
                             inst.mensaje?.let {
-                                it.mensaje = result.errorMessage
+                                it.mensaje = result.errorMessage.toString()
                                 it.tipo = "error"
                             }
                         }

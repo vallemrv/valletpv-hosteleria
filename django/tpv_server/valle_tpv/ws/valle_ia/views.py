@@ -7,7 +7,7 @@ import os
 @token_required
 def upload_audio(request):
     if 'audio' not in request.FILES:
-        return JsonError({"error": "No se subió ningún archivo"})
+        return JsonError("No se subió ningún archivo")
 
     audio_file = request.FILES['audio']
     file_dir = 'audios/'
@@ -22,7 +22,7 @@ def upload_audio(request):
     
     transcript = transcribe_audio(default_storage.path(filename))
     if transcript is None:
-        return JsonError({"error": "Error al transcribir el audio"})
+        return JsonError("Error al transcribir el audio")
 
     return JsonResponse({"transcript": transcript})
 

@@ -23,7 +23,6 @@ class Camareros(models.Model):
         camareros = Camareros.objects.filter(**filter)
         result = []
         for camarero in camareros:
-            #Borrammos el usuario que se ha creado para el camarero
             result.append(camarero.pk)
             camarero.delete()
         
@@ -60,7 +59,7 @@ class Camareros(models.Model):
 
     def serialize(self):
         data = model_to_dict(self)
-        data["permisos"] = self.permisos.split(",") if self.permisos != "" else []
+        data["permisos"] = self.permisos
         return data
     
     class Meta:

@@ -19,6 +19,7 @@ export const SeccionesStore = defineStore({
     // Cabecera de la tabla
     headers: ["Nombre", "Color", "Orden", "Icono"],
     showKeys: ["nombre", "color", "orden", "icono"],
+    displayName: "nombre",
     // Array de objetos con los datos de la tabla
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
@@ -74,8 +75,9 @@ export const SeccionesStore = defineStore({
         }
       }
       );
-      if (response.data.error) {
-        return "Error al añadir la sección: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al añadir la sección: " + error;
       }
       const newItems = [...this.items];
       newItems.push({
@@ -103,8 +105,9 @@ export const SeccionesStore = defineStore({
       const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
       const response = await axios.post(url, params);
 
-      if (response.data.error) {
-        return "Error al actualizar la sección: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al actualizar la sección: " + error;
       }
       const index = this.items.findIndex((i) => i.id === item.id);
       const newItems = [...this.items];
@@ -126,8 +129,9 @@ export const SeccionesStore = defineStore({
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, DELETE_REG);
       const response = await axios.post(url, params);
-      if (response.data.error) {
-        return "Error al eliminar la sección: " + response.data.error;
+      if (response.data.error || response.success === false) {
+        error = response.data.error ? response.data.error : response.data.errors;
+        return "Error al eliminar la sección: " + error;
       }
 
       const index = this.items.findIndex((i) => i.id === item.id);
