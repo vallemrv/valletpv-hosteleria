@@ -32,7 +32,7 @@ interface IBaseDao<T: BaseEntity> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: T)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(entity: T)
 
     fun deleteById(id: Long)

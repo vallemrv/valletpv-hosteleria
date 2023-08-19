@@ -26,7 +26,7 @@ class Camareros(models.Model):
             result.append(camarero.pk)
             camarero.delete()
         
-        comunicar_cambios_devices("rm", "camareros", result)
+        comunicar_cambios_devices("delete", "camareros", result)
         return result
        
 
@@ -40,14 +40,14 @@ class Camareros(models.Model):
         c = Camareros()
         c.nombre = nombre
         c.apellidos = apellido
-        c.activo = 1    
-        c.autorizado = 1
+        c.activo = True    
+        c.autorizado = True
         c.permisos = permisos   
         c.save()    
 
         serializer = c.serialize()
     
-        comunicar_cambios_devices("md", "camareros", serializer)
+        comunicar_cambios_devices("create", "camareros", [serializer])
        
         return serializer
         

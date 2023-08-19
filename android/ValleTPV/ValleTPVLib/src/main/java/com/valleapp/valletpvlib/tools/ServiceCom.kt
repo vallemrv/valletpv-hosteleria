@@ -12,18 +12,21 @@ import com.valleapp.valletpvlib.db.AppDatabase
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.IBaseDao
 import com.valleapp.valletpvlib.db.IBaseEntity
+import com.valleapp.valletpvlib.interfaces.IController
 import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 
-class ServiceCom : Service() {
+class ServiceCom : Service(), IController {
 
     private val binder = LocalBinder()
     private var serverConfig: ServerConfig? = null
     private var appDatabase: AppDatabase? = null
     private val procesarCola = InstruccionesManager()
+    private var wsClient: WSClient? = null
 
     override fun onBind(intent: Intent?): IBinder {
         return binder
@@ -55,6 +58,7 @@ class ServiceCom : Service() {
     override fun onDestroy() {
         super.onDestroy()
         procesarCola.stopProcesarCola()
+        wsClient?.salir()
     }
 
     private fun createNotificationChannel(id: String, name: String) {
@@ -68,8 +72,16 @@ class ServiceCom : Service() {
         manager?.createNotificationChannel(serviceChannel)
     }
 
+    override fun updateTables(o: JSONObject?) {
+        if (o != null) {
+            val tbName = o.getString("tb")
+            val tb = getDB(tbName)
+            handleSync(tb, o, tbName)
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
-    private fun syncDevice(lista: List<String>) {
+    override fun syncDevice(lista: List<String>) {
         GlobalScope.launch {
             val gson = Gson()
 
@@ -109,35 +121,41 @@ class ServiceCom : Service() {
         }
     }
 
-    private fun handleSync(tb: IBaseDao<*>, obj: JSONObject, tb_name: String) {
-        println(obj.toString())
-        val up = obj?.getJSONArray("update")
-
-        if (up != null) {
-            for (i in 0 until up.length()) {
-                val reg = up.getJSONObject(i)
-                val entity =  getEntity(tb_name)
-                entity.executeAccion(reg, tb, "UP")
-            }
+    private fun handleSync(tb: IBaseDao<*>, obj: JSONObject, tbName: String) {
+        if (obj.has("delete")) {
+            procesarDelete(obj.getJSONArray("delete"), tb)
         }
-        val insert = obj?.getJSONArray("create")
-        if (insert != null) {
-            for (i in 0 until insert.length()) {
-                val reg = insert.getJSONObject(i)
-                val entity =  getEntity(tb_name)
-                entity.executeAccion(reg, tb, "INS")
-            }
-        }
-        val delete = obj?.getJSONArray("delete")
-        if (delete != null) {
-            for (i in 0 until delete.length()) {
-                val id = delete.getLong(i)
-                tb.deleteById(id)
-            }
+        if (obj.has("update")) {
+            procesarUpdate(obj.getJSONArray("update"), tb, tbName)
         }
 
+        if (obj.has("create")) {
+            procesarCreate(obj.getJSONArray("create"), tb, tbName)
+        }
     }
 
+    private fun procesarCreate(insert: JSONArray, tb: IBaseDao<*>, tbName: String) {
+        for (i in 0 until insert.length()) {
+            val reg = insert.getJSONObject(i)
+            val entity = getEntity(tbName)
+            entity.executeAccion(reg, tb, "INS")
+        }
+    }
+
+    private fun procesarUpdate(up: JSONArray, tb: IBaseDao<*>, tbName: String) {
+        for (i in 0 until up.length()) {
+            val reg = up.getJSONObject(i)
+            val entity = getEntity(tbName)
+            entity.executeAccion(reg, tb, "UP")
+        }
+    }
+
+    private fun procesarDelete(delete: JSONArray, tb: IBaseDao<*>) {
+        for (i in 0 until delete.length()) {
+            val id = delete.getLong(i)
+            tb.deleteById(id)
+        }
+    }
 
 
     private fun getEntity(name: String): IBaseEntity {
@@ -156,8 +174,11 @@ class ServiceCom : Service() {
         if (this.serverConfig == null) {
             this.serverConfig = serverConfig
             ApiRequest.init(serverConfig.getParseUrl())
-            syncDevice(listOf("camareros"))
+            val controller = this
             GlobalScope.launch {
+                val wsUrl = serverConfig.getWSUrl()
+                wsClient = WSClient(wsUrl, "comunicacion/devices", controller)
+                wsClient?.connect()
                 procesarCola.procesarCola()
             }
             println("ServiceCom: setServerConfig")
@@ -165,10 +186,10 @@ class ServiceCom : Service() {
     }
 
 
-    fun getDB(tb_name: String): IBaseDao<*> {
-        when (tb_name) {
+    fun getDB(tbName: String): IBaseDao<*> {
+        when (tbName) {
             "camareros" -> return appDatabase?.camareroDao() as IBaseDao<*>
-            else -> throw IllegalArgumentException("DAO no encontrado para: $tb_name")
+            else -> throw IllegalArgumentException("DAO no encontrado para: $tbName")
         }
     }
 

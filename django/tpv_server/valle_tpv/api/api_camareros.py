@@ -12,7 +12,7 @@ def add(request):
             return JsonError( 'Ya existe un camarero con ese nombre y apellido')
         camarero = Camareros(nombre=nombre, apellidos=apellido, autorizado=True, activo=True)
         camarero.save()
-        comunicar_cambios_devices("insert", "camareros", camarero.serialize())
+        comunicar_cambios_devices("create", "camareros", [camarero.serialize()])
         return JsonResponse({})
     except:
         print("Error al crear el camarero")
@@ -25,6 +25,7 @@ def set_password(request):
         camarero = Camareros.objects.get(pk=request.POST.get('id', None))
         camarero.password = request.POST.get('password', None)
         camarero.save()
+        comunicar_cambios_devices("update", "camareros", [camarero.serialize()])
         return JsonResponse({})
     except:
         return JsonError('No existe el camarero')
@@ -35,6 +36,7 @@ def set_autorizado(request):
         camarero = Camareros.objects.get(pk=request.POST.get('id', None))
         camarero.autorizado = True if request.POST.get('autorizado', None).lower() == "true" else False
         camarero.save()
+        comunicar_cambios_devices("update", "camareros", [camarero.serialize()])
         return JsonResponse({})
     except:
         return JsonError('No existe el camarero')

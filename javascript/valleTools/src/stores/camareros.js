@@ -125,7 +125,7 @@ export const CamarerosStore = defineStore({
             const newItem = {
                 ...response.data,
                 displayName: response.data.nombre + " " + response.data.apellidos,
-                permisos: response.data.permisos.map((item) => {
+                permisos: response.data.permisos.split(",").map((item) => {
                     return this.permisos.find((i) => i.value === item);
                 }).filter((item) => item !== undefined)
             };

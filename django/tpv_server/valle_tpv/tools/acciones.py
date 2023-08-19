@@ -4,7 +4,7 @@
 import os
 from django.conf import settings
 from django.forms import model_to_dict
-from valle_tpv.tools.ws import send_mensaje_devices
+from valle_tpv.tools.ws import comunicar_cambios_devices
 
 
 def add_handler(model, tb_name, reg):
@@ -27,14 +27,8 @@ def add_handler(model, tb_name, reg):
     else:
         obj = model_to_dict(obj)
     
-    update = {
-        "op": "insert",
-        "device": "",
-        "tb": tb_name,
-        "obj": obj,
-        "receptor": "devices",
-    }
-    send_mensaje_devices(update) 
+    
+    comunicar_cambios_devices("create", tb_name, [obj])    
 
     return obj
 
@@ -66,15 +60,7 @@ def modifcar_handler(model, tb_name, reg, filter):
         obj.save()
         obj = obj.serialize() if hasattr(obj, "serialize") else model_to_dict(obj)
             
-        update = {
-            "op": "md",
-            "device": "",
-            "tb": tb_name,
-            "obj":obj,
-            "receptor": "devices",
-            }
-        
-        send_mensaje_devices(update)
+        comunicar_cambios_devices("update", tb_name, [obj])    
         return obj 
     return None
 
@@ -96,12 +82,5 @@ def delete_handler(model, tb_name, filter):
         result.append(obj.pk)
         obj.delete()
         
-    update = {
-        "op": "rm",
-        "device": "",
-        "tb": tb_name,
-        "obj": result,
-        "receptor": "devices",
-    }
-    send_mensaje_devices(update) 
+    comunicar_cambios_devices("delete", tb_name, result)  
     return result

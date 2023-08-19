@@ -13,9 +13,9 @@ data class ServerConfig(
     }
 
     fun loadJSON(obj: Map<String, Any>) {
-         try {
-             codigo = obj["codigo"].toString()
-             uid = obj["UID"].toString()
+        try {
+            codigo = obj["codigo"].toString()
+            uid = obj["UID"].toString()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -30,7 +30,7 @@ data class ServerConfig(
         if (args != null && !isEmpty()) {
             codigo?.let { aux.put("codigo", it) }
             uid?.let { aux.put("UID", it) }
-            for((k, v) in args){
+            for ((k, v) in args) {
                 aux[k] = v.toString()
             }
         }
@@ -47,10 +47,20 @@ data class ServerConfig(
         return codigo == c
     }
 
+    fun getWSUrl(): String {
+        var newUrl = url?: ""
+        newUrl = if (newUrl.contains("/api")) newUrl.substring(0, newUrl.indexOf("/api"))
+        else "$newUrl/ws/"
+        newUrl = when {
+            newUrl.startsWith("http://") -> newUrl.replace("http://", "ws://")
+            newUrl.startsWith("https://") -> newUrl.replace("https://", "wss://")
+            else -> "ws://$newUrl"
+        }
+        return newUrl
+    }
 
 
-
-    companion object{
+    companion object {
         fun parseUrl(url: String): String {
             var aux = url
             if (!aux.startsWith("https://") && !aux.startsWith("http://")) {

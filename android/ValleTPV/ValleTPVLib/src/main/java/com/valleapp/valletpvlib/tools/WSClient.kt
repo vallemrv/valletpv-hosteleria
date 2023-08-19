@@ -9,30 +9,16 @@ import org.json.JSONObject
 import java.net.URI
 import java.nio.ByteBuffer
 
-class WSClient(serverUri: String, end_point: String, private val controller: IController) : WebSocketClient(URI(urlParse(serverUri) + end_point)) {
+class WSClient(serverUri: String, endPoint: String, private val controller: IController) : WebSocketClient(URI(serverUri + endPoint)) {
 
     private var isWebsocketClose = false
     private var exit = false
 
 
-
-    companion object {
-        fun urlParse(url: String): String {
-            var newUrl = url
-            if (newUrl.contains("/api")) newUrl = newUrl.substring(0, newUrl.indexOf("/api"))
-            when {
-                newUrl.startsWith("http://") -> newUrl = newUrl.replace("http://", "ws://")
-                newUrl.startsWith("https://") -> newUrl = newUrl.replace("https://", "wss://")
-                else -> newUrl = "ws://$newUrl"
-            }
-            return newUrl
-        }
-    }
-
     override fun onOpen(serverHandshake: ServerHandshake) {
         isWebsocketClose = false
         println("Websocket open.....")
-        controller.sync_device(arrayOf("mesasabiertas", "lineaspedido", "camareros"), 500)
+        controller.syncDevice(listOf( "camareros"))
     }
 
     override fun onMessage(message: String) {
@@ -54,7 +40,12 @@ class WSClient(serverUri: String, end_point: String, private val controller: ICo
 
         if (!exit) {
             try {
-                this.reconnect()
+                Thread{
+                    Thread.sleep(1000)
+                    reconnect()
+                }.start()
+
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -74,7 +65,4 @@ class WSClient(serverUri: String, end_point: String, private val controller: ICo
         close()
     }
 
-    fun isWebsocketClosed(): Boolean {
-        return isWebsocketClose
-    }
 }

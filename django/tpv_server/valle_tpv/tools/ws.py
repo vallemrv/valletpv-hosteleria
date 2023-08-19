@@ -42,10 +42,9 @@ def send_mensaje_devices(v):
     
 def comunicar_cambios_devices(op, tb, obj, extras = {} ):
     update = {
-        "op": op,
         "extras": extras,
         "tb": tb,
-        "obj": obj,
+         op: obj,
         "receptor": "devices",
         }
     send_mensaje_devices(update)
