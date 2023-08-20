@@ -15,7 +15,7 @@ class Mesas(models.Model):
         'nombre': self.nombre,
         'orden': self.orden,
         'num': 0,
-        'abierta': 0,
+        'abierta': False,
         'color': self.zona.color, 
         'zona_id': self.zona.id,
         "tarifa": self.zona.tarifa, 

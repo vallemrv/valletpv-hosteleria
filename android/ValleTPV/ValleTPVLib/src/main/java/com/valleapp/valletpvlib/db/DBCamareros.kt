@@ -17,6 +17,7 @@ data class Camarero(
     var autorizado: Boolean? = true,
     var permisos: String? = ""
 ): BaseEntity(){
+
     private fun loadJson(json: JSONObject) {
         nombre = json.getString("nombre") ?: ""
         apellidos = json.getString("apellidos")?:""
@@ -34,15 +35,14 @@ data class Camarero(
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         loadJson(json)
         val tb = dao as CamareroDao
-        when(op){
-            "INS" -> {
-                tb.insert(this)
-            }
-            "UP" -> {
-                tb.update(this)
-            }
-
+        when (op) {
+            "INS" -> tb.insert(this)
+            "UP" ->   tb.update(this)
         }
+    }
+
+    override fun getInfoField(): InfoField {
+        return InfoField("$nombre $apellidos", id)
     }
 }
 

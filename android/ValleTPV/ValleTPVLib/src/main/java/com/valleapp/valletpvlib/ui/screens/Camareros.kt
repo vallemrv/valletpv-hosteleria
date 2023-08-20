@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.valleapp.valletpvlib.db.CamareroDao
-import com.valleapp.valletpvlib.db.IBaseEntity
 import com.valleapp.valletpvlib.models.BindServiceModel
+import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleGrid
 import com.valleapp.valletpvlib.ui.ValleTopBar
@@ -84,9 +84,11 @@ fun CamarerosGrid(
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                ValleGrid(columns = 5, botones = listaCamareros ){
-                    val info = (it as IBaseEntity).getInfoField()
-                    navController.navigate("mesas/${info.tag}")
+                ValleGrid(columns = 5, botones = listaCamareros) { info ->
+                    navController.navigate(
+                        RoutersBase.Mesas.route
+                            .replace("{camId}", info.tag.toString())
+                    )
                 }
                 ToastComposable(
                     message = "Presione nuevamente para salir ${3 - count}",

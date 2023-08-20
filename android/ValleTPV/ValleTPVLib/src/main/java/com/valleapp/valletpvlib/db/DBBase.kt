@@ -1,6 +1,7 @@
 package com.valleapp.valletpvlib.db
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
 import androidx.room.Database
 import androidx.room.Entity
 import androidx.room.Insert
@@ -9,12 +10,16 @@ import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.valleapp.valletpvlib.ui.theme.Pink00
 import org.json.JSONObject
+
+data class InfoField(val text: String, val tag: Any, val color: Color= Pink00)
 
 
 interface IBaseEntity {
 
     fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String)
+    fun getInfoField(): InfoField
 
 }
 
@@ -23,6 +28,10 @@ open class BaseEntity: IBaseEntity {
     @PrimaryKey(autoGenerate = true) var id: Long = 0
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun getInfoField(): InfoField {
+        return InfoField("", 0)
     }
 
 }
@@ -42,9 +51,11 @@ interface IBaseDao<T: BaseEntity> {
 }
 
 
-@Database(entities = [Camarero::class], version = 2, exportSchema = false)
+@Database(entities = [Camarero::class, Mesa::class, Zona::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun camareroDao(): CamareroDao
+    abstract fun mesasDao(): MesasDao
+    abstract fun zonasDao(): ZonasDao
 
 
     companion object {

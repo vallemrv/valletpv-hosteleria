@@ -18,7 +18,7 @@ class WSClient(serverUri: String, endPoint: String, private val controller: ICon
     override fun onOpen(serverHandshake: ServerHandshake) {
         isWebsocketClose = false
         println("Websocket open.....")
-        controller.syncDevice(listOf( "camareros"))
+        controller.syncDevice(listOf( "camareros", "mesas", "zonas"))
     }
 
     override fun onMessage(message: String) {

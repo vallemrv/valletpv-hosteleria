@@ -12,6 +12,8 @@ import com.valleapp.valletpvlib.db.AppDatabase
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.IBaseDao
 import com.valleapp.valletpvlib.db.IBaseEntity
+import com.valleapp.valletpvlib.db.Mesa
+import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.interfaces.IController
 import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -161,6 +163,8 @@ class ServiceCom : Service(), IController {
     private fun getEntity(name: String): IBaseEntity {
         when (name) {
             "camareros" -> return Camarero()
+            "mesas" -> return Mesa()
+            "zonas" -> return Zona()
             else -> throw IllegalArgumentException("Entity no encontrado para: $name")
         }
     }
@@ -189,6 +193,8 @@ class ServiceCom : Service(), IController {
     fun getDB(tbName: String): IBaseDao<*> {
         when (tbName) {
             "camareros" -> return appDatabase?.camareroDao() as IBaseDao<*>
+            "mesas" -> return appDatabase?.mesasDao() as IBaseDao<*>
+            "zonas" -> return appDatabase?.zonasDao() as IBaseDao<*>
             else -> throw IllegalArgumentException("DAO no encontrado para: $tbName")
         }
     }
