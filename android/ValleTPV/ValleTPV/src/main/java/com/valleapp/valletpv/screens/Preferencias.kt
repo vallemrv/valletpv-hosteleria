@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -36,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.PreferenciasModel
+import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleTopBar
 import com.valleapp.valletpvlib.ui.theme.Pink00
@@ -106,7 +105,7 @@ fun PreferenciasScreen() {
                 containerColor = Pink00,
             ) {
                 Icon(
-                    imageVector = Icons.Default.Check, contentDescription = "Guardar",
+                    painter = ExtendIcons.Save, contentDescription = "Guardar",
                     Modifier.fillMaxSize(),
                     tint = Color.Black
                 )

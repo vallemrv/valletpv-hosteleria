@@ -15,7 +15,6 @@ data class Zona(
 ) : BaseEntity() {
 
     private fun loadJson(json: JSONObject) {
-        println("Zona.loadJson: $json")
         id = json.getLong("id")
         nombre = json.getString("nombre")
         color = json.getString("color")

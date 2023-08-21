@@ -21,7 +21,6 @@ data class Mesa(
 ): BaseEntity() {
 
     private fun loadJson(json: JSONObject) {
-        println("Mesa.loadJson: $json")
         id = json.getLong("id")
         nombre = json.getString("nombre")
         color = json.getString("color")

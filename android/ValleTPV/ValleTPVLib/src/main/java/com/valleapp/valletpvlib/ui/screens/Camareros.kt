@@ -22,6 +22,7 @@ import androidx.navigation.NavHostController
 import com.valleapp.valletpvlib.db.CamareroDao
 import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.routers.RoutersBase
+import com.valleapp.valletpvlib.ui.TipoBoton
 import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleGrid
 import com.valleapp.valletpvlib.ui.ValleTopBar
@@ -29,7 +30,7 @@ import com.valleapp.valletpvlib.ui.ValleTopBar
 
 @Composable
 fun CamarerosGrid(
-    navController: NavHostController
+    navController: NavHostController, showContador: Boolean = true
 ) {
     val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -47,60 +48,64 @@ fun CamarerosGrid(
     val listaCamareros by db?.getAutorizados(autorizado = true)?.observeAsState(initial = listOf())
         ?: remember { mutableStateOf(listOf()) }
 
-    DisposableEffect(Unit) {
-        bindServiceModel.bindService()
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (count < 2) {
-                    count++
-                    showSnakbar = true
-                } else {
-                    count = 0
-                    navController?.popBackStack()
-                }
+    fun contarParaSalir() {
+        if (showContador) {
+            if (count < 2) {
+                count++
+                showSnakbar = true
+            } else {
+                count = 0
+                navController.popBackStack()
             }
-        }
-
-        dispatcher?.addCallback(callback)
-
-        onDispose {
-            bindServiceModel.unbindService()
-            callback.remove()
         }
     }
 
-    Scaffold(
-        topBar = {
-            ValleTopBar(title = "Camareros",
-                backAction = {
-                    if (count < 2) {
-                        count++
-                        showSnakbar = true
-                    } else {
-                        count = 0
-                        navController?.popBackStack()
-                    }
-                })
-        },
-        content = {
-            Box(modifier = Modifier.padding(it)) {
-                ValleGrid(columns = 5, botones = listaCamareros) { info ->
-                    navController.navigate(
-                        RoutersBase.Mesas.route
-                            .replace("{camId}", info.tag.toString())
-                    )
+    DisposableEffect(Unit) {
+        bindServiceModel.bindService()
+            val callback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    contarParaSalir()
                 }
-                ToastComposable(
-                    message = "Presione nuevamente para salir ${3 - count}",
-                    show = showSnakbar,
-                    timeout = 2000,
-                    fontSize = 20.sp,
-                    onHide = {
-                        showSnakbar = false
-                    }
-                )
+            }
+
+            dispatcher?.addCallback(callback)
+
+            onDispose {
+                bindServiceModel.unbindService()
+                callback.remove()
             }
         }
-    )
-}
+
+        Scaffold(
+            topBar = {
+                if(showContador)
+                ValleTopBar(title = "Camareros",
+                    backAction = {
+                        contarParaSalir()
+                    })
+                else
+                    ValleTopBar(title = "Camareros")
+            },
+            content = {
+                Box(modifier = Modifier.padding(it)) {
+                    ValleGrid(columns = 5, botones = listaCamareros, TipoBoton.SIMPLE) { info, _ ->
+                        count = 0
+                        navController.navigate(
+                            RoutersBase.Mesas.route
+                                .replace("{camId}", info.tag.toString())
+                        )
+                    }
+                    ToastComposable(
+                        message = "Presione nuevamente para salir ${3 - count}",
+                        show = showSnakbar,
+                        timeout = 2000,
+                        fontSize = 20.sp,
+                        onHide = {
+                            showSnakbar = false
+                        }
+                    )
+                }
+            }
+        )
+    }
 

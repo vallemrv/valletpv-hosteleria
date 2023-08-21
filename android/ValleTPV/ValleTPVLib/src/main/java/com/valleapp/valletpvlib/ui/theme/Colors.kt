@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 //paleta de colores
 
 val Pink00 = Color(0xFFD0B8D5)
+val Pink01 = Color(0xFFEBD0EC)
 
 val DarkColorPalette = lightColorScheme(
     primary = Color(0xFF9ECBF1),

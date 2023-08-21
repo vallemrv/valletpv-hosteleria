@@ -9,15 +9,15 @@ import androidx.compose.ui.unit.sp
 
 val ValleTypography = Typography(
     labelLarge = TextStyle(
-        fontSize = 40.sp,
+        fontSize = 35.sp,
         letterSpacing = (-1.5).sp
     ),
     labelMedium = TextStyle(
-        fontSize = 30.sp,
+        fontSize = 25.sp,
         letterSpacing = 0.sp
     ),
     labelSmall = TextStyle(
-        fontSize = 20.sp,
+        fontSize = 15.sp,
         letterSpacing = 0.sp
     ),
 )

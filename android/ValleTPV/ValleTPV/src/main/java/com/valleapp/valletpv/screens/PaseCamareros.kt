@@ -18,15 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,7 +30,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,6 +42,7 @@ import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.tools.ServiceCom
+import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.ValleTopBar
 import com.valleapp.valletpvlib.ui.theme.Pink00
 
@@ -92,7 +86,7 @@ fun PaseCamareros(navController: NavController? = null) {
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    painter = ExtendIcons.Add,
                     contentDescription = "Agregar",
                     tint = Color.Black,
                     modifier = Modifier
@@ -106,21 +100,11 @@ fun PaseCamareros(navController: NavController? = null) {
             ValleTopBar(
                 title = "Pase de Camareros"
             ) {
-                IconButton(onClick = {              }) {
-                    Icon(
-                        painter = painterResource(id = ExtendIcons.arqueo),
-                        contentDescription = "Preferencias",
-                        modifier = Modifier
-                            .size(80.dp)
-                    )
+                BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
+                    navController?.navigate(Routers.Arqueo.route)
                 }
-                IconButton(onClick = { navController?.navigate(Routers.Preferencias.route) }) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Preferencias",
-                        modifier = Modifier
-                            .size(80.dp)
-                    )
+                BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
+                    navController?.navigate(Routers.Preferencias.route)
                 }
             }
         },
@@ -202,9 +186,7 @@ fun PaseCamarerosScreen(vModel: CamarerosModel, navController: NavController? = 
                     .padding(16.dp)
             )
             // Aquí puedes usar una LazyColumn en lugar de ListView
-            LazyColumn() {
-                item {
-                }
+            LazyColumn {
                 items(autorizados) { camarero ->
                     Text(text = camarero.nombre + " " + camarero.apellidos,
                         modifier = Modifier
@@ -228,7 +210,7 @@ fun PaseCamarerosScreen(vModel: CamarerosModel, navController: NavController? = 
         ) {
             Image(
 
-                imageVector = Icons.Default.ExitToApp,
+                painter = ExtendIcons.Salir,
                 contentDescription = "Salir",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -250,7 +232,7 @@ fun PaseCamarerosScreen(vModel: CamarerosModel, navController: NavController? = 
             )
             Spacer(modifier = Modifier.height(3.dp))
             Image(
-                imageVector = Icons.Default.Check,
+                painter = ExtendIcons.Check,
                 contentDescription = "Aceptar",
                 modifier = Modifier
                     .fillMaxWidth()
