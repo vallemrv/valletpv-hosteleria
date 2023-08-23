@@ -5,20 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,53 +23,88 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.valleapp.valletpvlib.ExtendIcons
-import com.valleapp.valletpvlib.db.InfoField
-import com.valleapp.valletpvlib.ui.theme.Pink00
-import com.valleapp.valletpvlib.ui.theme.Pink01
-
+import com.valleapp.valletpvlib.db.AccionMesa
+import com.valleapp.valletpvlib.db.Mesa
+import com.valleapp.valletpvlib.ui.theme.ColorTheme
+import com.valleapp.valletpvlib.ui.theme.ExtendIcons
+import com.valleapp.valletpvlib.ui.theme.Styles
 
 @Composable
-fun BotonAccion(icon: Painter, contentDescription: String, onClick: () -> Unit) {
-    Box(
+fun BotonAccion(
+    icon: Painter,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    BotonIcon(
         modifier = Modifier
-            .fillMaxHeight()
-            .padding(3.dp)
-            .background(Pink01),
-        contentAlignment = Alignment.CenterStart,
+            .padding(2.dp)
+            .size(60.dp),
+        icon = icon,
+        color = ColorTheme.BotonesAccion,
+        contentDescription = contentDescription
+    ) {
+        onClick()
+    }
+}
 
-        ) {
-        IconButton(
-            onClick = onClick,
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BotonIcon(
+    icon: Painter,
+    color: Color,
+    contentDescription: String,
+    modifier: Modifier = Modifier
+        .padding(2.dp)
+        .size(50.dp),
+    onClick: () -> Unit
+) {
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
+        onClick = onClick,
+        modifier = modifier,
+        colors = CardDefaults.elevatedCardColors(color)
+
+    ) {
+        Box(
             modifier = Modifier
-                .width(70.dp)
-        ) {
+                .padding(5.dp),
+            contentAlignment = Alignment.Center,
+
+            ) {
+
             Icon(
                 painter = icon,
                 contentDescription = contentDescription,
                 tint = Color.Black,
                 modifier = Modifier.fillMaxSize()
             )
+
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BotonSimple(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
+fun BotonSimple(
+    text: String,
+    modifier: Modifier = Modifier.padding(2.dp).size(160.dp),
+    color: Color = ColorTheme.Primary,
+    tag: Any? = null,
+    onButtonClick: (Any?) -> Unit
+) {
     Card(
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = {
-            onButtonClick(obj, "main")
+            onButtonClick(tag)
         },
-        modifier = Modifier
-            .padding(8.dp)
-            .height(180.dp),
-        colors = CardDefaults.elevatedCardColors(obj.color)
+        modifier = modifier,
+        colors = CardDefaults.elevatedCardColors(color)
 
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
-                text = obj.text,
+                text = text,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
@@ -83,7 +112,7 @@ fun BotonSimple(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
                     .wrapContentSize(Alignment.Center),
                 lineHeight = 40.sp,
                 color = Color.Black,
-                style = MaterialTheme.typography.labelLarge,
+                style = Styles.TextBotones,
                 textAlign = TextAlign.Center
             )
         }
@@ -93,17 +122,24 @@ fun BotonSimple(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BotonMesa(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
+fun BotonMesa(
+    mesa: Mesa,
+    modifier: Modifier = Modifier
+        .padding(2.dp)
+        .size(160.dp),
+    onButtonClick: (Mesa) -> Unit = {},
+    onAccionClick: (Mesa, AccionMesa) -> Unit
+
+) {
     Card(
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = {
-            onButtonClick(obj, "main")
+            onButtonClick(mesa)
         },
-        modifier = Modifier
-            .padding(8.dp)
-            .height(180.dp),
+        modifier = modifier,
+
         colors = CardDefaults.cardColors(
-            containerColor = obj.color
+            containerColor = ColorTheme.hexToComposeColor(mesa.color)
         )
 
     ) {
@@ -113,14 +149,14 @@ fun BotonMesa(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = obj.text,
+                text = mesa.nombre,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center),
                 lineHeight = 40.sp,
                 color = Color.Black,
-                style = MaterialTheme.typography.labelLarge,
+                style = Styles.TextBotones,
                 textAlign = TextAlign.Center
             )
 
@@ -128,25 +164,25 @@ fun BotonMesa(obj: InfoField, onButtonClick: (InfoField, String?) -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom
-                ) {
+            ) {
                 Icon(painter = ExtendIcons.JuntarMesa, contentDescription = "JuntarMesa",
                     modifier = Modifier
                         .padding(3.dp)
                         .size(40.dp)
-                        .background(Pink00)
-                        .clickable { onButtonClick(obj, "juntar") })
+                        .background(ColorTheme.Primary)
+                        .clickable { onAccionClick(mesa, AccionMesa.JUNTAR) })
                 Icon(painter = ExtendIcons.CambiarMesa, contentDescription = "CambiarMesa",
                     modifier = Modifier
                         .padding(3.dp)
                         .size(40.dp)
-                        .background(Pink00)
-                        .clickable { onButtonClick(obj, "cambiar") })
+                        .background(ColorTheme.Primary)
+                        .clickable { onAccionClick(mesa, AccionMesa.MOVER) })
                 Icon(painter = ExtendIcons.Borrar, contentDescription = "BorrarMesa",
                     modifier = Modifier
                         .padding(3.dp)
                         .size(40.dp)
-                        .background(Pink00)
-                        .clickable { onButtonClick(obj, "borrar") })
+                        .background(ColorTheme.Primary)
+                        .clickable { onAccionClick(mesa, AccionMesa.BORRAR) })
             }
         }
 

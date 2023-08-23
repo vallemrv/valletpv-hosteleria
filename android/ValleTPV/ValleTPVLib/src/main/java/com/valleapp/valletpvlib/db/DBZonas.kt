@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Query
-import com.valleapp.valletpvlib.ui.theme.hexToComposeColor
 import org.json.JSONObject
 
 @Entity(tableName = "zonas")
@@ -30,8 +29,8 @@ data class Zona(
            }
     }
 
-    override fun getInfoField(): InfoField {
-        return InfoField(nombre, id, hexToComposeColor(color))
+    override fun toString(): String {
+        return nombre
     }
 }
 

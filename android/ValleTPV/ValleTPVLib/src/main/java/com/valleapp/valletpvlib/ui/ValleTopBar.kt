@@ -6,17 +6,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.valleapp.valletpvlib.ExtendIcons
-import com.valleapp.valletpvlib.ui.theme.Pink00
+import com.valleapp.valletpvlib.ui.theme.ColorTheme
+import com.valleapp.valletpvlib.ui.theme.ExtendIcons
+import com.valleapp.valletpvlib.ui.theme.Styles
 
 
 val NoOp: () -> Unit = {}
@@ -26,7 +26,7 @@ val NoOp: () -> Unit = {}
 @Composable
 fun ValleTopBar(
     title: String,
-    backgroundColor: Color = Pink00,
+    backgroundColor: Color = ColorTheme.Primary,
     backAction: () -> Unit = NoOp,
     actions: @Composable () -> Unit = {},
 ) {
@@ -43,7 +43,7 @@ fun ValleTopBar(
             ) {
                 Text(
                     text = title,
-                    style = TextStyle(fontSize = 20.sp, color = Color.Black),
+                    style = Styles.TextTitulos,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -61,9 +61,11 @@ fun ValleTopBar(
         },
         navigationIcon = {
             if (!isBackActionEmpty) {
-                BotonAccion(
+                BotonIcon(
                     icon = ExtendIcons.Back,
                     contentDescription = "Back Button",
+                    color = ColorTheme.Primary,
+                    modifier = Modifier.padding(top = 20.dp, start = 5.dp).size(60.dp),
                     onClick = backAction
                 )
             }

@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.valleapp.valletpv.routers.Routers
-import com.valleapp.valletpvlib.ExtendIcons
 import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.ValleTopBar
 import com.valleapp.valletpvlib.ui.screens.MesasGrid
+import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 @Composable
 fun MesasTpvScreen(navController: NavController, camId: Long) {
@@ -21,19 +21,24 @@ fun MesasTpvScreen(navController: NavController, camId: Long) {
                     navController.popBackStack()
                 }
             ) {
-                BotonAccion(ExtendIcons.AddCamareros, "Agregar camareors",
-                    onClick = { navController?.navigate(Routers.Preferencias.route) })
+                BotonAccion(icon = ExtendIcons.Mensajes, contentDescription = "Mesajes") {
+                    navController.navigate(Routers.Preferencias.route)
+                }
+                BotonAccion(
+                    ExtendIcons.AddCamareros, "Agregar camareors",
+                    onClick = { navController.navigate(Routers.Preferencias.route) })
 
-                BotonAccion(ExtendIcons.Configuration, "Impresoras",
-                    onClick = { navController?.navigate(Routers.Preferencias.route) })
+                BotonAccion(
+                    ExtendIcons.Configuration, "Impresoras",
+                    onClick = { navController.navigate(Routers.Preferencias.route) })
 
                 BotonAccion(
                     ExtendIcons.Listado,
                     "Camareros",
-                    onClick = { navController?.navigate(Routers.Preferencias.route) })
+                    onClick = { navController.navigate(Routers.Preferencias.route) })
 
                 BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
-                    navController?.navigate(Routers.Preferencias.route)
+                    navController.navigate(Routers.Preferencias.route)
                 }
 
             }

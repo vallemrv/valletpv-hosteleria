@@ -25,17 +25,31 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.valleapp.valletpvlib.db.IBaseEntity
+import com.valleapp.valletpvlib.db.AccionMesa
 import com.valleapp.valletpvlib.db.MesasDao
+import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.db.ZonasDao
 import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.ui.BotonSimple
-import com.valleapp.valletpvlib.ui.TipoBoton
+import com.valleapp.valletpvlib.ui.TableroMesas
 import com.valleapp.valletpvlib.ui.ToastComposable
-import com.valleapp.valletpvlib.ui.ValleGrid
+import com.valleapp.valletpvlib.ui.theme.ColorTheme
 
-class MesasModel: ViewModel(){
+
+class MesasModel<Mesa> : ViewModel() {
+    fun moverMesa(mesa: Mesa) {
+
+    }
+
+    fun cerrarMesa(mesa: Mesa) {
+
+    }
+
+    fun abrirMesa(mesa: Mesa) {
+
+    }
+
     var idZona: Long by mutableLongStateOf(0)
 }
 
@@ -44,7 +58,7 @@ fun MesasGrid(navController: NavController, camId: Long) {
     val context = LocalContext.current
     val app = context.applicationContext as Application
     val bindServiceModel: BindServiceModel = viewModel(initializer = { BindServiceModel(app) })
-    val model: MesasModel = viewModel()
+    val model: MesasModel<Any?> = viewModel()
 
 
     // Imaginando que bindServiceModel.mService tiene un tipo de retorno nullable
@@ -88,11 +102,14 @@ fun MesasGrid(navController: NavController, camId: Long) {
         ) {
             Card(elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)) {
                 LazyRow {
-                    items(listaZonas) {
-                        val info = (it as IBaseEntity).getInfoField()
-                        BotonSimple(obj = info, onButtonClick = { infR, _ ->
-                            model.idZona = infR.tag as Long
-                        })
+                    items(listaZonas) { zona ->
+                        BotonSimple(
+                            text = zona.nombre,
+                            tag = zona,
+                            color = ColorTheme.hexToComposeColor(zona.color)
+                        ) { tag ->
+                            model.idZona = (tag as Zona).id
+                        }
                     }
                 }
             }
@@ -104,19 +121,26 @@ fun MesasGrid(navController: NavController, camId: Long) {
         ) {
             Card(elevation = CardDefaults.cardElevation(defaultElevation = 10.dp))
             {
-                ValleGrid(columns = 5, botones = listaMesas, tipo = TipoBoton.MESA) { info, _ ->
+                TableroMesas(columns = 5, mesas = listaMesas, onItemClick = {
                     navController.navigate(
                         RoutersBase.Cuenta.route
                             .replace("{camId}", camId.toString())
-                            .replace("{mesaId}", info.tag.toString())
+                            .replace("{mesaId}", it.id.toString())
                     )
-                }
+                },
+                    onAccionClick = { mesa, accion ->
+                        when (accion) {
+                            AccionMesa.MOVER -> model.moverMesa(mesa)
+                            AccionMesa.JUNTAR -> model.cerrarMesa(mesa)
+                            AccionMesa.BORRAR -> model.abrirMesa(mesa)
+                        }
+                    })
             }
-        }
-
-        ToastComposable(message = "", show = showSnakbar, timeout = 2000) {
-            showSnakbar = false
         }
     }
 
+    ToastComposable(message = "", show = showSnakbar, timeout = 2000) {
+        showSnakbar = false
+    }
 }
+

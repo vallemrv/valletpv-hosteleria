@@ -41,7 +41,7 @@ class WSClient(serverUri: String, endPoint: String, private val controller: ICon
         if (!exit) {
             try {
                 Thread{
-                    Thread.sleep(1000)
+                    Thread.sleep(5000)
                     reconnect()
                 }.start()
 

@@ -10,12 +10,12 @@ import org.json.JSONObject
 
 @Entity(tableName = "camareros")
 data class Camarero(
-    var nombre: String? = "",
-    var apellidos: String? = "",
-    var activo: Boolean? = true,
-    var password: String? = "",
-    var autorizado: Boolean? = true,
-    var permisos: String? = ""
+    var nombre: String = "",
+    var apellidos: String = "",
+    var activo: Boolean = true,
+    var password: String = "",
+    var autorizado: Boolean = true,
+    var permisos: String = ""
 ): BaseEntity(){
 
     private fun loadJson(json: JSONObject) {
@@ -41,9 +41,10 @@ data class Camarero(
         }
     }
 
-    override fun getInfoField(): InfoField {
-        return InfoField("$nombre $apellidos", id)
+    override fun toString(): String {
+        return "$nombre $apellidos"
     }
+
 }
 
 @Dao

@@ -7,8 +7,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.valleapp.valletpvlib.ui.theme.hexToComposeColor
 import org.json.JSONObject
+
+enum class AccionMesa{
+    JUNTAR, MOVER, BORRAR,
+}
+
 
 @Entity(tableName = "mesas")
 data class Mesa(
@@ -39,8 +43,8 @@ data class Mesa(
         }
     }
 
-    override fun getInfoField(): InfoField {
-        return InfoField(nombre, id, hexToComposeColor(color))
+    override fun toString(): String {
+        return nombre
     }
 }
 

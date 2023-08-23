@@ -34,10 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.PreferenciasModel
-import com.valleapp.valletpvlib.ExtendIcons
+import com.valleapp.valletpvlib.ui.BotonSimple
 import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleTopBar
-import com.valleapp.valletpvlib.ui.theme.Pink00
+import com.valleapp.valletpvlib.ui.theme.ColorTheme
+import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
@@ -102,7 +103,7 @@ fun PreferenciasScreen() {
                 modifier = Modifier
                     .width(80.dp)
                     .fillMaxSize(),
-                containerColor = Pink00,
+                containerColor = ColorTheme.Primary,
             ) {
                 Icon(
                     painter = ExtendIcons.Save, contentDescription = "Guardar",
@@ -152,15 +153,10 @@ fun PreferenciasScreen() {
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        ExtendedFloatingActionButton(
-                            onClick = { vModel.onValidarClick() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(70.dp),
-                            containerColor = Pink00,
-                        ) {
-                            Text(text = "Validar Código", color = Color.Black, fontSize = 24.sp)
+                        BotonSimple(text = "Validar Codgio") { _ ->
+                            vModel.onValidarClick()
                         }
+
                     }
                 }
             }

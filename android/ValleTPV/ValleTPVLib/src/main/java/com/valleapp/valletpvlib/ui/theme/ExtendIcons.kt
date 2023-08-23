@@ -1,7 +1,8 @@
-package com.valleapp.valletpvlib
+package com.valleapp.valletpvlib.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import com.valleapp.valletpvlib.R
 
 object ExtendIcons {
 
@@ -27,5 +28,6 @@ object ExtendIcons {
 
     val Listado @Composable get() = painterResource(id = R.drawable.listado)
     val Back @Composable get() = painterResource(id = R.drawable.back)
+    val Mensajes @Composable get() = painterResource(id = R.drawable.mensaje)
 
 }

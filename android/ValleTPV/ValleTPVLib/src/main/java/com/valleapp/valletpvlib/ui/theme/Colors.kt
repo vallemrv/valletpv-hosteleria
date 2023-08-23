@@ -1,15 +1,18 @@
 package com.valleapp.valletpvlib.ui.theme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 //paleta de colores
 
-val Pink00 = Color(0xFFD0B8D5)
-val Pink01 = Color(0xFFEBD0EC)
 
-val DarkColorPalette = lightColorScheme(
-    primary = Color(0xFF9ECBF1),
-    primaryContainer = Color(0xFFB292EC),
-    secondary = Color(0xFF81F5E4),
-    surface = Color(0xFF917B96),
-)
+object ColorTheme {
+    val Primary = Color(0xFFD0B8D5)
+    val BotonesAccion = Color(0xFFEBD0EC)
+    val TextTitulos = Color.Black
+    val BgListas = Color(0xFFEBD0EC)
+    val Secundary = Color(0xFFC5CAE9)
+    fun hexToComposeColor(hex: String?): Color {
+        if (hex == null) return Primary
+        else  return Color(android.graphics.Color.parseColor(hex))
+    }
+}
+

@@ -6,22 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
 import com.valleapp.valletpv.routers.Navegador
-import com.valleapp.valletpvlib.ui.theme.ValleTheme
 import com.valleapp.valletpvlib.tools.ServiceCom
 
 class ValleTPV : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-              setContent {
-                  ValleTheme {
-                      Surface {
-                          Navegador()
-                      }
-                  }
+        super.onCreate(savedInstanceState)
+        setContent {
+            Surface {
+                Navegador()
             }
         }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -40,7 +37,7 @@ class ValleTPV : ComponentActivity() {
             putExtra("texto", "Servicio de comunicación")
         }
         startForegroundService(intent)
-      }
+    }
 
 }
 

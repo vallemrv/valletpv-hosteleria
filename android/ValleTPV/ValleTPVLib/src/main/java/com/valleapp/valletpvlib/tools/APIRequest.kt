@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url
+import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -80,6 +81,7 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<
         println(e)
         when (e) {
             is UnknownHostException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)
+            is ConnectException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)
             is SocketTimeoutException -> ApiResponse.Error(ApiErrorMessages.TIMEOUT)
             else -> ApiResponse.Error(ApiErrorMessages.UNKNOWN_ERROR)
         }

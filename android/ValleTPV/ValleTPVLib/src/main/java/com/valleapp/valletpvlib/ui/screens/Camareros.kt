@@ -22,9 +22,8 @@ import androidx.navigation.NavHostController
 import com.valleapp.valletpvlib.db.CamareroDao
 import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.routers.RoutersBase
-import com.valleapp.valletpvlib.ui.TipoBoton
+import com.valleapp.valletpvlib.ui.TableroCamareros
 import com.valleapp.valletpvlib.ui.ToastComposable
-import com.valleapp.valletpvlib.ui.ValleGrid
 import com.valleapp.valletpvlib.ui.ValleTopBar
 
 
@@ -32,16 +31,17 @@ import com.valleapp.valletpvlib.ui.ValleTopBar
 fun CamarerosGrid(
     navController: NavHostController, showContador: Boolean = true
 ) {
-    val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     val context = LocalContext.current
     val app = context.applicationContext as Application
+
     val bindServiceModel: BindServiceModel = viewModel(initializer = { BindServiceModel(app) })
 
     // Imaginando que bindServiceModel.mService tiene un tipo de retorno nullable
     val mService = bindServiceModel.mService
     val db: CamareroDao? = mService?.getDB("camareros") as? CamareroDao
+
     var count by remember { mutableIntStateOf(0) }
+
     var showSnakbar by remember { mutableStateOf(false) }
 
     // Si db es no nulo, obtén la lista de camareros autorizados, si no, usa una lista vacía
@@ -60,52 +60,54 @@ fun CamarerosGrid(
         }
     }
 
+    val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     DisposableEffect(Unit) {
         bindServiceModel.bindService()
-            val callback = object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    contarParaSalir()
-                }
-            }
-
-            dispatcher?.addCallback(callback)
-
-            onDispose {
-                bindServiceModel.unbindService()
-                callback.remove()
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                contarParaSalir()
             }
         }
 
-        Scaffold(
-            topBar = {
-                if(showContador)
+        dispatcher?.addCallback(callback)
+
+        onDispose {
+            bindServiceModel.unbindService()
+            callback.remove()
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            if (showContador)
                 ValleTopBar(title = "Camareros",
                     backAction = {
                         contarParaSalir()
                     })
-                else
-                    ValleTopBar(title = "Camareros")
-            },
-            content = {
-                Box(modifier = Modifier.padding(it)) {
-                    ValleGrid(columns = 5, botones = listaCamareros, TipoBoton.SIMPLE) { info, _ ->
-                        count = 0
-                        navController.navigate(
-                            RoutersBase.Mesas.route
-                                .replace("{camId}", info.tag.toString())
-                        )
-                    }
-                    ToastComposable(
-                        message = "Presione nuevamente para salir ${3 - count}",
-                        show = showSnakbar,
-                        timeout = 2000,
-                        fontSize = 20.sp,
-                        onHide = {
-                            showSnakbar = false
-                        }
+            else
+                ValleTopBar(title = "Camareros")
+        },
+        content = {
+            Box(modifier = Modifier.padding(it)) {
+                TableroCamareros(columns = 5, camareros = listaCamareros){camarero->
+                    count = 0
+                    navController.navigate(
+                        RoutersBase.Mesas.route
+                            .replace("{camId}", camarero.id.toString())
                     )
                 }
+
+                ToastComposable(
+                    message = "Presione nuevamente para salir ${3 - count}",
+                    show = showSnakbar,
+                    timeout = 2000,
+                    fontSize = 20.sp,
+                    onHide = {
+                        showSnakbar = false
+                    }
+                )
             }
-        )
-    }
+        }
+    )
+}
 

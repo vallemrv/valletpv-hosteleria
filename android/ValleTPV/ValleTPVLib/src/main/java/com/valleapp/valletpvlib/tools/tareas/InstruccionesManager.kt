@@ -6,6 +6,7 @@ import com.valleapp.valletpvlib.tools.ApiResponse
 import com.valleapp.valletpvlib.tools.Instrucciones
 import com.valleapp.valletpvlib.tools.safeApiCall
 import kotlinx.coroutines.sync.Mutex
+import java.lang.Thread.sleep
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -20,7 +21,7 @@ class InstruccionesManager {
 
     suspend fun procesarCola() {
         while (isRunning) {
-            println("procesando instrucciones ${cola.size}")
+
             if (cola.isNotEmpty()) {
                 val inst = cola.peek()
                 inst?.let {
@@ -33,11 +34,16 @@ class InstruccionesManager {
                         }
 
                         is ApiResponse.Error -> {
-                            if (!((result.errorMessage == ApiErrorMessages.TIMEOUT) ||
-                                        (result.errorMessage == ApiErrorMessages.NO_CONNECTION))
-                            ) {
+
+                            if (!((result.errorMessage == ApiErrorMessages.TIMEOUT)
+                                        || (result.errorMessage == ApiErrorMessages.NO_CONNECTION))) {
                                 cola.poll()
+
+
+                            }else{
+                                sleep(5000)
                             }
+
                             inst.mensaje?.let {
                                 it.mensaje = result.errorMessage.toString()
                                 it.tipo = "error"
@@ -45,8 +51,6 @@ class InstruccionesManager {
                         }
                     }
 
-                } ?: run {
-                    cola.poll()
                 }
 
             } else {
@@ -61,9 +65,9 @@ class InstruccionesManager {
         mutex.unlock()
     }
 
-    fun addInstruccion(instruccion: Instrucciones) {
+     fun addInstruccion(instruccion: Instrucciones) {
         cola.add(instruccion)
-        mutex.unlock()
-        println("Agregando   instruccion ${cola.size}, Estado del mutex: ${mutex.isLocked}")
+        if (mutex.isLocked) mutex.unlock()
+        println("Agregando   instruccion ${cola.size}")
     }
 }

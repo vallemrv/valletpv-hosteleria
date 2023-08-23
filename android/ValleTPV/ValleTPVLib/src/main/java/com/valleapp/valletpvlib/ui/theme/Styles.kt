@@ -1,28 +1,29 @@
 package com.valleapp.valletpvlib.ui.theme
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val ValleTypography = Typography(
-    labelLarge = TextStyle(
-        fontSize = 35.sp,
-        letterSpacing = (-1.5).sp
-    ),
-    labelMedium = TextStyle(
-        fontSize = 25.sp,
+object Styles {
+    val TextListas = TextStyle(
+        fontSize = 30.sp,
+        letterSpacing = 0.sp,
+
+    )
+    val TextTitulos = TextStyle(
+        fontSize = 40.sp,
+        letterSpacing = 0.sp,
+        color = ColorTheme.TextTitulos,
+        fontWeight = FontWeight.Bold
+    )
+    val TextSubTitulos = TextStyle(
+        fontSize = 32.sp,
+        letterSpacing = 0.sp,
+        color = ColorTheme.TextTitulos,
+        fontWeight = FontWeight.Bold
+    )
+    val TextBotones = TextStyle(
+        fontSize = 40.sp,
         letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontSize = 15.sp,
-        letterSpacing = 0.sp
-    ),
-)
-val ValleShapes = Shapes(
-    small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(0.dp),
-)
+    )
+}

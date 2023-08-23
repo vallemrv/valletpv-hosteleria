@@ -185,7 +185,7 @@ class ServiceCom : Service(), IController {
                 wsClient?.connect()
                 procesarCola.procesarCola()
             }
-            println("ServiceCom: setServerConfig")
+            println("Arrancando Procesos de cola y WSClient")
         }
     }
 
@@ -201,6 +201,5 @@ class ServiceCom : Service(), IController {
 
     fun addInstruccion(inst: Instrucciones) {
         procesarCola.addInstruccion(inst)
-        println("ServiceCom: addInstruccion")
     }
 }
