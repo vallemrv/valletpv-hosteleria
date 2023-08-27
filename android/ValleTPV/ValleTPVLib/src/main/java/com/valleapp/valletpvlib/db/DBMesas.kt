@@ -3,14 +3,12 @@ package com.valleapp.valletpvlib.db
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import org.json.JSONObject
 
 enum class AccionMesa{
-    JUNTAR, MOVER, BORRAR,
+    JUNTAR, MOVER, BORRAR, NADA
 }
 
 
@@ -55,9 +53,6 @@ interface MesasDao: IBaseDao<Mesa> {
     @Query("SELECT * FROM mesas WHERE idZona = :idZona ORDER BY orden DESC")
     fun getAllByZona(idZona: Long): LiveData<List<Mesa>>
 
-    @Query("SELECT * FROM mesas WHERE idZona = :id AND ID != :idm ORDER BY orden DESC")
-    fun getAllMenosUna(id: Int, idm: Int): LiveData<List<Mesa>>
-
     @Query("UPDATE mesas SET abierta=1, num=0 WHERE ID = :idm")
     fun abrirMesa(idm: Int)
 
@@ -67,9 +62,6 @@ interface MesasDao: IBaseDao<Mesa> {
     @Query("UPDATE mesas SET num=1 WHERE ID = :id")
     fun marcarRojo(id: Int)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMesa(mesa: Mesa)
-
     @Update
     fun updateMesa(mesa: Mesa)
 
@@ -78,4 +70,7 @@ interface MesasDao: IBaseDao<Mesa> {
 
     @Query("SELECT * FROM mesas ")
     override fun getAll(): List<Mesa>
+
+    @Query("SELECT * FROM mesas WHERE ID = :id")
+    fun getMesa(id: Long): Mesa
 }

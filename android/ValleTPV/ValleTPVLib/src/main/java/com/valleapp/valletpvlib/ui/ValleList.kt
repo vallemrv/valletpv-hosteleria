@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.valleapp.valletpvlib.db.BaseEntity
 import com.valleapp.valletpvlib.db.IBaseEntity
+import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 import com.valleapp.valletpvlib.ui.theme.Styles
 
@@ -31,7 +32,7 @@ fun ValleList(
     ) {
         Text(
             text = title,
-            style = Styles.TextSubTitulos,
+            style = Styles.TextTitulos2,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)
@@ -56,3 +57,18 @@ fun ListaSimple(title:String, list: List<BaseEntity>, onItemClick: (IBaseEntity)
         }
     }
 }
+
+
+
+
+@Composable
+fun ListaCuenta(title:String, list: List<LineaCuenta>, onBorrarClick: (LineaCuenta) -> Unit) {
+    ValleList(title = title) {
+        items(list) { item ->
+            ListItemCuenta(item){
+                onBorrarClick(it)
+            }
+        }
+    }
+}
+

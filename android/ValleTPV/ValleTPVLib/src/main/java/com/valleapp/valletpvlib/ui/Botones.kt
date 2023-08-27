@@ -1,5 +1,6 @@
 package com.valleapp.valletpvlib.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
 import com.valleapp.valletpvlib.db.AccionMesa
 import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
@@ -51,34 +55,43 @@ fun BotonAccion(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BotonIcon(
-    icon: Painter,
-    color: Color,
+    modifier: Modifier = Modifier,
+    url: String? = null,
+    icon: Painter = ExtendIcons.NotFound,
+    color: Color = ColorTheme.Primary,
     contentDescription: String,
-    modifier: Modifier = Modifier
-        .padding(2.dp)
-        .size(50.dp),
     onClick: () -> Unit
 ) {
+
+    val defaultModifier = if (modifier == Modifier) {
+        Modifier
+            .padding(2.dp)
+            .size(70.dp)
+    } else {
+        modifier
+    }
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = onClick,
-        modifier = modifier,
+        modifier = defaultModifier,
         colors = CardDefaults.elevatedCardColors(color)
 
     ) {
         Box(
-            modifier = Modifier
-                .padding(5.dp),
+            modifier = Modifier.padding(3.dp),
             contentAlignment = Alignment.Center,
 
             ) {
-
-            Icon(
-                painter = icon,
-                contentDescription = contentDescription,
-                tint = Color.Black,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (url != null) {
+                NetworkImage(url = url, contentDescription = contentDescription)
+            } else {
+                Icon(
+                    painter = icon,
+                    contentDescription = contentDescription,
+                    tint = Color.Black,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
         }
     }
@@ -88,17 +101,25 @@ fun BotonIcon(
 @Composable
 fun BotonSimple(
     text: String,
-    modifier: Modifier = Modifier.padding(2.dp).size(160.dp),
+    modifier: Modifier = Modifier,
     color: Color = ColorTheme.Primary,
     tag: Any? = null,
     onButtonClick: (Any?) -> Unit
 ) {
+    val defaultModifier = if (modifier == Modifier) {
+        Modifier
+            .padding(2.dp)
+            .size(170.dp)
+    } else {
+        modifier
+    }
+
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = {
             onButtonClick(tag)
         },
-        modifier = modifier,
+        modifier = defaultModifier,
         colors = CardDefaults.elevatedCardColors(color)
 
     ) {
@@ -124,19 +145,25 @@ fun BotonSimple(
 @Composable
 fun BotonMesa(
     mesa: Mesa,
-    modifier: Modifier = Modifier
-        .padding(2.dp)
-        .size(160.dp),
+    modifier: Modifier = Modifier,
     onButtonClick: (Mesa) -> Unit = {},
     onAccionClick: (Mesa, AccionMesa) -> Unit
 
 ) {
+
+    val defaultModifier = if (modifier == Modifier) {
+        Modifier
+            .padding(2.dp)
+            .size(170.dp)
+    } else {
+        modifier
+    }
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = {
             onButtonClick(mesa)
         },
-        modifier = modifier,
+        modifier = defaultModifier,
 
         colors = CardDefaults.cardColors(
             containerColor = ColorTheme.hexToComposeColor(mesa.color)
@@ -187,4 +214,22 @@ fun BotonMesa(
         }
 
     }
+}
+
+
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun NetworkImage(url: String, contentDescription: String = "") {
+    val painter = rememberImagePainter(
+        data = url,
+        builder = {
+            crossfade(true)
+        }
+    )
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,  // Añadir una descripción adecuada para accesibilidad
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
 }

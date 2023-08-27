@@ -54,6 +54,9 @@ interface CamareroDao: IBaseDao<Camarero> {
     @Query("DELETE FROM camareros WHERE ID = :id")
     override fun deleteById(id: Long)
 
+    @Query("SELECT * FROM camareros WHERE ID = :id")
+    fun getCamarero(id: Long): Camarero
+
     @Query("SELECT * FROM camareros ")
     override fun getAll(): List<Camarero>
 
@@ -68,7 +71,6 @@ interface CamareroDao: IBaseDao<Camarero> {
 
     @Insert
     fun insertCamarero(camarero: Camarero)
-
 
 
 }

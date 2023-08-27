@@ -1,6 +1,7 @@
 package com.valleapp.valletpvlib.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ val NoOp: () -> Unit = {}
 @Composable
 fun ValleTopBar(
     title: String,
+    subtitle: String? = null,
     backgroundColor: Color = ColorTheme.Primary,
     backAction: () -> Unit = NoOp,
     actions: @Composable () -> Unit = {},
@@ -41,11 +43,21 @@ fun ValleTopBar(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.CenterStart
             ) {
-                Text(
-                    text = title,
-                    style = Styles.TextTitulos,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                Column {
+                    Text(
+                        text = title,
+                        style = Styles.TextTitulos,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    if (subtitle != null) {
+                        Text(
+                            text = subtitle,
+                            style = Styles.TextSubTitulos,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+
             }
         },
         actions = {
@@ -65,7 +77,9 @@ fun ValleTopBar(
                     icon = ExtendIcons.Back,
                     contentDescription = "Back Button",
                     color = ColorTheme.Primary,
-                    modifier = Modifier.padding(top = 20.dp, start = 5.dp).size(60.dp),
+                    modifier = Modifier
+                        .padding(top = 20.dp, start = 5.dp)
+                        .size(60.dp),
                     onClick = backAction
                 )
             }

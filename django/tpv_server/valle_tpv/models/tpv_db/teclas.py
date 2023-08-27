@@ -77,6 +77,7 @@ class Secciones(models.Model):
     
     def serialize(self):
         data = model_to_dict(self)
+        data["url"] = self.icono.url if self.icono else ""
         data["icono"] = {
             'url': self.icono.url if self.icono else "",
             'name': self.icono.name.replace("iconos_secciones/", "") if self.icono else "",

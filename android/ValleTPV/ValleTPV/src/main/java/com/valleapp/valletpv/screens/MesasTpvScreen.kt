@@ -6,7 +6,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.valleapp.valletpv.routers.Routers
 import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.ValleTopBar
 import com.valleapp.valletpvlib.ui.screens.MesasGrid
@@ -22,23 +21,23 @@ fun MesasTpvScreen(navController: NavController, camId: Long) {
                 }
             ) {
                 BotonAccion(icon = ExtendIcons.Mensajes, contentDescription = "Mesajes") {
-                    navController.navigate(Routers.Preferencias.route)
+
                 }
                 BotonAccion(
                     ExtendIcons.AddCamareros, "Agregar camareors",
-                    onClick = { navController.navigate(Routers.Preferencias.route) })
+                    onClick = {  })
 
                 BotonAccion(
                     ExtendIcons.Configuration, "Impresoras",
-                    onClick = { navController.navigate(Routers.Preferencias.route) })
+                    onClick = {  })
 
                 BotonAccion(
                     ExtendIcons.Listado,
                     "Camareros",
-                    onClick = { navController.navigate(Routers.Preferencias.route) })
+                    onClick = {  })
 
                 BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
-                    navController.navigate(Routers.Preferencias.route)
+
                 }
 
             }

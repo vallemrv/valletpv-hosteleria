@@ -1,15 +1,15 @@
 package com.valleapp.valletpv.routers
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.valleapp.valletpv.screens.CamarerosScreen
+import com.valleapp.valletpv.screens.CuentaTpvScreen
 import com.valleapp.valletpv.screens.MesasTpvScreen
 import com.valleapp.valletpv.screens.PaseCamareros
 import com.valleapp.valletpv.screens.Preferencias
 import com.valleapp.valletpvlib.routers.RoutersBase
-import com.valleapp.valletpvlib.ui.screens.CamarerosGrid
 
 @Composable
 fun Navegador() {
@@ -18,18 +18,20 @@ fun Navegador() {
         composable(Routers.PaseCamareros.route) {
             PaseCamareros(navController)
         }
-        composable(Routers.Preferencias.route) {
+        composable(RoutersBase.Preferencias.route) {
             Preferencias(navController)
         }
         composable(RoutersBase.Camareros.route) {
-            CamarerosGrid(navController)
+            CamarerosScreen(navController)
         }
         composable(RoutersBase.Mesas.route) {
             val camid = it.arguments?.getString("camId") ?: "0"
             MesasTpvScreen(navController, camid.toLong())
         }
         composable(RoutersBase.Cuenta.route) {
-            Text(text = "Cuenta")
+            val camid = it.arguments?.getString("camId") ?: "0"
+            val mesaId = it.arguments?.getString("mesaId") ?: "0"
+            CuentaTpvScreen(navController, camid.toLong(), mesaId.toLong())
         }
     }
 }

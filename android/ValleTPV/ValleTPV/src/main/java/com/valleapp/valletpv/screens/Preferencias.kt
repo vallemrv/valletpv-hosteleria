@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,13 +41,13 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
-fun Preferencias(navController: NavController? = null) {
+fun Preferencias(navController: NavController) {
     Scaffold(
         topBar = {
             ValleTopBar(
                 title = "Preferencias",
                 backAction = {
-                    navController?.popBackStack()
+                    navController.popBackStack()
                 },
             )
         },
@@ -153,7 +152,7 @@ fun PreferenciasScreen() {
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        BotonSimple(text = "Validar Codgio") { _ ->
+                        BotonSimple(text = "Validar Codgio", modifier = Modifier.fillMaxWidth().height(70.dp)) { _ ->
                             vModel.onValidarClick()
                         }
 
@@ -169,13 +168,4 @@ fun PreferenciasScreen() {
             println("Preferecias cargadas con exito")
         }
     }
-}
-
-@Composable
-@Preview(
-    showBackground = true,
-    widthDp = 600,
-)
-fun PreferenciasPreview() {
-    Preferencias(null)
 }

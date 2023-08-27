@@ -59,6 +59,8 @@ dependencies {
     implementation("androidx.room:room-common:2.5.2")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.6.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
+    implementation ("io.coil-kt:coil-compose:1.3.2")
+
     val room_version = "2.5.2"
 
     implementation("androidx.room:room-runtime:$room_version")

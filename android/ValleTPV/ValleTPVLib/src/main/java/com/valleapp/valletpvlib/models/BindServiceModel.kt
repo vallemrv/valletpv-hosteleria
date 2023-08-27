@@ -19,13 +19,14 @@ class BindServiceModel(private val app: Application): AndroidViewModel(app) {
     private var connection: ServiceConnection? by mutableStateOf(null)
     var mService: ServiceCom? by mutableStateOf(null)
 
-    fun bindService() {
+    fun bindService(onServiceOk: (ServiceCom) -> Unit= {}) {
 
         connection = object : ServiceConnection {
             override fun onServiceConnected(className: ComponentName, service: IBinder) {
                 val binder = service as ServiceCom.LocalBinder
                 mService = binder.getService()
                 mBound = true
+                onServiceOk?.invoke(mService!!)
                 println("Servicio enlazado")
              }
 

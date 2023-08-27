@@ -29,5 +29,6 @@ object ExtendIcons {
     val Listado @Composable get() = painterResource(id = R.drawable.listado)
     val Back @Composable get() = painterResource(id = R.drawable.back)
     val Mensajes @Composable get() = painterResource(id = R.drawable.mensaje)
+    val NotFound @Composable get() = painterResource(id = R.drawable.not_found)
 
 }
