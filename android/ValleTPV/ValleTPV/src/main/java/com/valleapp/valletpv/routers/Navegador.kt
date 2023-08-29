@@ -11,9 +11,11 @@ import com.valleapp.valletpv.screens.PaseCamareros
 import com.valleapp.valletpv.screens.Preferencias
 import com.valleapp.valletpvlib.routers.RoutersBase
 
+
 @Composable
 fun Navegador() {
     val navController = rememberNavController()
+
     NavHost(navController = navController, startDestination = Routers.PaseCamareros.route) {
         composable(Routers.PaseCamareros.route) {
             PaseCamareros(navController)
@@ -25,13 +27,15 @@ fun Navegador() {
             CamarerosScreen(navController)
         }
         composable(RoutersBase.Mesas.route) {
-            val camid = it.arguments?.getString("camId") ?: "0"
-            MesasTpvScreen(navController, camid.toLong())
+            val camId = it.arguments?.getString("camId")
+            MesasTpvScreen(navController, camId?.toLong() ?: 0)
         }
         composable(RoutersBase.Cuenta.route) {
-            val camid = it.arguments?.getString("camId") ?: "0"
-            val mesaId = it.arguments?.getString("mesaId") ?: "0"
-            CuentaTpvScreen(navController, camid.toLong(), mesaId.toLong())
+            val mesaId = it.arguments?.getString("mesaId")
+            val camId = it.arguments?.getString("camId")
+            CuentaTpvScreen(navController, camId?.toLong() ?: 0, mesaId?.toLong() ?: 0)
         }
     }
+
 }
+

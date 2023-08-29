@@ -1,6 +1,5 @@
 package com.valleapp.valletpv.screens
 
-import android.app.Application
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,10 +17,12 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,39 +30,46 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
-import com.valleapp.valletpv.models.PreferenciasModel
 import com.valleapp.valletpv.routers.Routers
 import com.valleapp.valletpv.ui.AddCamareroDialog
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
+import com.valleapp.valletpvlib.models.PreferenciasModel
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.tools.ServiceCom
 import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.BotonIcon
 import com.valleapp.valletpvlib.ui.ListaSimple
 import com.valleapp.valletpvlib.ui.ValleTopBar
-import com.valleapp.valletpvlib.ui.screens.BaseScreen
+import com.valleapp.valletpvlib.ui.screens.BaseSecreen
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
 fun PaseCamareros(navController: NavController) {
-
     val cx = LocalContext.current
-    val app = cx.applicationContext as Application
-    val preferencias: PreferenciasModel = viewModel(initializer = { PreferenciasModel(app) })
+    val preferencias: PreferenciasModel = viewModel()
+
 
     if (!preferencias.preferenciasCargadas) {
         navController.navigate(RoutersBase.Preferencias.route)
-    }else{
-        BaseScreen {bindServiceModel ->
+    } else {
+
+        BaseSecreen { bindServiceModel ->
+            val mService by rememberUpdatedState(bindServiceModel.mService)
             val serverConfig = preferencias.serverConfig
             val vModel: CamarerosModel = viewModel(initializer = {
                 CamarerosModel(
-                    app,
                     serverConfig,
-                )})
+                )
+            })
+
+            LaunchedEffect(mService) { // Se ejecutará cada vez que mService cambie
+                if (mService != null) {
+                    vModel.setService(mService = mService)
+                }
+            }
 
             Scaffold(
                 floatingActionButton = {
@@ -90,7 +98,7 @@ fun PaseCamareros(navController: NavController) {
                     ValleTopBar(
                         title = "Pase de Camareros"
                     ) {
-                        BotonAccion(icon = ExtendIcons.Arqueo,  contentDescription = "Arqueo") {
+                        BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
                             navController.navigate(Routers.Arqueo.route)
                         }
                         BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
@@ -100,9 +108,11 @@ fun PaseCamareros(navController: NavController) {
                 },
                 content = {
                     Box(modifier = Modifier.padding(it)) {
-                        PaseCamarerosScreen(vModel = vModel, bindServiceModel.mService,  navController = navController) {
+                        PaseCamarerosScreen(
+                            vModel = vModel,
+                            navController = navController
+                        ) {
                             bindServiceModel.unbindService()
-
                             val intent = Intent(cx, ServiceCom::class.java)
                             cx.stopService(intent)
 
@@ -112,6 +122,7 @@ fun PaseCamareros(navController: NavController) {
                                 cx.startActivity(this)
                             }
                         }
+
                         AddCamareroDialog(vModel) { cam ->
                             vModel.showDialog = false
                             vModel.addCamarero(cam)
@@ -120,7 +131,9 @@ fun PaseCamareros(navController: NavController) {
                 }
             )
         }
+
     }
+
 
 }
 
@@ -128,11 +141,11 @@ fun PaseCamareros(navController: NavController) {
 @Composable
 fun PaseCamarerosScreen(
     vModel: CamarerosModel,
-    mService: ServiceCom?,
     navController: NavController,
     onSalir: () -> Unit
 ) {
-    vModel.setService(mService)
+
+    val mService by rememberUpdatedState(vModel.mService)
     val db: CamareroDao? = mService?.getDB("camareros") as? CamareroDao
     val autorizados by db?.getAutorizados(autorizado = true)
         ?.observeAsState(initial = listOf())
@@ -154,7 +167,7 @@ fun PaseCamarerosScreen(
                 .padding(10.dp)
         ) {
             // Primera columna
-            ListaSimple(title = "Camarero Libres", list = noAutorizados){
+            ListaSimple(title = "Camarero Libres", list = noAutorizados) {
                 vModel.setAutorizado((it as Camarero).id, true)
             }
         }
@@ -166,7 +179,7 @@ fun PaseCamarerosScreen(
                 .padding(10.dp)
         ) {
             // Segunda columna
-            ListaSimple(title = "Camarero Libres", list = autorizados){
+            ListaSimple(title = "Camarero Libres", list = autorizados) {
                 vModel.setAutorizado((it as Camarero).id, false)
             }
         }

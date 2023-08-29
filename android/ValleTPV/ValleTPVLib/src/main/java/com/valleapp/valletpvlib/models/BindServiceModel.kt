@@ -12,34 +12,40 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import com.valleapp.valletpvlib.tools.ServiceCom
 
-class BindServiceModel(private val app: Application): AndroidViewModel(app) {
+class BindServiceModel(private val app: Application) : AndroidViewModel(app) {
 
 
-    private var mBound by mutableStateOf(false)
-    private var connection: ServiceConnection? by mutableStateOf(null)
+    private var mBound = false
+    private var connection: ServiceConnection? = null
     var mService: ServiceCom? by mutableStateOf(null)
 
-    fun bindService(onServiceOk: (ServiceCom) -> Unit= {}) {
 
-        connection = object : ServiceConnection {
-            override fun onServiceConnected(className: ComponentName, service: IBinder) {
-                val binder = service as ServiceCom.LocalBinder
-                mService = binder.getService()
-                mBound = true
-                onServiceOk?.invoke(mService!!)
-                println("Servicio enlazado")
-             }
 
-            override fun onServiceDisconnected(arg0: ComponentName) {
-                mBound = false
+    fun bindService() {
+
+        if (connection == null) {
+            connection = object : ServiceConnection {
+                override fun onServiceConnected(className: ComponentName, service: IBinder) {
+                    val binder = service as ServiceCom.LocalBinder
+                    mService = binder.getService()
+                    mBound = true
+                    println("Servicio enlazado")
+                }
+
+                override fun onServiceDisconnected(arg0: ComponentName) {
+                    println("Servicio desenlazado")
+                    mBound = false
+                }
             }
         }
-        Intent(app.applicationContext, ServiceCom::class.java).also { intent ->
-            app.applicationContext.bindService(
-                intent,
-                connection as ServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
+        if (!mBound) {
+            Intent(app.applicationContext, ServiceCom::class.java).also { intent ->
+                app.applicationContext.bindService(
+                    intent,
+                    connection as ServiceConnection,
+                    Context.BIND_AUTO_CREATE
+                )
+            }
         }
     }
 
@@ -49,6 +55,7 @@ class BindServiceModel(private val app: Application): AndroidViewModel(app) {
                 app.applicationContext.unbindService(connection!!)
                 mBound = false
             }
+            println("Servicio desenlazado")
         }
     }
 }

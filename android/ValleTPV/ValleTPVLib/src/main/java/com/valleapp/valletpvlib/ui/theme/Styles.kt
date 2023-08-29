@@ -6,10 +6,13 @@ import androidx.compose.ui.unit.sp
 
 object Styles {
 
+    val TextTeclas = TextStyle(
+        fontSize = 25.sp,
+        letterSpacing = 0.sp,
+    )
     val TextListas = TextStyle(
         fontSize = 30.sp,
         letterSpacing = 0.sp,
-
     )
     val TextTitulos = TextStyle(
         fontSize = 40.sp,

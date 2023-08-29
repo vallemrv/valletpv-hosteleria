@@ -52,6 +52,24 @@ fun BotonAccion(
 }
 
 
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun NetworkImage(url: String, contentDescription: String = "") {
+    val painter = rememberImagePainter(
+        data = url,
+        builder = {
+            crossfade(true)
+        }
+    )
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,  // Añadir una descripción adecuada para accesibilidad
+        contentScale = ContentScale.FillBounds,
+        modifier = Modifier.padding(10.dp).fillMaxSize()
+    )
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BotonIcon(
@@ -60,7 +78,8 @@ fun BotonIcon(
     icon: Painter = ExtendIcons.NotFound,
     color: Color = ColorTheme.Primary,
     contentDescription: String,
-    onClick: () -> Unit
+    tag: Any? = null,
+    onClick: (Any?) -> Unit
 ) {
 
     val defaultModifier = if (modifier == Modifier) {
@@ -72,7 +91,9 @@ fun BotonIcon(
     }
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
-        onClick = onClick,
+        onClick = {
+            onClick(tag)
+        },
         modifier = defaultModifier,
         colors = CardDefaults.elevatedCardColors(color)
 
@@ -104,6 +125,7 @@ fun BotonSimple(
     modifier: Modifier = Modifier,
     color: Color = ColorTheme.Primary,
     tag: Any? = null,
+    style: androidx.compose.ui.text.TextStyle = Styles.TextBotones,
     onButtonClick: (Any?) -> Unit
 ) {
     val defaultModifier = if (modifier == Modifier) {
@@ -133,7 +155,7 @@ fun BotonSimple(
                     .wrapContentSize(Alignment.Center),
                 lineHeight = 40.sp,
                 color = Color.Black,
-                style = Styles.TextBotones,
+                style = style,
                 textAlign = TextAlign.Center
             )
         }
@@ -216,20 +238,3 @@ fun BotonMesa(
     }
 }
 
-
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-fun NetworkImage(url: String, contentDescription: String = "") {
-    val painter = rememberImagePainter(
-        data = url,
-        builder = {
-            crossfade(true)
-        }
-    )
-    Image(
-        painter = painter,
-        contentDescription = contentDescription,  // Añadir una descripción adecuada para accesibilidad
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize()
-    )
-}

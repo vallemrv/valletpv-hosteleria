@@ -20,7 +20,7 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 import com.valleapp.valletpvlib.ui.theme.Styles
 
 
-val NoOp: () -> Unit = {}
+val NoOp: (Any?) -> Unit = {}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,7 +29,7 @@ fun ValleTopBar(
     title: String,
     subtitle: String? = null,
     backgroundColor: Color = ColorTheme.Primary,
-    backAction: () -> Unit = NoOp,
+    backAction: (Any?) -> Unit = NoOp,
     actions: @Composable () -> Unit = {},
 ) {
     val isBackActionEmpty = backAction === NoOp

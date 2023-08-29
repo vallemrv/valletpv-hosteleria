@@ -26,7 +26,7 @@ data class Seccion(
 
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         loadJson(json)
-        val tb = dao as SeccionDao
+        val tb = dao as SeccionesDao
         when (op) {
             "INS" -> tb.insert(this)
             "UP" -> tb.update(this)
@@ -40,7 +40,7 @@ data class Seccion(
 
 
 @Dao
-interface SeccionDao: IBaseDao<Seccion> {
+interface SeccionesDao: IBaseDao<Seccion> {
 
     @Query("DELETE FROM secciones WHERE ID = :id")
     override fun deleteById(id: Long)

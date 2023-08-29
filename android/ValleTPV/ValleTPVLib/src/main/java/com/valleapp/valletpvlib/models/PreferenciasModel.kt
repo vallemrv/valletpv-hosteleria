@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.models
+package com.valleapp.valletpvlib.models
 
 
 import android.app.Application
@@ -83,9 +83,6 @@ class PreferenciasModel(private val app: Application) : AndroidViewModel(app) {
                         mostrarError(result.errorMessage)
                     }
 
-                    else -> {
-                        mostrarError("Error desconocido")
-                    }
                 }
             }
 

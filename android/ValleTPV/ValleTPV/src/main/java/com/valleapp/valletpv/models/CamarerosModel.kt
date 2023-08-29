@@ -1,11 +1,10 @@
 package com.valleapp.valletpv.models
 
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
@@ -17,13 +16,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class CamarerosModel(app: Application, private val serverConfig: ServerConfig) :
-    AndroidViewModel(app) {
+class CamarerosModel(private val serverConfig: ServerConfig) : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
-
-    private var mService: ServiceCom? by mutableStateOf(null)
-    private var db: CamareroDao? = null
+    var mService: ServiceCom? by mutableStateOf(null)
+    var db: CamareroDao? = null
 
     fun addCamarero(camarero: Camarero) {
         viewModelScope.launch(Dispatchers.IO) {

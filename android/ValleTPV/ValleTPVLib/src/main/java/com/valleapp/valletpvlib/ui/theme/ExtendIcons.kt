@@ -6,6 +6,8 @@ import com.valleapp.valletpvlib.R
 
 object ExtendIcons {
 
+    val Reset @Composable get() = painterResource(id = R.drawable.reset)
+    val Lupa @Composable get() = painterResource(id = R.drawable.lupa)
     val Arqueo @Composable get() = painterResource(id = R.drawable.arqueo_caja)
     val Efectivo @Composable get() = painterResource(id = R.drawable.efectivo)
     val Tarjeta @Composable get() = painterResource(id = R.drawable.tarjeta)

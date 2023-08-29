@@ -18,8 +18,8 @@ fun CamarerosGrid(
     column: Int
 ) {
 
-    BaseScreen {
-        val mService = it.mService
+    BaseSecreen { bindServiceModel ->
+        val mService = bindServiceModel.mService
         val db: CamareroDao? = mService?.getDB("camareros") as? CamareroDao
 
         val listaCamareros by db?.getAutorizados(autorizado = true)
@@ -34,5 +34,7 @@ fun CamarerosGrid(
 
         }
     }
+
+
 }
 

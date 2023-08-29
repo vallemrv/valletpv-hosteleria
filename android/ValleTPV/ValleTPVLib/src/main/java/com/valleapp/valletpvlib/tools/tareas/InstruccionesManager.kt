@@ -62,7 +62,7 @@ class InstruccionesManager {
 
     fun stopProcesarCola() {
         isRunning = false
-        mutex.unlock()
+        if (mutex.isLocked)  mutex.unlock()
     }
 
      fun addInstruccion(instruccion: Instrucciones) {

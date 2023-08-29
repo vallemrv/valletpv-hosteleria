@@ -26,6 +26,7 @@ fun CamarerosScreen(navController: NavController) {
     var count by remember { mutableIntStateOf(0) }
     var showSnakbar by remember { mutableStateOf(false) }
 
+
     fun contarParaSalir() {
         if (count < 2) {
             count++

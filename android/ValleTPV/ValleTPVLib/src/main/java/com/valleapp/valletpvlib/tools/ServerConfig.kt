@@ -9,6 +9,17 @@ data class ServerConfig(
 ) {
 
     fun getParseUrl(): String {
+        var aux = parseUrl(url ?: "")
+        if (!aux.endsWith("/")) {
+            aux += "/"
+        }
+        if (!aux.endsWith("/api/")) {
+            aux += "api/"
+        }
+        return aux
+    }
+
+    fun getUrlBase(): String {
         return parseUrl(url ?: "")
     }
 
@@ -65,12 +76,6 @@ data class ServerConfig(
             var aux = url
             if (!aux.startsWith("https://") && !aux.startsWith("http://")) {
                 aux = "http://$aux"
-            }
-            if (!aux.endsWith("/")) {
-                aux += "/"
-            }
-            if (!aux.endsWith("/api/")) {
-                aux += "api/"
             }
             return aux
         }

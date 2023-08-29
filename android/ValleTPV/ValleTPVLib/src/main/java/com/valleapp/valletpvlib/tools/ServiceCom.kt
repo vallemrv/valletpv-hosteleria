@@ -13,6 +13,8 @@ import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.IBaseDao
 import com.valleapp.valletpvlib.db.IBaseEntity
 import com.valleapp.valletpvlib.db.Mesa
+import com.valleapp.valletpvlib.db.Seccion
+import com.valleapp.valletpvlib.db.Tecla
 import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.interfaces.IController
 import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
@@ -21,6 +23,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.system.exitProcess
 
 class ServiceCom : Service(), IController {
 
@@ -78,6 +81,10 @@ class ServiceCom : Service(), IController {
         if (o != null) {
             val tbName = o.getString("tb")
             val tb = getDB(tbName)
+            if (tb == null) {
+                println("Tabla no encontrada: $tbName")
+                return
+            }
             handleSync(tb, o, tbName)
         }
     }
@@ -89,6 +96,10 @@ class ServiceCom : Service(), IController {
 
             for (item in lista) {
                 val tb = getDB(item)
+                if (tb == null) {
+                    println("Tabla no encontrada: $item")
+                    continue
+                }
                 val datos = tb.getAll()
 
                 // Convertir datos a JSON
@@ -165,6 +176,8 @@ class ServiceCom : Service(), IController {
             "camareros" -> return Camarero()
             "mesas" -> return Mesa()
             "zonas" -> return Zona()
+            "teclas" -> return Tecla()
+            "secciones" -> return Seccion()
             else -> throw IllegalArgumentException("Entity no encontrado para: $name")
         }
     }
@@ -189,17 +202,26 @@ class ServiceCom : Service(), IController {
         }
     }
 
+    fun getUrl(endPoint: String?): String {
+        return serverConfig?.getUrlBase() + endPoint
+    }
 
-    fun getDB(tbName: String): IBaseDao<*> {
+    fun getDB(tbName: String): IBaseDao<*>? {
         when (tbName) {
             "camareros" -> return appDatabase?.camareroDao() as IBaseDao<*>
             "mesas" -> return appDatabase?.mesasDao() as IBaseDao<*>
             "zonas" -> return appDatabase?.zonasDao() as IBaseDao<*>
-            else -> throw IllegalArgumentException("DAO no encontrado para: $tbName")
+            "teclas" -> return appDatabase?.teclasDao() as IBaseDao<*>
+            "secciones" -> return appDatabase?.seccionesDao() as IBaseDao<*>
+            else -> return null
         }
     }
 
     fun addInstruccion(inst: Instrucciones) {
         procesarCola.addInstruccion(inst)
+    }
+
+    fun exitApp(){
+        exitProcess(0)
     }
 }

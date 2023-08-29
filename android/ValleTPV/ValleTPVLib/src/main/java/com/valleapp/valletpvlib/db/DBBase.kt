@@ -12,7 +12,6 @@ import androidx.room.Update
 import org.json.JSONObject
 
 
-
 interface IBaseEntity {
 
     fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String)
@@ -21,15 +20,16 @@ interface IBaseEntity {
 }
 
 @Entity
-open class BaseEntity: IBaseEntity {
-    @PrimaryKey(autoGenerate = true) var id: Long = 0
+open class BaseEntity : IBaseEntity {
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         TODO("Not yet implemented")
     }
 
 }
 
-interface IBaseDao<T: BaseEntity> {
+interface IBaseDao<T : BaseEntity> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: T)
@@ -44,12 +44,16 @@ interface IBaseDao<T: BaseEntity> {
 }
 
 
-@Database(entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class], version = 1)
+@Database(
+    entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class, Seccion::class],
+    version = 1
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun camareroDao(): CamareroDao
     abstract fun mesasDao(): MesasDao
     abstract fun zonasDao(): ZonasDao
     abstract fun teclasDao(): TeclasDao
+    abstract fun seccionesDao(): SeccionesDao
 
 
     companion object {
