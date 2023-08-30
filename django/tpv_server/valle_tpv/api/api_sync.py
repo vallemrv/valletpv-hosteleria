@@ -9,7 +9,6 @@ import json
 from tokenapi.http import  JsonResponse       
 from django.apps import apps
 from django.forms import model_to_dict
-from valle_tpv.api.api_pedidos import comparar_lineaspedido
 from valle_tpv.decorators import check_dispositivo
 
 
@@ -20,6 +19,7 @@ def sync_devices(request):
     model_name = request.POST.get('tb_name')
     client_records = json.loads(request.POST.get('regs'))
     app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
+   
    
     
     Model = apps.get_model(app_name, model_name) # Reemplaza 'myapp' con el nombre de tu app

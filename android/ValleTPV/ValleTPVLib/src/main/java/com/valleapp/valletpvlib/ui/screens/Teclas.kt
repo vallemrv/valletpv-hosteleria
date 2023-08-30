@@ -21,6 +21,7 @@ fun TeclasGrid(
     val db = mService?.getDB("teclas") as? TeclasDao
     if (db != null) {
         val model: TeclasModel = viewModel(initializer = { TeclasModel(db) })
+        model.tarifa = cuentaModel.mesa?.tarifa ?: 1
 
         Box {
             TecladoArt(

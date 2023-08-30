@@ -12,15 +12,14 @@ data class Seccion(
     var color: String = "#FFC0CB",
     var orden: Int = 0,
     // Puedes usar una String para representar la ruta al archivo del icono si estás usando una base de datos local.
-    var icono: String? = null
+    var url: String? = null,
 ): BaseEntity() {
 
     // Suponiendo que tienes una función similar para cargar desde un JSONObject
     private fun loadJson(json: JSONObject) {
         nombre = json.getString("nombre") ?: ""
-        color = json.getString("color") ?: "#FFC0CB"
         orden = json.getInt("orden")
-        icono = json.getString("url")  // Asumiendo que el servidor retorna una ruta o URL como String.
+        url = json.getString("url")  // Asumiendo que el servidor retorna una ruta o URL como String.
         id = json.getLong("id")
     }
 

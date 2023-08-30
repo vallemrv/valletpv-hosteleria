@@ -51,18 +51,18 @@ fun ListItemCuenta(
     ) {
         Text(
             text = lineaCuenta.cantidad.toString(),
-            modifier = Modifier.weight(0.15f),
+            modifier = Modifier.weight(0.1f),
             textAlign = TextAlign.Right
         )
         Spacer(modifier = Modifier.weight(0.01f))
         Text(
             text = lineaCuenta.descripcion,
-            modifier = Modifier.weight(0.4f),
+            modifier = Modifier.padding(start = 3.dp).weight(0.4f),
             textAlign = TextAlign.Left,
         )
         Spacer(modifier = Modifier.weight(0.05f))
         Text(
-            text = "${lineaCuenta.precio}€",
+            text = "${lineaCuenta.precio} €",
             modifier = Modifier.weight(0.2f),
             textAlign = TextAlign.Right
         )

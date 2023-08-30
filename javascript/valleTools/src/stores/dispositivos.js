@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { buildUrl } from "@/api";
 import {
     LISTADO_SIMPLE,
-    UPDATE_REG, ADD_REG, DELETE_REG
+    UPDATE_REG,  DELETE_REG
 } from "@/endpoints";
 
 import axios from "axios";
@@ -18,6 +18,7 @@ export const DispositivosStore = defineStore({
         headers: ["Nombre", "Código", "Descripción"],
         displayName: "nombre",
         showKeys: ["nombre", "codigo", "descripcion"],
+        switchKey: "puede_enviar",
         fields: [
             { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"], },
             { key: 'descripcion', label: 'Descripción', type: 'text', rules: [v => !!v || "La descripción es requerida"], },
@@ -30,6 +31,19 @@ export const DispositivosStore = defineStore({
         },
     }),
     actions: {
+        async switchCh(item) {
+            const obj = {
+                filter: { id: item.id },
+                reg: {},
+                tb_name: this.modelo,
+            }
+            obj.reg[this.switchKey] = item[this.switchKey];
+
+            const params = this.empresaStore.createFormData(obj);
+            const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
+            await axios.post(url, params);
+
+        },
         async load(empresaStore) {
             this.empresaStore = empresaStore;
             let url = buildUrl(this.empresaStore.empresa.url, LISTADO_SIMPLE);

@@ -17,9 +17,10 @@ data class Mesa(
     var nombre: String = "",
     var color: String = "",
     var abierta: Boolean = false,
-    var idZona: Int = 0,
+    var zona_id: Int = 0,
     var num: Int = 0,
-    var orden: Int = 0
+    var orden: Int = 0,
+    var tarifa: Int = 0,
 ): BaseEntity() {
 
     private fun loadJson(json: JSONObject) {
@@ -27,9 +28,10 @@ data class Mesa(
         nombre = json.getString("nombre")
         color = json.getString("color")
         abierta = json.getBoolean("abierta")
-        idZona = json.getInt("zona_id")
+        zona_id = json.getInt("zona_id")
         num = json.getInt("num")
         orden = json.getInt("orden")
+        tarifa = json.getInt("tarifa")
     }
 
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
@@ -50,7 +52,7 @@ data class Mesa(
 @Dao
 interface MesasDao: IBaseDao<Mesa> {
 
-    @Query("SELECT * FROM mesas WHERE idZona = :idZona ORDER BY orden DESC")
+    @Query("SELECT * FROM mesas WHERE zona_id = :idZona ORDER BY orden DESC")
     fun getAllByZona(idZona: Long): LiveData<List<Mesa>>
 
     @Query("UPDATE mesas SET abierta=1, num=0 WHERE ID = :idm")

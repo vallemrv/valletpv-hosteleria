@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.models.CuentaModel
 import com.valleapp.valletpvlib.ui.ListaCuenta
 import com.valleapp.valletpvlib.ui.TecladoNumerico
@@ -33,7 +36,15 @@ fun CuentaTpvScreen(navController: NavController, camId: Long = 0, mesaId: Long 
              model.loadData(mService)
         }
 
-        var lineasCuenta: List<LineaCuenta> = listOf()
+        DisposableEffect(Unit ){
+            onDispose {
+               model.hacerPedido()
+            }
+        }
+
+        val lineasCuenta by model.lineasDao?.getLineaCuentas(mesaId)?.observeAsState(initial = listOf())
+            ?: remember { mutableStateOf(listOf()) }
+
 
         Scaffold(topBar = {
             ValleTopBar(title = model.titulo, subtitle = model.subtitulo, backAction = {
@@ -71,7 +82,4 @@ fun CuentaTpvScreen(navController: NavController, camId: Long = 0, mesaId: Long 
         })
     }
 
-
 }
-
-

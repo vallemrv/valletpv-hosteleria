@@ -1,9 +1,7 @@
 #modelo para la los datos de una empresa, cif, nombre, etc
 import django.db.models as models
 from django.forms.models import model_to_dict
-from django.conf import settings
 from uuid import uuid4
-import os
 import random
 
 
@@ -12,6 +10,7 @@ class Dispositivos(models.Model):
     UID = models.CharField(max_length=100, default="")
     codigo = models.CharField(max_length=6, default="")
     descripcion = models.CharField(max_length=100, default="")
+    puede_enviar = models.BooleanField(default=True)
    
     def serialize(self):
         return {
@@ -19,6 +18,7 @@ class Dispositivos(models.Model):
             "UID": self.UID,
             "codigo": self.codigo,
             "descripcion": self.descripcion,
+            "puede_enviar": self.puede_enviar,
         }
 
     def __str__(self):
@@ -108,18 +108,9 @@ class Empresa(models.Model):
         if "telefono" in data:
             empresa.telefono = data["telefono"]
         if "logo" in data:
-            file = empresa.logo
-            if file:
-                if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
             empresa.logo = data["logo"]
         if "logo_small" in data:
-            file = empresa.logo_small
-            if file:
-                if os.path.isfile(os.path.join(settings.MEDIA_ROOT, file.name)):
-                    os.remove(os.path.join(settings.MEDIA_ROOT, file.name))
             empresa.logo_small = data["logo_small"]
-
         if "email" in data:
             empresa.email = data["email"]
         if "iva" in data:
@@ -127,6 +118,23 @@ class Empresa(models.Model):
 
         empresa.save()
         return empresa.serialize()
+    
+
+    def save(self, *args, **kwargs):
+        try:
+            # Obtener el objeto Secciones desde la base de datos
+            obj = Empresa.objects.get(id=self.id)
+            # Verificar si el campo 'icono' ha cambiado
+            if obj.logo != self.logo:
+                # Si ha cambiado, eliminar el archivo antiguo
+                obj.logo.delete(save=False)
+            if obj.logo_small != self.logo_small:
+                # Si ha cambiado, eliminar el archivo antiguo
+                obj.logo_small.delete(save=False)
+        except Empresa.DoesNotExist:
+            # Si es una nueva instancia, simplemente continuar
+            pass
+        super(Empresa, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre

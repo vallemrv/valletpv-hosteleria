@@ -8,19 +8,19 @@ import org.json.JSONObject
 @Entity(tableName = "teclas")
 data class Tecla(
     var nombre: String = "",
-    var p1: Float = 0f,
-    var p2: Float = 0f,
-    var incremento: Float = 0f,
+    var p1: Double = 0.0,
+    var p2: Double = 0.0,
+    var incremento: Double = 0.0,
     var orden: Int = 0,
-    var familia: Int? = null,
+    var familia: Int = -1,
     var tag: String = "",
-    var descripcion_r: String? = null,
-    var descripcion_t: String? = null,
-    var seccion: Int? = null,
-    var parent: Int? = null,
+    var descripcion_r: String = "",
+    var descripcion_t: String = "",
+    var seccion: Int = -1,
+    var parent: Int = -1,
     var color: String = "#FFC0CB",  // Color rosado por defecto
-    var nombreFam: String? = null,
-    var seccion_nombre: String? = null,
+    var nombreFam: String = "",
+    var seccion_nombre: String = "",
     var child: Int = 0
 ) : BaseEntity() {
 
@@ -36,14 +36,14 @@ data class Tecla(
 
     fun loadJson(json: JSONObject) {
         nombre = json.optString("nombre")
-        p1 = json.optDouble("p1").toFloat()
-        p2 = json.optDouble("p2").toFloat()
-        incremento = json.optDouble("incremento").toFloat()
+        p1 = json.optDouble("p1")
+        p2 = json.optDouble("p2")
+        incremento = json.optDouble("incremento")
         orden = json.optInt("orden")
         familia = json.optInt("familia")
         tag = json.optString("tag", tag)
-        descripcion_r = json.optString("descripcion_r")
-        descripcion_t = json.optString("descripcion_t")
+        descripcion_r = json.optString("descripcion_r", "")
+        descripcion_t = json.optString("descripcion_t", "")
         seccion = json.optInt("seccion")
         parent = json.optInt("parent")
         color = json.optString("color", color)

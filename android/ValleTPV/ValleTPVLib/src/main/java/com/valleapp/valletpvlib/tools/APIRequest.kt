@@ -12,6 +12,7 @@ import java.net.UnknownHostException
 
 
 object ApiEndPoints {
+    const val PEDIDOS_ADD = "pedidos/add"
     const val DISPOSITIVO_NUEVO = "dispositivos/new"
     const val CAMAREROS_ADD = "camareros/add"
     const val CAMAREROS_SET_PASSWORD = "camareros/set_password"
@@ -78,7 +79,6 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<
             }
         }
     } catch (e: Exception) {
-        println(e)
         when (e) {
             is UnknownHostException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)
             is ConnectException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)

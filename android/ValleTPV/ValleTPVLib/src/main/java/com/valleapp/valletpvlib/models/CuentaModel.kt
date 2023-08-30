@@ -8,11 +8,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
+import com.valleapp.valletpvlib.db.LineaPedido
+import com.valleapp.valletpvlib.db.LineasDao
 import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.db.MesasDao
+import com.valleapp.valletpvlib.tools.ApiEndPoints
+import com.valleapp.valletpvlib.tools.Instrucciones
+import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.ServiceCom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 
 class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel() {
 
@@ -21,18 +28,23 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
     private var serviceCom: ServiceCom? by mutableStateOf(null)
     private var mesasDao: MesasDao? = null
     private var camarerosDao: CamareroDao? = null
+    private var serverConfig: ServerConfig? = null
+
+    var lineasDao: LineasDao? = null
 
     var titulo: String by mutableStateOf("")
     val subtitulo: String get() = "Cantidad $cantidad"
 
-    private var mesa: Mesa? by mutableStateOf(null)
+    var mesa: Mesa? by mutableStateOf(null)
     var camarero: Camarero? by mutableStateOf(null)
 
     fun loadData(service: ServiceCom?) {
         if (service == null) return
         this.serviceCom = service
-        mesasDao = service?.getDB("mesas") as MesasDao
+        mesasDao = service.getDB("mesas") as MesasDao
         camarerosDao = service.getDB("camareros") as CamareroDao
+        lineasDao = service.getDB("lineaspedido") as LineasDao
+        serverConfig = service.getServerConfig()
 
         viewModelScope.launch(Dispatchers.IO) {
             if (mesa == null) {
@@ -46,8 +58,40 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
         }
     }
 
-    fun addLinea(linea: LineaModel) {
-        serviceCom?.addLinea(linea)
+    fun addLinea(linea: LineaPedido) {
+        viewModelScope.launch(Dispatchers.IO) {
+            for(i in 1..cantidad) {
+                linea.mesa_id = mesaId
+                linea.camarero_id = camId
+                lineasDao?.insert(linea)
+                mesasDao?.abrirMesa(mesaId.toInt())
+            }
+        }
+    }
+
+    fun hacerPedido() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val lineas = lineasDao?.getNuevas(mesaId)
+            if (lineas == null || lineas.isEmpty()) return@launch
+            val pedido = JSONArray()
+            for (linea in lineas!!) {
+                linea.estado = "P"
+                lineasDao?.update(linea)
+                val obj = JSONObject()
+                obj.put("descripcion", linea.descripcion)
+                obj.put("precio", linea.precio)
+                obj.put("descripcion_t", linea.descripcion_t)
+                obj.put("tecla_id", linea.tecla_id)
+                pedido.put(obj)
+            }
+            val params = mapOf("idm" to mesaId, "idc" to camId, "pedido" to pedido)
+            val inst = Instrucciones(
+                params= serverConfig?.getParams(params),
+                endPoint = ApiEndPoints.PEDIDOS_ADD
+            )
+            serviceCom?.addInstruccion(inst)
+        }
+
     }
 
 

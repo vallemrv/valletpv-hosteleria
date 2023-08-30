@@ -45,8 +45,8 @@ interface IBaseDao<T : BaseEntity> {
 
 
 @Database(
-    entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class, Seccion::class],
-    version = 1
+    entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class, Seccion::class, LineaPedido::class],
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun camareroDao(): CamareroDao
@@ -54,6 +54,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun zonasDao(): ZonasDao
     abstract fun teclasDao(): TeclasDao
     abstract fun seccionesDao(): SeccionesDao
+
+    abstract fun lineasDao(): LineasDao
 
 
     companion object {

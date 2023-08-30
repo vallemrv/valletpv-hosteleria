@@ -12,6 +12,7 @@ import com.valleapp.valletpvlib.db.AppDatabase
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.IBaseDao
 import com.valleapp.valletpvlib.db.IBaseEntity
+import com.valleapp.valletpvlib.db.LineaPedido
 import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.db.Seccion
 import com.valleapp.valletpvlib.db.Tecla
@@ -23,7 +24,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
-import kotlin.system.exitProcess
 
 class ServiceCom : Service(), IController {
 
@@ -178,6 +178,7 @@ class ServiceCom : Service(), IController {
             "zonas" -> return Zona()
             "teclas" -> return Tecla()
             "secciones" -> return Seccion()
+            "lineaspedido" -> return LineaPedido()
             else -> throw IllegalArgumentException("Entity no encontrado para: $name")
         }
     }
@@ -213,6 +214,7 @@ class ServiceCom : Service(), IController {
             "zonas" -> return appDatabase?.zonasDao() as IBaseDao<*>
             "teclas" -> return appDatabase?.teclasDao() as IBaseDao<*>
             "secciones" -> return appDatabase?.seccionesDao() as IBaseDao<*>
+            "lineaspedido" -> return appDatabase?.lineasDao() as IBaseDao<*>
             else -> return null
         }
     }
@@ -221,7 +223,8 @@ class ServiceCom : Service(), IController {
         procesarCola.addInstruccion(inst)
     }
 
-    fun exitApp(){
-        exitProcess(0)
+    fun getServerConfig(): ServerConfig? {
+        return serverConfig
     }
+
 }

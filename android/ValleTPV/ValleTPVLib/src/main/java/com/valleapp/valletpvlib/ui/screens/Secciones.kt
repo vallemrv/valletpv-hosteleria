@@ -35,7 +35,7 @@ fun Secciones() {
             Column {
                 for (seccion in lista) {
                     BotonIcon(
-                        url = mService.getUrl(seccion.icono),
+                        url = mService.getUrl(seccion.url),
                         contentDescription = seccion.nombre,
                         tag = seccion,
                         modifier = Modifier

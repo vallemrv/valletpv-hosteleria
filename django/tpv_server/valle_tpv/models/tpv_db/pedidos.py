@@ -23,6 +23,7 @@ class Pedidos(models.Model):
    
     @staticmethod
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
+        print("agregar_nuevas_lineas", idm, idc, lineas, uid_device)
         
         p = Pedidos.objects.filter(uid_device=uid_device).first()
         if p: return None
@@ -51,17 +52,15 @@ class Pedidos(models.Model):
         pedido.save()
 
         for pd in lineas:
-            can = int(pd["Can"])
-            for i in range(0, can):
-                linea = Lineaspedido()
-                linea.infmesa_id = mesa.infmesa.pk
-                linea.pedido_id = pedido.pk
-                linea.descripcion = pd["descripcion"]
-                linea.descripcion_t = pd["descripcion_t"]
-                linea.precio = pd["precio"]
-                linea.estado =  'P'
-                linea.tecla_id = int(pd["tecla_id"]) if "tecla_id" in pd else None
-                linea.save()
+            linea = Lineaspedido()
+            linea.infmesa_id = mesa.infmesa.pk
+            linea.pedido_id = pedido.pk
+            linea.descripcion = pd["descripcion"]
+            linea.descripcion_t = pd["descripcion_t"]
+            linea.precio = pd["precio"]
+            linea.estado =  'P'
+            linea.tecla_id = int(pd["tecla_id"]) if "tecla_id" in pd else None
+            linea.save()
                
                 
         
@@ -158,7 +157,7 @@ class Lineaspedido(models.Model):
             mesa = Mesas.objects.filter(id=split[0]).first()
         obj = {
             'id': self.pk,
-            'peidod_id': self.pedido_id,
+            'pedido_id': self.pedido_id,
             'UID': self.infmesa.pk,
             'tecla_id': self.tecla.pk,
             'estado': self.estado,
@@ -167,10 +166,10 @@ class Lineaspedido(models.Model):
             'mesa_id': mesa.pk if mesa else -1,
             'nomMesa': mesa.nombre if mesa else "",
             'zona_id': mesa.zona.pk if mesa else -1,
-            'servido': Servidos.objects.filter(linea__pk=self.pk).count(),
+            'servido': Servidos.objects.filter(linea__pk=self.pk).count()>0,
             'descripcion_t': self.descripcion_t,
-            'receptor': self.tecla.familia.receptor.pk if self.tecla else "",
-            'camarero': self.pedido.camarero_id,
+            'receptor_id': self.tecla.familia.receptor.pk if self.tecla else "",
+            'camarero_id': self.pedido.camarero_id,
             }
         return obj
             

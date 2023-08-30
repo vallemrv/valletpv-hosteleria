@@ -1,45 +1,57 @@
 package com.valleapp.valletpvlib.db
 
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Query
 import org.json.JSONObject
 
-@Entity(tableName = "dbcuenta")
-data class DBCuenta(
-    var estado: String = "",
+data class LineaCuenta(
+    var cantidad: Int = 0,
+    var descripcion: String = "",
+    var precio: Double = 0.0,
+    var total: Double = 0.0,
+)
+
+
+@Entity(tableName = "LineasPedido")
+data class LineaPedido(
+    var estado: String? = "",
     var descripcion: String = "",
     var descripcion_t: String = "",
     var precio: Double = 0.0,
-    var pedidoId: Long? = null,
-    var mesaId: Long? = null,
-    var teclaId: Long? = null,
-    var nomMesa: String = "",
-    var zonaId: Long? = null,
-    var servido: Boolean = false,
-    var receptor: String = "",
-    var camreroId: Long? = null,
-    var UID: String = ""
+    var pedido_id: Long? = -1,
+    var mesa_id: Long? = -1,
+    var tecla_id: Long? = -1,
+    var nomMesa: String? = "",
+    var zona_id: Long? = -1,
+    var servido: Boolean? = false,
+    var receptor_id: String? = "",
+    var camarero_id: Long? = -1,
+    var UID: String? = "",
+    var pk: Long? = -1
 ) : BaseEntity() {
 
     private fun loadJson(json: JSONObject) {
-        id = json.getLong("id")
+        pk = json.getLong("id")
         estado = json.getString("estado")
         descripcion = json.getString("descripcion")
         descripcion_t = json.getString("descripcion_t")
         precio = json.getDouble("precio")
-        pedidoId = json.getLong("pedido_id")
-        mesaId = json.getLong("mesa_id")
-        teclaId = json.getLong("tecal_id")
+        pedido_id = json.getLong("pedido_id")
+        mesa_id = json.getLong("mesa_id")
+        tecla_id = json.getLong("tecla_id")
         nomMesa = json.getString("nomMesa")
-        zonaId = json.getLong("zona_id")
+        zona_id = json.getLong("zona_id")
         servido = json.getBoolean("servido")
-        receptor = json.getString("receptor")
-        camreroId = json.getLong("camarero")
+        receptor_id = json.getString("receptor_id")
+        camarero_id = json.getLong("camarero_id")
         UID = json.getString("UID")
     }
 
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         loadJson(json)
-        val tb = dao as DBCuentaDao
+        val tb = dao as LineasDao
         when (op) {
             "INS" -> tb.insert(this)
             "UP" -> tb.update(this)
@@ -52,16 +64,28 @@ data class DBCuenta(
 }
 
 @Dao
-interface DBCuentaDao : IBaseDao<DBCuenta> {
+interface LineasDao : IBaseDao<LineaPedido> {
 
-    @Query("SELECT * FROM dbcuenta")
-    fun getListaLive(): LiveData<List<DBCuenta>>
+    @Query("SELECT * FROM LineasPedido")
+    fun getListaLive(): LiveData<List<LineaPedido>>
 
-    @Query("SELECT * FROM dbcuenta")
-    override fun getAll(): List<DBCuenta>
+    @Query("SELECT pk as id, estado, descripcion_t," +
+            " descripcion, precio, pedido_id," +
+            " mesa_id, tecla_id, nomMesa," +
+            " zona_id, servido, receptor_id, camarero_id, UID  FROM LineasPedido")
+    override fun getAll(): List<LineaPedido>
 
-    @Query("DELETE FROM dbcuenta WHERE ID = :id")
+    @Query("DELETE FROM LineasPedido WHERE pk = :id")
     override fun deleteById(id: Long)
 
-    // Puedes agregar más queries según lo necesites...
+
+    @Query(
+        "SELECT COUNT(id) as cantidad, descripcion_t as descripcion, precio, COUNT(id) * precio as total  " +
+                "FROM LineasPedido WHERE mesa_id = :mesaId AND estado in ('P', 'N') GROUP BY tecla_id, descripcion_t, precio, estado"
+    )
+    fun getLineaCuentas(mesaId: Long): LiveData<List<LineaCuenta>>
+    @Query("SELECT id,  descripcion, descripcion_t, tecla_id, precio " +
+            "  FROM LineasPedido Where mesa_id = :mesaId AND estado = 'N'")
+    fun getNuevas(mesaId: Long): List<LineaPedido>
+
 }

@@ -8,7 +8,7 @@ class Receptores(models.Model):
     descripcion = models.CharField(max_length=200, default="") 
 
     def __unicode__(self):
-        return self.nombre +'  ' +self.descripcion
+        return self.nombre + ' ' +self.descripcion
 
     def __str__(self):
         return self.nombre + ' ' +self.descripcion
@@ -55,6 +55,9 @@ class Familias(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def compToList(self):
+        return self.compuesto_por.split(",") if self.compuesto_por != "" else []
 
     class Meta:
         db_table = 'familias'
@@ -64,7 +67,6 @@ class Familias(models.Model):
 class Secciones(models.Model):
     id = models.AutoField(primary_key=True) 
     nombre = models.CharField(max_length=50) 
-    color = models.CharField( max_length=11, default="#FFC0CB") 
     orden = models.IntegerField( default=0) 
     icono = models.FileField(upload_to='iconos_secciones/', blank=True, null=True)
     
@@ -84,6 +86,19 @@ class Secciones(models.Model):
             'size': self.icono.size if self.icono else 0,
         }
         return data
+    
+    def save(self, *args, **kwargs):
+        try:
+            # Obtener el objeto Secciones desde la base de datos
+            obj = Secciones.objects.get(id=self.id)
+            # Verificar si el campo 'icono' ha cambiado
+            if obj.icono != self.icono:
+                # Si ha cambiado, eliminar el archivo antiguo
+                obj.icono.delete(save=False)
+        except Secciones.DoesNotExist:
+            # Si es una nueva instancia, simplemente continuar
+            pass
+        super(Secciones, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'secciones'
@@ -149,7 +164,10 @@ class ComposicionTeclas(models.Model):
     tecla = models.ForeignKey(Teclas,  on_delete=models.CASCADE, db_column='IDTecla') 
     compuesto_por = models.CharField(max_length=300) 
     cantidad = models.IntegerField() 
-
+    
+    def compToList(self):
+        return self.compuesto_por.split(",") if self.compuesto_por != "" else []
+    
 
     def serialize(self):
         r = self

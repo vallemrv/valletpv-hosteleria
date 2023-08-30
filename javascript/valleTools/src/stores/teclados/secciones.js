@@ -23,14 +23,12 @@ export const SeccionesStore = defineStore({
     // Array de objetos con los datos de la tabla
     fields: [
       { key: 'nombre', label: 'Nombre', type: 'text', rules: [v => !!v || "El nombre es requerido"] },
-      { key: 'color', label: 'Color', type: 'color', rules: [v => !!v || "El color es requerido"] },
       { key: 'orden', label: 'Orden', type: 'number' },
       { key: 'icono', label: 'Icono', type: 'file', },
     ],
     // Nuevo elemento
     newItem: {
       nombre: "",
-      color: "",
       orden: 0,
       icono: null,
     },
