@@ -52,7 +52,7 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
         teclas.add(tecla)
         var precio = 0.0
         var descripcion = ""
-        var descripcion_t = ""
+        var descripcionT = ""
         for (t: Tecla in teclas) {
 
             // asignar precio segun tarifa si es 1 p1 y si es 2 p2
@@ -61,10 +61,10 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
                 precio += t.incremento
             }
             descripcion += t.nombre + " "
-            descripcion_t += t.nombre + " "
+            descripcionT += t.nombre + " "
 
             if (t.descripcionT.isNotBlank() && t.descripcionT != "null") {
-                descripcion_t = t.descripcionT
+                descripcionT = t.descripcionT
             }
 
             if (t.descripcionR.isNotBlank() && t.descripcionR != "null") {
@@ -77,9 +77,9 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
         return LineaPedido(
             estado = "N",
             descripcion = descripcion,
-            descripcion_t = descripcion_t,
+            descripcionT = descripcionT,
             precio = precio,
-            tecla_id = tecla.id,
+            teclaId = tecla.id,
         )
 
     }

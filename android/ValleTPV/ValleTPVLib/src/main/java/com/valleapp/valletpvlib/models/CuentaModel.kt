@@ -53,7 +53,7 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
             if (camarero == null) {
                 camarero = camarerosDao?.getCamarero(camId)
             }
-            println(lineasDao?.getAll())
+
             titulo = camarero.toString() + " - " + mesa.toString()
         }
     }
@@ -61,9 +61,9 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
     fun addLinea(linea: LineaPedido) {
         viewModelScope.launch(Dispatchers.IO) {
             for(i in 1..cantidad) {
-                linea.mesa_id = mesaId
-                linea.camarero_id = camId
-                linea.pk = System.currentTimeMillis()
+                linea.mesaId = mesaId
+                linea.camareroId = camId
+                linea.id = System.currentTimeMillis()
                 lineasDao?.insert(linea)
                 mesasDao?.abrirMesa(mesaId.toInt())
             }
@@ -73,16 +73,16 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
     fun hacerPedido() {
         viewModelScope.launch(Dispatchers.IO) {
             val lineas = lineasDao?.getNuevas(mesaId)
-            if (lineas == null || lineas.isEmpty()) return@launch
+            if (lineas.isNullOrEmpty()) return@launch
             val pedido = JSONArray()
-            for (linea in lineas!!) {
+            for (linea in lineas) {
                 linea.estado = "P"
                 lineasDao?.update(linea)
                 val obj = JSONObject()
                 obj.put("descripcion", linea.descripcion)
                 obj.put("precio", linea.precio)
-                obj.put("descripcion_t", linea.descripcion_t)
-                obj.put("tecla_id", linea.tecla_id)
+                obj.put("descripcionT", linea.descripcionT)
+                obj.put("teclaId", linea.teclaId)
                 pedido.put(obj)
             }
             val params = mapOf("idm" to mesaId, "idc" to camId, "pedido" to pedido, "uid_pedido" to System.currentTimeMillis())

@@ -22,7 +22,7 @@ interface IBaseEntity {
 @Entity
 open class BaseEntity : IBaseEntity {
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+    open var id: Long = 0
     override fun executeAccion(json: JSONObject, dao: IBaseDao<out BaseEntity>, op: String) {
         TODO("Not yet implemented")
     }
@@ -46,7 +46,7 @@ interface IBaseDao<T : BaseEntity> {
 
 @Database(
     entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class, Seccion::class, LineaPedido::class],
-    version = 2
+    version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun camareroDao(): CamareroDao

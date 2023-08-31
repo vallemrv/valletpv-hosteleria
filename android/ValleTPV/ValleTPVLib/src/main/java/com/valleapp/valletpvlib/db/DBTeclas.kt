@@ -41,8 +41,6 @@ data class Tecla(
         p2 = json.getDouble("p2")
         incremento = json.getDouble("incremento")
         orden = json.getInt("orden")
-
-
         familia = json.getInt("familia")
         tag = json.getString("tag")
         descripcionR = json.getString("descripcionR")
@@ -53,9 +51,6 @@ data class Tecla(
         nombreFam = json.getString("nombreFam")
         seccionNombre = json.getString("seccionNombre")
         child = json.getInt("child")
-
-
-        println("Tecla: $nombre - $tag - $descripcionR - $descripcionT - $seccion - $parent - $color - $nombreFam - $seccionNombre - $child")
     }
 
     override fun toString(): String {

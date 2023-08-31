@@ -144,8 +144,6 @@ class Teclas(models.Model):
         row["descripcionT"] = r.descripcion_t if r.descripcion_t else ""
         row["tag"] = r.tag if r.tag else ""
         row["orden"] = r.orden
-        row["p1"] = r.p1
-        row["p2"] = r.p2
         row["parent"] = r.parent.pk if r.parent else -1
         row["familia"] = r.familia.pk if r.familia else -1
         row["seccion"] = r.seccion.pk if r.seccion else -1

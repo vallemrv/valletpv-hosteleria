@@ -56,10 +56,10 @@ class Pedidos(models.Model):
             linea.infmesa_id = mesa.infmesa.pk
             linea.pedido_id = pedido.pk
             linea.descripcion = pd["descripcion"]
-            linea.descripcion_t = pd["descripcion_t"]
+            linea.descripcion_t = pd["descripcionT"]
             linea.precio = pd["precio"]
             linea.estado =  'P'
-            linea.tecla_id = int(pd["tecla_id"]) if "tecla_id" in pd else None
+            linea.tecla_id = int(pd["teclaId"]) if "teclaId" in pd else None
             linea.save()
                
                 
@@ -157,19 +157,19 @@ class Lineaspedido(models.Model):
             mesa = Mesas.objects.filter(id=split[0]).first()
         obj = {
             'id': self.pk,
-            'pedido_id': self.pedido_id,
-            'UID': self.infmesa.pk,
-            'tecla_id': self.tecla.pk if self.tecla else -1,
+            'pedidoId': self.pedido_id,
+            'uid': self.infmesa.pk,
+            'teclaId': self.tecla.pk if self.tecla else -1,
             'estado': self.estado,
             'precio': float(self.precio),
             'descripcion': self.descripcion,
-            'mesa_id': mesa.pk if mesa else -1,
+            'mesaId': mesa.pk if mesa else -1,
             'nomMesa': mesa.nombre if mesa else "",
-            'zona_id': mesa.zona.pk if mesa else -1,
+            'zonaId': mesa.zona.pk if mesa else -1,
             'servido': Servidos.objects.filter(linea__pk=self.pk).count()>0,
-            'descripcion_t': self.descripcion_t,
-            'receptor_id': self.tecla.familia.receptor.pk if self.tecla else -1,
-            'camarero_id': self.pedido.camarero_id,
+            'descripcionT': self.descripcion_t,
+            'receptorId': self.tecla.familia.receptor.pk if self.tecla else -1,
+            'camareroId': self.pedido.camarero_id,
             }
         return obj
             
