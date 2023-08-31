@@ -1,5 +1,6 @@
 package com.valleapp.valletpvlib.tools.tareas
 
+import com.valleapp.valletpvlib.interfaces.IServiceState
 import com.valleapp.valletpvlib.tools.ApiErrorMessages
 import com.valleapp.valletpvlib.tools.ApiRequest
 import com.valleapp.valletpvlib.tools.ApiResponse
@@ -19,7 +20,8 @@ class InstruccionesManager {
     private var isRunning = true
 
 
-    suspend fun procesarCola() {
+    suspend fun procesarCola(controller: IServiceState) {
+        isRunning = true
         while (isRunning) {
 
             if (cola.isNotEmpty()) {
@@ -34,8 +36,11 @@ class InstruccionesManager {
                         }
 
                         is ApiResponse.Error -> {
+                            if (result.errorMessage == ApiErrorMessages.UNAUTHORIZED){
+                                this.stopProcesarCola()
+                                controller.invalidateAuth()
 
-                            if (!((result.errorMessage == ApiErrorMessages.TIMEOUT)
+                            }else if (!((result.errorMessage == ApiErrorMessages.TIMEOUT)
                                         || (result.errorMessage == ApiErrorMessages.NO_CONNECTION))) {
                                 cola.poll()
 
@@ -44,10 +49,6 @@ class InstruccionesManager {
                                 sleep(5000)
                             }
 
-                            inst.mensaje?.let {
-                                it.mensaje = result.errorMessage.toString()
-                                it.tipo = "error"
-                            }
                         }
                     }
 
@@ -70,4 +71,5 @@ class InstruccionesManager {
         if (mutex.isLocked) mutex.unlock()
         println("Agregando   instruccion ${cola.size}")
     }
+
 }

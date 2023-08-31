@@ -10,22 +10,21 @@ import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
-import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.ServiceCom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class CamarerosModel(private val serverConfig: ServerConfig) : ViewModel() {
+class CamarerosModel() : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
     var mService: ServiceCom? by mutableStateOf(null)
-    var db: CamareroDao? = null
+    var db: CamareroDao? by mutableStateOf(null)
 
     fun addCamarero(camarero: Camarero) {
         viewModelScope.launch(Dispatchers.IO) {
             val inst = Instrucciones(
-                params = serverConfig.getParams(mapOf("nombre" to camarero.nombre, "apellido" to camarero.nombre)),
+                params = mService?.getParamsServer(mapOf("nombre" to camarero.nombre, "apellido" to camarero.nombre)),
                 endPoint = ApiEndPoints.CAMAREROS_ADD,
             )
             mService?.addInstruccion(inst)
@@ -36,7 +35,7 @@ class CamarerosModel(private val serverConfig: ServerConfig) : ViewModel() {
     fun setAutorizado(id: Long, b: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val inst = Instrucciones(
-                params = serverConfig.getParams(mapOf("autorizado" to b, "id" to id)),
+                params = mService?.getParamsServer(mapOf("autorizado" to b, "id" to id)),
                 endPoint = ApiEndPoints.CAMAREROS_SET_AUTORIZADO
             )
             mService?.addInstruccion(inst)
@@ -47,7 +46,6 @@ class CamarerosModel(private val serverConfig: ServerConfig) : ViewModel() {
     fun setService(mService: ServiceCom?) {
         if (mService != null) {
             this.mService = mService
-            mService.setServerConfig(serverConfig)
             db = mService.getDB("camareros") as CamareroDao
         }
     }

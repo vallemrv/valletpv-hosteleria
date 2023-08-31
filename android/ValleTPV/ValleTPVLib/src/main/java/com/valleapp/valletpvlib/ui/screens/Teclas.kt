@@ -12,10 +12,11 @@ import com.valleapp.valletpvlib.ui.TecladoArt
 
 @Composable
 fun TeclasGrid(
+    bindServiceModel: BindServiceModel,
     columns: Int,
     rows: Int,
 ) {
-    val bindServiceModel: BindServiceModel = viewModel()
+
     val cuentaModel: CuentaModel = viewModel()
     val mService = bindServiceModel.mService
     val db = mService?.getDB("teclas") as? TeclasDao

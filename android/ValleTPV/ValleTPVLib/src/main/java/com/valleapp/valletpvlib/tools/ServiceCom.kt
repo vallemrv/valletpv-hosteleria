@@ -18,6 +18,7 @@ import com.valleapp.valletpvlib.db.Seccion
 import com.valleapp.valletpvlib.db.Tecla
 import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.interfaces.IController
+import com.valleapp.valletpvlib.interfaces.IServiceState
 import com.valleapp.valletpvlib.tools.tareas.InstruccionesManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -27,6 +28,7 @@ import org.json.JSONObject
 
 class ServiceCom : Service(), IController {
 
+    private var validador: IServiceState? = null
     private val binder = LocalBinder()
     private var serverConfig: ServerConfig? = null
     private var appDatabase: AppDatabase? = null
@@ -77,6 +79,7 @@ class ServiceCom : Service(), IController {
         manager?.createNotificationChannel(serviceChannel)
     }
 
+
     override fun updateTables(o: JSONObject?) {
         if (o != null) {
             val tbName = o.getString("tb")
@@ -126,7 +129,13 @@ class ServiceCom : Service(), IController {
                     }
 
                     is ApiResponse.Error -> {
-                        println("Error: ${result.errorMessage}")
+                        if (result.errorMessage == ApiErrorMessages.UNAUTHORIZED) {
+                            validador?.invalidateAuth()
+                            break
+                        }else{
+                            println("Error: ${result.errorMessage}")
+                        }
+
                     }
 
                 }
@@ -172,13 +181,13 @@ class ServiceCom : Service(), IController {
 
 
     private fun getEntity(name: String): IBaseEntity {
-        when (name) {
-            "camareros" -> return Camarero()
-            "mesas" -> return Mesa()
-            "zonas" -> return Zona()
-            "teclas" -> return Tecla()
-            "secciones" -> return Seccion()
-            "lineaspedido" -> return LineaPedido()
+        return when (name) {
+            "camareros" -> Camarero()
+            "mesas" -> Mesa()
+            "zonas" -> Zona()
+            "teclas" -> Tecla()
+            "secciones" -> Seccion()
+            "lineaspedido" -> LineaPedido()
             else -> throw IllegalArgumentException("Entity no encontrado para: $name")
         }
     }
@@ -189,15 +198,19 @@ class ServiceCom : Service(), IController {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun setServerConfig(serverConfig: ServerConfig) {
-        if (this.serverConfig == null) {
+        if (this.serverConfig?.uid != serverConfig.uid) {
             this.serverConfig = serverConfig
             ApiRequest.init(serverConfig.getParseUrl())
             val controller = this
             GlobalScope.launch {
                 val wsUrl = serverConfig.getWSUrl()
+                procesarCola.stopProcesarCola()
+                wsClient?.salir()
+
                 wsClient = WSClient(wsUrl, "comunicacion/devices", controller)
                 wsClient?.connect()
-                procesarCola.procesarCola()
+
+                procesarCola.procesarCola(validador as IServiceState)
             }
             println("Arrancando Procesos de cola y WSClient")
         }
@@ -208,14 +221,14 @@ class ServiceCom : Service(), IController {
     }
 
     fun getDB(tbName: String): IBaseDao<*>? {
-        when (tbName) {
-            "camareros" -> return appDatabase?.camareroDao() as IBaseDao<*>
-            "mesas" -> return appDatabase?.mesasDao() as IBaseDao<*>
-            "zonas" -> return appDatabase?.zonasDao() as IBaseDao<*>
-            "teclas" -> return appDatabase?.teclasDao() as IBaseDao<*>
-            "secciones" -> return appDatabase?.seccionesDao() as IBaseDao<*>
-            "lineaspedido" -> return appDatabase?.lineasDao() as IBaseDao<*>
-            else -> return null
+        return when (tbName) {
+            "camareros" -> appDatabase?.camareroDao() as IBaseDao<*>
+            "mesas" -> appDatabase?.mesasDao() as IBaseDao<*>
+            "zonas" -> appDatabase?.zonasDao() as IBaseDao<*>
+            "teclas" -> appDatabase?.teclasDao() as IBaseDao<*>
+            "secciones" -> appDatabase?.seccionesDao() as IBaseDao<*>
+            "lineaspedido" -> appDatabase?.lineasDao() as IBaseDao<*>
+            else -> null
         }
     }
 
@@ -226,5 +239,14 @@ class ServiceCom : Service(), IController {
     fun getServerConfig(): ServerConfig? {
         return serverConfig
     }
+
+    fun getParamsServer(params: Map<String, Any>): Map<String, String> {
+        return serverConfig?.getParams(params) ?: mapOf()
+    }
+
+    fun setValidador(validador: IServiceState) {
+        this.validador = validador
+    }
+
 
 }

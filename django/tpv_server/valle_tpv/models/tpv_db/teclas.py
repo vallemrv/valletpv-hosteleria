@@ -143,8 +143,8 @@ class Teclas(models.Model):
         row["incremento"] = float(r.incremento)
         row["precio"] = float(r.p1) 
         row['color'] = r.familia.color  if r.familia else "#FFC0CB" 
-        row["nombreFam"] = r.familia.nombre if r.familia else None
-        row["seccion_nombre"] = r.seccion.nombre if r.seccion else None
+        row["nombreFam"] = r.familia.nombre if r.familia else ""
+        row["seccion_nombre"] = r.seccion.nombre if r.seccion else ""
         row["child"] = Teclas.objects.filter(parent=r.id).count()
         
         return row

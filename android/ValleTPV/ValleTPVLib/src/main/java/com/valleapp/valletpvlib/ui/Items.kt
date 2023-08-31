@@ -47,7 +47,7 @@ fun ListItemCuenta(
             .fillMaxWidth()
             .height(50.dp)
             .padding(2.dp),
-         verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = lineaCuenta.cantidad.toString(),
@@ -57,31 +57,34 @@ fun ListItemCuenta(
         Spacer(modifier = Modifier.weight(0.01f))
         Text(
             text = lineaCuenta.descripcion,
-            modifier = Modifier.padding(start = 3.dp).weight(0.4f),
+            modifier = Modifier
+                .padding(start = 3.dp)
+                .weight(0.4f),
             textAlign = TextAlign.Left,
         )
         Spacer(modifier = Modifier.weight(0.05f))
         Text(
-            text = "${lineaCuenta.precio} €",
+            //Convierte el precio a string con dos decimales
+            text = String.format("%.2f €", lineaCuenta.precio),
             modifier = Modifier.weight(0.2f),
             textAlign = TextAlign.Right
         )
         Spacer(modifier = Modifier.weight(0.05f))
         Text(
-            text = "${lineaCuenta.total}€",
+            text = String.format("%.2f €", lineaCuenta.total),
             modifier = Modifier.weight(0.2f),
             textAlign = TextAlign.Right
         )
         Spacer(modifier = Modifier.weight(0.05f))
-             BotonIcon(
-                icon = ExtendIcons.Borrar,
-                color = ColorTheme.Primary,
-                modifier = Modifier.size(40.dp),
-                contentDescription = "Borrrar"
-            ) {
-                onBorrarClicked(lineaCuenta)
-            }
-                Spacer(modifier = Modifier.weight(0.05f))
+        BotonIcon(
+            icon = ExtendIcons.Borrar,
+            color = ColorTheme.Primary,
+            modifier = Modifier.size(40.dp),
+            contentDescription = "Borrrar"
+        ) {
+            onBorrarClicked(lineaCuenta)
+        }
+        Spacer(modifier = Modifier.weight(0.05f))
     }
 }
 

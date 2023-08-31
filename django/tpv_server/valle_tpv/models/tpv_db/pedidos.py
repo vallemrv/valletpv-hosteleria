@@ -23,10 +23,10 @@ class Pedidos(models.Model):
    
     @staticmethod
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
-        print("agregar_nuevas_lineas", idm, idc, lineas, uid_device)
-        
-        p = Pedidos.objects.filter(uid_device=uid_device).first()
-        if p: return None
+       
+        #Esto era para que no se repitieran los pedidos
+        #p = Pedidos.objects.filter(uid_device=uid_device).first()
+        #if p: return None
         
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         

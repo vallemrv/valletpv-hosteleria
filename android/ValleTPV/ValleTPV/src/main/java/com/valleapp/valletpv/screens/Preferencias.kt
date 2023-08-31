@@ -19,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.models.PreferenciasModel
 import com.valleapp.valletpvlib.ui.BotonSimple
 import com.valleapp.valletpvlib.ui.ToastComposable
@@ -37,7 +40,11 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
-fun Preferencias(navController: NavController) {
+fun Preferencias(
+    navController: NavController,
+    bindServiceModel: BindServiceModel,
+    message: String = "Preferecias cargadas con exito"
+) {
     Scaffold(
         topBar = {
             ValleTopBar(
@@ -49,7 +56,7 @@ fun Preferencias(navController: NavController) {
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                PreferenciasScreen()
+                PreferenciasScreen(bindServiceModel, message = message)
             }
         }
     )
@@ -57,8 +64,17 @@ fun Preferencias(navController: NavController) {
 }
 
 @Composable
-fun PreferenciasScreen() {
+fun PreferenciasScreen(bindServiceModel: BindServiceModel, message: String) {
+
     val vModel: PreferenciasModel = viewModel()
+    val prefenciasCargadas = rememberUpdatedState(vModel.preferenciasCargadas)
+
+
+    LaunchedEffect(prefenciasCargadas) {
+        bindServiceModel.isAunthValid = prefenciasCargadas.value
+        if (message.isNotEmpty()) vModel.mostrarMessage(message)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -143,20 +159,21 @@ fun PreferenciasScreen() {
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        BotonSimple(text = "Validar Codgio", modifier = Modifier.fillMaxWidth().height(70.dp)) { _ ->
+                        BotonSimple(
+                            text = "Validar Codgio", modifier = Modifier
+                                .fillMaxWidth()
+                                .height(70.dp)
+                        ) { _ ->
                             vModel.onValidarClick()
                         }
 
                     }
                 }
             }
-            ToastComposable(message = vModel.strError, show = vModel.error, 3000) {
-                vModel.error = false
+            ToastComposable(message = vModel.message, show = vModel.showMessage, 3000) {
+                vModel.showMessage = false
             }
         }
 
-        ToastComposable(message = "Preferecias cargadas con exito", show = vModel.preferenciasCargadas, timeout = 3000 ) {
-            println("Preferecias cargadas con exito")
-        }
     }
 }

@@ -10,24 +10,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import com.valleapp.valletpvlib.interfaces.IServiceState
 import com.valleapp.valletpvlib.tools.ServiceCom
 
-class BindServiceModel(private val app: Application) : AndroidViewModel(app) {
+class BindServiceModel(private val app: Application) : AndroidViewModel(app), IServiceState {
 
 
     private var mBound = false
     private var connection: ServiceConnection? = null
+
+    var isAunthValid by mutableStateOf(true)
+
     var mService: ServiceCom? by mutableStateOf(null)
 
 
+    override fun invalidateAuth() {
+        isAunthValid = false
+        println("Auth invalido")
+    }
+
 
     fun bindService() {
-
         if (connection == null) {
             connection = object : ServiceConnection {
                 override fun onServiceConnected(className: ComponentName, service: IBinder) {
                     val binder = service as ServiceCom.LocalBinder
                     mService = binder.getService()
+                    mService!!.setValidador(this@BindServiceModel)
                     mBound = true
                     println("Servicio enlazado")
                 }
@@ -58,4 +67,5 @@ class BindServiceModel(private val app: Application) : AndroidViewModel(app) {
             println("Servicio desenlazado")
         }
     }
+
 }

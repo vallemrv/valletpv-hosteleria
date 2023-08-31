@@ -14,7 +14,9 @@ class Mesasabiertas(models.Model):
     def borrar_mesa_abierta(idm, idc, motivo):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         if mesa:
-            reg = mesa.infmesa.lineaspedido_set.filter((Q(estado="P") | Q(estado="M") | Q(estado="R")))
+            reg = mesa.infmesa.lineaspedido_set.filter((Q(estado="P") | 
+                                                        Q(estado="M") | 
+                                                        Q(estado="R")))
             for r in reg:
                 historial = Historialnulos()
                 historial.lineapedido_id = r.pk
@@ -28,7 +30,7 @@ class Mesasabiertas(models.Model):
 
 
             obj = mesa.serialize()
-            obj["abierta"] = 0
+            obj["abierta"] = False
             obj["num"] = 0
             comunicar_cambios_devices("md", "mesasabiertas", obj)
             mesa.delete()
@@ -71,7 +73,7 @@ class Mesasabiertas(models.Model):
                         comunicar_cambios_devices("md", "lineaspedido", l.serialize())
                         
                 obj = mesaS.serialize()
-                obj["abierta"] = 0
+                obj["abierta"] = False
                 obj["num"] = 0
                 comunicar_cambios_devices("md", "mesasabiertas", obj)
                 infmesa.delete()
@@ -79,7 +81,7 @@ class Mesasabiertas(models.Model):
     def serialize(self):
         obj = self.infmesa.serialize()
         obj["mesa_abierta_id"] = self.pk
-        obj["abierta"] = 1
+        obj["abierta"] = True
         return obj
 
     def get_lineaspedido(self):

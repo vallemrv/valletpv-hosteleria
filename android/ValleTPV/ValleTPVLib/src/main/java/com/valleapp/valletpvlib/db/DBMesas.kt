@@ -17,10 +17,10 @@ data class Mesa(
     var nombre: String = "",
     var color: String = "",
     var abierta: Boolean = false,
-    var zona_id: Int = 0,
-    var num: Int = 0,
-    var orden: Int = 0,
-    var tarifa: Int = 0,
+    var zona_id: Int? = -1,
+    var num: Int? = -1,
+    var orden: Int? = -1,
+    var tarifa: Int? = -1,
 ): BaseEntity() {
 
     private fun loadJson(json: JSONObject) {

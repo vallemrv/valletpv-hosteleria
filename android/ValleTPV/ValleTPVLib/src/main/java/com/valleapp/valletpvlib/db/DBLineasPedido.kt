@@ -26,7 +26,7 @@ data class LineaPedido(
     var nomMesa: String? = "",
     var zona_id: Long? = -1,
     var servido: Boolean? = false,
-    var receptor_id: String? = "",
+    var receptor_id: Long? = -1,
     var camarero_id: Long? = -1,
     var UID: String? = "",
     var pk: Long? = -1
@@ -44,7 +44,7 @@ data class LineaPedido(
         nomMesa = json.getString("nomMesa")
         zona_id = json.getLong("zona_id")
         servido = json.getBoolean("servido")
-        receptor_id = json.getString("receptor_id")
+        receptor_id = json.getLong("receptor_id")
         camarero_id = json.getLong("camarero_id")
         UID = json.getString("UID")
     }

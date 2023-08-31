@@ -17,12 +17,10 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +32,7 @@ import com.valleapp.valletpv.routers.Routers
 import com.valleapp.valletpv.ui.AddCamareroDialog
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
+import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.models.PreferenciasModel
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.tools.ServiceCom
@@ -41,100 +40,86 @@ import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.BotonIcon
 import com.valleapp.valletpvlib.ui.ListaSimple
 import com.valleapp.valletpvlib.ui.ValleTopBar
-import com.valleapp.valletpvlib.ui.screens.BaseSecreen
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
-fun PaseCamareros(navController: NavController) {
-    val cx = LocalContext.current
-    val preferencias: PreferenciasModel = viewModel()
+fun PaseCamareros(navController: NavController, bindServiceModel: BindServiceModel) {
+    val preferenciasModel: PreferenciasModel = viewModel()
 
-
-    if (!preferencias.preferenciasCargadas) {
-        navController.navigate(RoutersBase.Preferencias.route)
-    } else {
-
-        BaseSecreen { bindServiceModel ->
-            val mService by rememberUpdatedState(bindServiceModel.mService)
-            val serverConfig = preferencias.serverConfig
-            val vModel: CamarerosModel = viewModel(initializer = {
-                CamarerosModel(
-                    serverConfig,
-                )
-            })
-
-            LaunchedEffect(mService) { // Se ejecutará cada vez que mService cambie
-                if (mService != null) {
-                    vModel.setService(mService = mService)
-                }
-            }
-
-            Scaffold(
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { vModel.showDialog = true },
-                        containerColor = ColorTheme.Primary,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .size(80.dp),
-                        elevation = FloatingActionButtonDefaults.elevation(
-                            defaultElevation = 8.dp,
-                            pressedElevation = 12.dp
-                        )
-                    ) {
-                        Icon(
-                            painter = ExtendIcons.Add,
-                            contentDescription = "Agregar",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .fillMaxSize()
-                        )
-                    }
-                },
-                topBar = {
-                    ValleTopBar(
-                        title = "Pase de Camareros"
-                    ) {
-                        BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
-                            navController.navigate(Routers.Arqueo.route)
-                        }
-                        BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
-                            navController.navigate(RoutersBase.Preferencias.route)
-                        }
-                    }
-                },
-                content = {
-                    Box(modifier = Modifier.padding(it)) {
-                        PaseCamarerosScreen(
-                            vModel = vModel,
-                            navController = navController
-                        ) {
-                            bindServiceModel.unbindService()
-                            val intent = Intent(cx, ServiceCom::class.java)
-                            cx.stopService(intent)
-
-                            Intent(Intent.ACTION_MAIN).apply {
-                                addCategory(Intent.CATEGORY_HOME)
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                cx.startActivity(this)
-                            }
-                        }
-
-                        AddCamareroDialog(vModel) { cam ->
-                            vModel.showDialog = false
-                            vModel.addCamarero(cam)
-                        }
-                    }
-                }
-            )
-        }
-
+    if (!preferenciasModel.preferenciasCargadas) {
+        bindServiceModel.invalidateAuth()
     }
 
+    val cx = LocalContext.current
+    val mService = bindServiceModel.mService
 
+    if (mService != null) {
+
+        val vModel: CamarerosModel = viewModel()
+        vModel.setService(mService)
+
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { vModel.showDialog = true },
+                    containerColor = ColorTheme.Primary,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(80.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 12.dp
+                    )
+                ) {
+                    Icon(
+                        painter = ExtendIcons.Add,
+                        contentDescription = "Agregar",
+                        tint = Color.Black,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxSize()
+                    )
+                }
+            },
+            topBar = {
+                ValleTopBar(
+                    title = "Pase de Camareros"
+                ) {
+                    BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
+                        navController.navigate(Routers.Arqueo.route)
+                    }
+                    BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
+                        navController.navigate(RoutersBase.Preferencias.route)
+                    }
+                }
+            },
+            content = {
+                Box(modifier = Modifier.padding(it)) {
+                    PaseCamarerosScreen(
+                        vModel = vModel,
+                        navController = navController
+                    ) {
+                        bindServiceModel.unbindService()
+                        val intent = Intent(cx, ServiceCom::class.java)
+                        cx.stopService(intent)
+
+                        Intent(Intent.ACTION_MAIN).apply {
+                            addCategory(Intent.CATEGORY_HOME)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            cx.startActivity(this)
+                        }
+                    }
+
+                    AddCamareroDialog(vModel) { cam ->
+                        vModel.showDialog = false
+                        vModel.addCamarero(cam)
+                    }
+                }
+            }
+        )
+    }
 }
 
 
@@ -144,9 +129,7 @@ fun PaseCamarerosScreen(
     navController: NavController,
     onSalir: () -> Unit
 ) {
-
-    val mService by rememberUpdatedState(vModel.mService)
-    val db: CamareroDao? = mService?.getDB("camareros") as? CamareroDao
+    val db: CamareroDao? = vModel.db
     val autorizados by db?.getAutorizados(autorizado = true)
         ?.observeAsState(initial = listOf())
         ?: remember { mutableStateOf(listOf()) }

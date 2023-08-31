@@ -26,6 +26,7 @@ import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.db.ZonasDao
+import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.models.MesasModel
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.ui.BotonSimple
@@ -34,49 +35,54 @@ import com.valleapp.valletpvlib.ui.ValleGridSimple
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 
 
-
 @Composable
-fun MesasGrid(navController: NavController, camId: Long, columnMesas: Int, landScape: Boolean) {
+fun MesasGrid(
+    navController: NavController,
+    bindServiceModel: BindServiceModel,
+    camId: Long,
+    columnMesas: Int,
+    landScape: Boolean
+) {
 
     val model: MesasModel = viewModel()
 
-    BaseSecreen { bindServiceModel ->
-        model.mService = bindServiceModel.mService
-        model.db = model.mService?.getDB("mesas") as? MesasDao
-        model.dbZona = model.mService?.getDB("zonas") as? ZonasDao
+
+    model.mService = bindServiceModel.mService
+    model.db = model.mService?.getDB("mesas") as? MesasDao
+    model.dbZona = model.mService?.getDB("zonas") as? ZonasDao
 
 
-        val listaZonas by model.dbZona?.getListaLive()?.observeAsState(initial = listOf())
-            ?: remember { mutableStateOf(listOf()) }
+    val listaZonas by model.dbZona?.getListaLive()?.observeAsState(initial = listOf())
+        ?: remember { mutableStateOf(listOf()) }
 
-        val zona = listaZonas.firstOrNull()
-        if (zona != null && model.idZona <= 0) {
-            model.idZona = zona.id
-        }
-
-        val listaMesas by model.db?.getAllByZona(model.idZona)?.observeAsState(initial = listOf())
-            ?: remember { mutableStateOf(listOf()) }
-
-        if (landScape) {
-            LandScapeGrid(
-                navController = navController,
-                camId = camId,
-                listaZonas = listaZonas,
-                listaMesas = listaMesas,
-                model = model,
-                column = columnMesas
-            )
-        } else {
-            PortraitGrid(
-                navController = navController,
-                camId = camId,
-                listaZonas = listaZonas,
-                listaMesas = listaMesas,
-                model = model,
-                column = columnMesas
-            )
-        }
+    val zona = listaZonas.firstOrNull()
+    if (zona != null && model.idZona <= 0) {
+        model.idZona = zona.id
     }
+
+    val listaMesas by model.db?.getAllByZona(model.idZona)?.observeAsState(initial = listOf())
+        ?: remember { mutableStateOf(listOf()) }
+
+    if (landScape) {
+        LandScapeGrid(
+            navController = navController,
+            camId = camId,
+            listaZonas = listaZonas,
+            listaMesas = listaMesas,
+            model = model,
+            column = columnMesas
+        )
+    } else {
+        PortraitGrid(
+            navController = navController,
+            camId = camId,
+            listaZonas = listaZonas,
+            listaMesas = listaMesas,
+            model = model,
+            column = columnMesas
+        )
+    }
+
 }
 
 @Composable
@@ -94,9 +100,11 @@ fun PortraitGrid(
             .fillMaxSize()
             .padding(10.dp),
     ) {
-        Box(modifier = Modifier
-            .weight(0.2f)
-            .padding(start = 10.dp)) {
+        Box(
+            modifier = Modifier
+                .weight(0.2f)
+                .padding(start = 10.dp)
+        ) {
             ListaZonas(listaZonas, model, landScape = false)
         }
         Box(modifier = Modifier.weight(0.8f)) {
@@ -189,7 +197,7 @@ fun SelectorMesas(listaMesas: List<Mesa>, model: MesasModel, column: Int) {
                     ) { tag ->
                         model.ejecutarAccion(tag as Mesa)
                     }
-                }else{
+                } else {
                     BotonSimple(
                         text = it.nombre,
                         color = Color.Red

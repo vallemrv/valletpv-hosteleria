@@ -9,7 +9,6 @@ import org.json.JSONObject
 @Entity(tableName = "secciones")
 data class Seccion(
     var nombre: String = "",
-    var color: String = "#FFC0CB",
     var orden: Int = 0,
     // Puedes usar una String para representar la ruta al archivo del icono si estás usando una base de datos local.
     var url: String? = null,
@@ -19,7 +18,7 @@ data class Seccion(
     private fun loadJson(json: JSONObject) {
         nombre = json.getString("nombre") ?: ""
         orden = json.getInt("orden")
-        url = json.getString("url")  // Asumiendo que el servidor retorna una ruta o URL como String.
+        url = json.getString("url")
         id = json.getLong("id")
     }
 

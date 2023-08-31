@@ -65,7 +65,9 @@ fun NetworkImage(url: String, contentDescription: String = "") {
         painter = painter,
         contentDescription = contentDescription,  // Añadir una descripción adecuada para accesibilidad
         contentScale = ContentScale.FillBounds,
-        modifier = Modifier.padding(10.dp).fillMaxSize()
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxSize()
     )
 }
 
@@ -208,33 +210,33 @@ fun BotonMesa(
                 style = Styles.TextBotones,
                 textAlign = TextAlign.Center
             )
-
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Icon(painter = ExtendIcons.JuntarMesa, contentDescription = "JuntarMesa",
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .size(40.dp)
-                        .background(ColorTheme.Primary)
-                        .clickable { onAccionClick(mesa, AccionMesa.JUNTAR) })
-                Icon(painter = ExtendIcons.CambiarMesa, contentDescription = "CambiarMesa",
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .size(40.dp)
-                        .background(ColorTheme.Primary)
-                        .clickable { onAccionClick(mesa, AccionMesa.MOVER) })
-                Icon(painter = ExtendIcons.Borrar, contentDescription = "BorrarMesa",
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .size(40.dp)
-                        .background(ColorTheme.Primary)
-                        .clickable { onAccionClick(mesa, AccionMesa.BORRAR) })
+            if (mesa.abierta) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Icon(painter = ExtendIcons.JuntarMesa, contentDescription = "JuntarMesa",
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .size(40.dp)
+                            .background(ColorTheme.Primary)
+                            .clickable { onAccionClick(mesa, AccionMesa.JUNTAR) })
+                    Icon(painter = ExtendIcons.CambiarMesa, contentDescription = "CambiarMesa",
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .size(40.dp)
+                            .background(ColorTheme.Primary)
+                            .clickable { onAccionClick(mesa, AccionMesa.MOVER) })
+                    Icon(painter = ExtendIcons.Borrar, contentDescription = "BorrarMesa",
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .size(40.dp)
+                            .background(ColorTheme.Primary)
+                            .clickable { onAccionClick(mesa, AccionMesa.BORRAR) })
+                }
             }
         }
-
     }
 }
 

@@ -18,8 +18,8 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 
 
 @Composable
-fun Secciones() {
-        val bindServiceModel: BindServiceModel = viewModel()
+fun Secciones(bindServiceModel: BindServiceModel) {
+
         val mService = bindServiceModel.mService
         val dbSeccion = mService?.getDB("secciones") as? SeccionesDao
         if (dbSeccion != null) {

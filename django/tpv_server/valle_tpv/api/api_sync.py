@@ -37,17 +37,23 @@ def sync_devices(request):
         client_rec = client_dict.get(rec.pk)
         if client_rec:
             
-            # Si alguna key es diferente, devolver el registro con los valores buenos del servidor
-            if row != client_rec:
-                response_data['update'].append(row)
-               
-            # Eliminar el registro del diccionario del cliente una vez procesado
+            for k, v in client_rec.items():
+                v = None if v == "null" else v
+                v = None if v == -1 else v
+            
+                if v != row[k]:
+                    print("update", k, v,row[k])
+                    response_data['update'].append(row)
+                    break
+        
+            
             del client_dict[rec.pk]
         else:
             response_data['create'].append(row)  
 
     # Los registros restantes en el diccionario del cliente no existen en el servidor, devolver sus IDs para borrarlos en el cliente
     response_data['delete'] = list(client_dict.keys())
+    
     return JsonResponse({'sync': json.dumps(response_data)})
 
 @check_dispositivo
@@ -66,16 +72,3 @@ def update_from_devices(request):
 
 
 
-
-def equals(k, obj1, obj2):
-    if k.lower() in ["p1", "p2", "precio", "incremento", "entrega"]:
-        return float(obj1) == float(obj2)
-
-    if obj1 in ["None", "null"]:
-        if obj2 in ["None", "null"]:
-            return True
-        else:
-            return False
-
-    
-    return obj1.lower() == obj2.lower()

@@ -11,7 +11,7 @@ data class Tecla(
     var p1: Double = 0.0,
     var p2: Double = 0.0,
     var incremento: Double = 0.0,
-    var orden: Int = 0,
+    var orden: Int = -1,
     var familia: Int = -1,
     var tag: String = "",
     var descripcion_r: String = "",
@@ -44,8 +44,8 @@ data class Tecla(
         tag = json.optString("tag", tag)
         descripcion_r = json.optString("descripcion_r", "")
         descripcion_t = json.optString("descripcion_t", "")
-        seccion = json.optInt("seccion")
-        parent = json.optInt("parent")
+        seccion = json.optInt("seccion", -1)
+        parent = json.optInt("parent", -1)
         color = json.optString("color", color)
         nombreFam = json.optString("nombreFam")
         seccion_nombre = json.optString("seccion_nombre")

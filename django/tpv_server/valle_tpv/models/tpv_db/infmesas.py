@@ -97,9 +97,8 @@ class Infmesa(models.Model):
         if mesa:
             mesa_id = mesa.id
             nomMesa = mesa.nombre
-            zona = mesa.mesaszona_set.first()
-            if zona:
-                zona_id = zona.id
+            zona_id = mesa.zona_id
+            
 
         return {
             "UID": self.pk,
