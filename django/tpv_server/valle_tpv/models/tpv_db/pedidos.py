@@ -25,8 +25,8 @@ class Pedidos(models.Model):
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
        
         #Esto era para que no se repitieran los pedidos
-        #p = Pedidos.objects.filter(uid_device=uid_device).first()
-        #if p: return None
+        p = Pedidos.objects.filter(uid_device=uid_device).first()
+        if p: return None
         
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
@@ -34,7 +34,7 @@ class Pedidos(models.Model):
             infmesa = Infmesa()
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
-            infmesa.fecha = datetime.now()    #.strftime("%Y/%m/%d")
+            infmesa.fecha = datetime.now() 
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
             
@@ -68,7 +68,7 @@ class Pedidos(models.Model):
         pedido.infmesa.save()   
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
-        comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
+        comunicar_cambios_devices("md", "mesas", mesa.serialize())
            
         lineas = []
         for l in pedido.lineaspedido_set.all():
@@ -159,7 +159,7 @@ class Lineaspedido(models.Model):
             'id': self.pk,
             'pedido_id': self.pedido_id,
             'UID': self.infmesa.pk,
-            'tecla_id': self.tecla.pk,
+            'tecla_id': self.tecla.pk if self.tecla else -1,
             'estado': self.estado,
             'precio': float(self.precio),
             'descripcion': self.descripcion,
@@ -168,7 +168,7 @@ class Lineaspedido(models.Model):
             'zona_id': mesa.zona.pk if mesa else -1,
             'servido': Servidos.objects.filter(linea__pk=self.pk).count()>0,
             'descripcion_t': self.descripcion_t,
-            'receptor_id': self.tecla.familia.receptor.pk if self.tecla else "",
+            'receptor_id': self.tecla.familia.receptor.pk if self.tecla else -1,
             'camarero_id': self.pedido.camarero_id,
             }
         return obj

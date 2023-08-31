@@ -63,12 +63,12 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
             descripcion += t.nombre + " "
             descripcion_t += t.nombre + " "
 
-            if (!t.descripcion_t.isNullOrBlank() && t.descripcion_t != "null") {
-                descripcion_t = t.descripcion_t!!
+            if (t.descripcionT.isNotBlank() && t.descripcionT != "null") {
+                descripcion_t = t.descripcionT
             }
 
-            if (!t.descripcion_r.isNullOrBlank() && t.descripcion_r != "null") {
-                descripcion = t.descripcion_r!!
+            if (t.descripcionR.isNotBlank() && t.descripcionR != "null") {
+                descripcion = t.descripcionR
             }
 
         }
@@ -80,7 +80,6 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
             descripcion_t = descripcion_t,
             precio = precio,
             tecla_id = tecla.id,
-            pk = System.currentTimeMillis(),
         )
 
     }

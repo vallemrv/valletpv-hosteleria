@@ -19,8 +19,6 @@ def sync_devices(request):
     model_name = request.POST.get('tb_name')
     client_records = json.loads(request.POST.get('regs'))
     app_name = request.POST["app"] if "app" in request.POST else "valle_tpv"
-   
-   
     
     Model = apps.get_model(app_name, model_name) # Reemplaza 'myapp' con el nombre de tu app
 
@@ -30,19 +28,19 @@ def sync_devices(request):
 
     # Diccionario de registros del cliente para facilitar la búsqueda por ID
     client_dict = {rec['id']: rec for rec in client_records}
+ 
 
     # Comparar con los registros del servidor
     for rec in server_records:
+        
         row = rec.serialize() if hasattr(rec, "serialize") else model_to_dict(rec)
         client_rec = client_dict.get(rec.pk)
+       
         if client_rec:
             
             for k, v in client_rec.items():
-                v = None if v == "null" else v
-                v = None if v == -1 else v
-            
                 if v != row[k]:
-                    print("update", k, v,row[k])
+                    print("update", v, k, row[k])
                     response_data['update'].append(row)
                     break
         

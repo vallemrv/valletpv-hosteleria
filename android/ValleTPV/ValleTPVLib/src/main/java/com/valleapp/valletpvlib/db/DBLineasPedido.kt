@@ -34,6 +34,7 @@ data class LineaPedido(
 
     private fun loadJson(json: JSONObject) {
         pk = json.getLong("id")
+        println("LineaPedido: $pk")
         estado = json.getString("estado")
         descripcion = json.getString("descripcion")
         descripcion_t = json.getString("descripcion_t")
@@ -59,7 +60,7 @@ data class LineaPedido(
     }
 
     override fun toString(): String {
-        return "$descripcion - $precio"
+        return "' $descripcion - $precio - $pk - $id '"
     }
 }
 
@@ -72,12 +73,14 @@ interface LineasDao : IBaseDao<LineaPedido> {
     @Query("SELECT pk as id, estado, descripcion_t," +
             " descripcion, precio, pedido_id," +
             " mesa_id, tecla_id, nomMesa," +
-            " zona_id, servido, receptor_id, camarero_id, UID  FROM LineasPedido")
+            " zona_id, servido, receptor_id, camarero_id, UID FROM LineasPedido")
     override fun getAll(): List<LineaPedido>
 
     @Query("DELETE FROM LineasPedido WHERE pk = :id")
     override fun deleteById(id: Long)
 
+    @Query("DELETE FROM LineasPedido")
+    fun deleteAll()
 
     @Query(
         "SELECT COUNT(id) as cantidad, descripcion_t as descripcion, precio, COUNT(id) * precio as total  " +

@@ -85,6 +85,9 @@ class ServiceCom : Service(), IController {
             val tbName = o.getString("tb")
             val tb = getDB(tbName)
             if (tb == null) {
+                if (tbName == "mesasabiertas"){
+                    println(o.toString()    )
+                }
                 println("Tabla no encontrada: $tbName")
                 return
             }
@@ -175,6 +178,7 @@ class ServiceCom : Service(), IController {
     private fun procesarDelete(delete: JSONArray, tb: IBaseDao<*>) {
         for (i in 0 until delete.length()) {
             val id = delete.getLong(i)
+            println("Borrando: $id")
             tb.deleteById(id)
         }
     }

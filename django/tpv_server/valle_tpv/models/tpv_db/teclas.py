@@ -137,14 +137,25 @@ class Teclas(models.Model):
 
     def serialize(self):
         r = self
-        row = model_to_dict(r)
+        row = {}
+        row["id"] = r.id
+        row["nombre"] = r.nombre if r.nombre else ""
+        row["descripcionR"] = r.descripcion_r if r.descripcion_r else ""
+        row["descripcionT"] = r.descripcion_t if r.descripcion_t else ""
+        row["tag"] = r.tag if r.tag else ""
+        row["orden"] = r.orden
+        row["p1"] = r.p1
+        row["p2"] = r.p2
+        row["parent"] = r.parent.pk if r.parent else -1
+        row["familia"] = r.familia.pk if r.familia else -1
+        row["seccion"] = r.seccion.pk if r.seccion else -1
         row["p1"] = float(r.p1)
         row["p2"] = float(r.p2)
         row["incremento"] = float(r.incremento)
         row["precio"] = float(r.p1) 
         row['color'] = r.familia.color  if r.familia else "#FFC0CB" 
         row["nombreFam"] = r.familia.nombre if r.familia else ""
-        row["seccion_nombre"] = r.seccion.nombre if r.seccion else ""
+        row["seccionNombre"] = r.seccion.nombre if r.seccion else ""
         row["child"] = Teclas.objects.filter(parent=r.id).count()
         
         return row

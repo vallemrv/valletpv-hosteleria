@@ -53,7 +53,7 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
             if (camarero == null) {
                 camarero = camarerosDao?.getCamarero(camId)
             }
-
+            println(lineasDao?.getAll())
             titulo = camarero.toString() + " - " + mesa.toString()
         }
     }
@@ -63,6 +63,7 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
             for(i in 1..cantidad) {
                 linea.mesa_id = mesaId
                 linea.camarero_id = camId
+                linea.pk = System.currentTimeMillis()
                 lineasDao?.insert(linea)
                 mesasDao?.abrirMesa(mesaId.toInt())
             }
@@ -84,7 +85,7 @@ class CuentaModel(private val camId: Long, private val mesaId: Long) : ViewModel
                 obj.put("tecla_id", linea.tecla_id)
                 pedido.put(obj)
             }
-            val params = mapOf("idm" to mesaId, "idc" to camId, "pedido" to pedido)
+            val params = mapOf("idm" to mesaId, "idc" to camId, "pedido" to pedido, "uid_pedido" to System.currentTimeMillis())
             val inst = Instrucciones(
                 params= serverConfig?.getParams(params),
                 endPoint = ApiEndPoints.PEDIDOS_ADD

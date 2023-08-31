@@ -37,7 +37,6 @@ fun CuentaTpvScreen(
     val model: CuentaModel = viewModel(initializer = { CuentaModel(camId, mesaId) })
     val mService by rememberUpdatedState(newValue = bindServiceModel.mService)
     LaunchedEffect(mService) {
-        println( "CuentaTpvScreen: $mService")
         model.loadData(mService)
     }
 
