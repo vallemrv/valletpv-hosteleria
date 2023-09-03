@@ -65,7 +65,7 @@ def preimprimir(request):
         }
 
         if infmesa.numcopias <= 1:
-            comunicar_cambios_devices("md", "mesasabiertas", 
+            comunicar_cambios_devices("md", "mesas", 
                                     mesa_abierta.serialize(), 
                                     {"op": "preimprimir"})
 
@@ -86,19 +86,6 @@ def reenviarpedido(request):
                                             "pedido_id").annotate(can=Count('idart'))
     return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
-@check_dispositivo
-def reenviarlinea(request):
-    idp = request.POST["idp"];
-    id = request.POST["id"];
-    nombre = request.POST["Descripcion"];
-    pedido = Pedidos.objects.get(pk=idp)
-    camarero = Camareros.objects.get(pk=pedido.camarero_id)
-    mesa_a = pedido.infmesa.mesasabiertas_set.first()
-    lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
-                                            "descripcion",
-                                            "estado",
-                                            "pedido_id").annotate(can=Count('idart'))
-    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
 
 @check_dispositivo
@@ -114,6 +101,21 @@ def imprimir_factura(request):
     send_imprimir_ticket(request, id, True)
     return JsonResponse({})
 
+
+
+@check_dispositivo
+def reenviarlinea(request):
+    idp = request.POST["idp"];
+    id = request.POST["id"];
+    nombre = request.POST["descripcion"];
+    pedido = Pedidos.objects.get(pk=idp)
+    camarero = Camareros.objects.get(pk=pedido.camarero_id)
+    mesa_a = pedido.infmesa.mesasabiertas_set.first()
+    lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
+                                            "descripcion",
+                                            "estado",
+                                            "pedido_id").annotate(can=Count('idart'))
+    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
 def send_urgente(lineas, hora, camarero, mesa_a):
     if mesa_a:

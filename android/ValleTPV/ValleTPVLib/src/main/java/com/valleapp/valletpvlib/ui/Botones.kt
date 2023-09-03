@@ -64,10 +64,10 @@ fun NetworkImage(url: String, contentDescription: String = "") {
     Image(
         painter = painter,
         contentDescription = contentDescription,  // Añadir una descripción adecuada para accesibilidad
-        contentScale = ContentScale.FillBounds,
+        contentScale = ContentScale.Fit,
         modifier = Modifier
-            .padding(10.dp)
             .fillMaxSize()
+            .padding(10.dp)
     )
 }
 
@@ -86,8 +86,8 @@ fun BotonIcon(
 
     val defaultModifier = if (modifier == Modifier) {
         Modifier
-            .padding(2.dp)
             .size(70.dp)
+            .padding(8.dp)
     } else {
         modifier
     }
@@ -101,7 +101,7 @@ fun BotonIcon(
 
     ) {
         Box(
-            modifier = Modifier.padding(3.dp),
+            modifier = Modifier.padding(4.dp),
             contentAlignment = Alignment.Center,
 
             ) {

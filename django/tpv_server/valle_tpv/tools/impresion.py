@@ -50,13 +50,13 @@ def send_imprimir_ticket(request, id, es_factura=False):
 def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, request):
     ticket = Ticket.objects.get(pk=id)
     camarero = Camareros.objects.get(pk=ticket.camarero_id)
-    lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__idart"),
+    lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__tecla"),
                                                     precio=F("linea__precio"),
                                                     descripcion_t=F("linea__descripcion_t"))
 
-    lineas = lineas.values("idart",
+    lineas = lineas.values("tecla",
                            "descripcion_t",
-                           "precio").annotate(can=Count('idart'),
+                           "precio").annotate(can=Count('tecla'),
                                               totallinea=Sum("precio"))
     
 

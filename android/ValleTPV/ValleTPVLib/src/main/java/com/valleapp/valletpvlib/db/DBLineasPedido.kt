@@ -13,6 +13,14 @@ data class LineaCuenta(
     var total: Double = 0.0,
 )
 
+data class LineaCuentaSend(
+    var can: Int = 0,
+    var descripcion: String = "",
+    var descripcionT: String = "",
+    var precio: Double = 0.0,
+    var total: Double = 0.0,
+)
+
 
 @Entity(tableName = "LineasPedido")
 data class LineaPedido(
@@ -58,15 +66,18 @@ data class LineaPedido(
     }
 
     override fun toString(): String {
-        return "$descripcion - $nomMesa - $id"
+        return "$descripcionT $precio $estado $uid $id $pedidoId $mesaId $teclaId $nomMesa $zonaId $servido $receptorId $camareroId \n"
     }
 }
 
 @Dao
 interface LineasDao : IBaseDao<LineaPedido> {
 
-    @Query("SELECT * FROM LineasPedido")
-    fun getListaLive(): LiveData<List<LineaPedido>>
+    @Query("SELECT * FROM LineasPedido WHERE mesaId=:mesaId")
+    fun getAllLinea(mesaId: Long): LiveData<List<LineaPedido>>
+
+    @Query("SELECT id FROM LineasPedido WHERE mesaId=:mesaId")
+    fun getAllIds(mesaId: Long): List<Long>
 
     @Query("SELECT * FROM LineasPedido")
     override fun getAll(): List<LineaPedido>
@@ -75,16 +86,22 @@ interface LineasDao : IBaseDao<LineaPedido> {
     @Query("DELETE FROM LineasPedido WHERE id=:id")
     override fun deleteById(id: Long)
 
-    @Query("DELETE FROM LineasPedido")
-    fun deleteAll()
 
     @Query(
         "SELECT COUNT(id) as cantidad, descripcionT as descripcion, precio, COUNT(id) * precio as total  " +
                 "FROM LineasPedido WHERE mesaId = :mesaId AND estado in ('P', 'N') GROUP BY teclaId, descripcionT, precio, estado"
     )
     fun getLineaCuentas(mesaId: Long): LiveData<List<LineaCuenta>>
-    @Query("SELECT id, descripcion, descripcionT, teclaId, precio " +
+
+
+    @Query("SELECT id, descripcion, descripcionT, teclaId, precio, mesaId " +
             "  FROM LineasPedido Where mesaId = :mesaId AND estado = 'N'")
     fun getNuevas(mesaId: Long): List<LineaPedido>
+
+    @Query("SELECT SUM(precio) FROM LineasPedido WHERE mesaId = :mesaId AND estado = 'P'")
+    fun getTotal(mesaId: Long): Double
+
+    @Query("UPDATE LineasPedido SET estado = 'C' WHERE mesaId = :mesaId AND estado = 'P'")
+    fun cobrarLineas(mesaId: Long)
 
 }

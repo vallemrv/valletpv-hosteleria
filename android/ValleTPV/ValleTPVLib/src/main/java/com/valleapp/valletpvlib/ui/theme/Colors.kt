@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 
 
 object ColorTheme {
+    val Background = Color(0xFFCDC4DA)
     val Primary = Color(0xFFD0B8D5)
     val BotonesAccion = Color(0xFFEBD0EC)
     val TextTitulos = Color.Black

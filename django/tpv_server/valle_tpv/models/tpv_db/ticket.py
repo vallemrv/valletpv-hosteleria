@@ -19,7 +19,7 @@ class Ticket(models.Model):
 
 
     @staticmethod
-    def cerrar_cuenta(idm, idc, entrega, art):
+    def cerrar_cuenta(idm, idc, entrega, ids):
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         total = 0
         numart = -1
@@ -38,31 +38,26 @@ class Ticket(models.Model):
             id = ticket.id
 
 
-            for l in art:
-                can = int(l["Can"])
-                reg = Lineaspedido.objects.filter(Q(infmesa__pk=uid) & Q(idart=l["IDArt"]) &  Q(precio=l["Precio"]) &
-                                                  Q(descripcion_t=l["descripcion_t"]) & (Q(estado="P")))[:can]
+            for pk in ids:
+                reg = Lineaspedido.objects.filter(pk=pk).first()
 
-                for r in reg:
-                    total = total + r.precio
-                    linea = Ticketlineas()
-                    linea.ticket_id = ticket.pk
-                    linea.linea_id = r.pk
-                    linea.save()
-                    r.estado = 'C'
-                    r.save()
-                    
-                    comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "cobrado", "precio": float(r.precio)})
+                total = total + reg.precio
+                linea = Ticketlineas()
+                linea.ticket_id = ticket.pk
+                linea.linea_id = reg.pk
+                linea.save()
+                reg.estado = 'C'
+                reg.save()
+                
+                comunicar_cambios_devices("delete", "lineaspedido", ids)
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
            
             if numart <= 0:
-                for l in Mesasabiertas.objects.filter(infmesa__pk=uid):
-                    s = l.serialize()
-                    s["abierta"] = 0
-                    s["num"] = 0
-                    comunicar_cambios_devices("md", "mesasabiertas", s)
-                    l.delete()
+                mesa.delete()
+                s = mesa.mesa.serialize()
+                comunicar_cambios_devices("update", "mesas", [s])
+              
       
 
         return (total, id)

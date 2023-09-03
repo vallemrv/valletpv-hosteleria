@@ -11,10 +11,9 @@ import com.valleapp.valletpvlib.routers.RoutersBase
 
 @Composable
 fun BaseSecreen(navController: NavController, content: @Composable (BindServiceModel) -> Unit) {
+
     val bindServiceModel: BindServiceModel = viewModel()
     val preferenciasModel: PreferenciasModel = viewModel()
-
-
 
     val isAuth = bindServiceModel.isAunthValid
     val mService = bindServiceModel.mService

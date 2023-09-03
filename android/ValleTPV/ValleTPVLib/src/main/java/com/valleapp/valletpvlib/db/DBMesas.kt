@@ -59,7 +59,7 @@ interface MesasDao: IBaseDao<Mesa> {
     fun abrirMesa(idm: Int)
 
     @Query("UPDATE mesas SET abierta=0, num=0 WHERE ID = :idm")
-    fun cerrarMesa(idm: Int)
+    fun cerrarMesa(idm: Long)
 
     @Query("UPDATE mesas SET num=1 WHERE ID = :id")
     fun marcarRojo(id: Int)

@@ -1,5 +1,5 @@
 from django.urls import path
-from valle_tpv import api as api_views
+from valle_tpv.api import api_sync as api_views
 
 urlpatterns  =[
     path("update_from_devices", api_views.update_from_devices, name="update_from_devices"),

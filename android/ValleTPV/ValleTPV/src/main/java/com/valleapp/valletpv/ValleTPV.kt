@@ -22,7 +22,6 @@ class ValleTPV : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        println("ValleTPV: onDestroy")
         val intent = Intent(this, ServiceCom::class.java)
         stopService(intent)
     }

@@ -12,6 +12,10 @@ import java.net.UnknownHostException
 
 
 object ApiEndPoints {
+    const val PEDIDOS_COBRAR = "cuenta/cobrar"
+    const val BORRAR_MESA = "cuenta/rm"
+    const val PRE_IMPRIMIR = "impresoras/preimprimir"
+    const val ABRIR_CAJON = "impresoras/abircajon"
     const val PEDIDOS_ADD = "pedidos/add"
     const val DISPOSITIVO_NUEVO = "dispositivos/new"
     const val CAMAREROS_ADD = "camareros/add"

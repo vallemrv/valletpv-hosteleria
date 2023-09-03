@@ -12,11 +12,12 @@ class Mesasabiertas(models.Model):
 
     @staticmethod
     def borrar_mesa_abierta(idm, idc, motivo):
-        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-        if mesa:
-            reg = mesa.infmesa.lineaspedido_set.filter((Q(estado="P") | 
+        mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        if mesa_abierta:
+            reg = mesa_abierta.infmesa.lineaspedido_set.filter((Q(estado="P") | 
                                                         Q(estado="M") | 
                                                         Q(estado="R")))
+            delete = []
             for r in reg:
                 historial = Historialnulos()
                 historial.lineapedido_id = r.pk
@@ -26,14 +27,17 @@ class Mesasabiertas(models.Model):
                 historial.save()
                 r.estado = 'A'
                 r.save()
-                comunicar_cambios_devices("rm", "lineaspedido", {"ID":r.id}, {"op": "borrado", "precio": float(r.precio)})
+                delete.append(r.id)
+               
+            if (len(delete) > 0):
+                comunicar_cambios_devices("delete", "lineaspedido", delete)
 
 
-            obj = mesa.serialize()
+            obj = mesa_abierta.mesa.serialize()
             obj["abierta"] = False
             obj["num"] = 0
-            comunicar_cambios_devices("md", "mesasabiertas", obj)
-            mesa.delete()
+            comunicar_cambios_devices("update", "mesas", [obj])
+            mesa_abierta.delete()
             
 
 
@@ -52,7 +56,7 @@ class Mesasabiertas(models.Model):
             elif mesaP:
                 mesaP.mesa_id = ids
                 mesaP.save()
-                comunicar_cambios_devices("md", "mesasabiertas", [mesaP.serialize(), {"ID":idp,"num":0, "abierta":0}])
+                comunicar_cambios_devices("updae", "mesas", [mesaP.serialize()])
            
 
     @staticmethod

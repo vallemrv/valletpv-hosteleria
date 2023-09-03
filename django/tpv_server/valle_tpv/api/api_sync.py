@@ -22,7 +22,10 @@ def sync_devices(request):
     
     Model = apps.get_model(app_name, model_name) # Reemplaza 'myapp' con el nombre de tu app
 
-    server_records = Model.objects.all()
+    if model_name == "lineaspedido":
+        server_records = Model.objects.filter(estado__in=["P", "M", "R"])
+    else:
+        server_records = Model.objects.all()
 
     response_data = {'update': [], 'delete': [], 'create': []}
 
@@ -31,7 +34,9 @@ def sync_devices(request):
  
     if model_name == "lineaspedido":
         print(len(client_records), len(server_records)  )
-                  # Comparar con los registros del servidor
+
+
+    # Comparar con los registros del servidor
     for rec in server_records:
         
         row = rec.serialize() if hasattr(rec, "serialize") else model_to_dict(rec)

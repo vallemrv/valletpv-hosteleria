@@ -1,4 +1,3 @@
-package com.valleapp.valletpvlib.models
 
 import android.app.Application
 import android.content.ComponentName
@@ -10,37 +9,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.valleapp.valletpvlib.interfaces.IServiceState
+import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.ServiceCom
-import kotlinx.coroutines.launch
 
-class BindServiceModel(private val app: Application) : AndroidViewModel(app), IServiceState {
+class MainModel(app: Application): AndroidViewModel(app) {
+    var serverConfig: ServerConfig by mutableStateOf(ServerConfig())
+    var mService: ServiceCom? by mutableStateOf(null)
+    var isAunthValid by mutableStateOf(true)
+}
+
+
+class ValleAplicacion : Application() {
 
 
     private var mBound = false
     private var connection: ServiceConnection? = null
-
-    var isAunthValid by mutableStateOf(true)
-
-    var mService: ServiceCom? by mutableStateOf(null)
+    lateinit var mainModel: MainModel
 
 
-    override fun invalidateAuth() {
-        isAunthValid = false
-        println("Auth invalido")
-    }
-
-
-    fun bindService() {
+    override fun onCreate() {
+        super.onCreate()
         if (connection == null) {
             connection = object : ServiceConnection {
                 override fun onServiceConnected(className: ComponentName, service: IBinder) {
                     val binder = service as ServiceCom.LocalBinder
                     mService = binder.getService()
-                    mService!!.setValidador(this@BindServiceModel)
                     mBound = true
-                    println("Servicio enlazado")
+
                 }
 
                 override fun onServiceDisconnected(arg0: ComponentName) {
@@ -50,8 +45,8 @@ class BindServiceModel(private val app: Application) : AndroidViewModel(app), IS
             }
         }
         if (!mBound) {
-            Intent(app.applicationContext, ServiceCom::class.java).also { intent ->
-                app.applicationContext.bindService(
+            Intent(this, ServiceCom::class.java).also { intent ->
+                this.bindService(
                     intent,
                     connection as ServiceConnection,
                     Context.BIND_AUTO_CREATE
@@ -60,22 +55,14 @@ class BindServiceModel(private val app: Application) : AndroidViewModel(app), IS
         }
     }
 
-    fun unbindService() {
+    override fun onTerminate() {
+        super.onTerminate()
         if (mBound) {
             mService?.let {
-                app.applicationContext.unbindService(connection!!)
+                this.unbindService(connection!!)
                 mBound = false
             }
             println("Servicio desenlazado")
         }
     }
-
-    fun abrirCajon() {
-        viewModelScope.launch { mService?.abrirCajon() }
-    }
-
-    fun preImprimir(mesaId: Long) {
-        viewModelScope.launch { mService?.preImprimir(mesaId) }
-    }
-
 }

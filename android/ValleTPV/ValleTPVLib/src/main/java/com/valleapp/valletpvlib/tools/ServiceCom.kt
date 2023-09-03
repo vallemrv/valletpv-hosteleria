@@ -85,9 +85,6 @@ class ServiceCom : Service(), IController {
             val tbName = o.getString("tb")
             val tb = getDB(tbName)
             if (tb == null) {
-                if (tbName == "mesasabiertas"){
-                    println(o.toString()    )
-                }
                 println("Tabla no encontrada: $tbName")
                 return
             }
@@ -135,7 +132,7 @@ class ServiceCom : Service(), IController {
                         if (result.errorMessage == ApiErrorMessages.UNAUTHORIZED) {
                             validador?.invalidateAuth()
                             break
-                        }else{
+                        } else {
                             println("Error: ${result.errorMessage}")
                         }
 
@@ -178,7 +175,6 @@ class ServiceCom : Service(), IController {
     private fun procesarDelete(delete: JSONArray, tb: IBaseDao<*>) {
         for (i in 0 until delete.length()) {
             val id = delete.getLong(i)
-            println("Borrando: $id")
             tb.deleteById(id)
         }
     }
@@ -252,5 +248,22 @@ class ServiceCom : Service(), IController {
         this.validador = validador
     }
 
+    suspend fun abrirCajon() {
+        safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.ABRIR_CAJON,
+                serverConfig?.getParams()
+            )
+        }
+    }
+
+    suspend fun preImprimir(mesaId: Long) {
+        safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.PRE_IMPRIMIR,
+                serverConfig?.getParams(mapOf("idm" to mesaId))
+            )
+        }
+    }
 
 }

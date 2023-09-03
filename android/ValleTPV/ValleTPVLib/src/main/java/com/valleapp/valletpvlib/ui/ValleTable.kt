@@ -113,14 +113,16 @@ fun TableroMesas(
 
 @Composable
 fun TecladoNumerico(
-    columns: Int = 3, onItemClick: (Int) -> Unit
+    columns: Int = 3, tipoCal: Boolean = false, onItemClick: (String) -> Unit
 ) {
+    var teclado = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
+    if (tipoCal) teclado = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "C")
     Box(modifier = Modifier.padding(4.dp)) {
         FixedGrid(
-            items = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9),
+            items = teclado,
             columnCount = columns
         ) {
-            onItemClick(it as Int)
+            onItemClick(it.toString())
         }
     }
 
@@ -134,10 +136,12 @@ fun TecladoArt(
     onItemClick: (Tecla) -> Unit
 ) {
     // Calculamos cuántas filas necesitaremos
-    val rowCount = rows  + if (rows % columns != 0) 1 else 0
+    val rowCount = rows + if (rows % columns != 0) 1 else 0
 
     Column(
-        modifier = Modifier.fillMaxHeight().padding(4.dp), // O cualquier otro modificador que necesites
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(4.dp), // O cualquier otro modificador que necesites
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         for (rowIndex in 0 until rowCount) {
@@ -157,7 +161,7 @@ fun TecladoArt(
                         ) {
                             BotonSimple(
                                 text = item.toString(),
-                                tag =item,
+                                tag = item,
                                 color = ColorTheme.hexToComposeColor(item.color),
                                 modifier = Modifier.fillMaxSize(),
                                 style = Styles.TextTeclas

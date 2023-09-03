@@ -28,9 +28,9 @@ class Pedidos(models.Model):
         p = Pedidos.objects.filter(uid_device=uid_device).first()
         if p: return None
         
-        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        mesaabierta = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
-        if not mesa:
+        if not mesaabierta:
             infmesa = Infmesa()
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
@@ -38,14 +38,14 @@ class Pedidos(models.Model):
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
             
-            mesa = Mesasabiertas()
-            mesa.mesa_id = idm
-            mesa.infmesa_id = infmesa.pk
-            mesa.save()
+            mesaabierta = Mesasabiertas()
+            mesaabierta.mesa_id = idm
+            mesaabierta.infmesa_id = infmesa.pk
+            mesaabierta.save()
            
 
         pedido = Pedidos()
-        pedido.infmesa_id = mesa.infmesa.pk
+        pedido.infmesa_id = mesaabierta.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
         pedido.uid_device = uid_device
@@ -53,7 +53,7 @@ class Pedidos(models.Model):
 
         for pd in lineas:
             linea = Lineaspedido()
-            linea.infmesa_id = mesa.infmesa.pk
+            linea.infmesa_id = mesaabierta.infmesa.pk
             linea.pedido_id = pedido.pk
             linea.descripcion = pd["descripcion"]
             linea.descripcion_t = pd["descripcionT"]
@@ -68,14 +68,19 @@ class Pedidos(models.Model):
         pedido.infmesa.save()   
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
-        comunicar_cambios_devices("md", "mesas", mesa.serialize())
+        comunicar_cambios_devices("update", "mesas", [mesaabierta.mesa.serialize()])
            
-        lineas = []
+        lineas_new = []
         for l in pedido.lineaspedido_set.all():
-            lineas.append(l.serialize())
+            lineas_new.append(l.serialize())
 
-        comunicar_cambios_devices("insert", "lineaspedido", lineas)
+        comunicar_cambios_devices("create", "lineaspedido", lineas_new)
 
+
+        ids = [l["id"] for l in lineas]
+        #del array de lineas, solo los ids
+        comunicar_cambios_devices("delete", "lineaspedido", ids)
+        print("agregar_nuevas_lineas", ids)
         return pedido
 
 
