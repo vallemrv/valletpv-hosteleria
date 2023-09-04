@@ -14,13 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.ui.ToastComposable
 import com.valleapp.valletpvlib.ui.ValleTopBar
 import com.valleapp.valletpvlib.ui.screens.CamarerosGrid
 
 @Composable
-fun CamarerosScreen(navController: NavController, bindServiceModel: BindServiceModel) {
+fun CamarerosScreen(navController: NavController) {
 
     val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -60,7 +59,7 @@ fun CamarerosScreen(navController: NavController, bindServiceModel: BindServiceM
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                CamarerosGrid(navController = navController, bindServiceModel, column = 4)
+                CamarerosGrid(navController = navController, column = 4)
                 ToastComposable(
                     message = "Queda ${3-count} pulsacines para salir",
                     show = showSnakbar,

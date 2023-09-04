@@ -4,5 +4,4 @@ sealed class Routers (val route: String) {
     object Arqueo: Routers("arqueo")
     object PaseCamareros : Routers("pasecamareros")
 
-
 }

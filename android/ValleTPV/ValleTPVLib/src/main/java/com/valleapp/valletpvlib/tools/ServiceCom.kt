@@ -138,6 +138,7 @@ class ServiceCom : Service(), IController {
 
                     }
 
+                    else -> {}
                 }
             }
         }
@@ -197,7 +198,7 @@ class ServiceCom : Service(), IController {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun setServerConfig(serverConfig: ServerConfig) {
+    fun runSync(serverConfig: ServerConfig, v: IServiceState) {
         if (this.serverConfig?.uid != serverConfig.uid) {
             this.serverConfig = serverConfig
             ApiRequest.init(serverConfig.getParseUrl())
@@ -210,15 +211,13 @@ class ServiceCom : Service(), IController {
                 wsClient = WSClient(wsUrl, "comunicacion/devices", controller)
                 wsClient?.connect()
 
-                procesarCola.procesarCola(validador as IServiceState)
+                validador = v
+                procesarCola.procesarCola(v)
             }
             println("Arrancando Procesos de cola y WSClient")
         }
     }
 
-    fun getUrl(endPoint: String?): String {
-        return serverConfig?.getUrlBase() + endPoint
-    }
 
     fun getDB(tbName: String): IBaseDao<*>? {
         return when (tbName) {
@@ -244,9 +243,6 @@ class ServiceCom : Service(), IController {
         return serverConfig?.getParams(params) ?: mapOf()
     }
 
-    fun setValidador(validador: IServiceState) {
-        this.validador = validador
-    }
 
     suspend fun abrirCajon() {
         safeApiCall {

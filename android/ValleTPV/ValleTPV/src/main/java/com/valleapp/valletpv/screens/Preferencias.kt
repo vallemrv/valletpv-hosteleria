@@ -19,10 +19,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -30,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.valleapp.valletpvlib.models.BindServiceModel
+import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.models.PreferenciasModel
 import com.valleapp.valletpvlib.ui.BotonSimple
 import com.valleapp.valletpvlib.ui.ToastComposable
@@ -42,7 +41,6 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 @Composable
 fun Preferencias(
     navController: NavController,
-    bindServiceModel: BindServiceModel,
     message: String = "Preferecias cargadas con exito"
 ) {
     Scaffold(
@@ -56,7 +54,7 @@ fun Preferencias(
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                PreferenciasScreen(bindServiceModel, message = message)
+                 PreferenciasScreen(message = message)
             }
         }
     )
@@ -64,16 +62,11 @@ fun Preferencias(
 }
 
 @Composable
-fun PreferenciasScreen(bindServiceModel: BindServiceModel, message: String) {
+fun PreferenciasScreen(message: String) {
+    val app = LocalContext.current.applicationContext as ValleApp
+    val mainModel = app.mainModel
 
-    val vModel: PreferenciasModel = viewModel()
-    val prefenciasCargadas = rememberUpdatedState(vModel.preferenciasCargadas)
-
-
-    LaunchedEffect(prefenciasCargadas) {
-        bindServiceModel.isAunthValid = prefenciasCargadas.value
-        if (message.isNotEmpty()) vModel.mostrarMessage(message)
-    }
+    val vModel: PreferenciasModel = viewModel(initializer = { PreferenciasModel(mainModel, message) } )
 
     Column(
         modifier = Modifier

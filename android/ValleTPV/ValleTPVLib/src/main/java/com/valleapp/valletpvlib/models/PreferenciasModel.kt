@@ -1,26 +1,18 @@
 package com.valleapp.valletpvlib.models
 
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.ApiRequest
 import com.valleapp.valletpvlib.tools.ApiResponse
-import com.valleapp.valletpvlib.tools.JSON
-import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.safeApiCall
 import kotlinx.coroutines.launch
 
-class PreferenciasModel(
-    private val app: Application,
-) : AndroidViewModel(app) {
-
-
-    var serverConfig: ServerConfig by mutableStateOf(ServerConfig())
+class PreferenciasModel(private val mainModel: MainModel, message: String): ViewModel() {
 
     var url by mutableStateOf("")
     var codigo by mutableStateOf("")
@@ -30,33 +22,17 @@ class PreferenciasModel(
 
     var isCardVisible by mutableStateOf(false)
 
-    var preferenciasCargadas by mutableStateOf(false)
 
-
-    init {
-        println("PreferenciasModel init")
-        if (!preferenciasCargadas) {
-            JSON.deserializar("preferencias.dat", app.applicationContext)?.let {
-                if (it.has("url")) {
-                    url = it.getString("url")
-                    serverConfig.url = url
-                }
-                if (it.has("codigo")) {
-                    codigo = it.getString("codigo")
-                    serverConfig.codigo = codigo
-                }
-                if (it.has("UID")) {
-                    serverConfig.uid = it.getString("UID")
-                }
-                preferenciasCargadas = !serverConfig.isEmpty()
-                isCardVisible = preferenciasCargadas
-                if (!preferenciasCargadas) message = "Error al cargar preferencias"
-                showMessage = true
-            }
+   init {
+       mostrarMessage(message)
+        if (mainModel.isPreferenciasCargadas) {
+            url = mainModel.getUrl(null)
+            codigo = mainModel.getCodigo().toString()
+            isCardVisible = true
         }
     }
 
-    fun mostrarMessage(msg: String) {
+    private fun mostrarMessage(msg: String) {
         showMessage = true
         message = msg
     }
@@ -65,10 +41,7 @@ class PreferenciasModel(
     fun onOkClick() {
         if (url.isNotEmpty()) {
             codigo = ""
-            serverConfig.url = url
-            preferenciasCargadas = false
-
-            ApiRequest.init(serverConfig.getParseUrl())
+            mainModel.setUrl(url)
 
             viewModelScope.launch {
                 val result = safeApiCall {
@@ -76,18 +49,13 @@ class PreferenciasModel(
                 }
                 when (result) {
                     is ApiResponse.Success -> {
-                        serverConfig.loadJSON(result.data)
-                        serverConfig.toJson()?.let {
-                            JSON.serializar("preferencias.dat", it, app.applicationContext)
-                        }
+                        mainModel.loadJSON(result.data)
                         isCardVisible = true
-
                         mostrarMessage("Dispisitivo registrado correctamente, compruebe codigo.")
                     }
 
                     is ApiResponse.Error -> {
                         mostrarMessage(result.errorMessage.toString())
-
                     }
 
                 }
@@ -97,14 +65,10 @@ class PreferenciasModel(
     }
 
     fun onValidarClick() {
-        if (!serverConfig.isEmpty() && serverConfig.isEqualsCode(codigo)) {
-            serverConfig.toJson()?.let {
-                JSON.serializar("preferencias.dat", it, app.applicationContext)
-                mostrarMessage("Preferencias guardadas correctamente")
-                preferenciasCargadas = true
-            } ?: run {
-                mostrarMessage("Error al guardar preferencias")
-            }
+        if (mainModel.validarCodigo(codigo)) {
+            mainModel.guardarPreferencias()
+            isCardVisible = false
+            mostrarMessage("Preferencias guardadas correctamente")
         } else {
             mostrarMessage("Codigo inválido")
             codigo = ""

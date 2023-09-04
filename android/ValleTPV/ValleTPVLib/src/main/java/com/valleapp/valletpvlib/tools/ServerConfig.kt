@@ -54,10 +54,6 @@ data class ServerConfig(
         else null
     }
 
-    fun isEqualsCode(c: String): Boolean {
-        return codigo == c
-    }
-
     fun getWSUrl(): String {
         var newUrl = url?: ""
         newUrl = if (newUrl.contains("/api")) newUrl.substring(0, newUrl.indexOf("/api"))

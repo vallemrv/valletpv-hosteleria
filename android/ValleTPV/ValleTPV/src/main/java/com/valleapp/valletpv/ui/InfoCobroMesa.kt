@@ -11,10 +11,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -23,23 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import com.valleapp.valletpv.models.ModelCobros
 import kotlinx.coroutines.delay
-
-
-class ModelCobros : ViewModel() {
-    var total: Double by mutableDoubleStateOf(0.0)
-    var entregado: Double by mutableDoubleStateOf(0.0)
-    var cambio: Double by mutableDoubleStateOf(0.0)
-    var showMostrarInfo by mutableStateOf(false)
-
-    fun mostrarInfo(total: Double, entregado: Double, cambio: Double) {
-        showMostrarInfo = true
-        this.entregado = entregado
-        this.cambio = cambio
-        this.total = total
-    }
-}
 
 
 @Composable

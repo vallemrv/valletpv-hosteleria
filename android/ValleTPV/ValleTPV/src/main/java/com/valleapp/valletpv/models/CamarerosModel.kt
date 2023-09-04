@@ -8,26 +8,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
+import com.valleapp.valletpvlib.models.MainModel
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
-import com.valleapp.valletpvlib.tools.ServiceCom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class CamarerosModel() : ViewModel() {
+class CamarerosModel(val mainModel: MainModel) : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
-    var mService: ServiceCom? by mutableStateOf(null)
-    var db: CamareroDao? by mutableStateOf(null)
+
+    var db: CamareroDao = mainModel.getDB("camareros") as CamareroDao
 
     fun addCamarero(camarero: Camarero) {
         viewModelScope.launch(Dispatchers.IO) {
             val inst = Instrucciones(
-                params = mService?.getParamsServer(mapOf("nombre" to camarero.nombre, "apellido" to camarero.nombre)),
+                params = mainModel.getParams(mapOf("nombre" to camarero.nombre, "apellido" to camarero.nombre)),
                 endPoint = ApiEndPoints.CAMAREROS_ADD,
             )
-            mService?.addInstruccion(inst)
+            mainModel.addInstruccion(inst)
             db?.insertCamarero(camarero)
         }
     }
@@ -35,21 +35,13 @@ class CamarerosModel() : ViewModel() {
     fun setAutorizado(id: Long, b: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             val inst = Instrucciones(
-                params = mService?.getParamsServer(mapOf("autorizado" to b, "id" to id)),
+                params = mainModel.getParams(mapOf("autorizado" to b, "id" to id)),
                 endPoint = ApiEndPoints.CAMAREROS_SET_AUTORIZADO
             )
-            mService?.addInstruccion(inst)
+            mainModel.addInstruccion(inst)
             db?.setAutorizado(id, b)
         }
     }
-
-    fun setService(mService: ServiceCom?) {
-        if (mService != null) {
-            this.mService = mService
-            db = mService.getDB("camareros") as CamareroDao
-        }
-    }
-
 
 }
 

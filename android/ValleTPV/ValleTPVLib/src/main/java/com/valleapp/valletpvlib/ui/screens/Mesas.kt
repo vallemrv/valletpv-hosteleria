@@ -13,20 +13,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.AccionMesa
 import com.valleapp.valletpvlib.db.Mesa
-import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.db.Zona
-import com.valleapp.valletpvlib.db.ZonasDao
-import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.models.MesasModel
 import com.valleapp.valletpvlib.routers.RoutersBase
 import com.valleapp.valletpvlib.ui.BotonSimple
@@ -38,30 +35,26 @@ import com.valleapp.valletpvlib.ui.theme.ColorTheme
 @Composable
 fun MesasGrid(
     navController: NavController,
-    bindServiceModel: BindServiceModel,
     camId: Long,
     columnMesas: Int,
     landScape: Boolean
 ) {
+    val app = LocalContext.current.applicationContext as ValleApp
+    val mainModel = app.mainModel
 
-    val model: MesasModel = viewModel()
-
-
-    model.mService = bindServiceModel.mService
-    model.db = model.mService?.getDB("mesas") as? MesasDao
-    model.dbZona = model.mService?.getDB("zonas") as? ZonasDao
+    val model: MesasModel = viewModel( initializer = { MesasModel(mainModel)})
 
 
-    val listaZonas by model.dbZona?.getListaLive()?.observeAsState(initial = listOf())
-        ?: remember { mutableStateOf(listOf()) }
+    val listaZonas by model.dbZona.getListaLive().observeAsState(initial = listOf())
+
 
     val zona = listaZonas.firstOrNull()
     if (zona != null && model.idZona <= 0) {
         model.idZona = zona.id
     }
 
-    val listaMesas by model.db?.getAllByZona(model.idZona)?.observeAsState(initial = listOf())
-        ?: remember { mutableStateOf(listOf()) }
+    val listaMesas by model.db.getAllByZona(model.idZona).observeAsState(initial = listOf())
+
 
     if (landScape) {
         LandScapeGrid(

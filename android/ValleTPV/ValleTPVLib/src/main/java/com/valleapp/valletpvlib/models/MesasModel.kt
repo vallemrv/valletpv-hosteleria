@@ -17,7 +17,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class MesasModel : ViewModel() {
+class MesasModel(mainModel: MainModel) : ViewModel() {
+
+    var db: MesasDao
+    var dbZona: ZonasDao
+
+    var titulo: String by mutableStateOf("Mesas")
+    var mesaOrg: Mesa? by mutableStateOf(null)
+    var idZona: Long by mutableLongStateOf(-1)
+    var accionMesa: AccionMesa by mutableStateOf(AccionMesa.NADA)
+
+    init {
+        db = mainModel.getDB("mesas") as MesasDao
+        dbZona = mainModel.getDB("zonas") as ZonasDao
+    }
 
     fun moverMesa(mesa: Mesa) {
         mesaOrg = mesa
@@ -85,12 +98,7 @@ class MesasModel : ViewModel() {
         mesaOrg = null
     }
 
-    var titulo: String by mutableStateOf("Mesas")
-    var mesaOrg: Mesa? by mutableStateOf(null)
-    var idZona: Long by mutableLongStateOf(0)
-    var accionMesa: AccionMesa by mutableStateOf(AccionMesa.NADA)
-    var mService: ServiceCom? by mutableStateOf(null)
-    var db: MesasDao? by mutableStateOf(null)
-    var dbZona: ZonasDao? by mutableStateOf(null)
+
+
 
 }

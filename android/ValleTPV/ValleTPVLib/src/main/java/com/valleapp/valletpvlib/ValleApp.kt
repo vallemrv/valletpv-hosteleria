@@ -1,3 +1,4 @@
+package com.valleapp.valletpvlib
 
 import android.app.Application
 import android.content.ComponentName
@@ -5,80 +6,30 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
-import com.valleapp.valletpvlib.tools.JSON
-import com.valleapp.valletpvlib.tools.ServerConfig
+import com.valleapp.valletpvlib.models.MainModel
 import com.valleapp.valletpvlib.tools.ServiceCom
 
-class MainModel(private val app: Application): AndroidViewModel(app) {
-    var serverConfig: ServerConfig by mutableStateOf(ServerConfig())
-    var mService: ServiceCom? by mutableStateOf(null)
-    var isAunthValid by mutableStateOf(true)
 
-    var isPreferenciasCargadas by mutableStateOf(false)
-
-
-    fun invalidateAuth() {
-        isAunthValid = false
-        println("Auth invalido")
-    }
-
-    fun cargarPreferencias() {
-        serverConfig = ServerConfig()
-        if (!isPreferenciasCargadas) {
-            JSON.deserializar("preferencias.dat", app.applicationContext)?.let {
-                if (it.has("url")) {
-                     serverConfig.url = it.getString("url")
-                }
-                if (it.has("codigo")) {
-                    serverConfig.codigo = it.getString("codigo")
-                }
-                if (it.has("UID")) {
-                    serverConfig.uid = it.getString("UID")
-                }
-                isPreferenciasCargadas = !serverConfig.isEmpty()
-            }
-        }
-    }
-
-    fun guardarPreferencias() {
-        serverConfig.toJson().let {
-            if (it != null) {
-                JSON.serializar("preferencias.dat", it, app.applicationContext)
-            }
-        }
-    }
-
-
-    fun carg
-}
-
-
-class ValleAplicacion : Application() {
+class ValleApp : Application() {
 
 
     private var mBound = false
     private var connection: ServiceConnection = object : ServiceConnection {
-            override fun onServiceConnected(className: ComponentName, service: IBinder) {
-                val binder = service as ServiceCom.LocalBinder
-                mService = binder.getService()
-                mainModel.mService = mService
-                mBound = true
-            }
-
-            override fun onServiceDisconnected(arg0: ComponentName) {
-                println("Servicio desenlazado")
-                mBound = false
-            }
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as ServiceCom.LocalBinder
+            mainModel.setService(binder.getService())
+            mainModel.cargarPreferencias()
+            mBound = true
         }
 
-    private var mService: ServiceCom? = null
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            println("Servicio desenlazado")
+            mBound = false
+        }
+    }
+
 
     val mainModel: MainModel = MainModel(this)
-
 
     override fun onCreate() {
         super.onCreate()
@@ -93,14 +44,28 @@ class ValleAplicacion : Application() {
         }
     }
 
+
     override fun onTerminate() {
         super.onTerminate()
         if (mBound) {
-            mService?.let {
-                this.unbindService(connection)
-                mBound = false
-            }
+            unbindService(connection)
             println("Servicio desenlazado")
         }
     }
+
+    fun exit() {
+        if (mBound) {
+            this.unbindService(connection)
+            mBound = false
+        }
+        val intent = Intent(this, ServiceCom::class.java)
+        stopService(intent)
+
+        Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(this)
+        }
+    }
+
 }

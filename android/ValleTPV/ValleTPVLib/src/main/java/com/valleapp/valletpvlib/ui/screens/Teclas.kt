@@ -2,9 +2,13 @@ package com.valleapp.valletpvlib.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.TeclasDao
-import com.valleapp.valletpvlib.models.BindServiceModel
 import com.valleapp.valletpvlib.models.CuentaModel
 import com.valleapp.valletpvlib.models.TeclasModel
 import com.valleapp.valletpvlib.ui.TecladoArt
@@ -12,17 +16,21 @@ import com.valleapp.valletpvlib.ui.TecladoArt
 
 @Composable
 fun TeclasGrid(
-    bindServiceModel: BindServiceModel,
     columns: Int,
     rows: Int,
 ) {
+    val app = LocalContext.current.applicationContext as ValleApp
+    val mainModel = app.mainModel
 
     val cuentaModel: CuentaModel = viewModel()
-    val mService = bindServiceModel.mService
-    val db = mService?.getDB("teclas") as? TeclasDao
+    val db = mainModel.getDB("teclas") as? TeclasDao
     if (db != null) {
         val model: TeclasModel = viewModel(initializer = { TeclasModel(db) })
-        model.tarifa = cuentaModel.mesa?.tarifa ?: 1
+        val tarifa by  cuentaModel.tarifa.collectAsState()
+
+        LaunchedEffect(tarifa){
+            model.tarifa = tarifa
+        }
 
         Box {
             TecladoArt(

@@ -90,7 +90,7 @@ fun CamarerosPaseScreen(navController: NavController) {
         },
         content = {
             Box(modifier = Modifier.padding(it)) {
-                CamarerosSelPase(
+                CamarerosPase(
                     vModel = vModel,
                     navController = navController
                 ) {
@@ -109,7 +109,7 @@ fun CamarerosPaseScreen(navController: NavController) {
 
 
 @Composable
-fun CamarerosSelPase(
+fun CamarerosPase(
     vModel: CamarerosModel,
     navController: NavController,
     onSalir: () -> Unit
