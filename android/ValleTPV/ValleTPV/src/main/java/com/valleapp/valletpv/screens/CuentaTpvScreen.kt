@@ -20,11 +20,14 @@ import androidx.navigation.NavController
 import com.valleapp.valletpv.models.ModelCobros
 import com.valleapp.valletpv.ui.CobrarMesaDialog
 import com.valleapp.valletpvlib.ValleApp
+import com.valleapp.valletpvlib.db.TeclasDao
 import com.valleapp.valletpvlib.models.CuentaModel
+import com.valleapp.valletpvlib.models.TeclasModel
 import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.ListaCuenta
 import com.valleapp.valletpvlib.ui.TecladoNumerico
 import com.valleapp.valletpvlib.ui.ValleTopBar
+import com.valleapp.valletpvlib.ui.screens.SearchView
 import com.valleapp.valletpvlib.ui.screens.Secciones
 import com.valleapp.valletpvlib.ui.screens.TeclasGrid
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
@@ -41,12 +44,12 @@ fun CuentaTpvScreen(
     val app = LocalContext.current.applicationContext as ValleApp
     val mainModel = app.mainModel
 
+    val modelMesas: TeclasModel = viewModel(initializer = { TeclasModel(mainModel.getDB("teclas") as TeclasDao) })
     val model: CuentaModel = viewModel(initializer = { CuentaModel(mainModel, camId, mesaId) })
     val titulo by model.titulo.collectAsState()
 
     var showCobrarDialog by remember { mutableStateOf(false) }
-
-
+    val tarifa by model.tarifa.collectAsState()
 
     DisposableEffect(Unit) {
         onDispose {
@@ -61,7 +64,6 @@ fun CuentaTpvScreen(
         ValleTopBar(title = titulo , subtitle = model.subtitulo, backAction = {
             navController.popBackStack()
         }, actions = {
-
             BotonAccion(icon = ExtendIcons.DividirCuenta, contentDescription = "Dividir cuenta") {
 
             }
@@ -95,12 +97,17 @@ fun CuentaTpvScreen(
                 }
                 //Teclado
                 Box(modifier = Modifier.weight(0.5f)) {
-                    TeclasGrid(3, 6)
+                    TeclasGrid(3, 6, tarifa){ lineaPedido ->
+                        model.addLinea(lineaPedido)
+                        model.cantidad = 1
+                    }
                 }
 
                 //Secciones
                 Box(modifier = Modifier.weight(0.1f)) {
-                    Secciones()
+                    Secciones(){
+
+                    }
                 }
             }
             if (showCobrarDialog) {
@@ -115,6 +122,15 @@ fun CuentaTpvScreen(
 
         }
     })
+
+    SearchView(modelMesas.showSearch) {
+        if (it.isEmpty()){
+            modelMesas.cargarTeclasBySeccion(modelMesas.getSeccionId())
+            modelMesas.showSearch = false
+        }else {
+            modelMesas.cargarTeclasByStr(it)
+        }
+    }
 
 }
 

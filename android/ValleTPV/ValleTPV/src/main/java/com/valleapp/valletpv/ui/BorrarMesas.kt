@@ -16,8 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.valleapp.valletpvlib.ui.BotonIcon
 import com.valleapp.valletpvlib.ui.BotonSimple
@@ -36,15 +37,23 @@ fun BorrarMesa(onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
                     .padding(16.dp)
                     .height(250.dp)
             ) {
-                Text("Borrar mesa", modifier = Modifier.padding(bottom = 16.dp), style = Styles.TextTitulos)
-                Row(modifier = Modifier.height(70.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Borrar mesa",
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    style = Styles.TextTitulos
+                )
+                Row(
+                    modifier = Modifier.height(70.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     TextField(
                         value = reason,
                         onValueChange = { reason = it },
+                        textStyle = TextStyle(fontSize = 35.sp),
                         label = { Text("Motivo") },
-                        modifier = Modifier.weight(0.8f)
+                        modifier = Modifier.weight(0.8f),
+
                     )
                     Spacer(modifier = Modifier.weight(0.05f))
                     BotonIcon(
@@ -80,14 +89,8 @@ fun PreselectButton(text: String, onClick: () -> Unit) {
         text = text,
         color = ColorTheme.Primary,
         style = Styles.TextTeclas,
-    ){
+    ) {
         onClick()
     }
 }
 
-
-@Composable
-@Preview
-fun BorrarMesaPreview() {
-    BorrarMesa(onDismissRequest = { /*TODO*/ }, onSubmit = { /*TODO*/ })
-}

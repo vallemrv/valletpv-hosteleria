@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
 
 
+
     private var seccionId: Int = -1
     private var strBus: String = ""
     private var teclas = ArrayList<Tecla>()
@@ -21,6 +22,7 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
 
     var tarifa: Int by mutableStateOf(1)
     var listaTeclas: List<Tecla> by mutableStateOf(listOf())
+    var showSearch: Boolean by mutableStateOf(false)
 
     fun getSeccionId(): Int {
         return seccionId
@@ -40,7 +42,7 @@ class TeclasModel(private val teclasDao: TeclasDao) : ViewModel() {
         }
     }
 
-    fun cargarTeclasByBusqueda(busqueda: String) {
+    fun cargarTeclasByStr(busqueda: String) {
         strBus = busqueda
         viewModelScope.launch(Dispatchers.IO) {
             listaTeclas = teclasDao.getByBusqueda(strBus)

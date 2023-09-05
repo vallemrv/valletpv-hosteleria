@@ -84,15 +84,19 @@ fun MesasTpvScreen(
                 BorrarMesa(
                     onDismissRequest = { model.cancelar() },
                     onSubmit = { motivo ->
-                        model.ejecutarAccion(
-                            motivo = motivo,
-                            camId = camId,
-                        )
+                        if (motivo.isNotEmpty()) {
+                            model.ejecutarAccion(
+                                motivo = motivo,
+                                camId = camId,
+                            )
+                        }
                     })
             }
-            PaseCamarerosDialog(camarerosModel, showDialogSelPas) {
-                showDialogSelPas = false
-            }
+
         }
+    }
+
+    PaseCamarerosDialog(camarerosModel, showDialogSelPas) {
+        showDialogSelPas = false
     }
 }

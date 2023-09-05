@@ -78,9 +78,8 @@ class Pedidos(models.Model):
 
 
         ids = [l["id"] for l in lineas]
-        #del array de lineas, solo los ids
+        #delete array de lineas, solo los ids
         comunicar_cambios_devices("delete", "lineaspedido", ids)
-        print("agregar_nuevas_lineas", ids)
         return pedido
 
 

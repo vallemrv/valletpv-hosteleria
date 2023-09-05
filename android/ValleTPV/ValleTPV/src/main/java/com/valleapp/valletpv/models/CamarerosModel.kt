@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class CamarerosModel(val mainModel: MainModel) : ViewModel() {
+class CamarerosModel(private val mainModel: MainModel) : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
 
