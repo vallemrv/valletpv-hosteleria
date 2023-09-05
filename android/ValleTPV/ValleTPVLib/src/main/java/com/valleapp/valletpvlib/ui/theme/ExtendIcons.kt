@@ -6,6 +6,7 @@ import com.valleapp.valletpvlib.R
 
 object ExtendIcons {
 
+    val ImprimirFactura @Composable get() = painterResource(id = R.drawable.imprimir_factura)
     val Cobrar @Composable get() = painterResource(id = R.drawable.cobrar)
     val Reset @Composable get() = painterResource(id = R.drawable.reset)
     val Lupa @Composable get() = painterResource(id = R.drawable.lupa)
@@ -15,9 +16,9 @@ object ExtendIcons {
     val AddCamareros @Composable get() = painterResource(id = R.drawable.add_camareros)
     val Check @Composable get() = painterResource(id = R.drawable.check)
     val Salir @Composable get() = painterResource(id = R.drawable.salir)
-    val JuntarMesas @Composable get() = painterResource(id = R.drawable.juntarmesas)
+    val JuntarMesas @Composable get() = painterResource(id = R.drawable.juntar_mesas)
     val DividirCuenta @Composable get() = painterResource(id = R.drawable.separar_ticket)
-    val JuntarMesa @Composable get() = painterResource(id = R.drawable.juntarmesas)
+    val JuntarMesa @Composable get() = painterResource(id = R.drawable.juntar_mesas)
     val AbrirCaja @Composable get() = painterResource(id = R.drawable.open_cash)
     val Borrar @Composable get() = painterResource(id = R.drawable.papelera)
     val Configuration @Composable get() = painterResource(id = R.drawable.configuracion)

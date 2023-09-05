@@ -32,9 +32,6 @@ def sync_devices(request):
     # Diccionario de registros del cliente para facilitar la búsqueda por ID
     client_dict = {rec['id']: rec for rec in client_records}
  
-    if model_name == "lineaspedido":
-        print(len(client_records), len(server_records)  )
-
 
     # Comparar con los registros del servidor
     for rec in server_records:

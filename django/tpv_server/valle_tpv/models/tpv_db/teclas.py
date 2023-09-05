@@ -6,6 +6,7 @@ class Receptores(models.Model):
     nombre = models.CharField(max_length=40) 
     activo = models.BooleanField( default=True) 
     descripcion = models.CharField(max_length=200, default="") 
+    isTicket = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.nombre + ' ' +self.descripcion

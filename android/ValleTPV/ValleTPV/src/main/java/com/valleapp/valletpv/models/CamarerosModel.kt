@@ -19,7 +19,7 @@ class CamarerosModel(private val mainModel: MainModel) : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
 
-    var db: CamareroDao = mainModel.getDB("camareros") as CamareroDao
+    var db: CamareroDao by mutableStateOf( mainModel.getDB("camareros") as CamareroDao)
 
     fun addCamarero(camarero: Camarero) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -28,7 +28,7 @@ class CamarerosModel(private val mainModel: MainModel) : ViewModel() {
                 endPoint = ApiEndPoints.CAMAREROS_ADD,
             )
             mainModel.addInstruccion(inst)
-            db?.insertCamarero(camarero)
+            db.insertCamarero(camarero)
         }
     }
 
@@ -39,7 +39,7 @@ class CamarerosModel(private val mainModel: MainModel) : ViewModel() {
                 endPoint = ApiEndPoints.CAMAREROS_SET_AUTORIZADO
             )
             mainModel.addInstruccion(inst)
-            db?.setAutorizado(id, b)
+            db.setAutorizado(id, b)
         }
     }
 

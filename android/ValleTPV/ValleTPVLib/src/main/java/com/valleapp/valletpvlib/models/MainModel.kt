@@ -11,12 +11,14 @@ import com.valleapp.valletpvlib.interfaces.IServiceState
 import com.valleapp.valletpvlib.tools.ApiRequest
 import com.valleapp.valletpvlib.tools.Instrucciones
 import com.valleapp.valletpvlib.tools.JSON
+import com.valleapp.valletpvlib.tools.LineasTicket
 import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.ServiceCom
+import com.valleapp.valletpvlib.tools.Ticket
 import kotlinx.coroutines.launch
 
 
-class MainModel(private val app: Application): AndroidViewModel(app), IServiceState {
+class MainModel(private val app: Application) : AndroidViewModel(app), IServiceState {
 
     private var serverConfig: ServerConfig = ServerConfig()
     private var mService: ServiceCom? by mutableStateOf(null)
@@ -31,7 +33,7 @@ class MainModel(private val app: Application): AndroidViewModel(app), IServiceSt
     }
 
     fun cargarPreferencias() {
-         if (!isPreferenciasCargadas) {
+        if (!isPreferenciasCargadas) {
             JSON.deserializar("preferencias.dat", app.applicationContext)?.let {
                 if (it.has("url")) {
                     serverConfig.url = it.getString("url")
@@ -73,7 +75,7 @@ class MainModel(private val app: Application): AndroidViewModel(app), IServiceSt
     }
 
     fun validarCodigo(codigo: String): Boolean {
-         return codigo == serverConfig.codigo
+        return codigo == serverConfig.codigo
     }
 
     fun getParams(mapOf: Map<String, Any>): Map<String, String> {
@@ -109,6 +111,29 @@ class MainModel(private val app: Application): AndroidViewModel(app), IServiceSt
     fun abrirCajon() {
         viewModelScope.launch {
             mService?.abrirCajon()
+        }
+    }
+
+    suspend fun getLineasTicket(id: Long): List<LineasTicket> {
+        return mService?.getLineasTicket(id) ?: listOf()
+    }
+
+
+    suspend fun getListaTicket(offset: Int): List<Ticket> {
+        return mService?.getListaTicket(offset) ?: listOf()
+    }
+
+    fun imprimirTicket(selectedTicket: Ticket?) {
+        viewModelScope.launch {
+            if (selectedTicket != null)
+                mService?.imprimirTicket(selectedTicket.id)
+        }
+    }
+
+    fun imprimirFactura(selectedTicket: Ticket?) {
+        viewModelScope.launch {
+            if (selectedTicket != null)
+                mService?.imprimirFactura(selectedTicket.id)
         }
     }
 

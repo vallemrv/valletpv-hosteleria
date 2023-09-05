@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,8 +43,9 @@ fun BotonAccion(
 ) {
     BotonIcon(
         modifier = Modifier
-            .padding(2.dp)
-            .size(60.dp),
+            .padding(3.dp)
+            .fillMaxHeight(.65f)
+            .aspectRatio(1f),
         icon = icon,
         color = ColorTheme.BotonesAccion,
         contentDescription = contentDescription

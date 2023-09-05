@@ -12,6 +12,10 @@ import java.net.UnknownHostException
 
 
 object ApiEndPoints {
+    const val IMPRIMIR_FACTURA = "impresoras/imprimir_factura"
+    const val IMPRIMIR_TICKET = "impresoras/imprimir_ticket"
+    const val GET_LINEAS_TICKET = "tickets/lineas"
+    const val GET_LISTA_TICKET = "tickets/lista"
     const val PEDIDOS_COBRAR = "cuenta/cobrar"
     const val BORRAR_MESA = "cuenta/rm"
     const val PRE_IMPRIMIR = "impresoras/preimprimir"
@@ -83,6 +87,7 @@ suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>): ApiResponse<
             }
         }
     } catch (e: Exception) {
+        println(e.printStackTrace())
         when (e) {
             is UnknownHostException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)
             is ConnectException -> ApiResponse.Error(ApiErrorMessages.NO_CONNECTION)

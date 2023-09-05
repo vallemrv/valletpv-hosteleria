@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.ui.BorrarMesa
+import com.valleapp.valletpv.ui.ListadoTicket
 import com.valleapp.valletpv.ui.PaseCamarerosDialog
 import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.AccionMesa
@@ -34,6 +35,9 @@ fun MesasTpvScreen(
     val model: MesasModel = viewModel(initializer = { MesasModel(mainModel) })
     val camarerosModel: CamarerosModel = viewModel(initializer = { CamarerosModel(mainModel) })
     var showDialogSelPas by remember {
+        mutableStateOf(false)
+    }
+    var showListaTicket by remember {
         mutableStateOf(false)
     }
 
@@ -58,8 +62,8 @@ fun MesasTpvScreen(
 
                     BotonAccion(
                         ExtendIcons.Listado,
-                        "Camareros",
-                        onClick = { })
+                        "Lista de tickets",
+                        onClick = {  showListaTicket = true})
 
                     BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
                         mainModel.abrirCajon()
@@ -98,5 +102,9 @@ fun MesasTpvScreen(
 
     PaseCamarerosDialog(camarerosModel, showDialogSelPas) {
         showDialogSelPas = false
+    }
+
+    ListadoTicket(mainModel, showListaTicket){
+        showListaTicket = false
     }
 }

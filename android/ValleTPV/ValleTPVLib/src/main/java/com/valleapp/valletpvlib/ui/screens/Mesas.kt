@@ -55,7 +55,6 @@ fun MesasGrid(
 
     val listaMesas by model.db.getAllByZona(model.idZona).observeAsState(initial = listOf())
 
-
     if (landScape) {
         LandScapeGrid(
             navController = navController,

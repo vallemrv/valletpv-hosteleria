@@ -18,5 +18,6 @@ urlpatterns = [
     path("pedidos/", include("valle_tpv.urls.api_urls.pedidos"), name="api_android_pedidos"),
     path("impresoras/", include("valle_tpv.urls.api_urls.impresion"), name="api_android_impresoras"),
     path("cuenta/", include("valle_tpv.urls.api_urls.cuenta"), name="api_android_cuenta"),
+    path("tickets/", include("valle_tpv.urls.api_urls.ticket"), name="api_android_tickets"),
 ]
 

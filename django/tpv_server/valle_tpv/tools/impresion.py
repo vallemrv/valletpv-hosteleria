@@ -48,19 +48,27 @@ def send_imprimir_ticket(request, id, es_factura=False):
 
 
 def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, request):
+    receptor = Receptores.objects.filter(isTicket=True).first()
+    if not receptor:
+        receptor_activo = False
+    else:
+        receptor_activo = receptor_activo if receptor_activo else receptor.activo
+
+    if not receptor_activo:
+        return    
+
     ticket = Ticket.objects.get(pk=id)
     camarero = Camareros.objects.get(pk=ticket.camarero_id)
-    lineas = ticket.ticketlineas_set.all().annotate(idart=F("linea__tecla"),
+    lineas = ticket.ticketlineas_set.all().annotate(teclaId=F("linea__tecla_id"),
                                                     precio=F("linea__precio"),
-                                                    descripcion_t=F("linea__descripcion_t"))
+                                                    descripcion=F("linea__descripcion_t"))
 
-    lineas = lineas.values("tecla",
-                           "descripcion_t",
+    lineas = lineas.values("teclaId",
+                           "descripcion",
                            "precio").annotate(can=Count('tecla'),
                                               totallinea=Sum("precio"))
     
 
-    receptor = Receptores.objects.get(nombre='Ticket')
     lineas_ticket = []
     for l in lineas:
         lineas_ticket.append(l)
@@ -72,10 +80,9 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, 
     obj = {
         "op": "ticket",
         "fecha": ticket.fecha + " " + ticket.hora,
-        "receptor": receptor.nomimp,
-        "nom_receptor": receptor.nombre,
-        "receptor_activo": receptor_activo if receptor_activo else receptor.activo,
-        "abrircajon": abrircajon,
+        "receptor": receptor.nombre,
+        "isActivo": receptor_activo if receptor_activo else receptor.activo,
+        "abrirCajon": abrircajon,
         "camarero": camarero.nombre + " " + camarero.apellidos,
         "mesa": ticket.mesa,
         "lineas":lineas_ticket,

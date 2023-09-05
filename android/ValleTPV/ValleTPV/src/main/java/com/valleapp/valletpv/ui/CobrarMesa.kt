@@ -43,7 +43,7 @@ fun CobrarMesaDialog(modelCuenta: CuentaModel, onDismiss: (Double?, Double?) -> 
                 Text(
                     "Cobrar mesa",
                     modifier = Modifier.padding(bottom = 16.dp),
-                    style = Styles.TextTitulos
+                    style = Styles.H1
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 

@@ -32,7 +32,7 @@ fun ValleList(
     ) {
         Text(
             text = title,
-            style = Styles.TextTitulos2,
+            style = Styles.H2,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color)

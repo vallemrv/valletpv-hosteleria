@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.valleapp.valletpvlib.db.AppDatabase
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.IBaseDao
@@ -138,7 +139,6 @@ class ServiceCom : Service(), IController {
 
                     }
 
-                    else -> {}
                 }
             }
         }
@@ -235,15 +235,6 @@ class ServiceCom : Service(), IController {
         procesarCola.addInstruccion(inst)
     }
 
-    fun getServerConfig(): ServerConfig? {
-        return serverConfig
-    }
-
-    fun getParamsServer(params: Map<String, Any>): Map<String, String> {
-        return serverConfig?.getParams(params) ?: mapOf()
-    }
-
-
     suspend fun abrirCajon() {
         safeApiCall {
             ApiRequest.service.post(
@@ -258,6 +249,91 @@ class ServiceCom : Service(), IController {
             ApiRequest.service.post(
                 ApiEndPoints.PRE_IMPRIMIR,
                 serverConfig?.getParams(mapOf("idm" to mesaId))
+            )
+        }
+    }
+
+    suspend fun getListaTicket(offset: Int): List<Ticket>? {
+        val result = safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.GET_LISTA_TICKET,
+                serverConfig?.getParams(mapOf("offset" to offset))
+            )
+        }
+
+        return when (result) {
+            is ApiResponse.Success -> {
+                val lineasJson = result.data["lineas"] ?: return null
+                val type = object : TypeToken<List<Ticket>>() {}.type
+                val tickets: List<Ticket> = Gson().fromJson(lineasJson, type)
+                tickets
+            }
+
+            is ApiResponse.Error -> {
+                if (result.errorMessage == ApiErrorMessages.UNAUTHORIZED) {
+                    validador?.invalidateAuth()
+                    null
+                } else {
+                    println("Error: ${result.errorMessage}")
+                    null
+                }
+            }
+        }
+    }
+
+    suspend fun getLineasTicket(id: Long): List<LineasTicket>? {
+        val result = safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.GET_LINEAS_TICKET,
+                serverConfig?.getParams(mapOf("id" to id.toString()))
+            )
+        }
+        return when (result) {
+            is ApiResponse.Success -> {
+                val lineasJson = result.data["lineas"] ?: return null
+                val type = object : TypeToken<List<LineasTicket>>() {}.type
+                val lineas: List<LineasTicket> = Gson().fromJson(lineasJson, type)
+                lineas
+            }
+
+            is ApiResponse.Error -> {
+                if (result.errorMessage == ApiErrorMessages.UNAUTHORIZED) {
+                    validador?.invalidateAuth()
+                    null
+                } else {
+                    println("Error: ${result.errorMessage}")
+                    null
+                }
+            }
+        }
+    }
+
+    suspend fun imprimirTicket(id: Long) {
+        safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.IMPRIMIR_TICKET,
+                serverConfig?.getParams(
+                    mapOf(
+                        "id" to id,
+                        "receptor_activo" to true,
+                        "abrircajon" to false
+                    )
+                )
+            )
+        }
+    }
+
+    suspend fun imprimirFactura(id: Long) {
+        safeApiCall {
+            ApiRequest.service.post(
+                ApiEndPoints.IMPRIMIR_FACTURA,
+                serverConfig?.getParams(
+                    mapOf(
+                        "id" to id,
+                        "receptor_activo" to true,
+                        "abrircajon" to false
+                    )
+                )
             )
         }
     }

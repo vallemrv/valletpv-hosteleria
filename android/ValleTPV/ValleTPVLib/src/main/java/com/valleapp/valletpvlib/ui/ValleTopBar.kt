@@ -46,7 +46,7 @@ fun ValleTopBar(
                 Column {
                     Text(
                         text = title,
-                        style = Styles.TextTitulos,
+                        style = Styles.H1,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     if (subtitle != null) {

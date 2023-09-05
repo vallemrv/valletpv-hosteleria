@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.valleapp.valletpv.models.CamarerosModel
@@ -31,22 +30,20 @@ fun PaseCamarerosDialog(vModel: CamarerosModel, showDialog: Boolean, onClick: ()
     if (showDialog) {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = androidx.compose.ui.Alignment.Center
+            contentAlignment = Alignment.Center
         ) {
-            Surface(
-                color = Color.Black.copy(alpha = 0.5f),
+            Box(
                 modifier = Modifier
-                    .alpha(0.9f)
                     .fillMaxSize()
-            ) {}
+                    .background(Color.run { Black.copy(alpha = 0.5f) })
+            )
             Card(
                 elevation = CardDefaults.elevatedCardElevation(8.dp),
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize(.9f)
+                    .fillMaxSize(.8f)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Pase de camareros", style = Styles.TextTitulos)
+                    Text(text = "Pase de camareros", style = Styles.H1)
                     Box(modifier = Modifier.weight(0.85f)) {
                         SelectoresPase(vModel = vModel)
                     }

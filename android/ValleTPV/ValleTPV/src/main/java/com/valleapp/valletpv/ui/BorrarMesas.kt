@@ -40,7 +40,7 @@ fun BorrarMesa(onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
                 Text(
                     "Borrar mesa",
                     modifier = Modifier.padding(bottom = 16.dp),
-                    style = Styles.TextTitulos
+                    style = Styles.H1
                 )
                 Row(
                     modifier = Modifier.height(70.dp),
