@@ -4,9 +4,15 @@ from django.forms.models import model_to_dict
 class Receptores(models.Model):
     id = models.AutoField(primary_key=True) 
     nombre = models.CharField(max_length=40) 
+    nom_impresora = models.CharField(max_length=40, default="", blank=True)
     activo = models.BooleanField( default=True) 
-    descripcion = models.CharField(max_length=200, default="") 
+    descripcion = models.CharField(max_length=200, default="", blank=True)
     isTicket = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.isTicket:
+            Receptores.objects.update(isTicket=False)
+        super(Receptores, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.nombre + ' ' +self.descripcion

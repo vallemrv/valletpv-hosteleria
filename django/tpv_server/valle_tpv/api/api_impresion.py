@@ -18,10 +18,15 @@ from datetime import datetime
 
 @check_dispositivo
 def abrircajon(request):
+    receptor = Receptores.objects.filter(isTicket=True).first()
+    if not receptor:
+        return JsonResponse({})
+    
     obj = {
         "op": "open",
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-        "receptor": Receptores.objects.get(nombre='Ticket').nomimp,
+        "receptor": receptor.nombre,
+        "impresora": receptor.nom_impresora,
         "receptor_activo": True,
     }
     send_mensaje_impresora(obj)
@@ -31,6 +36,10 @@ def abrircajon(request):
 
 @check_dispositivo
 def preimprimir(request):
+    receptor = Receptores.objects.filter(isTicket=True).first()
+    if not receptor:
+        return JsonResponse({})
+    
     idm = request.POST["idm"]
     mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
     if mesa_abierta:
@@ -47,7 +56,7 @@ def preimprimir(request):
                                                 totallinea=Sum("precio"))
         
 
-        receptor = Receptores.objects.get(nombre='Ticket')
+        
         lineas_ticket = []
         for l in lineas:
             lineas_ticket.append(l)
@@ -55,8 +64,9 @@ def preimprimir(request):
         obj = {
         "op": "preticket",
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f"),
-        "receptor": receptor.nomimp,
-        "receptor_activo": receptor.activo,
+        "receptor": receptor.nombre,
+        "impresora": receptor.nom_impresora,
+        "receptor_activo": True,
         "camarero": camareo.nombre + " " + camareo.apellidos,
         "mesa": mesa.nombre,
         "numcopias": infmesa.numcopias,
@@ -65,9 +75,7 @@ def preimprimir(request):
         }
 
         if infmesa.numcopias <= 1:
-            comunicar_cambios_devices("md", "mesas", 
-                                    mesa_abierta.serialize(), 
-                                    {"op": "preimprimir"})
+            comunicar_cambios_devices("update", "mesas",[mesa_abierta.serialize()])
 
         send_mensaje_impresora(obj)
     return JsonResponse({})

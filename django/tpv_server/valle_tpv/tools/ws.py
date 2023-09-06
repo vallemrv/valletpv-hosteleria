@@ -15,10 +15,10 @@ import json
 def send_mensaje_impresora(v):
     try:
         if 'op' in v:
-            v = {v["receptor"]: v}
+            v = {v["impresora"]: v}
         for o in v:
             r = v[o]
-            channel_name = settings.EMPRESA + "_impresion_" + r["receptor"]
+            channel_name = settings.EMPRESA + "_impresion_" + r["impresora"]
             layer = get_channel_layer()
             async_to_sync(layer.group_send)(channel_name, {
                 'type': 'send_message',
