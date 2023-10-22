@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.AccionMesa
+import com.valleapp.valletpvlib.db.LineasDao
 import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.db.ZonasDao
@@ -44,7 +45,6 @@ class MesasModel(private val mainModel: MainModel) : ViewModel() {
         accionMesa = AccionMesa.BORRAR
     }
 
-
     fun ejecutarAccion(
         mesa: Mesa? = null,
         motivo: String? = null,
@@ -52,15 +52,83 @@ class MesasModel(private val mainModel: MainModel) : ViewModel() {
     ) {
         when (accionMesa) {
             AccionMesa.MOVER -> {
+                viewModelScope.launch(Dispatchers.IO){
+                    if (mesa != null && mesaOrg != null) {
+                        val mesasDao = mainModel.getDB("mesas") as? MesasDao
+                        val lineaCuenta = mainModel.getDB("lineaspedido") as? LineasDao
+                        val lineasOrg = lineaCuenta?.getByMesa(mesaOrg!!.id)
+                        val lineasDest = lineaCuenta?.getByMesa(mesa.id)
+
+                        if (lineasDest?.isEmpty() == true) {
+                            lineasOrg?.forEach { linea ->
+                                linea.nomMesa = mesa.nombre
+                                linea.mesaId = mesa.id
+                                linea.zonaId = mesa.zonaId
+                                lineaCuenta.update(linea)
+                            }
+                            mesaOrg!!.id.let { mesasDao?.cerrarMesa(it) }
+                            mesasDao?.abrirMesa(mesa.id)
+                        } else {
+                            lineasOrg?.forEach { linea ->
+                                linea.nomMesa = mesa.nombre
+                                linea.mesaId = mesa.id
+                                linea.zonaId = mesa.zonaId
+                                lineaCuenta.update(linea)
+                            }
+                            lineasDest?.forEach { linea ->
+                                linea.nomMesa = mesaOrg!!.nombre
+                                linea.mesaId = mesaOrg!!.id
+                                linea.zonaId = mesaOrg!!.zonaId
+                                lineaCuenta.update(linea)
+                            }
+                        }
+
+                        val inst = Instrucciones(
+                            ApiEndPoints.CAMBIAR_MESAS, mainModel.getParams(
+                                mapOf(
+                                    "idOrg" to mesaOrg!!.id, "idDest" to mesa.id
+                                )
+                            )
+                        )
+                        mainModel.addInstruccion(inst)
+                    }
+                    cancelar()
+                }
 
             }
 
             AccionMesa.JUNTAR -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    if (mesa != null && mesaOrg != null) {
+                        val mesasDao = mainModel.getDB("mesas") as? MesasDao
+                        val lineaCuenta = mainModel.getDB("lineaspedido") as? LineasDao
 
+                        if (mesa.abierta) {
+                            val lineasDest = lineaCuenta?.getByMesa(mesa.id)
+                            lineasDest?.forEach { linea ->
+                                linea.nomMesa = mesaOrg!!.nombre
+                                linea.mesaId = mesaOrg!!.id
+                                linea.zonaId = mesaOrg!!.zonaId
+                                lineaCuenta.update(linea)
+                            }
+
+                            mesa.id?.let { mesasDao?.cerrarMesa(it) }
+                            val inst = Instrucciones(
+                                ApiEndPoints.JUNTAR_MESAS, mainModel.getParams(
+                                    mapOf(
+                                        "idOrg" to mesaOrg!!.id, "idDest" to mesa.id
+                                    )
+                                )
+                            )
+                            mainModel.addInstruccion(inst)
+                        }
+                    }
+                    cancelar()
+                }
             }
 
-            AccionMesa.BORRAR -> {
 
+            AccionMesa.BORRAR -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     val mesasDao = mainModel.getDB("mesas") as? MesasDao
                     mesasDao?.cerrarMesa(mesaOrg!!.id)
@@ -72,8 +140,7 @@ class MesasModel(private val mainModel: MainModel) : ViewModel() {
                         )
                     )
                     mainModel.addInstruccion(inst)
-                    accionMesa = AccionMesa.NADA
-
+                    cancelar()
                 }
             }
 

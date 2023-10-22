@@ -17,7 +17,7 @@ class Mesas(models.Model):
         'num': 0,
         'abierta': False,
         'color': self.zona.color, 
-        'zona_id': self.zona.id,
+        'zonaId': self.zona.id,
         "tarifa": self.zona.tarifa, 
         }
 
@@ -25,6 +25,7 @@ class Mesas(models.Model):
         if mesa_abierta:
             obj["num"] = mesa_abierta.infmesa.numcopias
             obj["abierta"] = True
+        
         return obj
 
 

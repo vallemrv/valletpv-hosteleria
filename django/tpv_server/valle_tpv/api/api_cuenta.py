@@ -60,10 +60,6 @@ def cuenta_rm_linea(request):
     return HttpResponse('success')
 
 
-
-
-
-
 @csrf_exempt
 def get_cuenta(request):
     id = request.POST['mesa_id']
@@ -75,15 +71,15 @@ def get_cuenta(request):
     
     return JsonResponse(lstArt)
 
-@csrf_exempt
+@check_dispositivo
 def juntarmesas(request):
-    Mesasabiertas.juntar_mesas_abiertas( request.POST["idp"], request.POST["ids"])
-    return HttpResponse('success')
+    Mesasabiertas.juntar_mesas_abiertas( request.POST["idOrg"], request.POST["idDest"])
+    return JsonResponse({})
 
-@csrf_exempt
+@check_dispositivo
 def cambiarmesas(request):
-    Mesasabiertas.cambiar_mesas_abiertas(request.POST["idp"], request.POST["ids"])
-    return HttpResponse('success')
+    Mesasabiertas.cambiar_mesas_abiertas(request.POST["idOrg"], request.POST["idDest"])
+    return JsonResponse({})
 
 @csrf_exempt
 def mvlinea(request):

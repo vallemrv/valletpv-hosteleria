@@ -74,6 +74,9 @@ data class LineaPedido(
 interface LineasDao : IBaseDao<LineaPedido> {
 
     @Query("SELECT * FROM LineasPedido WHERE mesaId=:mesaId")
+    fun getByMesa(mesaId: Long): List<LineaPedido>
+
+    @Query("SELECT * FROM LineasPedido WHERE mesaId=:mesaId")
     fun getAllLinea(mesaId: Long): LiveData<List<LineaPedido>>
 
     @Query("SELECT id FROM LineasPedido WHERE mesaId=:mesaId")
@@ -81,7 +84,6 @@ interface LineasDao : IBaseDao<LineaPedido> {
 
     @Query("SELECT * FROM LineasPedido")
     override fun getAll(): List<LineaPedido>
-
 
     @Query("DELETE FROM LineasPedido WHERE id=:id")
     override fun deleteById(id: Long)

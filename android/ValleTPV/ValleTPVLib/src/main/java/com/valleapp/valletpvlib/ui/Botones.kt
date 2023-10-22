@@ -167,17 +167,14 @@ fun BotonSimple(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BotonMesa(
+fun BotonMesaAccion(
     mesa: Mesa,
+    isOrg: Boolean,
     modifier: Modifier = Modifier,
-    onButtonClick: (Mesa) -> Unit = {},
-    onAccionClick: (Mesa, AccionMesa) -> Unit
-
+    onButtonClick: (Mesa) -> Unit = {}
 ) {
-
     val defaultModifier = if (modifier == Modifier) {
         Modifier
             .padding(2.dp)
@@ -185,13 +182,13 @@ fun BotonMesa(
     } else {
         modifier
     }
+
     Card(
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
         onClick = {
-            onButtonClick(mesa)
+            if (!isOrg) onButtonClick(mesa)
         },
         modifier = defaultModifier,
-
         colors = CardDefaults.cardColors(
             containerColor = ColorTheme.hexToComposeColor(mesa.color)
         )
@@ -213,6 +210,98 @@ fun BotonMesa(
                 style = Styles.TextBotones,
                 textAlign = TextAlign.Center
             )
+            if (isOrg) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(19.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier.fillMaxSize(),
+                        tint = Color.Red,
+                        painter = ExtendIcons.Cerrar,
+                        contentDescription = "es original"
+                    )
+                }
+            }
+            if (mesa.abierta) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(9.dp),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    Icon(
+                        tint = Color.Black,
+                        modifier = Modifier.size(40.dp),
+                        painter = ExtendIcons.MesaAbierta, contentDescription = "es original"
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BotonMesa(
+    mesa: Mesa,
+    modifier: Modifier = Modifier,
+    onButtonClick: (Mesa) -> Unit = {},
+    onAccionClick: (Mesa, AccionMesa) -> Unit
+
+) {
+
+    val defaultModifier = if (modifier == Modifier) {
+        Modifier
+            .padding(2.dp)
+            .size(170.dp)
+    } else {
+        modifier
+    }
+
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp),
+        onClick = {
+            onButtonClick(mesa)
+        },
+        modifier = defaultModifier,
+
+        colors = CardDefaults.cardColors(
+            containerColor = ColorTheme.hexToComposeColor(mesa.color)
+        )
+
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = mesa.nombre,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center),
+                lineHeight = 40.sp,
+                color = Color.Black,
+                style = Styles.TextBotones,
+                textAlign = TextAlign.Center
+            )
+            if (mesa.num!! > 0) {
+                Box(modifier = Modifier.fillMaxSize(.9f), contentAlignment = Alignment.TopStart) {
+                    Icon(
+                        modifier = Modifier.size(40.dp),
+                        painter = ExtendIcons.Imprimir,
+                        contentDescription = "Mesa impresa"
+                    )
+                }
+            }
+
             if (mesa.abierta) {
                 Row(
                     modifier = Modifier.fillMaxSize(),

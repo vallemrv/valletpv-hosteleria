@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.IBaseDao
+import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.interfaces.IServiceState
 import com.valleapp.valletpvlib.tools.ApiRequest
 import com.valleapp.valletpvlib.tools.Instrucciones
@@ -15,6 +16,7 @@ import com.valleapp.valletpvlib.tools.LineasTicket
 import com.valleapp.valletpvlib.tools.ServerConfig
 import com.valleapp.valletpvlib.tools.ServiceCom
 import com.valleapp.valletpvlib.tools.Ticket
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -103,7 +105,9 @@ class MainModel(private val app: Application) : AndroidViewModel(app), IServiceS
     }
 
     fun preImprimir(mesaId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            val mesasDao = getDB("mesas") as MesasDao
+            mesasDao.marcarRojo(mesaId)
             mService?.preImprimir(mesaId)
         }
     }

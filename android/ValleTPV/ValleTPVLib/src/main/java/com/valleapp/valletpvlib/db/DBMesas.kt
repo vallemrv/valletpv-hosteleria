@@ -17,7 +17,7 @@ data class Mesa(
     var nombre: String = "",
     var color: String = "",
     var abierta: Boolean = false,
-    var zona_id: Int? = -1,
+    var zonaId: Long? = -1,
     var num: Int? = -1,
     var orden: Int? = -1,
     var tarifa: Int? = -1,
@@ -28,7 +28,7 @@ data class Mesa(
         nombre = json.getString("nombre")
         color = json.getString("color")
         abierta = json.getBoolean("abierta")
-        zona_id = json.getInt("zona_id")
+        zonaId = json.getLong("zonaId")
         num = json.getInt("num")
         orden = json.getInt("orden")
         tarifa = json.getInt("tarifa")
@@ -52,17 +52,17 @@ data class Mesa(
 @Dao
 interface MesasDao: IBaseDao<Mesa> {
 
-    @Query("SELECT * FROM mesas WHERE zona_id = :idZona ORDER BY orden DESC")
+    @Query("SELECT * FROM mesas WHERE zonaId = :idZona ORDER BY orden DESC")
     fun getAllByZona(idZona: Long): LiveData<List<Mesa>>
 
     @Query("UPDATE mesas SET abierta=1, num=0 WHERE ID = :idm")
-    fun abrirMesa(idm: Int)
+    fun abrirMesa(idm: Long)
 
     @Query("UPDATE mesas SET abierta=0, num=0 WHERE ID = :idm")
     fun cerrarMesa(idm: Long)
 
     @Query("UPDATE mesas SET num=1 WHERE ID = :id")
-    fun marcarRojo(id: Int)
+    fun marcarRojo(id: Long)
 
     @Update
     fun updateMesa(mesa: Mesa)

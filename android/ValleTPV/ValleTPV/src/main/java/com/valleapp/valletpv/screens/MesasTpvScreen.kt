@@ -45,7 +45,11 @@ fun MesasTpvScreen(
         topBar = {
             ValleTopBar(title = model.titulo,
                 backAction = {
+                    if (model.accionMesa == AccionMesa.NADA)
                     navController.popBackStack()
+                    else
+                        model.cancelar()
+
                 }
             ) {
                 if (model.accionMesa == AccionMesa.NADA) {
@@ -67,10 +71,6 @@ fun MesasTpvScreen(
 
                     BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
                         mainModel.abrirCajon()
-                    }
-                } else {
-                    BotonAccion(icon = ExtendIcons.Reset, contentDescription = "Cancelar") {
-                        model.cancelar()
                     }
                 }
 

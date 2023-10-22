@@ -102,7 +102,7 @@ class Infmesa(models.Model):
 
         return {
             "UID": self.pk,
-            "mesa_id": mesa_id,
+            "mesaId": mesa_id,
             "num": self.numcopias,
             "abierta": 0,
             "nomMesa": nomMesa,
@@ -112,7 +112,7 @@ class Infmesa(models.Model):
             "total_cobrado": float(total_cobrado),
             "hora": self.hora,
             "camarero": self.camarero.nombre + " " + self.camarero.apellidos,
-            "zona_id": zona_id
+            "zonaId": zona_id
         }
 
     def get_pedidos(self):

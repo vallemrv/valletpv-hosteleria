@@ -61,7 +61,7 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
                 linea.camareroId = camId
                 linea.id = System.currentTimeMillis()
                 lineasDao.insert(linea)
-                mesasDao.abrirMesa(mesaId.toInt())
+                mesasDao.abrirMesa(mesaId)
             }
 
         }

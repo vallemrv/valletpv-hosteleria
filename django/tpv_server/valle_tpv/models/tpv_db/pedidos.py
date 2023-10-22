@@ -175,6 +175,7 @@ class Lineaspedido(models.Model):
             'receptorId': self.tecla.familia.receptor.pk if self.tecla else -1,
             'camareroId': self.pedido.camarero_id,
             }
+        
         return obj
             
 

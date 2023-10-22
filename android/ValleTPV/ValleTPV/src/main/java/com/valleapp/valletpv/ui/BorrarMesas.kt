@@ -1,6 +1,7 @@
 package com.valleapp.valletpv.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,11 +38,28 @@ fun BorrarMesa(onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
                     .padding(16.dp)
                     .height(250.dp)
             ) {
-                Text(
-                    "Borrar mesa",
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    style = Styles.H1
-                )
+                Row {
+                    Text(
+                        "Borrar mesa",
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .weight(.8f),
+                        style = Styles.H1
+                    )
+                    Box(
+                        modifier = Modifier.weight(.2f),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        BotonIcon(
+                            contentDescription = "Cancelar",
+                            icon = ExtendIcons.Cerrar,
+                            onClick = {
+                                onDismissRequest()
+                            })
+                    }
+
+                }
+
                 Row(
                     modifier = Modifier.height(70.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -54,19 +72,22 @@ fun BorrarMesa(onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
                         label = { Text("Motivo") },
                         modifier = Modifier.weight(0.8f),
 
-                    )
-                    Spacer(modifier = Modifier.weight(0.05f))
-                    BotonIcon(
-                        icon = ExtendIcons.Check,
-                        color = ColorTheme.Primary,
-                        contentDescription = "Aceptar",
+                        )
+                    Box(
                         modifier = Modifier
                             .weight(0.2f),
-                        onClick = { onSubmit(reason) }
-                    )
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        BotonIcon(
+                            icon = ExtendIcons.Check,
+                            color = ColorTheme.Primary,
+                            contentDescription = "Aceptar",
+                            onClick = { onSubmit(reason) }
+                        )
+                    }
                 }
 
-
+                Spacer(modifier = Modifier.weight(0.05f))
                 Row(
                     modifier = Modifier
                         .weight(0.3f)

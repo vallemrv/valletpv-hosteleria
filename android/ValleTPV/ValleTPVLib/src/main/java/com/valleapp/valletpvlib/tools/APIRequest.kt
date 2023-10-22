@@ -26,6 +26,8 @@ object ApiEndPoints {
     const val CAMAREROS_SET_PASSWORD = "camareros/set_password"
     const val CAMAREROS_SET_AUTORIZADO = "camareros/set_autorizado"
     const val SYNC_DEVICES = "sync/sync_devices"
+    const val JUNTAR_MESAS = "cuenta/juntarmesas"
+    const val CAMBIAR_MESAS = "cuenta/cambiarmesas"
 }
 
 object ApiErrorMessages {

@@ -41,51 +41,57 @@ class Mesasabiertas(models.Model):
             
 
 
-
     @staticmethod
-    def cambiar_mesas_abiertas(idp, ids):
-        if idp != ids:
-            mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
-            mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
-            if mesaS:
-                infmesa = mesaS.infmesa
-                mesaS.infmesa = mesaP.infmesa
-                mesaS.save()
-                mesaP.infmesa = infmesa;
-                mesaP.save()
-            elif mesaP:
-                mesaP.mesa_id = ids
-                mesaP.save()
-                comunicar_cambios_devices("updae", "mesas", [mesaP.serialize()])
+    def cambiar_mesas_abiertas(idOrg, idDest):
+        if idOrg != idDest:
+            mesaOrg = Mesasabiertas.objects.filter(mesa__pk=idOrg).first()
+            mesaDest = Mesasabiertas.objects.filter(mesa__pk=idDest).first()
+           
+            if mesaOrg and mesaDest:
+                infmesaOrg = mesaOrg.infmesa
+                infmesaDest = mesaDest.infmesa
+
+                mesaOrg.infmesa = infmesaDest
+                mesaOrg.save()
+
+                mesaDest.infmesa = infmesaOrg
+                mesaDest.save()
+
+                comunicar_cambios_devices("update", "mesas", [mesaOrg.serialize(), mesaDest.serialize()])
+            elif mesaOrg:
+                mesaOrg.mesa_id = idDest
+                mesaOrg.save()
+                comunicar_cambios_devices("update", "mesas", [mesaOrg.serialize()])
+
            
 
     @staticmethod
-    def juntar_mesas_abiertas(idp, ids):
-        
-        if idp != ids:
-            mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
-            mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
-            if mesaS:
-                infmesa = mesaS.infmesa
-                pedidos = infmesa.pedidos_set.all()
-                for pedido in pedidos:
-                    pedido.infmesa_id = mesaP.infmesa.pk
+    def juntar_mesas_abiertas(idOrg, idDest):
+        if idOrg != idDest:
+            mesaOrg = Mesasabiertas.objects.filter(mesa__pk=idOrg).first()
+            mesaDest = Mesasabiertas.objects.filter(mesa__pk=idDest).first()
+
+            if mesaDest:
+                infmesaDest = mesaDest.infmesa
+                pedidosDest = infmesaDest.pedidos_set.all()
+                
+                lineasModificadas = []
+                for pedido in pedidosDest:
+                    pedido.infmesa_id = mesaOrg.infmesa.pk
                     pedido.save()
                     for l in pedido.lineaspedido_set.all():
-                        l.infmesa_id = mesaP.infmesa.pk
+                        l.infmesa_id = mesaOrg.infmesa.pk
                         l.save()
-                        comunicar_cambios_devices("md", "lineaspedido", l.serialize())
-                        
-                obj = mesaS.serialize()
-                obj["abierta"] = False
-                obj["num"] = 0
-                comunicar_cambios_devices("md", "mesasabiertas", obj)
-                infmesa.delete()
+                        lineasModificadas.append(l.serialize())
+                    comunicar_cambios_devices("update", "lineaspedido", lineasModificadas)
+                
+                mesaDest.delete()
+                comunicar_cambios_devices("update", "mesas", [mesaDest.serialize(), mesaOrg.serialize()])
+                
+
     
     def serialize(self):
-        obj = self.infmesa.serialize()
-        obj["mesa_abierta_id"] = self.pk
-        obj["abierta"] = True
+        obj = self.mesa.serialize()
         return obj
 
     def get_lineaspedido(self):

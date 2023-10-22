@@ -36,9 +36,6 @@ def abrircajon(request):
 
 @check_dispositivo
 def preimprimir(request):
-    receptor = Receptores.objects.filter(isTicket=True).first()
-    if not receptor:
-        return JsonResponse({})
     
     idm = request.POST["idm"]
     mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
@@ -47,6 +44,13 @@ def preimprimir(request):
         infmesa.numcopias = infmesa.numcopias + 1
         infmesa.save()
         
+        if infmesa.numcopias <= 1:
+            comunicar_cambios_devices("update", "mesas",[mesa_abierta.serialize()])
+            
+        receptor = Receptores.objects.filter(isTicket=True).first()
+        if not receptor:
+            return JsonResponse({})
+
         camareo = infmesa.camarero
         mesa = mesa_abierta.mesa
         lineas = infmesa.lineaspedido_set.filter(estado="P")
@@ -74,8 +78,6 @@ def preimprimir(request):
         'total': infmesa.lineaspedido_set.filter(estado="P").aggregate(Total=Sum("precio"))['Total']
         }
 
-        if infmesa.numcopias <= 1:
-            comunicar_cambios_devices("update", "mesas",[mesa_abierta.serialize()])
 
         send_mensaje_impresora(obj)
     return JsonResponse({})

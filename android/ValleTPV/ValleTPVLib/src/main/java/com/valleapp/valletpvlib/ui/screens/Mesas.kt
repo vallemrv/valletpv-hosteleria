@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +25,7 @@ import com.valleapp.valletpvlib.db.Mesa
 import com.valleapp.valletpvlib.db.Zona
 import com.valleapp.valletpvlib.models.MesasModel
 import com.valleapp.valletpvlib.routers.RoutersBase
+import com.valleapp.valletpvlib.ui.BotonMesaAccion
 import com.valleapp.valletpvlib.ui.BotonSimple
 import com.valleapp.valletpvlib.ui.TableroMesas
 import com.valleapp.valletpvlib.ui.ValleGridSimple
@@ -37,14 +37,12 @@ fun MesasGrid(
     navController: NavController,
     camId: Long,
     columnMesas: Int,
-    landScape: Boolean
+    landScape: Boolean = true
 ) {
     val app = LocalContext.current.applicationContext as ValleApp
     val mainModel = app.mainModel
 
-    val model: MesasModel = viewModel( initializer = { MesasModel(mainModel)})
-
-
+    val model: MesasModel = viewModel(initializer = { MesasModel(mainModel) })
     val listaZonas by model.dbZona.getListaLive().observeAsState(initial = listOf())
 
 
@@ -141,8 +139,6 @@ fun LandScapeGrid(
 
 @Composable
 fun ListaZonas(listaZonas: List<Zona>, model: MesasModel, landScape: Boolean) {
-
-
     if (landScape) {
         LazyColumn {
             items(listaZonas) { zona ->
@@ -181,19 +177,8 @@ fun SelectorMesas(listaMesas: List<Mesa>, model: MesasModel, column: Int) {
 
         ValleGridSimple(columns = column) {
             items(listaMesas) {
-                if (it.id != model.mesaOrg?.id) {
-                    BotonSimple(
-                        text = it.nombre,
-                        tag = it,
-                        color = ColorTheme.hexToComposeColor(it.color)
-                    ) { tag ->
-                        model.ejecutarAccion(tag as Mesa)
-                    }
-                } else {
-                    BotonSimple(
-                        text = it.nombre,
-                        color = Color.Red
-                    ) {}
+                BotonMesaAccion(it, it.id == model.mesaOrg?.id) { mesa ->
+                    model.ejecutarAccion(mesa)
                 }
             }
         }
