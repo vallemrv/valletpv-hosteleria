@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.screens
+package com.valleapp.valletpv.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -46,7 +46,7 @@ fun MesasTpvScreen(
             ValleTopBar(title = model.titulo,
                 backAction = {
                     if (model.accionMesa == AccionMesa.NADA)
-                    navController.popBackStack()
+                        navController.popBackStack()
                     else
                         model.cancelar()
 
@@ -67,7 +67,7 @@ fun MesasTpvScreen(
                     BotonAccion(
                         ExtendIcons.Listado,
                         "Lista de tickets",
-                        onClick = {  showListaTicket = true})
+                        onClick = { showListaTicket = true })
 
                     BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
                         mainModel.abrirCajon()
@@ -84,18 +84,19 @@ fun MesasTpvScreen(
                 landScape = true,
                 columnMesas = 5
             )
-            if (model.accionMesa == AccionMesa.BORRAR) {
-                BorrarMesa(
-                    onDismissRequest = { model.cancelar() },
-                    onSubmit = { motivo ->
-                        if (motivo.isNotEmpty()) {
-                            model.ejecutarAccion(
-                                motivo = motivo,
-                                camId = camId,
-                            )
-                        }
-                    })
-            }
+
+            BorrarMesa(
+                model.accionMesa == AccionMesa.BORRAR,
+                onDismissRequest = { model.cancelar() },
+                onSubmit = { motivo ->
+                    if (motivo.isNotEmpty()) {
+                        model.ejecutarAccion(
+                            motivo = motivo,
+                            camId = camId,
+                        )
+                    }
+                })
+
 
         }
     }
@@ -104,7 +105,7 @@ fun MesasTpvScreen(
         showDialogSelPas = false
     }
 
-    ListadoTicket(mainModel, showListaTicket){
+    ListadoTicket(mainModel, showListaTicket) {
         showListaTicket = false
     }
 }

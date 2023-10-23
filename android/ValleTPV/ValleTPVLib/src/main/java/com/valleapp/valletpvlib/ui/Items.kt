@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.valleapp.valletpvlib.db.BaseEntity
 import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
-import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 import com.valleapp.valletpvlib.ui.theme.Styles
 
 
@@ -40,7 +38,6 @@ fun ListItem(item: BaseEntity, onItemClick: (BaseEntity) -> Unit) {
 @Composable
 fun ListItemCuenta(
     lineaCuenta: LineaCuenta,
-    onBorrarClicked: (LineaCuenta) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -76,15 +73,7 @@ fun ListItemCuenta(
             textAlign = TextAlign.Right
         )
         Spacer(modifier = Modifier.weight(0.05f))
-        BotonIcon(
-            icon = ExtendIcons.Borrar,
-            color = ColorTheme.Primary,
-            modifier = Modifier.size(40.dp),
-            contentDescription = "Borrrar"
-        ) {
-            onBorrarClicked(lineaCuenta)
-        }
-        Spacer(modifier = Modifier.weight(0.05f))
+
     }
 }
 

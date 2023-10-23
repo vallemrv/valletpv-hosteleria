@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui
+package com.valleapp.valletpv.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ fun CobrarMesaDialog(
     var cambio by remember { mutableDoubleStateOf(0.0) }
 
 
-    BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxWidth(0.7f).fillMaxHeight(.85f)) {
+    BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxWidth(0.65f).fillMaxHeight(.85f)) {
         Column(Modifier.padding(16.dp)) {
             Text(
                 "Cobrar mesa",

@@ -12,23 +12,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BaseDialog(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.run { Black.copy(alpha = 0.5f) })
-        )
-        Card(
-            elevation = CardDefaults.elevatedCardElevation(8.dp),
-            modifier = modifier
-        ) {
-            content()
-        }
-    }
-
+fun BaseDialog(modifier: Modifier = Modifier, showDialog:Boolean, content: @Composable () -> Unit) {
+   if (showDialog) {
+       Box(
+           modifier = Modifier.fillMaxSize(),
+           contentAlignment = Alignment.Center
+       ) {
+           Box(
+               modifier = Modifier
+                   .fillMaxSize()
+                   .background(Color.run { Black.copy(alpha = 0.5f) })
+           )
+           Card(
+               elevation = CardDefaults.elevatedCardElevation(8.dp),
+               modifier = modifier
+           ) {
+               content()
+           }
+       }
+   }
 }

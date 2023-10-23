@@ -108,7 +108,6 @@ fun InfoCobros(
         LaunchedEffect(key1 = model.showMostrarInfo) {
             delay(timeout)
             model.showMostrarInfo = false
-
         }
     }
 }

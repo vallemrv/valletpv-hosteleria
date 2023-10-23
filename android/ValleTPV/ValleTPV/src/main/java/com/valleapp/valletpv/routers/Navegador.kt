@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.valleapp.valletpv.models.ModelCobros
-import com.valleapp.valletpv.screens.CamarerosPaseScreen
-import com.valleapp.valletpv.screens.CamarerosScreen
-import com.valleapp.valletpv.screens.CuentaTpvScreen
-import com.valleapp.valletpv.screens.MesasTpvScreen
-import com.valleapp.valletpv.screens.Preferencias
+import com.valleapp.valletpv.ui.screens.CamarerosPaseScreen
+import com.valleapp.valletpv.ui.screens.CamarerosScreen
+import com.valleapp.valletpv.ui.screens.CuentaTpvScreen
+import com.valleapp.valletpv.ui.screens.MesasTpvScreen
+import com.valleapp.valletpv.ui.screens.Preferencias
 import com.valleapp.valletpv.ui.InfoCobros
 import com.valleapp.valletpvlib.routers.RoutersBase
 

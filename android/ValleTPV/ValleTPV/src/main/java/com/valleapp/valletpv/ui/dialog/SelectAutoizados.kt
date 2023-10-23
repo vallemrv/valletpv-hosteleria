@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.valleapp.valletpv.models.CamarerosModel
-import com.valleapp.valletpv.screens.SelectoresPase
+import com.valleapp.valletpv.ui.screens.SelectoresPase
 import com.valleapp.valletpvlib.ui.BotonSimple
 import com.valleapp.valletpvlib.ui.dialog.BaseDialog
 import com.valleapp.valletpvlib.ui.theme.ColorTheme

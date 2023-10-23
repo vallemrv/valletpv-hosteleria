@@ -65,9 +65,7 @@ fun ListaSimple(title:String, list: List<BaseEntity>, onItemClick: (IBaseEntity)
 fun ListaCuenta(title:String, list: List<LineaCuenta>, onBorrarClick: (LineaCuenta) -> Unit) {
     ValleList(title = title) {
         items(list) { item ->
-            ListItemCuenta(item){
-                onBorrarClick(it)
-            }
+            ListItemCuenta(item)
         }
     }
 }

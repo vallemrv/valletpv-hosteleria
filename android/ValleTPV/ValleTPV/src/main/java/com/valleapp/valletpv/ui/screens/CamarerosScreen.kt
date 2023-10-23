@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.screens
+package com.valleapp.valletpv.ui.screens
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner

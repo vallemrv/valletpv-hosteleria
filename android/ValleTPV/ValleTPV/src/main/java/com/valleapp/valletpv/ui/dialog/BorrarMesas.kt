@@ -1,12 +1,14 @@
 package com.valleapp.valletpv.ui.dialog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,14 +33,17 @@ import com.valleapp.valletpvlib.ui.theme.Styles
 fun BorrarMesa(showDialog: Boolean, onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
     var reason by remember { mutableStateOf("") }
 
-    BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxSize(.6f)) {
-
+    BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxHeight(.6f).fillMaxWidth(.5f)) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .height(250.dp)
+                .fillMaxSize()
+                .padding(10.dp)
         ) {
-            Row {
+            Row(modifier = Modifier
+                .weight(.3f)
+                .background(ColorTheme.Background)
+                .padding(5.dp),
+                verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "Borrar mesa",
                     modifier = Modifier
@@ -57,11 +62,10 @@ fun BorrarMesa(showDialog: Boolean, onDismissRequest: () -> Unit, onSubmit: (Str
                             onDismissRequest()
                         })
                 }
-
             }
 
             Row(
-                modifier = Modifier.height(70.dp),
+                modifier = Modifier.weight(.3f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -90,8 +94,9 @@ fun BorrarMesa(showDialog: Boolean, onDismissRequest: () -> Unit, onSubmit: (Str
             Spacer(modifier = Modifier.weight(0.05f))
             Row(
                 modifier = Modifier
-                    .weight(0.3f)
-                    .padding(top = 16.dp),
+                    .weight(0.4f)
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 PreselectButton("Simpa", onClick = { onSubmit("Simpa") })

@@ -12,6 +12,7 @@ import java.net.UnknownHostException
 
 
 object ApiEndPoints {
+    const val EDITAR_CUENTA = "cuenta/editar_cuenta"
     const val IMPRIMIR_FACTURA = "impresoras/imprimir_factura"
     const val IMPRIMIR_TICKET = "impresoras/imprimir_ticket"
     const val GET_LINEAS_TICKET = "tickets/lineas"

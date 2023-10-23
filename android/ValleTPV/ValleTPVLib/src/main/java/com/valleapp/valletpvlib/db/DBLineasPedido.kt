@@ -13,15 +13,6 @@ data class LineaCuenta(
     var total: Double = 0.0,
 )
 
-data class LineaCuentaSend(
-    var can: Int = 0,
-    var descripcion: String = "",
-    var descripcionT: String = "",
-    var precio: Double = 0.0,
-    var total: Double = 0.0,
-)
-
-
 @Entity(tableName = "LineasPedido")
 data class LineaPedido(
     var estado: String? = "",
@@ -93,7 +84,7 @@ interface LineasDao : IBaseDao<LineaPedido> {
         "SELECT COUNT(id) as cantidad, descripcionT as descripcion, precio, COUNT(id) * precio as total  " +
                 "FROM LineasPedido WHERE mesaId = :mesaId AND estado in ('P', 'N') GROUP BY teclaId, descripcionT, precio, estado"
     )
-    fun getLineaCuentas(mesaId: Long): LiveData<List<LineaCuenta>>
+    fun getLineasCuenta(mesaId: Long): LiveData<List<LineaCuenta>>
 
 
     @Query("SELECT id, descripcion, descripcionT, teclaId, precio, mesaId " +
@@ -105,5 +96,8 @@ interface LineasDao : IBaseDao<LineaPedido> {
 
     @Query("UPDATE LineasPedido SET estado = 'C' WHERE mesaId = :mesaId AND estado = 'P'")
     fun cobrarLineas(mesaId: Long)
+
+    @Query("SELECT id FROM LineasPedido WHERE descripcionT = :descripcion AND precio = :precio LIMIT 1")
+    fun findFirstByDescripcionAndPrecio(descripcion: String, precio: Double): Long?
 
 }
