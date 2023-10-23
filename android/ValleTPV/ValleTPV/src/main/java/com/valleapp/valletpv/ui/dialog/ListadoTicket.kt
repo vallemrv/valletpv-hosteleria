@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui
+package com.valleapp.valletpv.ui.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +36,7 @@ import com.valleapp.valletpvlib.models.MainModel
 import com.valleapp.valletpvlib.tools.LineasTicket
 import com.valleapp.valletpvlib.tools.Ticket
 import com.valleapp.valletpvlib.ui.BotonAccion
+import com.valleapp.valletpvlib.ui.dialog.BaseDialog
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 import com.valleapp.valletpvlib.ui.theme.Styles
@@ -44,117 +45,117 @@ import kotlinx.coroutines.launch
 @Composable
 fun ListadoTicket(mainModel: MainModel, show: Boolean, onClickSalir: () -> Unit) {
 
-    if (show) {
-        var selectedTicket by remember { mutableStateOf<Ticket?>(null) }
-        var offset by remember { mutableIntStateOf(0) }
-        var listaTicket by remember { mutableStateOf(listOf<Ticket>()) }
-        var isLoading by remember { mutableStateOf(false) }
-        var hasMoreItems by remember { mutableStateOf(true) }
 
-        val listState = rememberLazyListState()
-        val coroutineScope = rememberCoroutineScope()
+    var selectedTicket by remember { mutableStateOf<Ticket?>(null) }
+    var offset by remember { mutableIntStateOf(0) }
+    var listaTicket by remember { mutableStateOf(listOf<Ticket>()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var hasMoreItems by remember { mutableStateOf(true) }
 
-        var lineas by remember { mutableStateOf(listOf<LineasTicket>()) }
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(Unit) {
-            if (listaTicket.isEmpty()) {
-                isLoading = true
-                listaTicket = mainModel.getListaTicket(offset)
-                isLoading = false
-                offset += 10
-            }
+    var lineas by remember { mutableStateOf(listOf<LineasTicket>()) }
+
+    LaunchedEffect(Unit) {
+        if (listaTicket.isEmpty()) {
+            isLoading = true
+            listaTicket = mainModel.getListaTicket(offset)
+            isLoading = false
+            offset += 10
         }
+    }
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                .collect { lastIndex ->
-                    if (lastIndex == listState.layoutInfo.totalItemsCount - 1) {
-                        isLoading = true
-                        val newTickets = mainModel.getListaTicket(offset)
-                        if (newTickets.size < 10) {
-                            hasMoreItems = false
-                        }
-                        listaTicket = listaTicket + newTickets
-                        isLoading = false
-                        if (hasMoreItems) {
-                            offset += 10
-                        }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .collect { lastIndex ->
+                if (lastIndex == listState.layoutInfo.totalItemsCount - 1) {
+                    isLoading = true
+                    val newTickets = mainModel.getListaTicket(offset)
+                    if (newTickets.size < 10) {
+                        hasMoreItems = false
+                    }
+                    listaTicket = listaTicket + newTickets
+                    isLoading = false
+                    if (hasMoreItems) {
+                        offset += 10
                     }
                 }
-        }
+            }
+    }
 
-        BaseDialog(modifier = Modifier.fillMaxSize(.9f)) {
-            Column(
-                Modifier
-                    .fillMaxSize()
+    BaseDialog(modifier = Modifier.fillMaxSize(.9f), show) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(text = "Listado de tickets", style = Styles.H1)
+            Spacer(modifier = Modifier.padding(8.dp))
+            Row(
+                modifier = Modifier
+                    .weight(.8f)
                     .padding(16.dp)
             ) {
-                Text(text = "Listado de tickets", style = Styles.H1)
-                Spacer(modifier = Modifier.padding(8.dp))
-                Row(
-                    modifier = Modifier
-                        .weight(.8f)
-                        .padding(16.dp)
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator()
-                    } else {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier.weight(.5f)
-                        ) {
-                            items(listaTicket) { ticket ->
-                                CabeceraTicket(ticket = ticket, isSel = ticket == selectedTicket) {
-                                    selectedTicket = ticket
-                                    coroutineScope.launch {
-                                        lineas = mainModel.getLineasTicket(ticket.id)
-                                    }
+                if (isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.weight(.5f)
+                    ) {
+                        items(listaTicket) { ticket ->
+                            CabeceraTicket(ticket = ticket, isSel = ticket == selectedTicket) {
+                                selectedTicket = ticket
+                                coroutineScope.launch {
+                                    lineas = mainModel.getLineasTicket(ticket.id)
                                 }
-                                Spacer(modifier = Modifier.padding(8.dp))
                             }
+                            Spacer(modifier = Modifier.padding(8.dp))
                         }
-                    }
-
-                    Box(modifier = Modifier.weight(.5f)) {
-                        TicketDetalle(
-                            lineas = lineas, // Asegúrate de obtener 'lineas' de algún lugar
-                            ticket = selectedTicket
-                        )
                     }
                 }
-                Row(
-                    modifier = Modifier
-                        .weight(.2f)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    if (selectedTicket != null) {
-                        BotonAccion(
-                            icon = ExtendIcons.ImprimirFactura,
-                            contentDescription = "Factura",
-                        ) {
-                            mainModel.imprimirFactura(selectedTicket)
-                        }
-                        BotonAccion(
-                            icon = ExtendIcons.Imprimir,
-                            contentDescription = "Imprimir"
-                        ) {
-                            mainModel.imprimirTicket(selectedTicket)
-                        }
 
+                Box(modifier = Modifier.weight(.5f)) {
+                    TicketDetalle(
+                        lineas = lineas, // Asegúrate de obtener 'lineas' de algún lugar
+                        ticket = selectedTicket
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .weight(.2f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (selectedTicket != null) {
+                    BotonAccion(
+                        icon = ExtendIcons.ImprimirFactura,
+                        contentDescription = "Factura",
+                    ) {
+                        mainModel.imprimirFactura(selectedTicket)
                     }
                     BotonAccion(
-                        icon = ExtendIcons.Salir,
-                        contentDescription = "Salir",
-                        onClick = onClickSalir
-                    )
-
+                        icon = ExtendIcons.Imprimir,
+                        contentDescription = "Imprimir"
+                    ) {
+                        mainModel.imprimirTicket(selectedTicket)
+                    }
 
                 }
+                BotonAccion(
+                    icon = ExtendIcons.Salir,
+                    contentDescription = "Salir",
+                    onClick = onClickSalir
+                )
+
+
             }
         }
     }
 }
+
 
 @Composable
 fun CabeceraTicket(ticket: Ticket, isSel: Boolean, onClick: (Ticket) -> Unit = {}) {

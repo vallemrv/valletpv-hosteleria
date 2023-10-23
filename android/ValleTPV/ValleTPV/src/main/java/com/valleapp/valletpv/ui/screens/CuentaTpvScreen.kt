@@ -18,15 +18,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.ModelCobros
-import com.valleapp.valletpv.ui.CobrarMesaDialog
+import com.valleapp.valletpv.ui.dialog.CobrarMesaDialog
 import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.TeclasDao
 import com.valleapp.valletpvlib.models.CuentaModel
+import com.valleapp.valletpvlib.models.EditLineaModel
 import com.valleapp.valletpvlib.models.TeclasModel
 import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.ListaCuenta
 import com.valleapp.valletpvlib.ui.TecladoNumerico
 import com.valleapp.valletpvlib.ui.ValleTopBar
+import com.valleapp.valletpvlib.ui.dialog.EditarPedido
 import com.valleapp.valletpvlib.ui.screens.SearchView
 import com.valleapp.valletpvlib.ui.screens.Secciones
 import com.valleapp.valletpvlib.ui.screens.TeclasGrid
@@ -45,10 +47,14 @@ fun CuentaTpvScreen(
     val mainModel = app.mainModel
 
     val modelMesas: TeclasModel = viewModel(initializer = { TeclasModel(mainModel.getDB("teclas") as TeclasDao) })
+    val modelEditCuenta: EditLineaModel = viewModel(initializer = { EditLineaModel(mainModel, mesaId)})
     val model: CuentaModel = viewModel(initializer = { CuentaModel(mainModel, camId, mesaId) })
     val titulo by model.titulo.collectAsState()
 
     var showCobrarDialog by remember { mutableStateOf(false) }
+    var showEditCuenta by remember {
+        mutableStateOf(false)
+    }
     val tarifa by model.tarifa.collectAsState()
 
     DisposableEffect(Unit) {
@@ -57,7 +63,7 @@ fun CuentaTpvScreen(
         }
     }
 
-    val lineasCuenta by model.lineasDao.getLineaCuentas(mesaId).observeAsState(initial = listOf())
+    val lineasCuenta by model.lineasDao.getLineasCuenta(mesaId).observeAsState(initial = listOf())
 
 
     Scaffold(topBar = {
@@ -105,19 +111,21 @@ fun CuentaTpvScreen(
 
                 //Secciones
                 Box(modifier = Modifier.weight(0.1f)) {
-                    Secciones(){
-
-                    }
+                    Secciones{}
                 }
             }
-            if (showCobrarDialog) {
-                CobrarMesaDialog(modelCuenta = model) { total, entregado ->
-                    if (total != null && entregado != null) {
-                        mCobros.mostrarInfo(total, entregado, entregado - total)
-                        navController.popBackStack()
-                    }
-                    showCobrarDialog = false
+
+            CobrarMesaDialog(modelCuenta = model, showCobrarDialog) { total, entregado ->
+                if (total != null && entregado != null) {
+                    mCobros.mostrarInfo(total, entregado, entregado - total)
+                    navController.popBackStack()
                 }
+                showCobrarDialog = false
+            }
+
+
+            EditarPedido(modelEditCuenta, showEditCuenta){
+                showEditCuenta = false
             }
 
         }

@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui
+package com.valleapp.valletpv.ui.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +20,6 @@ import com.valleapp.valletpvlib.ui.theme.ColorTheme
 fun AddCamareroDialog(vModel: CamarerosModel, onClick: (Camarero) -> Unit) {
 
     val camarero = Camarero()
-
 
     if (vModel.showDialog) {
         AlertDialog(

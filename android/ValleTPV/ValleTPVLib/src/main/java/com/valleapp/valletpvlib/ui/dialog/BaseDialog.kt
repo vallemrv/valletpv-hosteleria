@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.ui
+package com.valleapp.valletpvlib.ui.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

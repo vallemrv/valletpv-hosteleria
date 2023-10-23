@@ -13,9 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
-import com.valleapp.valletpv.ui.BorrarMesa
-import com.valleapp.valletpv.ui.ListadoTicket
-import com.valleapp.valletpv.ui.PaseCamarerosDialog
+import com.valleapp.valletpv.ui.dialog.BorrarMesa
+import com.valleapp.valletpv.ui.dialog.ListadoTicket
+import com.valleapp.valletpv.ui.dialog.PaseCamarerosDialog
 import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.AccionMesa
 import com.valleapp.valletpvlib.models.MesasModel

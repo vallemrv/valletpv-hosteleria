@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.CamarerosModel
 import com.valleapp.valletpv.routers.Routers
-import com.valleapp.valletpv.ui.AddCamareroDialog
+import com.valleapp.valletpv.ui.dialog.AddCamareroDialog
 import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.Camarero
 import com.valleapp.valletpvlib.db.CamareroDao
