@@ -1,8 +1,6 @@
 package com.valleapp.valletpvlib.models
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.valleapp.valletpvlib.db.LineaCuenta
@@ -10,89 +8,85 @@ import com.valleapp.valletpvlib.db.LineasDao
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
 
+class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
-class EditLineaModel(private val mainModel: MainModel, mesaId: Long) : ViewModel() {
+    private val db: LineasDao = mainModel.getDB("lineaspedido") as LineasDao
 
-    val db: LineasDao by mutableStateOf(mainModel.getDB("lineaspedido") as LineasDao)
-    var pedidosActivos: MutableLiveData<List<LineaCuenta>> by mutableStateOf(MutableLiveData(db.getLineasCuenta(mesaId).value ?: listOf()))
-    var pedidosEliminados: MutableLiveData<List<LineaCuenta>> by mutableStateOf(MutableLiveData(listOf()))
+    private val _pedidosActivos = MutableLiveData(listOf<LineaCuenta>())
+    val pedidosActivos: LiveData<List<LineaCuenta>> get() = _pedidosActivos
 
-    var totalActivo: MutableLiveData<Double> by mutableStateOf(MutableLiveData(0.0))
-    var totalBorrado: MutableLiveData<Double> by mutableStateOf(MutableLiveData(0.0))
+    private val _pedidosEliminados = MutableLiveData(listOf<LineaCuenta>())
+    val pedidosEliminados: LiveData<List<LineaCuenta>> get() = _pedidosEliminados
 
-    fun actualizarTotales() {
-        totalActivo.value = pedidosActivos.value?.sumOf { it.cantidad * it.precio } ?: 0.0
-        totalBorrado.value = pedidosEliminados.value?.sumOf { it.cantidad * it.precio } ?: 0.0
-    }
+    private val _totalActivo = MutableLiveData(0.0)
+    val totalActivo: LiveData<Double> get() = _totalActivo
 
-    init {
+    private val _totalBorrado = MutableLiveData(0.0)
+    val totalBorrado: LiveData<Double> get() = _totalBorrado
+
+
+    fun inicializar(cuenta: List<LineaCuenta>){
+        _pedidosActivos.value = cuenta.map { it.copy() }.toMutableList()
+        _pedidosEliminados.value = emptyList()
         actualizarTotales()
     }
 
+    private fun actualizarTotales() {
+        _totalActivo.value = _pedidosActivos.value?.sumOf { it.cantidad * it.precio } ?: 0.0
+        _totalBorrado.value = _pedidosEliminados.value?.sumOf { it.cantidad * it.precio } ?: 0.0
+    }
+
     fun setEliminado(linea: LineaCuenta, borrar: Boolean) {
-        val activos = pedidosActivos.value?.toMutableList() ?: mutableListOf()
-        val eliminados = pedidosEliminados.value?.toMutableList() ?: mutableListOf()
+        val activos = _pedidosActivos.value?.toMutableList() ?: mutableListOf()
+        val eliminados = _pedidosEliminados.value?.toMutableList() ?: mutableListOf()
 
-        if (borrar) {
-            val existente = eliminados.find { it.descripcion == linea.descripcion && it.precio == linea.precio }
+        val targetList = if (borrar) eliminados else activos
 
-            if (existente != null) {
-                existente.cantidad += linea.cantidad
-            } else {
-                eliminados.add(linea.copy())
-            }
+        val existente = targetList.find { it.descripcion == linea.descripcion && it.precio == linea.precio }
 
-            if (linea.cantidad > 1) {
-                linea.cantidad -= 1
-            } else {
-                activos.remove(linea)
-            }
-            pedidosActivos.value = activos
+
+        if (existente != null) {
+            existente.cantidad ++
         } else {
-            val existente = activos.find { it.descripcion == linea.descripcion && it.precio == linea.precio }
-
-            if (existente != null) {
-                existente.cantidad += linea.cantidad
-            } else {
-                activos.add(linea.copy())
-            }
-
-            eliminados.remove(linea)
-            pedidosActivos.value = activos
-            pedidosEliminados.value = eliminados
+            val aux = linea.copy()
+            aux.cantidad = 1
+            targetList.add(aux)
         }
+
+        linea.cantidad --
+
+        if (linea.cantidad < 1) {
+            if (borrar)
+            activos.remove(linea)
+            else
+            eliminados.remove(linea)
+        }
+
+        println("Linea: $linea Borrado = $borrar")
+        println("Existente: $existente")
+
+        _pedidosActivos.postValue(activos)
+        _pedidosEliminados.postValue(eliminados)
 
         actualizarTotales()
     }
 
     fun ejecutarBorrado() {
-        val idsParaBorrar = mutableListOf<Long>()
-
-        pedidosEliminados.value?.forEach { lineaEliminada ->
-            repeat(lineaEliminada.cantidad) {
-                val id = db.findFirstByDescripcionAndPrecio(lineaEliminada.descripcion, lineaEliminada.precio)
-                if (id != null) {
-                    db.deleteById(id)
-                    idsParaBorrar.add(id)
-                }
-            }
-        }
-
-        val params = mapOf(
-            "ids" to idsParaBorrar,
-        )
-
-        val inst = Instrucciones(
-            params = mainModel.getParams(params),
-            endPoint = ApiEndPoints.EDITAR_CUENTA
-        )
-
-        mainModel.addInstruccion(inst)
+        _pedidosEliminados.value?.let { eliminarPedidos(it) }
+        actualizarTotales()
     }
 
+    private fun eliminarPedidos(pedidos: List<LineaCuenta>) {
+        val idsParaBorrar = pedidos.map { lineaEliminada ->
+            List(lineaEliminada.cantidad) {
+                db.findFirstByDescripcionAndPrecio(lineaEliminada.descripcion, lineaEliminada.precio)
+            }
+        }.flatten().filterNotNull()
 
+        idsParaBorrar.forEach { db.deleteById(it) }
+
+        val params = mapOf("ids" to idsParaBorrar)
+        val inst = Instrucciones(params = mainModel.getParams(params), endPoint = ApiEndPoints.EDITAR_CUENTA)
+        mainModel.addInstruccion(inst)
+    }
 }
-
-
-
-

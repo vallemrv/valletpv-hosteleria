@@ -1,6 +1,7 @@
 package com.valleapp.valletpvlib.ui.dialog
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Card
@@ -22,6 +23,7 @@ fun BaseDialog(modifier: Modifier = Modifier, showDialog:Boolean, content: @Comp
                modifier = Modifier
                    .fillMaxSize()
                    .background(Color.run { Black.copy(alpha = 0.5f) })
+                   .clickable { /* Haz algo aquí para cerrar el diálogo si es necesario */ }
            )
            Card(
                elevation = CardDefaults.elevatedCardElevation(8.dp),

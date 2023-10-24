@@ -62,7 +62,7 @@ fun ListaSimple(title:String, list: List<BaseEntity>, onItemClick: (IBaseEntity)
 
 
 @Composable
-fun ListaCuenta(title:String, list: List<LineaCuenta>, onBorrarClick: (LineaCuenta) -> Unit) {
+fun ListaCuenta(title:String, list: List<LineaCuenta>) {
     ValleList(title = title) {
         items(list) { item ->
             ListItemCuenta(item)

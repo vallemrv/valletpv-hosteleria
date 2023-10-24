@@ -47,7 +47,7 @@ fun CuentaTpvScreen(
     val mainModel = app.mainModel
 
     val modelMesas: TeclasModel = viewModel(initializer = { TeclasModel(mainModel.getDB("teclas") as TeclasDao) })
-    val modelEditCuenta: EditLineaModel = viewModel(initializer = { EditLineaModel(mainModel, mesaId)})
+    val modelEditCuenta: EditLineaModel = viewModel(initializer = { EditLineaModel(mainModel)})
     val model: CuentaModel = viewModel(initializer = { CuentaModel(mainModel, camId, mesaId) })
     val titulo by model.titulo.collectAsState()
 
@@ -70,6 +70,13 @@ fun CuentaTpvScreen(
         ValleTopBar(title = titulo , subtitle = model.subtitulo, backAction = {
             navController.popBackStack()
         }, actions = {
+            BotonAccion(
+                icon = ExtendIcons.Borrar,
+                contentDescription = "Modificar cuenta") {
+                model.hacerPedido()
+                modelEditCuenta.inicializar(lineasCuenta)
+                showEditCuenta = true
+            }
             BotonAccion(icon = ExtendIcons.DividirCuenta, contentDescription = "Dividir cuenta") {
 
             }
@@ -84,15 +91,14 @@ fun CuentaTpvScreen(
             BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
                 mainModel.abrirCajon()
             }
+
         })
     }, content = {
         Box(Modifier.padding(it)) {
             Row {
                 Column(Modifier.weight(0.4f)) {
                     Box(modifier = Modifier.weight(0.7f)) {
-                        ListaCuenta("Cuenta", lineasCuenta) {
-                            println("Click en linea cuenta")
-                        }
+                        ListaCuenta("Cuenta", lineasCuenta)
                     }
                     Box(modifier = Modifier.weight(0.3f)) {
                         TecladoNumerico(columns = 3) { can ->
