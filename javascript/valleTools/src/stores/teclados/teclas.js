@@ -131,9 +131,12 @@ export const TeclasStore = defineStore({
     async add(item) {
       if (this.parent_id) {
         item.parent_id = this.parent_id;
+        item.seccion_id = null;
       } else if (this.seccion_id) {
         item.seccion_id = this.seccion_id;
+        item.parent_id = null;
       }
+
       item.familia = item.familia.value;
       const obj = {
         reg: item,
@@ -164,8 +167,10 @@ export const TeclasStore = defineStore({
     async update(item) {
       if (this.parent_id) {
         item.parent_id = this.parent_id;
+        item.seccion_id = null;
       } else if (this.seccion_id) {
         item.seccion_id = this.seccion_id;
+        item.parent_id = null;
       }
       item.familia_id = item.familia.value;
       const obj = {
@@ -173,6 +178,8 @@ export const TeclasStore = defineStore({
         reg: item,
         tb_name: this.modelo,
       }
+
+      
       const params = this.empresaStore.createFormData(obj);
       const url = buildUrl(this.empresaStore.empresa.url, UPDATE_REG);
       const response = await axios.post(url, params);

@@ -26,7 +26,7 @@
                             <v-col cols="4" v-for="(item, index) in   storeSecciones.items  " :key="index">
                                 <v-item :value="item.id" v-slot="{ isSelected, toggle }">
                                     <v-card :class="['d-flex align-center ']"
-                                        :style="{ backgroundColor: item.color }" dark height="90"
+                                        :style="{ backgroundColor: '#FFCDC4DA' }" dark height="90"
                                         style="width: 100%;" @click="(e) => { toggle(e); sel_seccion(item, isSelected) }">
 
                                         <!-- Si item.icono está presente, muestra la imagen -->
