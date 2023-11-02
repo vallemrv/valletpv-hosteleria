@@ -30,7 +30,7 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 import com.valleapp.valletpvlib.ui.theme.Styles
 
 @Composable
-fun BorrarMesa(showDialog: Boolean, onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
+fun BorrarMesa(showDialog: Boolean, title: String="Borrar mesa", onDismissRequest: () -> Unit, onSubmit: (String) -> Unit) {
     var reason by remember { mutableStateOf("") }
 
     BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxHeight(.6f).fillMaxWidth(.5f)) {
@@ -45,7 +45,7 @@ fun BorrarMesa(showDialog: Boolean, onDismissRequest: () -> Unit, onSubmit: (Str
                 .padding(5.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Borrar mesa",
+                    title,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .weight(.8f),

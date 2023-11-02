@@ -3,10 +3,14 @@ package com.valleapp.valletpvlib.models
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.db.LineasDao
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
@@ -71,22 +75,31 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
         actualizarTotales()
     }
 
-    fun ejecutarBorrado() {
-        _pedidosEliminados.value?.let { eliminarPedidos(it) }
+    fun ejecutarBorrado(motivo: String, idm: Long, idc: Long) {
+        _pedidosEliminados.value?.let { eliminarPedidos(it, motivo, idm, idc) }
         actualizarTotales()
     }
 
-    private fun eliminarPedidos(pedidos: List<LineaCuenta>) {
-        val idsParaBorrar = pedidos.map { lineaEliminada ->
-            List(lineaEliminada.cantidad) {
-                db.findFirstByDescripcionAndPrecio(lineaEliminada.descripcion, lineaEliminada.precio)
+
+    private fun eliminarPedidos(pedidos: List<LineaCuenta>, motivo: String = "", idm: Long, idc: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val idsParaBorrar = mutableListOf<Long>()  // Reemplaza TipoDeId con el tipo correcto de tu ID
+
+            pedidos.forEach { pedido ->
+                repeat(pedido.cantidad) {
+                    db.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio)?.let { id ->
+                        db.deleteById(id)
+                        idsParaBorrar.add(id)
+                    }
+                }
             }
-        }.flatten().filterNotNull()
 
-        idsParaBorrar.forEach { db.deleteById(it) }
-
-        val params = mapOf("ids" to idsParaBorrar)
-        val inst = Instrucciones(params = mainModel.getParams(params), endPoint = ApiEndPoints.EDITAR_CUENTA)
-        mainModel.addInstruccion(inst)
+            val params = mapOf("ids" to idsParaBorrar, "motivo" to motivo, "idm" to idm, "idc" to idc)
+            val inst = Instrucciones(
+                params = mainModel.getParams(params),
+                endPoint = ApiEndPoints.EDITAR_CUENTA
+            )
+            mainModel.addInstruccion(inst)
+        }
     }
 }

@@ -179,12 +179,10 @@ class Lineaspedido(models.Model):
         return obj
             
 
-    def borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n):
-        num = -1
-        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
-        if mesa:
-            uid = mesa.infmesa.pk
-            reg = Lineaspedido.objects.filter(infmesa__pk=uid, idart=idArt, estado=s, precio=p, descripcion=n)[:can]
+    def borrar_linea_pedido(ids, idc, motivo, idm):
+        deleted = []
+        for id in ids:
+            reg = Lineaspedido.objects.filter(pk=id)
     
             for r in reg:
                 if motivo != 'null':
@@ -198,24 +196,22 @@ class Lineaspedido(models.Model):
                     r.save()
                 else:
                     r.delete()
+
+            deleted.append({"id": id})
                 
-                r.modifiar_composicion()
-                r.infmesa.componer_articulos()
-                comunicar_cambios_devices("rm", "lineaspedido", {"id":r.id}, {"op": "borrado", "precio": float(r.precio)})
+        r.modifiar_composicion()
+        r.infmesa.componer_articulos()
+            
+        comunicar_cambios_devices("delete", "lineaspedido", deleted)
                 
 
-            num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
-            if num <= 0:
-                for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
-                    obj = m.serialize()
-                    obj["abierta"] = 0
-                    obj["num"] = 0
-                    obj["nomMesa"] = m.mesa.nombre
-                    comunicar_cambios_devices("md", "mesasabiertas", obj)
-                    m.delete()
+        mesaabierta = Mesasabiertas.objects.filter(id=idm).first()
+        if mesaabierta:
+            for m in Mesasabiertas.objects.filter(infmesa__uid=mesaabierta.infmesa.uid):
+                comunicar_cambios_devices("update", "mesas", [m.mesa.serialize()])
+                m.delete()
                
 
-        return num
 
     class Meta:
         db_table = 'lineaspedido'

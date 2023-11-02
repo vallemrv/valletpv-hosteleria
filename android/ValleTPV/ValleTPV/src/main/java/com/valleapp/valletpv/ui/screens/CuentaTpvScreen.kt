@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.valleapp.valletpv.models.ModelCobros
+import com.valleapp.valletpv.ui.dialog.BorrarMesa
 import com.valleapp.valletpv.ui.dialog.CobrarMesaDialog
 import com.valleapp.valletpvlib.ValleApp
 import com.valleapp.valletpvlib.db.TeclasDao
@@ -55,6 +56,10 @@ fun CuentaTpvScreen(
     var showEditCuenta by remember {
         mutableStateOf(false)
     }
+    var showMotivoDialog by remember {
+        mutableStateOf(false)
+    }
+
     val tarifa by model.tarifa.collectAsState()
 
     DisposableEffect(Unit) {
@@ -131,8 +136,19 @@ fun CuentaTpvScreen(
 
 
             EditarPedido(modelEditCuenta, showEditCuenta){
+                if (true){
+                    showMotivoDialog = true
+                }
                 showEditCuenta = false
             }
+
+            BorrarMesa(showDialog = showMotivoDialog,
+                title = "Ejecutar borrado",
+                onDismissRequest = { showMotivoDialog=false },
+                onSubmit = {
+                    showMotivoDialog=false
+                    modelEditCuenta.ejecutarBorrado(it, mesaId, camId)
+                })
 
         }
     })

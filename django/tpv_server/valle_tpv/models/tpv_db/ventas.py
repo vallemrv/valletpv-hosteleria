@@ -177,11 +177,11 @@ class Cierrecaja(models.Model):
             ID__range=(self.ticketcom, self.ticketfinal),
             ticketlineas__lineaspedido__isnull=False
         ).values(
-            'ticketlineas__lineaspedido__IDArt', 
+            'ticketlineas__lineaspedido__tecla_id', 
             'ticketlineas__lineaspedido__Descripcion_t',
             'ticketlineas__lineaspedido__Precio'
         ).annotate(
-            Can=Count('ticketlineas__lineaspedido__IDArt'),
+            Can=Count('ticketlineas__lineaspedido__tecla_id'),
             Total=Sum('ticketlineas__lineaspedido__Precio')
         ).order_by('ticketlineas__lineaspedido__Descripcion_t')
 

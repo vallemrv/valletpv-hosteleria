@@ -26,7 +26,7 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 fun EditarPedido(
     vModel: EditLineaModel,
     showDialog: Boolean,
-    onCloseDialog: () -> Unit
+    onCloseDialog: (Boolean) -> Unit
 ) {
 
     val pedidosActivos by vModel.pedidosActivos.observeAsState(initial = listOf())
@@ -63,7 +63,7 @@ fun EditarPedido(
                         .aspectRatio(1f),
                     contentDescription = "Salir", icon = ExtendIcons.Salir
                 ) {
-                    onCloseDialog()
+                    onCloseDialog(false)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 BotonIcon(
@@ -72,8 +72,7 @@ fun EditarPedido(
                         .aspectRatio(1f),
 
                     contentDescription = "Aceptar", icon = ExtendIcons.Check) {
-                    vModel.ejecutarBorrado()
-                    onCloseDialog()
+                    onCloseDialog(true)
                 }
             }
         }

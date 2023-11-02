@@ -18,7 +18,7 @@ def send_mensaje_impresora(v):
             v = {v["impresora"]: v}
         for o in v:
             r = v[o]
-            channel_name = settings.EMPRESA + "_impresion_" + r["impresora"]
+            channel_name = settings.EMPRESA + "_impresion_" + r["receptor"]
             layer = get_channel_layer()
             async_to_sync(layer.group_send)(channel_name, {
                 'type': 'send_message',

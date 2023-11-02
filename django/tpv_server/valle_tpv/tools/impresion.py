@@ -16,21 +16,20 @@ def imprimir_pedido(id):
     pedido = Pedidos.objects.get(pk=id)
     camareo = Camareros.objects.get(pk=pedido.camarero_id)
     mesa = pedido.infmesa.mesasabiertas_set.get().mesa
-    lineas = pedido.lineaspedido_set.values("idart",
+    lineas = pedido.lineaspedido_set.values("tecla_id",
                                            "descripcion",
                                            "estado",
-                                           "pedido_id").annotate(can=Count('idart'))
+                                           "pedido_id").annotate(can=Count('tecla_id'))
     
     
     receptores = {}
     for l in lineas:
-        receptor = Teclas.objects.get(id=l['idart']).familia.receptor
+        receptor = Teclas.objects.get(id=l['tecla_id']).familia.receptor
         if receptor.nombre not in receptores:
             receptores[receptor.nombre] = {
                 "op": "pedido",
                 "hora": pedido.hora,
-                "receptor": receptor.nomimp,
-                "nom_receptor": receptor.nombre,
+                "receptor": receptor.nombre,
                 "receptor_activo": receptor.activo,
                 "camarero": camareo.nombre + " " + camareo.apellidos,
                 "mesa": mesa.nombre,

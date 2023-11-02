@@ -8,5 +8,5 @@ urlpatterns  = [
     path("mvlinea", api_views.mvlinea, name="cuenta_mvlinea"),
     path("cobrar", api_views.cuenta_cobrar, name="cuenta_cobrar"),
     path("rm", api_views.cuenta_rm, name="cuenta_rm"),
-    path("rmlinea", api_views.cuenta_rm_linea, name="cuenta_rm_linea"),
+    path("editar_cuenta", api_views.editar_cuenta, name="editar_cuenta"),
 ]

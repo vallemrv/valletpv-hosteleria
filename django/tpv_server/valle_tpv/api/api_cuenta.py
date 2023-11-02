@@ -47,17 +47,10 @@ def cuenta_cobrar(request):
 
 
 @check_dispositivo
-def cuenta_rm_linea(request):
-    idm = request.POST["idm"]
-    p = request.POST["Precio"]
-    idArt = request.POST["idArt"]
-    can = int(request.POST["can"])
-    idc = request.POST["idc"]
-    motivo = request.POST["motivo"]
-    s = request.POST["Estado"]
-    n = request.POST["Descripcion"]
-    Lineaspedido.borrar_linea_pedido(idm, p, idArt, can, idc, motivo, s, n)
-    return HttpResponse('success')
+def editar_cuenta(request):
+    Lineaspedido.borrar_linea_pedido(json.loads(request.POST["ids"]), request.POST["idc"], 
+                                     request.POST["motivo"], request.POST["idm"])
+    return JsonResponse({})
 
 
 @csrf_exempt

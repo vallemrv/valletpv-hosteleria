@@ -54,9 +54,9 @@ def preimprimir(request):
         camareo = infmesa.camarero
         mesa = mesa_abierta.mesa
         lineas = infmesa.lineaspedido_set.filter(estado="P")
-        lineas = lineas.values("idart", 
+        lineas = lineas.values("tecla_id", 
                             "descripcion_t", 
-                            "precio").annotate(can=Count('idart'),
+                            "precio").annotate(can=Count('tecla_id'),
                                                 totallinea=Sum("precio"))
         
 
@@ -90,10 +90,10 @@ def reenviarpedido(request):
     pedido = Pedidos.objects.get(pk=idp);
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
-    lineas = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).values("idart",
+    lineas = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).values("tecla_id",
                                             "descripcion",
                                             "estado",
-                                            "pedido_id").annotate(can=Count('idart'))
+                                            "pedido_id").annotate(can=Count('tecla_id'))
     return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
 
@@ -121,10 +121,10 @@ def reenviarlinea(request):
     pedido = Pedidos.objects.get(pk=idp)
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
-    lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
+    lineas = pedido.lineaspedido_set.filter(tecla_id=id, descripcion=nombre).values("tecla_id",
                                             "descripcion",
                                             "estado",
-                                            "pedido_id").annotate(can=Count('idart'))
+                                            "pedido_id").annotate(can=Count('tecla_id'))
     return send_urgente(lineas, pedido.hora, camarero, mesa_a)
 
 def send_urgente(lineas, hora, camarero, mesa_a):
@@ -132,7 +132,7 @@ def send_urgente(lineas, hora, camarero, mesa_a):
         mesa = mesa_a.mesa
         receptores = {}
         for l in lineas:
-            receptor = Teclas.objects.get(id=l['idart']).familia.receptor
+            receptor = Teclas.objects.get(id=l['tecla_id']).familia.receptor
             if receptor.nombre not in receptores:
                 receptores[receptor.nombre] = {
                     "op": "urgente",

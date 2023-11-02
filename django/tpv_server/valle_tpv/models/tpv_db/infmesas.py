@@ -124,7 +124,7 @@ class Infmesa(models.Model):
             lineas = []
             for l in p.lineaspedido_set.values_list("descripcion", 
                                  "precio", 
-                                 "estado").annotate(Cam=Count("idart"),
+                                 "estado").annotate(Cam=Count("tecla_id"),
                                                     Total=Sum("precio")):
                 lineas.append({
                     "Descripcion": l[0],

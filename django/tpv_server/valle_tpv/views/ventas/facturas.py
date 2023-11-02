@@ -46,16 +46,16 @@ def crear_factura(request):
         cp = request.POST["cp"]
         nif = request.POST["cif"]
 
-        rows = ticket.ticketlineas_set.values("linea__idart",  
+        rows = ticket.ticketlineas_set.values("linea__tec_id",  
                                           "linea__descripcion_t",
-                                          "linea__precio").annotate(can=Count('linea__idart'),
+                                          "linea__precio").annotate(can=Count('linea__tecla_id'),
                                                                     total=Sum("linea__precio"))
         lineas = []
         total = 0
         for r in rows:
             total = total + r["total"]
             lineas.append({
-                "idart": r["linea__idart"],
+                "tecla_id": r["linea__tecla_id"],
                 "Nombre": r["linea__descripcion_t"],
                 "Precio": "{0:.2f}".format(r["linea__precio"]),
                 "Total": "{0:.2f}".format(r["total"]),

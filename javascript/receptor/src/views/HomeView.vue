@@ -139,7 +139,7 @@ export default {
         w.disconnect();
       });
       this.getReceptores().forEach((r) => {
-        var ws_aux = new VWebsocket(this.server, r.nomimp, r.Nombre, this.$store.commit);
+        var ws_aux = new VWebsocket(this.server, r.Nombre, this.$store.commit);
         this.ws.push(ws_aux);
         ws_aux.connect();
       });

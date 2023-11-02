@@ -25,7 +25,7 @@ def articulos_vendidos(request):
     if not ventas:
         return JsonError("No hay ventas en este mes")
 
-    # Contar y agrupar por idart
+    # Contar y agrupar por tecla_id
     ventas = ventas.annotate(can=Count("tecla_id")).order_by("-can")
 
     # Limitar los resultados a 25 y obtener nombres de los artículos
