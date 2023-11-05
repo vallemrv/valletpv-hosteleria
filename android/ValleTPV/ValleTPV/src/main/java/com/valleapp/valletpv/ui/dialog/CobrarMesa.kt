@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.valleapp.valletpvlib.models.CuentaModel
 import com.valleapp.valletpvlib.ui.BotonIcon
 import com.valleapp.valletpvlib.ui.TecladoNumerico
 import com.valleapp.valletpvlib.ui.dialog.BaseDialog
@@ -31,12 +29,11 @@ import com.valleapp.valletpvlib.ui.theme.Styles
 
 @Composable
 fun CobrarMesaDialog(
-    modelCuenta: CuentaModel,
+    total: Double,
     showDialog: Boolean,
     onDismiss: (Double?, Double?) -> Unit
 ) {
 
-    val total by modelCuenta.total.collectAsState()
     var entregado by remember { mutableStateOf("") }
     var cambio by remember { mutableDoubleStateOf(0.0) }
 
@@ -132,7 +129,6 @@ fun CobrarMesaDialog(
                         ) {
                             if (entregado.isNotEmpty()) return@BotonIcon
                             val entregadoDouble = 0.0
-                            modelCuenta.cobrarMesa(entregadoDouble)
                             onDismiss(total, entregadoDouble)
                         }
                         Spacer(modifier = Modifier.width(16.dp))
@@ -147,9 +143,7 @@ fun CobrarMesaDialog(
                             if (entregado.isEmpty()) entregado = total.toString()
                             if (cambio < 0) return@BotonIcon
                             val entregadoDouble = entregado.toDoubleOrNull() ?: 0.0
-                            modelCuenta.cobrarMesa(entregadoDouble)
                             onDismiss(total, entregadoDouble)
-
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         BotonIcon(

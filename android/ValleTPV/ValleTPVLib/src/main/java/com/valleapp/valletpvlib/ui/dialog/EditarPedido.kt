@@ -26,21 +26,22 @@ import com.valleapp.valletpvlib.ui.theme.ExtendIcons
 fun EditarPedido(
     vModel: EditLineaModel,
     showDialog: Boolean,
+    title: String,
     onCloseDialog: (Boolean) -> Unit
 ) {
 
-    val pedidosActivos by vModel.pedidosActivos.observeAsState(initial = listOf())
-    val pedidosEliminados by vModel.pedidosEliminados.observeAsState(initial = listOf())
+    val lineasTicket by vModel.lineasTicket.observeAsState(initial = listOf())
+    val lineasModificadas by vModel.lineasEditadas.observeAsState(initial = listOf())
 
-    val totalActivos by vModel.totalActivo.observeAsState(initial = 0.0)
-    val totalEliminados by vModel.totalBorrado.observeAsState(initial = 0.0)
+    val totalActivos by vModel.totalTicket.observeAsState(initial = 0.0)
+    val totalModificado by vModel.totalEditado.observeAsState(initial = 0.0)
 
     BaseDialog(showDialog = showDialog, modifier = Modifier.fillMaxSize(.8f)) {
 
         Row(modifier= Modifier.padding(9.dp) ) {
             Box(modifier = Modifier.weight(.45f)) {
-                ValleList(title = "Total a cobrar: ${String.format("%.2f", totalActivos)} €") {
-                    items(pedidosActivos) {
+                ValleList(title = "Total ticket: ${String.format("%.2f", totalActivos)} €") {
+                    items(lineasTicket) {
                         Box(modifier = Modifier.clickable { vModel.setEliminado(it, true) }){
                             ListItemCuenta(lineaCuenta = it)
                         }
@@ -48,8 +49,8 @@ fun EditarPedido(
                 }
             }
             Box(modifier = Modifier.weight(.45f)) {
-                ValleList(title = "Total a borrar: ${String.format("%.2f", totalEliminados)} €") {
-                    items(pedidosEliminados) {
+                ValleList(title = "$title  ${String.format("%.2f", totalModificado)} €") {
+                    items(lineasModificadas) {
                         Box(modifier = Modifier.clickable { vModel.setEliminado(it, false) }) {
                             ListItemCuenta(lineaCuenta = it)
                         }

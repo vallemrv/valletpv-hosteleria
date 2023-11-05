@@ -164,7 +164,7 @@ fun SelectoresPase(
     vModel: CamarerosModel
 ) {
 
-    val db: CamareroDao = vModel.db
+    val db: CamareroDao = vModel.db?: return
     val autorizados by db.getAutorizados(autorizado = true)
         .observeAsState(initial = listOf())
 

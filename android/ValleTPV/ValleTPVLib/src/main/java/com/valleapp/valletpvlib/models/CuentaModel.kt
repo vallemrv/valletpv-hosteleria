@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.CamareroDao
+import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.db.LineaPedido
 import com.valleapp.valletpvlib.db.LineasDao
 import com.valleapp.valletpvlib.db.MesasDao
@@ -99,12 +100,20 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
 
     }
 
-    fun cobrarMesa(entregado: Double) {
+    fun cobrarMesa(entregado: Double, lineasCuenta: List<LineaCuenta>) {
         //Dentro de un scope IO cargar todos los datos de la mesa y enviarlos al servidor
         //los paramteros son idm, idc, array de lineas y entregado
         viewModelScope.launch(Dispatchers.IO) {
-            val lineas: List<Long> = lineasDao.getAllIds(mesaId)
-            if (lineas.isEmpty()) return@launch
+            val lineas = mutableListOf<Long>()  // Reemplaza TipoDeId con el tipo correcto de tu ID
+
+            lineasCuenta.forEach { pedido ->
+                repeat(pedido.cantidad) {
+                    lineasDao.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio)?.let { id ->
+                        lineas.add(id)
+                    }
+                }
+            }
+           if (lineas.isEmpty()) return@launch
             val params =
                 mapOf("idm" to mesaId, "idc" to camId, "ids" to lineas, "entrega" to entregado)
             val inst = Instrucciones(
@@ -112,8 +121,11 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
                 endPoint = ApiEndPoints.PEDIDOS_COBRAR
             )
             mainModel.addInstruccion(inst)
-            mesasDao.cerrarMesa(mesaId)
-            lineasDao.cobrarLineas(mesaId)
+            lineasDao.cobrarlineas(lineas)
+            getTotal()
+            if (total.value == 0.0) {
+                mesasDao.cerrarMesa(mesaId)
+            }
         }
     }
 

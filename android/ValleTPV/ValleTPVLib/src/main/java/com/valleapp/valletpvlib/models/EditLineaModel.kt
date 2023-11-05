@@ -16,33 +16,36 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
     private val db: LineasDao = mainModel.getDB("lineaspedido") as LineasDao
 
-    private val _pedidosActivos = MutableLiveData(listOf<LineaCuenta>())
-    val pedidosActivos: LiveData<List<LineaCuenta>> get() = _pedidosActivos
+    private val _lineasTicket = MutableLiveData(listOf<LineaCuenta>())
+    val lineasTicket: LiveData<List<LineaCuenta>> get() = _lineasTicket
 
-    private val _pedidosEliminados = MutableLiveData(listOf<LineaCuenta>())
-    val pedidosEliminados: LiveData<List<LineaCuenta>> get() = _pedidosEliminados
+    private val _lineasEditadas = MutableLiveData(listOf<LineaCuenta>())
+    val lineasEditadas: LiveData<List<LineaCuenta>> get() = _lineasEditadas
 
-    private val _totalActivo = MutableLiveData(0.0)
-    val totalActivo: LiveData<Double> get() = _totalActivo
+    private val _totalTicket = MutableLiveData(0.0)
+    val totalTicket: LiveData<Double> get() = _totalTicket
 
-    private val _totalBorrado = MutableLiveData(0.0)
-    val totalBorrado: LiveData<Double> get() = _totalBorrado
+    private val _totalEditado = MutableLiveData(0.0)
+    val totalEditado: LiveData<Double> get() = _totalEditado
 
 
     fun inicializar(cuenta: List<LineaCuenta>){
-        _pedidosActivos.value = cuenta.map { it.copy() }.toMutableList()
-        _pedidosEliminados.value = emptyList()
+        _lineasTicket.value = cuenta.map { it.copy() }.toMutableList()
+        _lineasEditadas.value = emptyList()
         actualizarTotales()
     }
 
     private fun actualizarTotales() {
-        _totalActivo.value = _pedidosActivos.value?.sumOf { it.cantidad * it.precio } ?: 0.0
-        _totalBorrado.value = _pedidosEliminados.value?.sumOf { it.cantidad * it.precio } ?: 0.0
+        _totalTicket.value = _lineasTicket.value?.sumOf { it.cantidad * it.precio } ?: 0.0
+        _totalEditado.value = _lineasEditadas.value?.sumOf { it.cantidad * it.precio } ?: 0.0
+
+        println("Total Ticket: ${_totalTicket.value}")
+        println("Total Editado: ${_totalEditado.value}")
     }
 
     fun setEliminado(linea: LineaCuenta, borrar: Boolean) {
-        val activos = _pedidosActivos.value?.toMutableList() ?: mutableListOf()
-        val eliminados = _pedidosEliminados.value?.toMutableList() ?: mutableListOf()
+        val activos = _lineasTicket.value?.toMutableList() ?: mutableListOf()
+        val eliminados = _lineasEditadas.value?.toMutableList() ?: mutableListOf()
 
         val targetList = if (borrar) eliminados else activos
 
@@ -60,23 +63,20 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
         linea.cantidad --
 
         if (linea.cantidad < 1) {
-            if (borrar)
-            activos.remove(linea)
-            else
-            eliminados.remove(linea)
+            if (borrar) {
+                activos.remove(linea)
+            }else{
+                eliminados.remove(linea)
+            }
         }
 
-        println("Linea: $linea Borrado = $borrar")
-        println("Existente: $existente")
-
-        _pedidosActivos.postValue(activos)
-        _pedidosEliminados.postValue(eliminados)
-
+        _lineasTicket.value = activos
+        _lineasEditadas.value = eliminados
         actualizarTotales()
     }
 
     fun ejecutarBorrado(motivo: String, idm: Long, idc: Long) {
-        _pedidosEliminados.value?.let { eliminarPedidos(it, motivo, idm, idc) }
+        _lineasEditadas.value?.let { eliminarPedidos(it, motivo, idm, idc) }
         actualizarTotales()
     }
 

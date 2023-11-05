@@ -10,6 +10,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,7 +54,16 @@ fun CuentaTpvScreen(
     val titulo by model.titulo.collectAsState()
 
     var showCobrarDialog by remember { mutableStateOf(false) }
-    var showEditCuenta by remember {
+
+    var titleEditarCuenta by remember { mutableStateOf("Total a borrar") }
+    var isBorrar by remember { mutableStateOf(false) }
+
+    val totalTicket by model.total.collectAsState()
+    var totalACobrar by remember {
+        mutableDoubleStateOf(0.0)
+    }
+
+    var showEditarCuenta by remember {
         mutableStateOf(false)
     }
     var showMotivoDialog by remember {
@@ -76,14 +86,29 @@ fun CuentaTpvScreen(
             navController.popBackStack()
         }, actions = {
             BotonAccion(
+                icon = ExtendIcons.Varios,
+                contentDescription = "Varios") {
+
+            }
+            BotonAccion(
                 icon = ExtendIcons.Borrar,
                 contentDescription = "Modificar cuenta") {
-                model.hacerPedido()
-                modelEditCuenta.inicializar(lineasCuenta)
-                showEditCuenta = true
+                if (totalTicket> 0.0) {
+                    model.hacerPedido()
+                    modelEditCuenta.inicializar(lineasCuenta)
+                    titleEditarCuenta = "Total a borrar"
+                    isBorrar = true
+                    showEditarCuenta = true
+                }
             }
             BotonAccion(icon = ExtendIcons.DividirCuenta, contentDescription = "Dividir cuenta") {
-
+                if (totalTicket > 0.0) {
+                    model.hacerPedido()
+                    modelEditCuenta.inicializar(lineasCuenta)
+                    titleEditarCuenta = "Total a dividir"
+                    isBorrar = false
+                    showEditarCuenta = true
+                }
             }
             BotonAccion(icon = ExtendIcons.Imprimir, contentDescription = "Imprimir ticket") {
                 mainModel.preImprimir(mesaId)
@@ -91,6 +116,7 @@ fun CuentaTpvScreen(
 
             BotonAccion(icon = ExtendIcons.Cobrar, contentDescription = "Cobrar efectivo") {
                 model.hacerPedido()
+                totalACobrar = totalTicket
                 showCobrarDialog = true
             }
             BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
@@ -126,30 +152,40 @@ fun CuentaTpvScreen(
                 }
             }
 
-            CobrarMesaDialog(modelCuenta = model, showCobrarDialog) { total, entregado ->
-                if (total != null && entregado != null) {
-                    mCobros.mostrarInfo(total, entregado, entregado - total)
-                    navController.popBackStack()
+            CobrarMesaDialog(totalACobrar, showCobrarDialog) { totalCobrado, entregado ->
+                if (totalCobrado != null && entregado != null) {
+                    mCobros.mostrarInfo(totalCobrado, entregado, entregado - totalCobrado)
+                    if (totalCobrado == totalTicket) {
+                        model.cobrarMesa(entregado, lineasCuenta)
+                        navController.popBackStack()
+                    }else{
+                        model.cobrarMesa(entregado, modelEditCuenta.lineasEditadas.value ?: listOf())
+                    }
+
                 }
                 showCobrarDialog = false
             }
 
 
-            EditarPedido(modelEditCuenta, showEditCuenta){
-                if (true){
-                    showMotivoDialog = true
+            EditarPedido(modelEditCuenta,
+                title= titleEditarCuenta,
+                showDialog = showEditarCuenta
+            ){ modificar->
+                if (modificar) {
+                    totalACobrar = modelEditCuenta.totalEditado.value!!
+                    showMotivoDialog = isBorrar
+                    showCobrarDialog = !isBorrar
                 }
-                showEditCuenta = false
+                showEditarCuenta = false
             }
 
             BorrarMesa(showDialog = showMotivoDialog,
-                title = "Ejecutar borrado",
+                title = "Borrar lineas",
                 onDismissRequest = { showMotivoDialog=false },
-                onSubmit = {
+                onSubmit = {motivo->
                     showMotivoDialog=false
-                    modelEditCuenta.ejecutarBorrado(it, mesaId, camId)
+                    modelEditCuenta.ejecutarBorrado(motivo, mesaId, camId)
                 })
-
         }
     })
 

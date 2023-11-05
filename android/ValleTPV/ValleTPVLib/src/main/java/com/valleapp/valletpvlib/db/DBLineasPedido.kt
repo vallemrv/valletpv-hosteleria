@@ -95,7 +95,10 @@ interface LineasDao : IBaseDao<LineaPedido> {
     fun getTotal(mesaId: Long): Double
 
     @Query("UPDATE LineasPedido SET estado = 'C' WHERE mesaId = :mesaId AND estado = 'P'")
-    fun cobrarLineas(mesaId: Long)
+    fun cobrarMesa(mesaId: Long)
+
+    @Query("UPDATE LineasPedido SET estado = 'C' WHERE id in (:ids) AND estado = 'P'")
+    fun cobrarlineas(ids: List<Long>)
 
     @Query("SELECT id FROM LineasPedido WHERE descripcionT = :descripcion AND precio = :precio LIMIT 1")
     fun findFirstByDescripcionAndPrecio(descripcion: String, precio: Double): Long?
