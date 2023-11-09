@@ -12,6 +12,7 @@ import com.valleapp.valletpvlib.tools.ServiceCom
 
 class ValleApp : Application() {
 
+    val mainModel: MainModel = MainModel(this)
 
     private var mBound = false
     private var connection: ServiceConnection = object : ServiceConnection {
@@ -20,6 +21,7 @@ class ValleApp : Application() {
             mainModel.setService(binder.getService())
             mainModel.cargarPreferencias()
             mBound = true
+            println("Servicio enlazado")
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -27,9 +29,6 @@ class ValleApp : Application() {
             mBound = false
         }
     }
-
-
-    val mainModel: MainModel = MainModel(this)
 
     override fun onCreate() {
         super.onCreate()

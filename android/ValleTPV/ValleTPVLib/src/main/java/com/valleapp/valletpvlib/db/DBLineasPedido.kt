@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Query
+import androidx.room.RoomWarnings
 import org.json.JSONObject
 
 data class LineaCuenta(
@@ -82,11 +83,12 @@ interface LineasDao : IBaseDao<LineaPedido> {
 
     @Query(
         "SELECT COUNT(id) as cantidad, descripcionT as descripcion, precio, COUNT(id) * precio as total  " +
-                "FROM LineasPedido WHERE mesaId = :mesaId AND estado in ('P', 'N') GROUP BY teclaId, descripcionT, precio, estado"
+                "FROM LineasPedido WHERE mesaId = :mesaId AND estado in ('P', 'N')" +
+                " GROUP BY teclaId, descripcionT, precio, estado"
     )
     fun getLineasCuenta(mesaId: Long): LiveData<List<LineaCuenta>>
 
-
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     @Query("SELECT id, descripcion, descripcionT, teclaId, precio, mesaId " +
             "  FROM LineasPedido Where mesaId = :mesaId AND estado = 'N'")
     fun getNuevas(mesaId: Long): List<LineaPedido>
@@ -97,10 +99,11 @@ interface LineasDao : IBaseDao<LineaPedido> {
     @Query("UPDATE LineasPedido SET estado = 'C' WHERE mesaId = :mesaId AND estado = 'P'")
     fun cobrarMesa(mesaId: Long)
 
-    @Query("UPDATE LineasPedido SET estado = 'C' WHERE id in (:ids) AND estado = 'P'")
-    fun cobrarlineas(ids: List<Long>)
+    @Query("UPDATE LineasPedido SET estado = 'C' WHERE id = :id  AND estado = 'P'")
+    fun cobrarlinea(id: Long)
 
-    @Query("SELECT id FROM LineasPedido WHERE descripcionT = :descripcion AND precio = :precio LIMIT 1")
-    fun findFirstByDescripcionAndPrecio(descripcion: String, precio: Double): Long?
+    @Query("SELECT id FROM LineasPedido WHERE descripcionT = :descripcion " +
+            "AND precio = :precio AND estado in (:estado) LIMIT 1")
+    fun findFirstByDescripcionAndPrecio(descripcion: String, precio: Double, estado: List<String>): Long?
 
 }

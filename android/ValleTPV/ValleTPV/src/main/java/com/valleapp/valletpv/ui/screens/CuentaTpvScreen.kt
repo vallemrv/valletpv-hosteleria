@@ -13,11 +13,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.room.util.convertUUIDToByte
 import com.valleapp.valletpv.models.ModelCobros
 import com.valleapp.valletpv.ui.dialog.BorrarMesa
 import com.valleapp.valletpv.ui.dialog.CobrarMesaDialog
@@ -35,6 +37,8 @@ import com.valleapp.valletpvlib.ui.screens.SearchView
 import com.valleapp.valletpvlib.ui.screens.Secciones
 import com.valleapp.valletpvlib.ui.screens.TeclasGrid
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -44,6 +48,8 @@ fun CuentaTpvScreen(
     camId: Long = 0,
     mesaId: Long = 0
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
 
     val app = LocalContext.current.applicationContext as ValleApp
     val mainModel = app.mainModel
@@ -93,21 +99,27 @@ fun CuentaTpvScreen(
             BotonAccion(
                 icon = ExtendIcons.Borrar,
                 contentDescription = "Modificar cuenta") {
-                if (totalTicket> 0.0) {
-                    model.hacerPedido()
-                    modelEditCuenta.inicializar(lineasCuenta)
-                    titleEditarCuenta = "Total a borrar"
-                    isBorrar = true
-                    showEditarCuenta = true
+                model.hacerPedido()
+                coroutineScope.launch {
+                    delay(100)
+                    if (totalTicket> 0.0) {
+                        modelEditCuenta.inicializar(lineasCuenta)
+                        titleEditarCuenta = "Total a borrar"
+                        isBorrar = true
+                        showEditarCuenta = true
+                    }
                 }
             }
             BotonAccion(icon = ExtendIcons.DividirCuenta, contentDescription = "Dividir cuenta") {
-                if (totalTicket > 0.0) {
-                    model.hacerPedido()
-                    modelEditCuenta.inicializar(lineasCuenta)
-                    titleEditarCuenta = "Total a dividir"
-                    isBorrar = false
-                    showEditarCuenta = true
+                model.hacerPedido()
+                coroutineScope.launch {
+                    delay(100)
+                    if (totalTicket > 0.0) {
+                        modelEditCuenta.inicializar(lineasCuenta)
+                        titleEditarCuenta = "Total a dividir"
+                        isBorrar = false
+                        showEditarCuenta = true
+                    }
                 }
             }
             BotonAccion(icon = ExtendIcons.Imprimir, contentDescription = "Imprimir ticket") {
@@ -116,8 +128,13 @@ fun CuentaTpvScreen(
 
             BotonAccion(icon = ExtendIcons.Cobrar, contentDescription = "Cobrar efectivo") {
                 model.hacerPedido()
-                totalACobrar = totalTicket
-                showCobrarDialog = true
+                coroutineScope.launch {
+                    delay(100)
+                    if (totalTicket > 0.0) {
+                        totalACobrar = totalTicket
+                        showCobrarDialog = true
+                    }
+                }
             }
             BotonAccion(icon = ExtendIcons.AbrirCaja, contentDescription = "Abrir cajon") {
                 mainModel.abrirCajon()

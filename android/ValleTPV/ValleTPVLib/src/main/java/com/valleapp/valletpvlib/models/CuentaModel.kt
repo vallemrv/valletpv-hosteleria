@@ -13,6 +13,7 @@ import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -108,11 +109,13 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
 
             lineasCuenta.forEach { pedido ->
                 repeat(pedido.cantidad) {
-                    lineasDao.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio)?.let { id ->
+                    lineasDao.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio, estado = listOf("P"))?.let { id ->
+                        lineasDao.cobrarlinea(id)
                         lineas.add(id)
                     }
                 }
             }
+
            if (lineas.isEmpty()) return@launch
             val params =
                 mapOf("idm" to mesaId, "idc" to camId, "ids" to lineas, "entrega" to entregado)
@@ -121,8 +124,8 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
                 endPoint = ApiEndPoints.PEDIDOS_COBRAR
             )
             mainModel.addInstruccion(inst)
-            lineasDao.cobrarlineas(lineas)
             getTotal()
+            delay(200)
             if (total.value == 0.0) {
                 mesasDao.cerrarMesa(mesaId)
             }

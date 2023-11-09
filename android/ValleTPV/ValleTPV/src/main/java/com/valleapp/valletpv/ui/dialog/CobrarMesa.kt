@@ -130,6 +130,7 @@ fun CobrarMesaDialog(
                             if (entregado.isNotEmpty()) return@BotonIcon
                             val entregadoDouble = 0.0
                             onDismiss(total, entregadoDouble)
+                            entregado = ""
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         BotonIcon(
@@ -144,6 +145,7 @@ fun CobrarMesaDialog(
                             if (cambio < 0) return@BotonIcon
                             val entregadoDouble = entregado.toDoubleOrNull() ?: 0.0
                             onDismiss(total, entregadoDouble)
+                            entregado = ""
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         BotonIcon(
@@ -155,6 +157,7 @@ fun CobrarMesaDialog(
                                 .fillMaxWidth()
                         ) {
                             onDismiss(null, null)
+                            entregado = ""
                         }
                     }
 

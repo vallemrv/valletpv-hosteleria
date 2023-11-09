@@ -54,13 +54,16 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
         if (existente != null) {
             existente.cantidad ++
+            existente.total = existente.cantidad * existente.precio
         } else {
             val aux = linea.copy()
             aux.cantidad = 1
+            aux.total = aux.cantidad * aux.precio
             targetList.add(aux)
         }
 
         linea.cantidad --
+        linea.total = linea.cantidad * linea.precio
 
         if (linea.cantidad < 1) {
             if (borrar) {
@@ -87,7 +90,7 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
             pedidos.forEach { pedido ->
                 repeat(pedido.cantidad) {
-                    db.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio)?.let { id ->
+                    db.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio, estado = listOf("P"))?.let { id ->
                         db.deleteById(id)
                         idsParaBorrar.add(id)
                     }

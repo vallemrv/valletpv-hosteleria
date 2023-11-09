@@ -19,7 +19,8 @@ class CamarerosModel(private val mainModel: MainModel) : ViewModel() {
 
     var showDialog: Boolean by mutableStateOf(false)
 
-    var db: CamareroDao by mutableStateOf( mainModel.getDB("camareros") as CamareroDao)
+    var db: CamareroDao? = mainModel.getDB("camareros") as? CamareroDao
+
 
     fun addCamarero(camarero: Camarero) {
         viewModelScope.launch(Dispatchers.IO) {

@@ -16,8 +16,12 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,75 +39,95 @@ import com.valleapp.valletpvlib.ui.BotonAccion
 import com.valleapp.valletpvlib.ui.BotonIcon
 import com.valleapp.valletpvlib.ui.ListaSimple
 import com.valleapp.valletpvlib.ui.ValleTopBar
+import com.valleapp.valletpvlib.ui.screens.ScreenLoading
 import com.valleapp.valletpvlib.ui.theme.ColorTheme
 import com.valleapp.valletpvlib.ui.theme.ExtendIcons
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun CamarerosPaseScreen(navController: NavController) {
+
     val app = LocalContext.current.applicationContext as ValleApp
     val mainModel = app.mainModel
 
-    if (!mainModel.isPreferenciasCargadas) {
-        navController.navigate(RoutersBase.Preferencias.route)
+    val coroutineScope = rememberCoroutineScope()
+
+    var showUI = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            delay(500)
+            if (!mainModel.isPreferenciasCargadas) {
+                navController.navigate(RoutersBase.Preferencias.route)
+            }else{
+                showUI.value = true
+            }
+        }
     }
 
 
-    val vModel: CamarerosModel = viewModel(initializer = {
-        CamarerosModel(mainModel)
-    })
+   if (showUI.value) {
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { vModel.showDialog = true },
-                containerColor = ColorTheme.Primary,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .size(80.dp),
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 8.dp,
-                    pressedElevation = 12.dp
-                )
-            ) {
-                Icon(
-                    painter = ExtendIcons.Add,
-                    contentDescription = "Agregar",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxSize()
-                )
-            }
-        },
-        topBar = {
-            ValleTopBar(
-                title = "Pase de Camareros"
-            ) {
-                BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
-                    navController.navigate(Routers.Arqueo.route)
-                }
-                BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
-                    navController.navigate(RoutersBase.Preferencias.route)
-                }
-            }
-        },
-        content = {
-            Box(modifier = Modifier.padding(it)) {
-                CamarerosPase(
-                    vModel = vModel,
-                    navController = navController
-                ) {
-                    app.exit()
-                }
+       val vModel: CamarerosModel = viewModel(initializer = {
+           CamarerosModel(mainModel)
+       })
 
-                AddCamareroDialog(vModel) { cam ->
-                    vModel.showDialog = false
-                    vModel.addCamarero(cam)
-                }
-            }
-        }
-    )
+       Scaffold(
+           floatingActionButton = {
+               FloatingActionButton(
+                   onClick = { vModel.showDialog = true },
+                   containerColor = ColorTheme.Primary,
+                   modifier = Modifier
+                       .padding(10.dp)
+                       .size(80.dp),
+                   elevation = FloatingActionButtonDefaults.elevation(
+                       defaultElevation = 8.dp,
+                       pressedElevation = 12.dp
+                   )
+               ) {
+                   Icon(
+                       painter = ExtendIcons.Add,
+                       contentDescription = "Agregar",
+                       tint = Color.Black,
+                       modifier = Modifier
+                           .padding(10.dp)
+                           .fillMaxSize()
+                   )
+               }
+           },
+           topBar = {
+               ValleTopBar(
+                   title = "Pase de Camareros"
+               ) {
+                   BotonAccion(icon = ExtendIcons.Arqueo, contentDescription = "Arqueo") {
+                       navController.navigate(Routers.Arqueo.route)
+                   }
+                   BotonAccion(icon = ExtendIcons.Settings, contentDescription = "Preferencias") {
+                       navController.navigate(RoutersBase.Preferencias.route)
+                   }
+               }
+           },
+           content = {
+               Box(modifier = Modifier.padding(it)) {
+                   CamarerosPase(
+                       vModel = vModel,
+                       navController = navController
+                   ) {
+                       app.exit()
+                   }
+
+                   AddCamareroDialog(vModel) { cam ->
+                       vModel.showDialog = false
+                       vModel.addCamarero(cam)
+                   }
+               }
+           }
+       )
+   }else{
+       ScreenLoading()
+   }
 
 }
 
@@ -164,12 +188,16 @@ fun SelectoresPase(
     vModel: CamarerosModel
 ) {
 
-    val db: CamareroDao = vModel.db?: return
-    val autorizados by db.getAutorizados(autorizado = true)
-        .observeAsState(initial = listOf())
 
-    val noAutorizados by db.getAutorizados(autorizado = false)
-        .observeAsState(initial = listOf())
+    val db: CamareroDao? = vModel.db
+
+    val autorizados by db?.getAutorizados(autorizado = true)
+        ?.observeAsState(initial = listOf()) ?: remember { mutableStateOf(listOf()) }
+
+
+    val noAutorizados by db?.getAutorizados(autorizado = true)
+        ?.observeAsState(initial = listOf()) ?: remember { mutableStateOf(listOf()) }
+
 
     Row {
         Box(

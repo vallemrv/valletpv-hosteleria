@@ -46,7 +46,7 @@ interface IBaseDao<T : BaseEntity> {
 
 @Database(
     entities = [Camarero::class, Mesa::class, Zona::class, Tecla::class, Seccion::class, LineaPedido::class],
-    version = 2
+    version = 2, exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun camareroDao(): CamareroDao
