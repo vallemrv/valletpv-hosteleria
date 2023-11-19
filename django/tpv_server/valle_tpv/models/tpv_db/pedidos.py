@@ -28,9 +28,9 @@ class Pedidos(models.Model):
         p = Pedidos.objects.filter(uid_device=uid_device).first()
         if p: return None
         
-        mesaabierta = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+        mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
-        if not mesaabierta:
+        if not mesa_abierta:
             infmesa = Infmesa()
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
@@ -38,14 +38,14 @@ class Pedidos(models.Model):
             infmesa.uid = idm + '-' + str(uuid4())
             infmesa.save()
             
-            mesaabierta = Mesasabiertas()
-            mesaabierta.mesa_id = idm
-            mesaabierta.infmesa_id = infmesa.pk
-            mesaabierta.save()
+            mesa_abierta = Mesasabiertas()
+            mesa_abierta.mesa_id = idm
+            mesa_abierta.infmesa_id = infmesa.pk
+            mesa_abierta.save()
            
 
         pedido = Pedidos()
-        pedido.infmesa_id = mesaabierta.infmesa.pk
+        pedido.infmesa_id = mesa_abierta.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
         pedido.camarero_id = idc
         pedido.uid_device = uid_device
@@ -53,7 +53,7 @@ class Pedidos(models.Model):
 
         for pd in lineas:
             linea = Lineaspedido()
-            linea.infmesa_id = mesaabierta.infmesa.pk
+            linea.infmesa_id = mesa_abierta.infmesa.pk
             linea.pedido_id = pedido.pk
             linea.descripcion = pd["descripcion"]
             linea.descripcion_t = pd["descripcionT"]
@@ -64,11 +64,11 @@ class Pedidos(models.Model):
                
                 
         
-        pedido.infmesa.numcopias = 0
-        pedido.infmesa.save()   
-        pedido.infmesa.componer_articulos()
-        pedido.infmesa.unir_en_grupos()
-        comunicar_cambios_devices("update", "mesas", [mesaabierta.mesa.serialize()])
+        mesa_abierta.infmesa.numcopias = 0
+        mesa_abierta.infmesa.save()   
+        mesa_abierta.infmesa.componer_articulos()
+        mesa_abierta.infmesa.unir_en_grupos()
+        comunicar_cambios_devices("update", "mesas", [mesa_abierta.mesa.serialize()])
            
         lineas_new = []
         for l in pedido.lineaspedido_set.all():
@@ -76,9 +76,11 @@ class Pedidos(models.Model):
 
         comunicar_cambios_devices("create", "lineaspedido", lineas_new)
 
+        #  delete array de lineas nuevas para modificar los ids del dispositivo
+        #  que ha creado las linea
+        #  solo los ids
 
         ids = [l["id"] for l in lineas]
-        #delete array de lineas, solo los ids
         comunicar_cambios_devices("delete", "lineaspedido", ids)
         return pedido
 
@@ -153,12 +155,13 @@ class Lineaspedido(models.Model):
 
 
     def serialize(self):
-        mesa = Mesasabiertas.objects.filter(infmesa__pk=self.infmesa.pk).first()
-        if mesa:
-            mesa = mesa.mesa
+        mesa_abierta = Mesasabiertas.objects.filter(infmesa__pk=self.infmesa.pk).first()
+        if mesa_abierta:
+            mesa = mesa_abierta.mesa
         else:
             split = self.infmesa.pk.split("-")
             mesa = Mesas.objects.filter(id=split[0]).first()
+
         obj = {
             'id': self.pk,
             'pedidoId': self.pedido_id,
@@ -196,23 +199,26 @@ class Lineaspedido(models.Model):
                     r.save()
                 else:
                     r.delete()
-
-            deleted.append({"id": id})
+                r.modifiar_composicion()
                 
-        r.modifiar_composicion()
-        r.infmesa.componer_articulos()
-            
+
+            deleted.append(id)
+
         comunicar_cambios_devices("delete", "lineaspedido", deleted)
-                
-
-        mesaabierta = Mesasabiertas.objects.filter(id=idm).first()
-        if mesaabierta:
-            for m in Mesasabiertas.objects.filter(infmesa__uid=mesaabierta.infmesa.uid):
-                comunicar_cambios_devices("update", "mesas", [m.mesa.serialize()])
-                m.delete()
+        
+        mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
+        if mesa_abierta:
+            mesa_abierta.infmesa.componer_articulos()
+            mesa_abierta.infmesa.unir_en_grupos()
+            numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=mesa_abierta.infmesa.pk).count()
+             
+            if numart <= 0:
+                mesa_abierta.delete()
+                s = mesa_abierta.mesa.serialize()
                
-
-
+                comunicar_cambios_devices("update", "mesas", [s])
+            
+                
     class Meta:
         db_table = 'lineaspedido'
 

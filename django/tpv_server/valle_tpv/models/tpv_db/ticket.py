@@ -19,21 +19,21 @@ class Ticket(models.Model):
 
 
     @staticmethod
-    def cerrar_cuenta(idm, idc, entrega, ids):
-        mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
+    def cobrar_cuenta(idm, idc, entrega, ids):
+        mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         total = 0
         numart = -1
         id = -1
      
-        if mesa:
-            uid = mesa.infmesa.pk
+        if mesa_abierta:
+            uid = mesa_abierta.infmesa.pk
             ticket = Ticket()
             ticket.hora = datetime.now().strftime("%H:%M")
             ticket.fecha = datetime.now() 
             ticket.camarero_id = idc
             ticket.uid = uid
             ticket.entrega = entrega
-            ticket.mesa = mesa.mesa.nombre
+            ticket.mesa = mesa_abierta.mesa.nombre
             ticket.save()
             id = ticket.id
 
@@ -52,10 +52,10 @@ class Ticket(models.Model):
                 comunicar_cambios_devices("delete", "lineaspedido", ids)
 
             numart = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
-           
+            
             if numart <= 0:
-                mesa.delete()
-                s = mesa.mesa.serialize()
+                mesa_abierta.delete()
+                s = mesa_abierta.mesa.serialize()
                 comunicar_cambios_devices("update", "mesas", [s])
               
       

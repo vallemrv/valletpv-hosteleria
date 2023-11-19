@@ -36,7 +36,7 @@ def cuenta_cobrar(request):
     entrega = request.POST["entrega"]
     ids = json.loads(request.POST["ids"])
 
-    total, id = Ticket.cerrar_cuenta(idm, idc, entrega, ids)
+    total, id = Ticket.cobrar_cuenta(idm, idc, entrega, ids)
            
     if (id > 0):
         send_imprimir_ticket(request, id)

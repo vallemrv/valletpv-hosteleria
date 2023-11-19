@@ -42,7 +42,7 @@ def send_cobrar_mesa(request):
         obj["Can"] = 1
         art.append(obj)
 
-    Ticket.cerrar_cuenta(mesa.mesa.id, idc, entrega, art)
+    Ticket.cobrar_cuenta(mesa.mesa.id, idc, entrega, art)
    
     return JsonResponse({})
 

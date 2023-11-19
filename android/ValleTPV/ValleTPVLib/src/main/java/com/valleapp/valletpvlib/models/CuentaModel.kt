@@ -109,7 +109,8 @@ class CuentaModel(val mainModel: MainModel, private val camId: Long, private val
 
             lineasCuenta.forEach { pedido ->
                 repeat(pedido.cantidad) {
-                    lineasDao.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio, estado = listOf("P"))?.let { id ->
+                    lineasDao.findFirstByDescripcionAndPrecio(pedido.descripcion,
+                        pedido.precio, estado = listOf("P"), mesaId)?.let { id ->
                         lineasDao.cobrarlinea(id)
                         lineas.add(id)
                     }

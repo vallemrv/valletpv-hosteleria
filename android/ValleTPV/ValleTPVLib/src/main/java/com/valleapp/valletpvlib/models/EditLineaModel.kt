@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.valleapp.valletpvlib.db.LineaCuenta
 import com.valleapp.valletpvlib.db.LineasDao
+import com.valleapp.valletpvlib.db.MesasDao
 import com.valleapp.valletpvlib.tools.ApiEndPoints
 import com.valleapp.valletpvlib.tools.Instrucciones
 import kotlinx.coroutines.Dispatchers
@@ -38,9 +39,6 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
     private fun actualizarTotales() {
         _totalTicket.value = _lineasTicket.value?.sumOf { it.cantidad * it.precio } ?: 0.0
         _totalEditado.value = _lineasEditadas.value?.sumOf { it.cantidad * it.precio } ?: 0.0
-
-        println("Total Ticket: ${_totalTicket.value}")
-        println("Total Editado: ${_totalEditado.value}")
     }
 
     fun setEliminado(linea: LineaCuenta, borrar: Boolean) {
@@ -80,7 +78,6 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
     fun ejecutarBorrado(motivo: String, idm: Long, idc: Long) {
         _lineasEditadas.value?.let { eliminarPedidos(it, motivo, idm, idc) }
-        actualizarTotales()
     }
 
 
@@ -90,7 +87,8 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
 
             pedidos.forEach { pedido ->
                 repeat(pedido.cantidad) {
-                    db.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio, estado = listOf("P"))?.let { id ->
+                    db.findFirstByDescripcionAndPrecio(pedido.descripcion, pedido.precio,
+                        estado = listOf("P"), idm)?.let { id ->
                         db.deleteById(id)
                         idsParaBorrar.add(id)
                     }
@@ -103,6 +101,10 @@ class EditLineaModel(private val mainModel: MainModel) : ViewModel() {
                 endPoint = ApiEndPoints.EDITAR_CUENTA
             )
             mainModel.addInstruccion(inst)
+            if (totalEditado.value == 0.0) {
+                var db_mesa = mainModel.getDB("mesas") as MesasDao
+                db_mesa.cerrarMesa(idm)
+            }
         }
     }
 }

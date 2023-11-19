@@ -55,7 +55,7 @@ fun CuentaTpvScreen(
     val mainModel = app.mainModel
 
     val modelMesas: TeclasModel = viewModel(initializer = { TeclasModel(mainModel.getDB("teclas") as TeclasDao) })
-    val modelEditCuenta: EditLineaModel = viewModel(initializer = { EditLineaModel(mainModel)})
+    val modelEditCuenta: EditLineaModel = viewModel(initializer = { EditLineaModel(mainModel) })
     val model: CuentaModel = viewModel(initializer = { CuentaModel(mainModel, camId, mesaId) })
     val titulo by model.titulo.collectAsState()
 
