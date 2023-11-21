@@ -6,10 +6,17 @@
     android:layout_height="match_parent"
     tools:context="com.valleapp.valletpv.Cuenta">
 
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/contentControles"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="@dimen/btn_accion"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true">
 
@@ -24,8 +31,8 @@
 
         <ImageButton
             android:id="@+id/AbrirCajon"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/btn_accion"
+            android:layout_height="@dimen/btn_accion"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
@@ -42,8 +49,8 @@
 
         <ImageButton
             android:id="@+id/Cobrar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/btn_accion"
+            android:layout_height="@dimen/btn_accion"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
@@ -61,7 +68,7 @@
         <EditText
             android:id="@+id/txtBuscar"
             android:layout_width="250dp"
-            android:layout_height="100dp"
+            android:layout_height="@dimen/btn_accion"
             android:layout_alignBottom="@+id/btnVarios"
             android:layout_centerVertical="true"
             android:layout_toStartOf="@+id/btnVarios"
@@ -74,8 +81,8 @@
 
         <ImageButton
             android:id="@+id/btnVarios"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/btn_accion"
+            android:layout_height="@dimen/btn_accion"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
@@ -92,8 +99,8 @@
 
         <ImageButton
             android:id="@+id/preimprimir"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/btn_accion"
+            android:layout_height="@dimen/btn_accion"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
@@ -110,8 +117,8 @@
 
         <ImageButton
             android:id="@+id/separar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/btn_accion"
+            android:layout_height="@dimen/btn_accion"
             android:layout_centerVertical="true"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"

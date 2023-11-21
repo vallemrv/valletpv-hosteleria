@@ -24,8 +24,8 @@
        >
 
         <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/btn_mesas_accion"
+            android:layout_height="@dimen/btn_mesas_accion"
             android:id="@+id/btnBorrarMesa"
             android:onClick="clickBorrarMesa"
             android:background="@drawable/fondo_btn_xml"
@@ -36,8 +36,8 @@
             />
 
         <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/btn_mesas_accion"
+            android:layout_height="@dimen/btn_mesas_accion"
             android:id="@+id/btnCambiarMesa"
             android:onClick="clickCambiarMesa"
             android:background="@drawable/fondo_btn_xml"
@@ -49,8 +49,8 @@
 
         <ImageButton
             android:id="@+id/btnCobrar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/btn_mesas_accion"
+            android:layout_height="@dimen/btn_mesas_accion"
             android:layout_margin="5dp"
             android:background="@drawable/fondo_btn_xml"
             android:onClick="clickCobrarMesa"
