@@ -1,6 +1,7 @@
 sl_dump.js
 *.zip
 .DS_Store
+dump.rdb
 
 
 # Directorios y ficheros no necesarios
