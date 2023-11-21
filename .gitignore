@@ -2,6 +2,7 @@ sl_dump.js
 *.zip
 .DS_Store
 dump.rdb
+django/valletpv_web/mail_server/settings.py
 
 
 # Directorios y ficheros no necesarios
