@@ -1,6 +1,8 @@
 {
-  "appId": "com.valleapp.valleges",
-  "appName": "ValleGES",
+  "appId": "es.valletpv.valleges",
+  "appName": "es.valletpv.valleges",
   "webDir": "dist",
-  "bundledWebRuntime": false
+  "server": {
+    "androidScheme": "https"
+  }
 }
