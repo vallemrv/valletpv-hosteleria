@@ -33,5 +33,3 @@ def suscribirse(resquest):
         )
     return redirect( "index")
 
-def valleges(request):
-    return render(request, template_name="www/valleges/index.html")
