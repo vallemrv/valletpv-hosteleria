@@ -17,10 +17,12 @@
 
 <script>
 export default {
-    props:[ "items"],
-    data(){
-        return {
-            drawer: true
+    props:{
+        items:{
+            default: [],
+        },
+        drawer:{
+            default: false,
         }
     },
     methods: {

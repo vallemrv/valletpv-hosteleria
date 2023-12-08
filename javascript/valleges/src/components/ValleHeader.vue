@@ -7,16 +7,34 @@
           <v-col cols="12" class="pa-0 ma-0 text-caption">{{ empresa.nombre }} </v-col>
         </v-row>
      </v-toolbar-title>
+
      <v-progress-circular
             indeterminate
             color="primary"
             v-if="ocupado"
           ></v-progress-circular>
-    <v-spacer></v-spacer>
+    
     <valle-inbox :anchor="anchor" :num_inst="num_inst" v-if="num_inst > 0"></valle-inbox>
      <v-btn v-for="(btn, i) in btns" :key="i" icon @click="btn.callback(btn.op)">
-     <v-icon>{{btn.icon}}</v-icon>
+        <v-icon>{{btn.icon}}</v-icon>
      </v-btn>
+     <v-btn icon v-if="empresas.length > 0">
+      <v-icon>mdi-dots-vertical</v-icon>
+      <v-menu location="bottom start" origin="end" activator="parent">
+        <v-list>
+          <v-list-item
+            v-for="(item, index) in empresas"
+            :key="index"
+            :value="index"
+            @click="selEmpresa(index)"
+          >
+            <v-list-item-title>{{ item.nombre }}   
+              <v-icon v-if="item.nombre == empresa.nombre">mdi-check</v-icon>
+          </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -28,13 +46,13 @@ export default {
   props:["title", "btns", "anchor"],
   data: () => ({ }),
   computed: {
-    ...mapState(["empresa",  "ocupado", "instrucciones"]),
+    ...mapState(["empresa", "empresas",  "ocupado", "instrucciones"]),
     num_inst() {
       return this.instrucciones ? this.instrucciones.length : 0;
     },
   },
   methods: {
-    ...mapActions(["getListado"]),
+    ...mapActions(["getListado", "selEmpresa"]),
   },
 };
 </script>

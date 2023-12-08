@@ -57,6 +57,14 @@ export default {
         else state.empresa = state.empresas[0];
         commit(types.REQUEST_SUCCESS)
     },
+    borrarEmpresa({ commit, state }, index){
+        let v = state.empresas.filter(element => {
+            return element.nombre != state.empresas[index].nombre
+         });
+         state.empresas = [...v];
+         localStorage.empresas = JSON.stringify(v)
+         commit(types.REQUEST_SUCCESS)
+    },
     borrarVentas( {commit, state}){
         commit(types.GET_REQUEST)
         let params = new FormData()

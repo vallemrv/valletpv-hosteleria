@@ -80,6 +80,23 @@ export default {
   },
   methods: {
     ...mapActions(["getListadoCompuesto", "addInstruccion"]),
+    get_familias_mapeadas(){
+    return this.familias.map((e) => {
+        if (e.composicion) {
+            e.composicion = e.composicion.replace(/'/g, '"');
+            try {
+                e.composicion = JSON.parse(e.composicion);
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                e.composicion = []; // asigna un array vacío si hay un error
+            }
+        } else {
+            e.composicion = [];
+        }
+        return e;
+    });
+},
+
     op_btns(op){
         this.showDialogo = true;
         this.tipo = "add";
@@ -96,7 +113,7 @@ export default {
       ) {
         this.getListadoCompuesto({ tablas: ["familias", "receptores", "teclas"] });
       } else {
-        this.$store.state.itemsFiltrados = this.familias;
+        //this.$store.state.itemsFiltrados = this.get_familias_mapeadas();
       }
     },
     on_click_tools(v, op) {
@@ -130,11 +147,12 @@ export default {
       if (!v) {
         this.cargarRegistro();
       } else {
-        this.$store.state.itemsFiltrados = this.familias;
+        this.$store.state.itemsFiltrados =  this.get_familias_mapeadas() ;
       }
     },
     receptores(v) {},
   },
+  
   mounted() {
     this.cargarRegistro();
   },
