@@ -3,6 +3,7 @@ testtpv.back
 aplicaciones_gestion_sueltas
 output.json
 .DS_Store
+constant_config.py
 
 # Directorios y ficheros no necesarios
 .vscode/
