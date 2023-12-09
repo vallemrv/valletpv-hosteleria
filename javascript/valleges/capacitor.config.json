@@ -1,8 +1,0 @@
-{
-  "appId": "es.valletpv.valleges",
-  "appName": "es.valletpv.valleges",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https"
-  }
-}

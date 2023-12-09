@@ -15,7 +15,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import ValleFooter from "./components/ValleFooter";
+import ValleFooter from "./components/ValleFooter.vue";
 
 export default {
   components: { ValleFooter },
