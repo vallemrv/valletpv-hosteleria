@@ -69,15 +69,22 @@ import ValleColorInputVue from "./ValleColorInput.vue";
 
 export default {
   components: { ValleSelectVue, ValleColorInputVue },
-  props: ["show", "item", "form", "title", "tb_name", "tipo"],
+  props: ["item", "form", "title", "tb_name", "tipo"],
   data() {
-    return { textAlert: null };
+    return {
+       textAlert: null,
+       show: false,
+     };
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
+    show_dialogo() {
+      this.show = true;
+    },
     close_dialogo() {
       this.textAlert = null;
       this.$emit("close", null);
+      this.show = false;
     },
     enviar() {
       this.textAlert = this.$tools.valid_form(this.item, this.form);
@@ -102,10 +109,12 @@ export default {
             filter: this.item.filter,
           };
           this.addInstruccion({ inst: inst });
+          close_dialogo();
         } else {
            this.$emit("close", this.item);
+           this.show = false;
         }
-        this.close_dialogo();
+        
       }
     },
   },
@@ -113,6 +122,7 @@ export default {
     show(v) {
       if (!v) {
         this.$emit("close");
+        this.show = false;
       }
     },
   },

@@ -3,7 +3,7 @@
   <v-container>
     <v-row class="text-center mt-10">
       <v-col cols="12">
-        <v-img height="300px" src="@/assets/logo_v3.png"></v-img>
+        <v-img height="300px" src="/assets/logo_v3.png"></v-img>
       </v-col>
       <v-col cols="12" class="ma-0 pa-0">
         <div class="text-subtitle-1 font-weight-bold">

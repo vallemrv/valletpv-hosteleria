@@ -2,16 +2,16 @@
   <v-app-bar app color="#cfb6d4">
     <v-app-bar-nav-icon
       v-if="empresa"
-      @click.stop="drawer = !drawer"
+      @click.stop="drawer = !drawer; refs.menu.open_drawer(drawer)"
     ></v-app-bar-nav-icon>
     <v-toolbar-title v-if="empresa"> {{ empresa.nombre }} </v-toolbar-title>
-    <v-toolbar-title v-else>ValleGestion</v-toolbar-title>
+    <v-toolbar-title v-else>ValleGES</v-toolbar-title>
     <v-progress-circular
       indeterminate
       color="primary"
       v-if="ocupado"
     ></v-progress-circular>
-    <v-btn icon @click="showDialog = true"><v-icon>mdi-home-plus</v-icon></v-btn>
+    <v-btn icon @click="showDialog()"><v-icon>mdi-home-plus</v-icon></v-btn>
     <v-btn icon v-if="empresas.length > 0">
       <v-icon>mdi-dots-vertical</v-icon>
       <v-menu location="bottom start" origin="end" activator="parent">
@@ -32,12 +32,12 @@
     </v-btn>
     
   </v-app-bar>
-  <valle-menu :items="items" :drawer="drawer" @click_item="on_click_menu"></valle-menu>
+  <valle-menu :items="items" ref="menu" @click_item="on_click_menu"></valle-menu>
   <valle-dialogo-form
     @close="on_close_form"
+    ref="dialgForm"
     :title="titledialog"
     :tipo="tipo"
-    :show="showDialog"
     :item="itemEmpresa"
     :form="formEmpresa"
   >
@@ -58,7 +58,6 @@ export default {
   data: () => ({
     titledialog: "Agregar empresa",
     tipo: "add_empresa",
-    showDialog: false,
     drawer: false,
     formEmpresa: [
       { col: "nombre", label: "Nombre", tp: "text" },
@@ -73,8 +72,10 @@ export default {
   },
   methods: {
     ...mapActions(["addEmpresa", "selEmpresa", "borrarEmpresa"]),
+    showDialog() {
+      this.$refs.dialgForm.show_dialogo();
+    },
     on_close_form(item) {
-      this.showDialog = false;
       if (item) {
         this.addEmpresa(item);
         this.itemEmpresa = {};

@@ -21,11 +21,15 @@ export default {
         items:{
             default: [],
         },
-        drawer:{
-            default: false,
-        }
+
     },
+    data: () => ({
+        drawer: false,
+    }),
     methods: {
+      open_drawer(){
+        this.drawer = true;
+      },
       on_click_item(v){
        this.$emit("click_item", v);
       }
