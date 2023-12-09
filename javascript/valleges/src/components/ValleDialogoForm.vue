@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="show" content-class="v-dialog--custom">
+    <v-dialog v-model="show" >
       <v-card :title="title">
         <v-divider></v-divider>
         <v-card-text>
@@ -54,7 +54,7 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-          <v-btn color="primary" @click="close_dialogo">cancelar</v-btn>
+          <v-btn color="primary" @click="close_dialog">cancelar</v-btn>
           <v-btn color="pink" @click="enviar">aceptar</v-btn>
         </v-card-actions>
       </v-card>
@@ -78,12 +78,11 @@ export default {
   },
   methods: {
     ...mapActions(["addItem", "addInstruccion"]),
-    show_dialogo() {
+    show_dialog() {
       this.show = true;
     },
-    close_dialogo() {
+    close_dialog() {
       this.textAlert = null;
-      this.$emit("close", null);
       this.show = false;
     },
     enviar() {
@@ -111,7 +110,7 @@ export default {
           this.addInstruccion({ inst: inst });
           close_dialogo();
         } else {
-           this.$emit("close", this.item);
+           this.$emit("setItem", this.item);
            this.show = false;
         }
         
@@ -121,7 +120,6 @@ export default {
   watch: {
     show(v) {
       if (!v) {
-        this.$emit("close");
         this.show = false;
       }
     },

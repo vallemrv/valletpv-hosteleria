@@ -1,5 +1,5 @@
-import TeclasView from '@/views/gestion/teclados/TeclasView/TeclasView'
 import CamarerosView from '@/views/gestion/camareros/CamarerosView'
+import TeclasView from '@/views/gestion/teclados/TeclasView/TeclasView'
 
 import SeccionesView from '@/views/gestion/teclados/SeccionesView'
 import TecladosComanda from '@/views/gestion/teclados/TecladosComanda'

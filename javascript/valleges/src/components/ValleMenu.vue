@@ -27,8 +27,8 @@ export default {
         drawer: false,
     }),
     methods: {
-      open_drawer(){
-        this.drawer = true;
+      open_drawer(show){
+        this.drawer = show;
       },
       on_click_item(v){
        this.$emit("click_item", v);

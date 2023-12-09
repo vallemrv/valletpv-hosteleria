@@ -1,23 +1,9 @@
 <template>
-  <valle-editor-item
-    :filtro="filtro"
-    :tb_name="tb_name"
-    :form="form"
-    :tabla="tabla"
-    :tools="tools"
-    @click_filter="on_click_filter"
-    @click_tools="on_click_tools"
-  >
+  <valle-editor-item :tb_name="tb_name" :form="form" :tabla="tabla" :tools="tools" @click_filter="on_click_filter"
+    @click_tools="on_click_tools">
   </valle-editor-item>
-  <valle-dialogo-form
-    @close="on_close_dialogo"
-    :show="showDialog"
-    :title="titleDialogo"
-    :item="itemSel"
-    :form="form"
-    :tb_name="tb_name"
-    :tipo="tipo"
-  >
+  <valle-dialogo-form @close="on_close_dialogo" :show="showDialog" :title="titleDialogo" :item="itemSel" :form="form"
+    :tb_name="tb_name" :tipo="tipo">
   </valle-dialogo-form>
 </template>
 
@@ -33,16 +19,18 @@ export default {
     ...mapState(["camareros", "permisoschoices"]),
     form() {
       return [
-        { col: "nombre", label: "Nombre", tp: "text" },
-        { col: "apellidos", label: "1º Apellido", tp: "text" },
+        { col: "nombre", label: "Nombre", tp: "text", mobileVisible: true },
+        { col: "apellidos", label: "1º Apellido", tp: "text", mobileVisible: true },
         {
           col: "permisos",
           label: "Permisos",
           choices: this.getListValues("permisoschoices", "choices"),
           tp: "multiple",
+          mobileVisible: false, 
         },
       ];
     },
+
   },
   data() {
     const col = ["nombre", "apellidos", "permisos"];

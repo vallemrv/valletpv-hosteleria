@@ -3,9 +3,7 @@
   <v-container>
     <Camareros v-if="vista == 'edicion'" />
     <CamarerosPase v-else-if="vista == 'pase'"/>
-
-    <ValleDialogoForm :show="showDialogo" :form="form" 
-                        @close="on_close_add_cam" 
+    <ValleDialogoForm   ref="dialogForm" :form="form" 
                         tb_name="camareros"
                         :item="item"
                         tipo="add" title="Agregar camarero"/>
@@ -18,8 +16,8 @@
 import { mapGetters, mapState } from "vuex";
 import ValleHeader from "@/components/ValleHeader.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";
-import Camareros from "./components/Camareros.vue";
-import CamarerosPase from "./components/CamarerosPase.vue";
+import Camareros from "@/views/gestion/camareros/components/Camareros.vue";
+import CamarerosPase from "@/views/gestion/camareros/components/CamarerosPase.vue";
 
 export default {
     components:{ ValleHeader, ValleDialogoForm, Camareros, CamarerosPase },
@@ -60,7 +58,7 @@ export default {
           switch(op){
               case "add-cam":
                   this.item = {}
-                  this.showDialogo = true
+                  this.$ref.dialogForm.show_dialogo(true)
                   break;
               case "show-pase":
                   this.vista = "pase";

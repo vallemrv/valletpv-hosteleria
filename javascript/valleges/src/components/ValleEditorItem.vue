@@ -32,7 +32,7 @@
 
 <script>
 import { mapState } from "vuex";
-import ValleHeader from "./ValleHeader";
+import ValleHeader from "@/components/ValleHeader.vue";
 import ValleListadosTb from "@/components/ValleListadosTb.vue";
 import ValleFiltros from "@/components/ValleFiltros.vue";
 import ValleDialogoForm from "@/components/ValleDialogoForm.vue";

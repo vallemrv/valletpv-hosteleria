@@ -2,7 +2,7 @@
   <v-app-bar app color="#cfb6d4">
     <v-app-bar-nav-icon
       v-if="empresa"
-      @click.stop="drawer = !drawer; refs.menu.open_drawer(drawer)"
+      @click.stop="drawer = !drawer; $refs.mainMenu.open_drawer(drawer)"
     ></v-app-bar-nav-icon>
     <v-toolbar-title v-if="empresa"> {{ empresa.nombre }} </v-toolbar-title>
     <v-toolbar-title v-else>ValleGES</v-toolbar-title>
@@ -32,9 +32,9 @@
     </v-btn>
     
   </v-app-bar>
-  <valle-menu :items="items" ref="menu" @click_item="on_click_menu"></valle-menu>
+  <valle-menu :items="items" ref="mainMenu" @click_item="on_click_menu"></valle-menu>
   <valle-dialogo-form
-    @close="on_close_form"
+    @setItem="setItem"
     ref="dialgForm"
     :title="titledialog"
     :tipo="tipo"
@@ -73,9 +73,9 @@ export default {
   methods: {
     ...mapActions(["addEmpresa", "selEmpresa", "borrarEmpresa"]),
     showDialog() {
-      this.$refs.dialgForm.show_dialogo();
+      this.$refs.dialgForm.show_dialog();
     },
-    on_close_form(item) {
+    setItem(item) {
       if (item) {
         this.addEmpresa(item);
         this.itemEmpresa = {};

@@ -31,7 +31,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import ValleSwitch from "@/components/ValleSwitch";
+import ValleSwitch from "@/components/ValleSwitch.vue";
 
 export default {
   components: { ValleSwitch },
