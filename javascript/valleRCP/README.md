@@ -1,4 +1,4 @@
-# receptor
+# valleRCP
 
 ## Project setup
 ```
