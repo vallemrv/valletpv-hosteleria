@@ -19,7 +19,7 @@ export default {
     },
     get_listado(){
         return post("/api/receptores/get_lista")
-    }
+    },
     gestionar_peticion(server, params){
         return post(server, "api/autorizaciones/gestionar_peticion", params)
     },

@@ -3,7 +3,7 @@
     <v-main app>
       <router-view></router-view>
     </v-main>
-    <valle-footer></valle-footer>
+  
     <v-snackbar v-model="snackbar" multi-line>
       {{ error }}
       <template v-slot:actions>

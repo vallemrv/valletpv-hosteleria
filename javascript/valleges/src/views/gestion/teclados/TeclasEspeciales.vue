@@ -66,7 +66,7 @@ export default {
         all: [],
       },
       btns:[ {icon: "mdi-plus", op: "add", callback: this.op_btns}],
-      tb_name_edit:"composicion"
+      tb_name_edit:"composicionteclas"
     };
   },
   computed: {
@@ -122,6 +122,7 @@ export default {
         this.titleForm = "Agregar tecla"
         this.formSel = this.form;
         this.tb_name = "teclas"
+        this.tb_name_edit = "teclas"
     },
     mostrarTeclasComp() {
       this.$store.state.itemsFiltrados = this.getItemsFiltered(null, "composicionteclas");
