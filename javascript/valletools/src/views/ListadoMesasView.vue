@@ -33,10 +33,11 @@
           <v-card-title
             >
             <v-row>
-              <v-col cols="6">
+              <v-col cols="4">
                 Mesa: {{ item.nomMesa }}
               </v-col>
-              <v-col cols="6" class="text-right"> Hora: {{ item.hora }}</v-col>
+              <v-col cols="4" class="text-left"> Fecha: {{ item.fecha }}</v-col>
+              <v-col cols="4" class="text-right"> Hora: {{ item.hora }}</v-col>
             </v-row>
           </v-card-title>
           <v-card-text>

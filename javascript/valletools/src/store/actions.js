@@ -217,7 +217,8 @@ export default {
         params.append("token", state.empresa.token)
         API.getNulos(state.empresa.url, params)
         .then( r => {
-            state.nulos = r; 
+            state.nulos = r;
+            console.log(r) 
             commit(types.REQUEST_SUCCESS);
         })
         .catch(error => {
@@ -231,6 +232,7 @@ export default {
         params.append("token", state.empresa.token)
         API.getListdoMesas(state.empresa.url, params)
         .then( r => {
+           
             state.listadomesas = r; 
             commit(types.REQUEST_SUCCESS);
         })
