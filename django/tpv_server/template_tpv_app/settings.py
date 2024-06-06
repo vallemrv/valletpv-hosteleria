@@ -152,10 +152,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 #smtp config
-EMAIL_HOST_PASSWORD = 'Calamatraca'
-EMAIL_HOST_USER = 'valleapp.store@gmail.com'
-EMAIL_PORT = '587'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ''
+EMAIL_PORT = ''
+EMAIL_HOST = ''
 EMAIL_USE_TLS = True
 
 # session expire at browser close
