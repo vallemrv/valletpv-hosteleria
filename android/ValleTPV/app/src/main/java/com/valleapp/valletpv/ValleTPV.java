@@ -11,9 +11,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpv.db.DBCamareros;
@@ -36,10 +36,22 @@ public class ValleTPV extends Activity {
     ListView lsnoautorizados;
     ListView lstautorizados;
 
+    private String urlCashlogy = "";
+    private boolean usarCashlogy = false;
+
 
     private final Handler handleHttp = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
-            rellenarListas();
+            Bundle bundle = msg.getData();
+            Log.e("CASHLOGY", bundle.toString());
+            if (bundle.containsKey("CashlogyMsg")) {
+                String toastMessage = bundle.getString("CashlogyMsg");
+                if (toastMessage != null) {
+                    Toast.makeText(ValleTPV.this, toastMessage, Toast.LENGTH_LONG).show();
+                }
+            }else {
+                rellenarListas();
+            }
         }
     };
 
@@ -101,18 +113,21 @@ public class ValleTPV extends Activity {
     @Override
     protected void onResume() {
         cargarPreferencias();
-        if (myServicio!=null){
+        if (myServicio != null) {
             myServicio.setExHandler("camareros", handleHttp);
             rellenarListas();
         }
         if (server != null && !server.equals("") && myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
+            intent.putExtra("url_cashlogy", urlCashlogy);  // Agregar URL de Cashlogy
+            intent.putExtra("usar_cashlogy", usarCashlogy); // Agregar estado del CheckBox
             startService(intent);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         }
         super.onResume();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -126,24 +141,26 @@ public class ValleTPV extends Activity {
         JSON json = new JSON();
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
-            if(pref==null){
+            if (pref == null) {
                 Intent intent = new Intent(this, PreferenciasTPV.class);
                 startActivity(intent);
-            }else{
+            } else {
                 server = pref.getString("URL");
+                urlCashlogy = pref.optString("URL_Cashlogy", ""); // Leer URL_Cashlogy
+                usarCashlogy = pref.optBoolean("usaCashlogy", false); // Leer usarCashlogy
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
 
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();
             if(myServicio!=null){
+                myServicio.setUiHandlerCashlogy(handleHttp);
                 myServicio.setExHandler("camareros", handleHttp);
                 dbCamareros = (DBCamareros) myServicio.getDb("camareros");
                 rellenarListas();

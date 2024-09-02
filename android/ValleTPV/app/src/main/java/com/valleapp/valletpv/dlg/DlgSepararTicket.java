@@ -39,7 +39,7 @@ public class DlgSepararTicket extends Dialog{
         setContentView(R.layout.separarticket);
 
         final TextView tot = findViewById(R.id.lblTotalCobro);
-        ImageButton ok = findViewById(R.id.btn_aceptar_monedas);
+        ImageButton ok = findViewById(R.id.btn_guardar_preferencias);
         ImageButton s = findViewById(R.id.btn_salir_monedas);
 
         final ListView lstCobros = findViewById(R.id.lstCobros);

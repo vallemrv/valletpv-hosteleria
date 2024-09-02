@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
+import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
@@ -51,6 +52,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -507,10 +509,42 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         }
     }
 
-    public void cobrarMesa(View v){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) { // Este es el código que usamos en startActivityForResult
+            if (resultCode == Activity.RESULT_OK) {
+                // Cobro exitoso
+                double totalIngresado = data.getDoubleExtra("totalIngresado", 0.0);
+
+                // Recibir los datos adicionales
+                double totalMesa = data.getDoubleExtra("totalMesa", 0.0);
+                String lineasString = data.getStringExtra("lineas");
+
+                // Convertir lineasString de vuelta a JSONArray si lo necesitas
+                JSONArray lst = null;
+                try {
+                    lst = new JSONArray(lineasString);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                cobrar(lst, totalMesa, totalIngresado);
+
+                Toast.makeText(this, "Cobro realizado con éxito", Toast.LENGTH_LONG).show();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // Cobro cancelado
+                Toast.makeText(this, "Cobro cancelado", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+    public void cobrarMesa(View v) {
         try {
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            JSONArray l = dbCuenta.filterGroup("IDMesa="+mesa.getString("ID"));
+            JSONArray l = dbCuenta.filterGroup("IDMesa=" + mesa.getString("ID"));
             mostrarCobrar(l, totalMesa);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -567,9 +601,9 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         EditText bus = findViewById(R.id.txtBuscar);
         bus.addTextChangedListener(this);
         try {
-           server = getIntent().getExtras().getString("url");
-           cam = new JSONObject(getIntent().getExtras().getString("cam"));
-           mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
+           server = Objects.requireNonNull(getIntent().getExtras()).getString("url");
+           cam = new JSONObject(Objects.requireNonNull(getIntent().getExtras().getString("cam")));
+           mesa = new JSONObject(Objects.requireNonNull(getIntent().getExtras().getString("mesa")));
            tipo = getIntent().getExtras().getString("op");
            TextView title = findViewById(R.id.txtTitulo);
            title.setText(cam.getString("nombre") +" "+
@@ -671,7 +705,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             try {
                 setEstadoAutoFinish(true, true);
                 if (dlgCobrar != null) dlgCobrar.dismiss();
-                dlgCobrar = new DlgCobrar(this, this);
+                dlgCobrar = new DlgCobrar(this, this, myServicio.usaCashlogy());
                 dlgCobrar.setTitle("Cobrar " + mesa.getString("Nombre"));
                 dlgCobrar.setDatos(lsart, totalCobro);
                 dlgCobrar.setOnDismissListener(dialogInterface -> dlgCobrar = null);
@@ -682,6 +716,20 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
         }
     }
+
+    public void cobrarConCashlogy(JSONArray lsart, Double totalCobro) {
+        // Crear un Intent para iniciar la Activity de Cashlogy
+        Intent intent = new Intent(this, CobroCashlogyActivity.class);
+
+        // Pasar los datos necesarios a la Activity de Cashlogy
+        intent.putExtra("totalMesa", totalCobro);
+        intent.putExtra("lineas", lsart.toString());
+
+        // Iniciar la Activity y esperar un resultado (usando el código 1 para identificarla)
+        startActivityForResult(intent, 1);
+    }
+
+
 
     @Override
     public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
@@ -727,8 +775,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         }
 
     }
-
-
 
 
     @SuppressLint("SetTextI18n")

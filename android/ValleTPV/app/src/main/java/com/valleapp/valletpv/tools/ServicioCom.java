@@ -21,6 +21,10 @@ import com.valleapp.valletpv.db.DBZonas;
 import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IBaseSocket;
 import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
+import com.valleapp.valletpv.tools.CashlogyManager.CashlogyManager;
+import com.valleapp.valletpv.tools.CashlogyManager.CashlogySocketManager;
+import com.valleapp.valletpv.tools.CashlogyManager.ChangeAction;
+import com.valleapp.valletpv.tools.CashlogyManager.PaymentAction;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -48,6 +52,11 @@ public class ServicioCom extends Service {
     private JSONObject mesa_abierta;
 
     String server = null;
+    String urlCashlogy = null;
+    boolean usarCashlogy = false;
+    private CashlogySocketManager cashlogySocketManager;
+    CashlogyManager cashlogyManager;
+
 
     Timer timerUpdateLow = new Timer();
     Timer timerManejarInstrucciones = new Timer();
@@ -74,9 +83,11 @@ public class ServicioCom extends Service {
                         for (int i = 0; i < objs.length(); i++) {
                             updateTables(objs.getJSONObject(i));
                         }
-                    }else if (op.equals("camareros")) {
-                        DBCamareros db = (DBCamareros) getDb("camareros");
-                        db.rellenarTabla(new JSONArray(res));
+                    }else {
+                        if ( op != null && op.equals("camareros")) {
+                            DBCamareros db = (DBCamareros) getDb("camareros");
+                            db.rellenarTabla(new JSONArray(res));
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -212,35 +223,65 @@ public class ServicioCom extends Service {
         }
     }
 
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) return START_NOT_STICKY;
+
+        // Recoger parámetros del Intent
         String url = intent.getStringExtra("url");
-        if (url != null){
+        urlCashlogy = intent.getStringExtra("url_cashlogy");  // Recoger URL de Cashlogy
+        usarCashlogy = intent.getBooleanExtra("usar_cashlogy", false); // Recoger estado del CheckBox
+
+        if (url != null) {
             server = url;
             IniciarDB();
             crearWebsocket();
+
+            // Iniciar CashlogySocketManager si está habilitado
+            if (usarCashlogy && urlCashlogy != null) {
+                iniciarCashlogySocketManager(urlCashlogy);
+            }
+
+            // Programar la sincronización periódica
             timerUpdateLow.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     sync_device(tbNameUpdateLow, 1000);
                 }
-            },1000, 290000);
+            }, 1000, 290000);
+
+            // Programar el manejo de instrucciones
             timerManejarInstrucciones.schedule(
                     new TareaManejarInstrucciones(colaInstrucciones, 1000), 2000, 1);
+
+            // Programar la verificación de la conexión WebSocket
             checkWebsocket.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if (isWebsocketClose && client!= null){
+                    if (isWebsocketClose && client != null) {
                         client.reconnect();
                     }
                 }
             }, 2000, 5000);
+
             return START_STICKY;
         }
         return START_NOT_STICKY;
-
     }
+
+    private void iniciarCashlogySocketManager(String urlCashlogy) {
+        // Inicializar el CashlogySocketManager con la URL de Cashlogy y el handler para la UI
+        cashlogySocketManager = new CashlogySocketManager(urlCashlogy);
+        cashlogySocketManager.start(); // Iniciar la conexión con Cashlogy
+
+        // Ejecutar la acción de inicialización de Cashlogy
+        cashlogyManager = new CashlogyManager(cashlogySocketManager);
+        cashlogyManager.initialize();
+    }
+
+
 
     @Override
     public void onCreate() {
@@ -250,6 +291,13 @@ public class ServicioCom extends Service {
     @Override
     public void onDestroy() {
         timerUpdateLow.cancel();
+        timerManejarInstrucciones.cancel();
+        checkWebsocket.cancel();
+
+        if (cashlogySocketManager != null) {
+            cashlogySocketManager.stop(); // Detener el socket de Cashlogy si está en uso
+        }
+
         super.onDestroy();
     }
 
@@ -306,8 +354,10 @@ public class ServicioCom extends Service {
     }
 
     public void abrirCajon() {
-        if(server!=null) new HTTPRequest(server + "/impresion/abrircajon",
-                new ContentValues(), "abrir_cajon", controller_http);
+        if(!usarCashlogy) {
+            if (server != null) new HTTPRequest(server + "/impresion/abrircajon",
+                    new ContentValues(), "abrir_cajon", controller_http);
+        }
     }
 
     public void getLineasTicket(Handler mostrarLsTicket, String IDTicket) {
@@ -375,6 +425,7 @@ public class ServicioCom extends Service {
         }
     }
 
+
     public void cobrarCuenta(ContentValues params) {
         synchronized (colaInstrucciones){
             colaInstrucciones.add(new Instrucciones(params, server+"/cuenta/cobrar"));
@@ -435,10 +486,37 @@ public class ServicioCom extends Service {
         this.mesa_abierta = m;
     }
 
+
     public class MyBinder extends Binder{
-       public ServicioCom getService() {
+        public ServicioCom getService() {
             return ServicioCom.this;
-       }
+        }
+    }
+
+     /*
+     Metodos para la integracion del cashlogy
+     */
+
+    // Método para actualizar el Handler cashlogy desde una Activity o Fragment
+    public void setUiHandlerCashlogy(Handler handler) {
+       // Pasar el nuevo handler al CashlogySocketManager si ya está inicializado
+        if (cashlogySocketManager != null) {
+            cashlogySocketManager.setUiHandler(handler);
+        }
+    }
+
+    // Saber si utiliza el cashlogy
+    public boolean usaCashlogy(){
+        return usarCashlogy;
+    }
+
+    public PaymentAction cashLogyPayment(double amount, Handler uiHandler){
+        return cashlogyManager.makePayment(amount, uiHandler );
+    }
+
+
+    public ChangeAction cashLogyChange(Handler uiHandler) {
+        return cashlogyManager.makeChange( uiHandler );
     }
 
 }

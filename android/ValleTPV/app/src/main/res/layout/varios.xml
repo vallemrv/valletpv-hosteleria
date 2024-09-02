@@ -15,7 +15,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="5dp"
-        android:layout_toStartOf="@+id/btn_aceptar_monedas"
+        android:layout_toStartOf="@+id/btn_guardar_preferencias"
         android:gravity="bottom"
         android:hint="@string/precio"
         android:importantForAutofill="no"
@@ -49,7 +49,7 @@
 
 
     <ImageButton
-        android:id="@+id/btn_aceptar_monedas"
+        android:id="@+id/btn_guardar_preferencias"
         android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_alignTop="@+id/txt_varios_precio"

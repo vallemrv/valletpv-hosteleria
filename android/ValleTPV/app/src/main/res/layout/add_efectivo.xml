@@ -51,7 +51,7 @@
         android:textSize="35sp" />
 
     <ImageButton
-        android:id="@+id/btn_aceptar_monedas"
+        android:id="@+id/btn_guardar_preferencias"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_below="@+id/txtMoneda"

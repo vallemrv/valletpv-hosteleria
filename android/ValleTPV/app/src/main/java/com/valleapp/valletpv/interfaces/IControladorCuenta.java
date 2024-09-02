@@ -14,4 +14,6 @@ public interface IControladorCuenta {
     void pedirArt(JSONObject art);
     void clickMostrarBorrar(final JSONObject art);
     void borrarArticulo(JSONObject art) throws JSONException;
+
+    void cobrarConCashlogy(JSONArray lsart, Double totalCobro);
 }

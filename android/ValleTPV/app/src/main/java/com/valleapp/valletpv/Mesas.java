@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -30,6 +29,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
+import com.valleapp.valletpv.cashlogyActivitis.CambioCashlogyActivity;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.db.DBCuenta;
 import com.valleapp.valletpv.db.DBMesas;
@@ -220,7 +220,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                     @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.boton_mesa, null);
 
                     ImageButton btnCm = v.findViewById(R.id.btnCambiarMesa);
-                    ImageButton btnC = v.findViewById(R.id.btnCobrar);
+                    ImageButton btnC = v.findViewById(R.id.btnAceptar);
                     ImageButton btnRm = v.findViewById(R.id.btnBorrarMesa);
                     LinearLayout panel = v.findViewById(R.id.pneBtnMesa);
                     String abierta = m.getString("abierta");
@@ -487,24 +487,36 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         startActivity(intent);
     }
 
-    public void clickAbrirCaja(View v){
-        setEstadoAutoFinish(true,false);
-        DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-        if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
-            try {
-                JSONObject p = new JSONObject();
-                p.put("idc", cam.getString("ID"));
-                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                    dbCamareros, this,
-                    p, "abrir_cajon");
-                dlg.show();
-            } catch (JSONException e) {
-                e.printStackTrace();
+    public void clickAbrirCaja(View v) {
+        setEstadoAutoFinish(true, false);
+
+        if (myServicio != null && myServicio.usaCashlogy()) {
+            // Si usa Cashlogy, mostrar la actividad CambioCashlogyActivity
+            Intent intent = new Intent(this, CambioCashlogyActivity.class);
+            startActivity(intent);
+        } else {
+            // Si no usa Cashlogy, proceder con la lógica actual
+            assert myServicio != null;
+            DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            if (dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
+                try {
+                    JSONObject p = new JSONObject();
+                    p.put("idc", cam.getString("ID"));
+                    DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
+                            dbCamareros, this,
+                            p, "abrir_cajon");
+                    dlg.show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (myServicio != null) {
+                    myServicio.abrirCajon();
+                }
             }
-        }else {
-            if (myServicio != null) myServicio.abrirCajon();
         }
     }
+
 
     public void clickCambiarMesa(View v){
         Intent intent = new Intent(cx, OpMesas.class);

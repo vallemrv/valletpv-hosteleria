@@ -1,25 +1,67 @@
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:orientation="horizontal">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-        <EditText
-            android:id="@+id/txtUrl"
-            android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.9"
-            android:hint="@string/url_servidor"
-            android:inputType="textUri"
-            android:textSize="48sp"
-            android:importantForAutofill="no" />
+    <!-- EditText para la URL del servidor -->
+    <EditText
+        android:id="@+id/txtUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/url_servidor"
+        android:importantForAutofill="no"
+        android:inputType="textUri"
+        android:textSize="34sp" />
+
+    <!-- Espacio entre los componentes -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- CheckBox para usar Cashlogy -->
+    <CheckBox
+        android:id="@+id/chkUseCashlogy"
+        android:layout_width="wrap_content"
+        android:layout_height="100sp"
+        android:text="@string/usar_cashlogy"
+        android:textSize="34sp" />
+
+    <!-- Espacio entre los componentes -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- EditText para la dirección de Cashlogy -->
+    <EditText
+        android:id="@+id/txtCashlogyConnector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/direcci_n_de_cashlogy_connector"
+        android:importantForAutofill="no"
+        android:inputType="textUri"
+        android:textSize="34sp" />
+
+    <!-- Espacio entre el segundo EditText y el botón -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="34sp" />
+
+    <!-- Botón OK alineado a la derecha -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
 
         <Button
-            android:id="@+id/btn_aceptar_monedas"
-            android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.1"
+            android:id="@+id/btn_aceptar_preferencias"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/fondo_btn_xml"
+            android:textSize="34sp"
             android:text="@string/ok" />
-
     </LinearLayout>
+
+</LinearLayout>

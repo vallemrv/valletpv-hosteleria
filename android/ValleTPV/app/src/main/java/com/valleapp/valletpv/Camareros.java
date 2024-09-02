@@ -19,7 +19,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -57,10 +56,10 @@ public class Camareros extends Activity {
             if (op == null) {
                 rellenarCamareros();
             }else{
-                if (op == "show_info_cobro"){
+                if (op.equals("show_info_cobro")){
                     Bundle datos = msg.getData();
                     Double entrega = datos.getDouble("entrega");
-                    Double cambio = datos.getDouble("cambio");
+                    double cambio = datos.getDouble("cambio");
                     if (cambio > 0) {
                         LayoutInflater inflater = getLayoutInflater();
                         View layout = inflater.inflate(R.layout.toast_info_cambio, findViewById(R.id.toast_info_cobro_container));
@@ -108,7 +107,7 @@ public class Camareros extends Activity {
                    btn.setSingleLine(false);
                    String n = cam.getString("nombre");
                    String a = cam.getString("apellidos");
-                   btn.setText(n +" "+a);
+                   btn.setText(String.format("%s %s", n, a));
                    btn.setBackgroundResource(R.drawable.fondo_btn_xml);
                    btn.setOnClickListener(view -> {
                        try {
@@ -175,7 +174,7 @@ public class Camareros extends Activity {
         super.onDestroy();
     }
 
-    private ServiceConnection mConexion = new ServiceConnection() {
+    private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServicioCom.MyBinder)iBinder).getService();

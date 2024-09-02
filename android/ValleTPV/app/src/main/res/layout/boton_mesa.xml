@@ -48,7 +48,7 @@
 
 
         <ImageButton
-            android:id="@+id/btnCobrar"
+            android:id="@+id/btnAceptar"
             android:layout_width="@dimen/btn_mesas_accion"
             android:layout_height="@dimen/btn_mesas_accion"
             android:layout_margin="5dp"

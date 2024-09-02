@@ -14,6 +14,7 @@ import com.valleapp.valletpv.R;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Created by valle on 19/10/14.
@@ -28,9 +29,11 @@ public class DlgCobrar extends Dialog{
     TextView lblEntrega;
     TextView lblCambio;
     TextView lbltotal;
+    boolean usaCashlogy;
 
-    public DlgCobrar(Context context, IControladorCuenta controlador) {
+    public DlgCobrar(Context context, IControladorCuenta controlador, boolean usaCashlogy) {
         super(context);
+        this.usaCashlogy = usaCashlogy;
         this.controlador = controlador;
         setContentView(R.layout.cobros);
         lbltotal = findViewById(R.id.lblPrecio);
@@ -39,10 +42,16 @@ public class DlgCobrar extends Dialog{
         ImageButton tj = findViewById(R.id.btnTarjeta);
         ImageButton ef = findViewById(R.id.btnEfectivo);
         ImageButton s = findViewById(R.id.btn_salir_monedas);
-        s.setOnClickListener(view -> clickSalir(view));
-        ef.setOnClickListener(view -> clickEfectivo(view));
+        LinearLayout pne = findViewById(R.id.pneBotonera);
 
-        tj.setOnClickListener(view -> clickTarjeta(view));
+        // Ocultar el LinearLayout si usaCashlogy es true
+        if (usaCashlogy) {
+            pne.setVisibility(View.GONE);
+        }
+
+        s.setOnClickListener(this::clickSalir);
+        ef.setOnClickListener(this::clickEfectivo);
+        tj.setOnClickListener(this::clickTarjeta);
     }
 
     public void setDatos(JSONArray lineas, Double totalCobro){
@@ -64,14 +73,19 @@ public class DlgCobrar extends Dialog{
 
 
     public void clickEfectivo(View v){
+        if (usaCashlogy){
+            controlador.cobrarConCashlogy(lineas, totalCobro);
+            clickSalir(v);
+            return;
+        }
         if(entrega>=totalCobro) {
             clickSalir(v);
-            controlador.cobrar(lineas,totalCobro,entrega);
+            controlador.cobrar(lineas, totalCobro, entrega);
         }
     }
 
     public void clickTarjeta(View v){
-        if (entrega == totalCobro) {
+        if (Objects.equals(entrega, totalCobro)) {
             clickSalir(v);
             controlador.cobrar(lineas, totalCobro, 0.00);
         }

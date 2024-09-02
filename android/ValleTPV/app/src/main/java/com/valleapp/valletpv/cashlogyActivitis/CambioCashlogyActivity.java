@@ -10,7 +10,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,14 +24,24 @@ import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.tools.CashlogyManager.ChangeAction;
 import com.valleapp.valletpv.tools.ServicioCom;
 
-public class CambioCashlogy extends Activity {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class CambioCashlogyActivity extends Activity {
 
      TextView tvTotalAdmitido;
-     TextView tvListaMonedas;
-     StringBuilder currentInput = new StringBuilder();
      ServicioCom myServicio;
 
      ChangeAction changeAction;
+
+    private boolean mensajeMostrado = false;
+
+    // Mapa para asociar denominaciones con sus respectivos botones
+    private Map<Integer, ImageButton> botonDenominacionesMap = new HashMap<>();
+
+
 
     // Definición del ServiceConnection para conectar y desconectar el servicio ServicioCom
     private final ServiceConnection mConexion = new ServiceConnection() {
@@ -59,18 +74,33 @@ public class CambioCashlogy extends Activity {
 
                     case "CASHLOGY_ERR":
                         // Mostrar un Toast con el error y finalizar la actividad
-                        setResult(Activity.RESULT_CANCELED);
-                        finish();
                         Toast.makeText(this, "Error: " + value, Toast.LENGTH_LONG).show();
+                        if (!value.startsWith("Error de ocupación")) {
+                            finish();
+                        }
                         break;
 
                     case "CASHLOGY_IMPORTE_ADMITIDO":
                         // Actualizar el TextView para el importe admitido
-
+                        double importeAdmitido = Double.parseDouble(value);
+                        tvTotalAdmitido.setText(String.format("%01.2f €", (importeAdmitido)));
                         break;
 
-                    case "CASHLOGY_CAMBIO_COMPLETADO":
+                    case "CASHLOGY_CAMBIO":
+                        Toast.makeText(this,  value, Toast.LENGTH_LONG).show();
+                        finish();
+                        break;
 
+                    case "CASHLOGY_DENOMINACIONES_DISPONIBLES":
+                        Map<Integer, Integer> denominaciones = parseDenominaciones(value);
+                        actualizarBotonesConDenominaciones(denominaciones);
+
+                        // Mostrar el mensaje solo una vez
+                        if (!mensajeMostrado) {
+                            TextView tvMensajeUsuario = findViewById(R.id.tvMensajeUsuario);
+                            tvMensajeUsuario.setText("Ahora elija la fracción más pequeña que desea recibir en el cambio.");
+                            mensajeMostrado = true;
+                        }
                         break;
 
                     default:
@@ -82,8 +112,6 @@ public class CambioCashlogy extends Activity {
             return true;
         }));
 
-        // Ejecutar la acción de cambio
-        changeAction.execute();  // Enviar el comando #A# para iniciar el cambio
     }
 
 
@@ -94,11 +122,34 @@ public class CambioCashlogy extends Activity {
 
         // Vincular las vistas
         tvTotalAdmitido = findViewById(R.id.tvTotalAdmitido);
-        tvListaMonedas = findViewById(R.id.tvListaMonedas);
+        ImageButton btnSalir = findViewById(R.id.btnSalir);
 
+        // Vincular los botones a las variables y agregarlos al mapa
+        botonDenominacionesMap.put(2000, findViewById(R.id.btnVeinteEuros));    // 20 euros -> 2000 céntimos
+        botonDenominacionesMap.put(1000, findViewById(R.id.btnDiezEuros));      // 10 euros -> 1000 céntimos
+        botonDenominacionesMap.put(500, findViewById(R.id.btnCincoEuros));      // 5 euros -> 500 céntimos
+        botonDenominacionesMap.put(200, findViewById(R.id.btnDosEuros));        // 2 euros -> 200 céntimos
+        botonDenominacionesMap.put(100, findViewById(R.id.btnUnEuro));          // 1 euro -> 100 céntimos
+        botonDenominacionesMap.put(50, findViewById(R.id.btnCincuentaCents));   // 0.50 euros -> 50 céntimos
+        botonDenominacionesMap.put(20, findViewById(R.id.btnVeinteCents));      // 0.20 euros -> 20 céntimos
+        botonDenominacionesMap.put(10, findViewById(R.id.btnDiezCents));        // 0.10 euros -> 10 céntimos
+        botonDenominacionesMap.put(5, findViewById(R.id.btnCincoCents));        // 0.05 euros -> 5 céntimos
+        botonDenominacionesMap.put(2, findViewById(R.id.btnDosCents));          // 0.02 euros -> 2 céntimos
+        botonDenominacionesMap.put(1, findViewById(R.id.btnUnCentimo));         // 0.01 euros -> 1 céntimo
 
-        // Configurar el teclado numérico
-        setupNumericKeypad();
+        // Configurar un único listener para todos los botones
+        for (Map.Entry<Integer, ImageButton> entry : botonDenominacionesMap.entrySet()) {
+            ImageButton boton = entry.getValue();
+            boton.setOnClickListener(v -> {
+                Integer denominacionEnCentimos = entry.getKey();
+                changeAction.cambiar(denominacionEnCentimos);
+            });
+        }
+
+        btnSalir.setOnClickListener(v -> {
+            // Aquí va el código para manejar la acción de cancelar
+            cancelarCambio();
+        });
 
 
 
@@ -106,6 +157,43 @@ public class CambioCashlogy extends Activity {
         Intent intent = new Intent(this, ServicioCom.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
     }
+
+
+    private Map<Integer, Integer> parseDenominaciones(String value) {
+        Map<Integer, Integer> denominacionesMap = new HashMap<>();
+        String[] denominacionesArray = value.split(",");
+
+        for (String denominacion : denominacionesArray) {
+            String[] parts = denominacion.split(":");
+            int denominacionEnCentimos = Integer.parseInt(parts[0]);
+            int cantidad = Integer.parseInt(parts[1]);
+            denominacionesMap.put(denominacionEnCentimos, cantidad);
+        }
+
+        return denominacionesMap;
+    }
+
+
+    private void actualizarBotonesConDenominaciones(Map<Integer, Integer> denominacionesDisponibles) {
+        for (Map.Entry<Integer, ImageButton> entry : botonDenominacionesMap.entrySet()) {
+            Integer valorEnCentimos = entry.getKey();
+
+            // Verificar si la denominación está disponible en el mapa
+            if (denominacionesDisponibles.containsKey(valorEnCentimos) && denominacionesDisponibles.get(valorEnCentimos) > 0) {
+                entry.getValue().setVisibility(View.VISIBLE);
+            } else {
+                entry.getValue().setVisibility(View.GONE);
+            }
+        }
+    }
+
+
+    private void cancelarCambio() {
+        if (changeAction != null ) {
+            changeAction.cancelar();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -116,34 +204,6 @@ public class CambioCashlogy extends Activity {
             myServicio = null;
         }
     }
-
-    private void setupNumericKeypad() {
-        int[] buttonIds = {
-                R.id.btnNum0, R.id.btnNum1, R.id.btnNum2, R.id.btnNum3, R.id.btnNum4,
-                R.id.btnNum5, R.id.btnNum6, R.id.btnNum7, R.id.btnNum8, R.id.btnNum9,
-                R.id.btnNumDot, R.id.btnNumClear
-        };
-
-        for (int id : buttonIds) {
-            Button button = findViewById(id);
-            button.setOnClickListener(this::onNumericButtonClick);
-        }
-    }
-
-    private void onNumericButtonClick(View view) {
-        Button button = (Button) view;
-        String buttonText = button.getText().toString();
-
-        if (buttonText.equals("C")) {
-            currentInput.setLength(0); // Clear input
-        } else {
-            currentInput.append(buttonText);
-        }
-
-        // Actualizar la vista de total admitido con el valor ingresado
-        tvTotalAdmitido.setText(currentInput.toString());
-    }
-
 
 
 

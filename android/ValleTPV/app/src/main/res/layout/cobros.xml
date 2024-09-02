@@ -112,9 +112,10 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/cobrar"
+                    android:contentDescription="@string/agregar_efectivo"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
+                    android:src="@drawable/cobrar"
                     android:text="New Button" />
 
                 <ImageButton
@@ -124,10 +125,10 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/tarjeta"
+                    android:contentDescription="@string/cobro_tarjeta"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
-                    />
+                    android:src="@drawable/tarjeta" />
 
                 <ImageButton
                     android:id="@+id/btn_salir_monedas"
@@ -136,9 +137,10 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
-                    android:src="@drawable/salir"
+                    android:contentDescription="@string/salir"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
+                    android:src="@drawable/salir"
                     android:text="New Button" />
 
             </LinearLayout>
@@ -164,8 +166,8 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="1"
-                    android:text="1"
-                    android:textSize="50dp" />
+                    android:text="@string/numero_1"
+                    android:textSize="50sp" />
 
                 <Button
                     android:layout_width="0dp"
@@ -174,7 +176,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="2"
-                    android:text="2"
+                    android:text="@string/numero_2"
                     android:textSize="50sp" />
 
                 <Button
@@ -184,7 +186,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="3"
-                    android:text="3"
+                    android:text="@string/nuemro_3"
                     android:textSize="50sp" />
 
             </LinearLayout>
@@ -201,7 +203,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="4"
-                    android:text="4"
+                    android:text="@string/numero_4"
                     android:textSize="50sp" />
 
                 <Button
@@ -211,7 +213,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="5"
-                    android:text="5"
+                    android:text="@string/numero_5"
                     android:textSize="50sp" />
 
                 <Button
@@ -221,7 +223,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="6"
-                    android:text="6"
+                    android:text="@string/numero_6"
                     android:textSize="50sp" />
 
 
@@ -239,7 +241,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="7"
-                    android:text="7"
+                    android:text="@string/numero_7"
                     android:textSize="50sp" />
 
                 <Button
@@ -249,7 +251,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="8"
-                    android:text="8"
+                    android:text="@string/numero_8"
                     android:textSize="50sp" />
 
                 <Button
@@ -259,7 +261,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="9"
-                    android:text="9"
+                    android:text="@string/numero_9"
                     android:textSize="50sp" />
 
 
@@ -277,7 +279,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="."
-                    android:text="."
+                    android:text="@string/punto_decimal"
                     android:textSize="50sp" />
 
                 <Button
@@ -287,7 +289,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="0"
-                    android:text="0"
+                    android:text="@string/mumero_0"
                     android:textSize="50sp" />
 
                 <Button
@@ -297,7 +299,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/fondo_btn_xml"
                     android:tag="C"
-                    android:text="C"
+                    android:text="@string/letra_C"
                     android:textSize="50sp" />
 
 

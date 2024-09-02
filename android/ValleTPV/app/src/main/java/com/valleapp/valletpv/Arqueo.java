@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.cashlogyActivitis.ArqueoCashlogyActivity;
 import com.valleapp.valletpv.tools.HTTPRequest;
 import com.valleapp.valletpv.tools.JSON;
 
@@ -48,8 +49,10 @@ public class Arqueo extends Activity {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
             String res = msg.getData().getString("RESPONSE");
+            assert op != null;
             if (op.equals("cambio")) {
                 try {
+                    assert res != null;
                     JSONObject obj = new JSONObject(res);
                     cambio = obj.getDouble("cambio");
                     txtCambio.setText(String.format("%.2f €", cambio));
@@ -62,6 +65,7 @@ public class Arqueo extends Activity {
                 }
 
             } else if(op.equals("arqueo")){
+                assert res != null;
                 if(res.equals("success")) finish();
                 else{
                     mostrarMensaje("No hay Ticket para hacer un arqueo...\n " +
@@ -69,6 +73,7 @@ public class Arqueo extends Activity {
                 }
             }
         }
+
 
     };
 
@@ -164,11 +169,11 @@ public class Arqueo extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_arqueo);
         CargarPreferencias();
-        pneGastos = (LinearLayout)findViewById(R.id.pneGastos);
-        pneEfectivo = (LinearLayout)findViewById(R.id.pneEfectivo);
-        txtCambio = (TextView)findViewById(R.id.lblCambio);
-        txtEfectivo = (TextView)findViewById(R.id.lblEfectivo);
-        txtGastos = (TextView)findViewById(R.id.lblGastos);
+        pneGastos = findViewById(R.id.pneGastos);
+        pneEfectivo = findViewById(R.id.pneEfectivo);
+        txtCambio = findViewById(R.id.lblCambio);
+        txtEfectivo = findViewById(R.id.lblEfectivo);
+        txtGastos = findViewById(R.id.lblGastos);
         this.cx = this;
     }
 
@@ -177,9 +182,9 @@ public class Arqueo extends Activity {
        dlg.setContentView(R.layout.add_efectivo);
        dlg.setTitle("Agregar efectivo");
        ImageButton s = dlg.findViewById(R.id.btn_salir_monedas);
-       ImageButton ok = dlg.findViewById(R.id.btn_aceptar_monedas);
-       final TextView m = (TextView) dlg.findViewById(R.id.txtMoneda);
-       final TextView c = (TextView) dlg.findViewById(R.id.txtCantidad);
+       ImageButton ok = dlg.findViewById(R.id.btn_guardar_preferencias);
+       final TextView m = dlg.findViewById(R.id.txtMoneda);
+       final TextView c = dlg.findViewById(R.id.txtCantidad);
           s.setOnClickListener(view -> dlg.cancel());
           ok.setOnClickListener(view -> {
             try {
@@ -210,8 +215,8 @@ public class Arqueo extends Activity {
           dlg.setTitle("Agregar gasto");
           ImageButton s = dlg.findViewById(R.id.Salir);
           ImageButton ok = dlg.findViewById(R.id.Aceptar);
-          final TextView txtDes = (TextView) dlg.findViewById(R.id.txtDescripcion);
-          final TextView imp = (TextView) dlg.findViewById(R.id.txtImporte);
+          final TextView txtDes = dlg.findViewById(R.id.txtDescripcion);
+          final TextView imp = dlg.findViewById(R.id.txtImporte);
           s.setOnClickListener(view -> dlg.cancel());
           ok.setOnClickListener(view -> {
               try {
@@ -239,7 +244,7 @@ public class Arqueo extends Activity {
           dlg.setTitle("Editar Cambio");
           ImageButton s = dlg.findViewById(R.id.salirCambio);
           ImageButton ok =  dlg.findViewById(R.id.aceptarCam);
-          final TextView txtDes = (TextView) dlg.findViewById(R.id.cambio);
+          final TextView txtDes = dlg.findViewById(R.id.cambio);
           s.setOnClickListener(view -> dlg.cancel());
           ok.setOnClickListener(view -> {
             try{
@@ -268,22 +273,63 @@ public class Arqueo extends Activity {
 
       }
 
-      public void CargarPreferencias(){
-          JSON json = new JSON();
-          try {
-              JSONObject pref = json.deserializar("preferencias.dat", this);
-              if(pref==null){
-                  Intent intent = new Intent(this,PreferenciasTPV.class);
-                  startActivity(intent);
-              }else{
-                  server = pref.getString("URL");
-                  new HTTPRequest(server+"/arqueos/getcambio",new ContentValues(),"cambio", controller_http);
-              }
+    public void CargarPreferencias() {
+        JSON json = new JSON();
+        try {
+            JSONObject pref = json.deserializar("preferencias.dat", this);
+            if (pref == null) {
+                Intent intent = new Intent(this, PreferenciasTPV.class);
+                startActivity(intent);
+            } else {
+                server = pref.getString("URL");
 
-          } catch (Exception e) {
-              e.printStackTrace();
-          }
-      }
+                // Verifica si la preferencia indica que se debe usar Cashlogy
+                boolean usaCashlogy = pref.getBoolean("usaCashlogy");
+
+                if (usaCashlogy) {
+                    // Solicita los datos del servidor primero
+                    new HTTPRequest(server + "/arqueos/getcambio", new ContentValues(), "cambio", new Handler(Looper.getMainLooper()) {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            String res = msg.getData().getString("RESPONSE");
+                            if (res != null) {
+                                try {
+                                    JSONObject obj = new JSONObject(res);
+                                    // Recoge los datos del servidor
+                                    double cambio = obj.getDouble("cambio");
+                                    boolean hayArqueo = obj.getBoolean("hay_arqueo");
+
+                                    // Inicia ArqueoCashlogyActivity pasando los datos
+                                    Intent intent = new Intent(Arqueo.this, ArqueoCashlogyActivity.class);
+                                    intent.putExtra("cambio", cambio);
+                                    intent.putExtra("hayArqueo", hayArqueo);
+
+                                    // Añadir preferencias al Intent
+                                    intent.putExtra("URL", pref.getString("URL"));
+                                    intent.putExtra("URL_Cashlogy", pref.getString("URL_Cashlogy"));
+                                    intent.putExtra("usaCashlogy", pref.getBoolean("usaCashlogy"));
+
+                                    startActivity(intent);
+                                    finish(); // Finaliza la actividad actual
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Si no se usa Cashlogy, continúa con la lógica normal
+                    new HTTPRequest(server + "/arqueos/getcambio", new ContentValues(), "cambio", controller_http);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     public void clickBorrarEfc(View v){
         JSONObject obj = (JSONObject)v.getTag();

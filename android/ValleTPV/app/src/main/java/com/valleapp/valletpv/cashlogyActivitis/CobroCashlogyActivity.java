@@ -1,4 +1,4 @@
-package com.valleapp.valletpv;
+package com.valleapp.valletpv.cashlogyActivitis;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.tools.CashlogyManager.PaymentAction;
 import com.valleapp.valletpv.tools.ServicioCom;
 
@@ -66,8 +67,8 @@ public class CobroCashlogyActivity extends Activity {
         tvTotalCobro = findViewById(R.id.tvTotalCobro);
         tvTotalIngresado = findViewById(R.id.tvTotalIngresado);
         tvCambio = findViewById(R.id.tvCambio);
-        btnCobrar = findViewById(R.id.btnCobrar);
-        btnCancelar = findViewById(R.id.btnCancelar);
+        btnCobrar = findViewById(R.id.btnAceptar);
+        btnCancelar = findViewById(R.id.btnSalir);
 
         // Configurar la UI con los datos iniciales
         tvTotalCobro.setText(String.format("%01.2f €", totalMesa));
@@ -105,9 +106,11 @@ public class CobroCashlogyActivity extends Activity {
 
                         case "CASHLOGY_ERR":
                             // Mostrar un Toast con el error
-                            setResult(Activity.RESULT_CANCELED);
-                            finish();
-                            Toast.makeText(this, "Error: " + value, Toast.LENGTH_LONG).show();
+                            if (!value.startsWith("Error de ocupación")) {
+                                setResult(Activity.RESULT_CANCELED);
+                                finish();
+                                Toast.makeText(this, "Error: " + value, Toast.LENGTH_LONG).show();
+                            }
                             break;
 
                         case "CASHLOGY_IMPORTE_ADMITIDO":

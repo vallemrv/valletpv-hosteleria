@@ -1,5 +1,6 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.valletpv.tools.CashlogyManager;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -9,25 +10,30 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class CashlogySocketManager {
-     String cashlogyUrl;
-     int cashlogyPort = 8092; // Ajusta este valor según el puerto utilizado por Cashlogy
-     Socket socket;
-     BufferedReader reader;
-     OutputStream writer;
-     Handler uiHandler;
+    String cashlogyUrl;
+    int cashlogyPort = 8092; // Ajusta este valor según el puerto utilizado por Cashlogy
+    Socket socket;
+    BufferedReader reader;
+    OutputStream writer;
+    Handler uiHandler;
 
-     Timer initializationTimer = new Timer();
+    CashlogyAction currentAction;
 
-    public CashlogySocketManager(String url, Handler handler) {
+    Timer initializationTimer = new Timer();
+
+    public CashlogySocketManager(String url) {
         this.cashlogyUrl = url;
-        this.uiHandler = handler;
     }
 
     public void start() {
         new Thread(this::initializeSocket).start();
+    }
+
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     private void initializeSocket() {
@@ -36,154 +42,149 @@ public class CashlogySocketManager {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = socket.getOutputStream();
 
-            // Enviar el comando de inicialización no bloqueante
-            initializationTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    sendCommand("#I#"); // Comando de inicialización
-                }
-            }, 0);
+            Log.i("CASHLOGY", "Socket conectado exitosamente");  // Verifica que la conexión se haya realizado
 
-            // Iniciar la recepción de datos en un hilo separado
-            new Thread(this::listenForResponses).start();
 
         } catch (Exception e) {
             Log.e("CASHLOGY", "Error al inicializar Cashlogy: " + e.getMessage());
             e.printStackTrace();
-            notifyUI("Error al conectar con Cashlogy");
+            notifyUI("CASHLOGY_ERR","Error al conectar con Cashlogy");
         }
     }
-    // Clase genérica para todas las acciones de Cashlogy
-    public abstract class CashlogyAction {
-        protected com.valleapp.valletpv.tools.CashlogyManager socketManager;
 
-        public CashlogyAction(com.valleapp.valletpv.tools.CashlogyManager socketManager) {
-            this.socketManager = socketManager;
+    public void sendCommand(final String command) {
+        if (!isConnected()) {
+            Log.e("CASHLOGY", "El socket no está conectado, esperando...");
+            waitForConnectionAndSend(command);
+            return;
         }
 
-        public abstract void execute();
-        public abstract void handleResponse(String response);
+        new Thread(() -> {
+            try {
+                writer.write((command + "\r\n").getBytes());
+                writer.flush();
+
+                // Leer la respuesta de manera no bloqueante
+                char[] buffer = new char[4096];
+
+                int charsRead = reader.read(buffer);
+
+                if (charsRead != -1) {
+                    String response = new String(buffer, 0, charsRead);
+                    processResponse(command, response); // Pasa tanto el comando como la respuesta
+                } else {
+                    Log.e("CASHLOGY", "No se pudo leer la respuesta o el socket está cerrado.");
+                }
+
+
+            } catch (Exception e) {
+                Log.e("CASHLOGY", "Error al enviar comando: " + e.getMessage(), e);
+                e.printStackTrace();
+            }
+
+        }).start();
     }
 
-    // Clase específica para inicialización
-    public class InitializeAction extends CashlogyAction {
 
-        public InitializeAction(com.valleapp.valletpv.tools.CashlogyManager socketManager) {
-            super(socketManager);
-        }
+    private void waitForConnectionAndSend(final String command) {
+        new Thread(() -> {
+            int attempts = 5; // Número de intentos de reintento
+            while (attempts > 0 && !isConnected()) {
+                try {
+                    Thread.sleep(1000); // Espera 1 segundo antes de reintentar
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                attempts--;
+            }
 
-        @Override
-        public void execute() {
-            socketManager.sendCommand("#I#");
-        }
-
-        @Override
-        public void handleResponse(String response) {
-            if (response.contains("ACK")) {
-                socketManager.notifyUI("Cashlogy inicializado correctamente");
+            if (isConnected()) {
+                sendCommand(command); // Intenta enviar el comando nuevamente
             } else {
-                socketManager.notifyUI("Error en la inicialización de Cashlogy");
+                Log.e("CASHLOGY", "No se pudo establecer la conexión después de varios intentos.");
+                notifyUI("CASHLOGY_ERR", "Error: No se pudo establecer la conexión con Cashlogy.");
             }
-        }
+        }).start();
     }
 
-    // Clase específica para el comando de cobro, etc.
-    public class PaymentAction extends CashlogyAction {
-        private String amount;
 
-        public PaymentAction(com.valleapp.valletpv.tools.CashlogyManager socketManager, String amount) {
-            super(socketManager);
-            this.amount = amount;
-        }
-
-        @Override
-        public void execute() {
-            socketManager.sendCommand("#C#" + amount + "#");
-        }
-
-        @Override
-        public void handleResponse(String response) {
-            if (response.contains("ACK")) {
-                socketManager.notifyUI("Cobro realizado con éxito");
-            } else {
-                socketManager.notifyUI("Error en el cobro");
+    private void processResponse(final String command, final String response) {
+        if (response.startsWith("#0#")) {
+            // Respuesta exitosa
+            if (currentAction != null) {
+                currentAction.handleResponse(command, response); // Pasar el comando y la respuesta a la acción actual
             }
-        }
-    }
-
-    // En la clase principal o manejador
-    public class CashlogyManager {
-        private com.valleapp.valletpv.tools.CashlogyManager socketManager;
-
-        public CashlogyManager(com.valleapp.valletpv.tools.CashlogyManager socketManager) {
-            this.socketManager = socketManager;
-        }
-
-        public void initialize() {
-            CashlogyAction action = new InitializeAction(socketManager);
-            action.execute();
-        }
-
-        public void makePayment(String amount) {
-            CashlogyAction action = new PaymentAction(socketManager, amount);
-            action.execute();
-        }
-    }
-
-
-    private void listenForResponses() {
-        try {
-            String response;
-            while ((response = reader.readLine()) != null) {
-                Log.i("CASHLOGY", "Respuesta recibida: " + response);
-                // Procesar la respuesta recibida
-                processResponse(response);
+        } else if (response.startsWith("#WR:")) {
+            // Advertencia
+            if (currentAction != null) {
+                currentAction.handleResponse(command, response); // Pasar la advertencia a la acción actual
             }
-        } catch (Exception e) {
-            Log.e("CASHLOGY", "Error al recibir datos de Cashlogy: " + e.getMessage());
-            e.printStackTrace();
-            notifyUI("Error en la comunicación con Cashlogy");
+        } else if (response.startsWith("#ER:")) {
+            // Error
+            currentAction.handleResponse(command, "CASHLOGY_ERR");
+            Log.e("CASHLOGY", response);
+            handleErrors(command, response);
+        } else {
+            // Respuesta desconocida
+            Log.e("CASHLOGY", "Respuesta desconocida: " + response);
         }
     }
 
-    public void sendCommand(String command) {
-        try {
-            writer.write((command + "\r\n").getBytes());
-            writer.flush();
-            Log.i("CASHLOGY", "Comando enviado: " + command);
-        } catch (Exception e) {
-            Log.e("CASHLOGY", "Error al enviar comando: " + e.getMessage());
-            e.printStackTrace();
+    private void handleErrors(String command, String errorResponse) {
+        String errorMessage;
+        if (errorResponse.contains("GENERIC")) {
+            errorMessage = "Error genérico: Problema en la comunicación o devolución.";
+        } else if (errorResponse.contains("BAD_DATA")) {
+            errorMessage = "Error de datos: Parámetros del comando enviados incorrectamente.";
+        } else if (errorResponse.contains("BUSY")) {
+            errorMessage = "Error de ocupación: El dispositivo está ocupado con otra operación.";
+        } else if (errorResponse.contains("ILLEGAL")) {
+            errorMessage = "Error de comando ilegal: El comando no puede realizarse en el estado actual.";
+        } else {
+            errorMessage = "Error desconocido: " + errorResponse;
         }
+
+        // Notificar a la UI del error crítico
+        notifyUI("CASHLOGY_ERR", errorMessage);
+
     }
 
-    private void processResponse(String response) {
-        // Aquí puedes procesar la respuesta de Cashlogy y enviar mensajes a la UI si es necesario
-        // Por ejemplo, si la respuesta es una confirmación de inicialización exitosa:
-        if (response.contains("ACK")) {
-            notifyUI("Cashlogy inicializado correctamente");
-        }
-        // Otros comandos pueden ser manejados aquí
-    }
 
-    private void notifyUI(String message) {
+    public void notifyUI(String key, String message) {
         if (uiHandler != null) {
             Message msg = uiHandler.obtainMessage();
-            msg.obj = message;
+            Bundle bundle = new Bundle();
+            bundle.putString("key", key);
+            bundle.putString("value", message); // Poner el mensaje en un Bundle
+            msg.setData(bundle);
             uiHandler.sendMessage(msg);
         }
     }
 
     public void stop() {
+
         try {
+
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
             if (initializationTimer != null) {
                 initializationTimer.cancel();
             }
+
         } catch (Exception e) {
             Log.e("CASHLOGY", "Error al cerrar CashlogySocketManager: " + e.getMessage());
         }
+
+        Log.i("CASHLOGY", "Servidor cerrado correctamente..... " );
+
+    }
+
+    public void setUiHandler(Handler handler) {
+        this.uiHandler = handler;
+    }
+
+    public void setCurrentAction(CashlogyAction action) {
+        this.currentAction = action;
     }
 }

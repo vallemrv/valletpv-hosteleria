@@ -64,6 +64,18 @@
             android:name=".OpMesas"
             android:label="@string/title_activity_op_mesas"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".cashlogyActivitis.CobroCashlogyActivity"
+            android:label="@string/cobro_por_cashlgoy"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".cashlogyActivitis.CambioCashlogyActivity"
+            android:label="@string/cambio_cashlogy"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".cashlogyActivitis.ArqueoCashlogyActivity"
+            android:label="@string/arqueo_de_caja"
+            android:screenOrientation="landscape" />
 
         <service
             android:name=".tools.ServicioCom"

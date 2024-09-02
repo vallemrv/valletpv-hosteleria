@@ -1,10 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+    compileSdkVersion 33
+
     defaultConfig {
         applicationId "com.valleapp.valletpv"
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 33
         useLibrary 'org.apache.http.legacy'
         versionCode 4
         versionName "3.0.2.1"
