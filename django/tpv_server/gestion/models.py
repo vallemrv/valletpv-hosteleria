@@ -654,6 +654,7 @@ class Infmesa(models.Model):
             "num": self.numcopias,
             "abierta": 0,
             "nomMesa": nomMesa,
+            "fecha": self.fecha,
             "total_pedido": float(total_pedido),
             "total_regalado": float(total_r) + float(total_m),
             "total_anulado": float(total_anulado),

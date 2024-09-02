@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'comunicacion',
-    'gestion',
+	'gestion',
     'app',
     'api_android',
     'corsheaders',
@@ -164,10 +164,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 #smtp config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST_PASSWORD = '{{password_mail}}'
-EMAIL_HOST_USER = '{{email_smtp}}'
-EMAIL_PORT = '{{port_smtp}}'
-EMAIL_HOST = '{{host_smtp}}'
+EMAIL_HOST_PASSWORD = 'nitrogeno'
+EMAIL_HOST_USER = 'mails@valleapp.com'
+EMAIL_PORT = '465'
+EMAIL_HOST = 'dallas143.arvixeshared.com'
 EMAIL_USE_SSL = True
 
 # session expire at browser close

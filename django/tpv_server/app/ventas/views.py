@@ -61,7 +61,7 @@ def get_infomesa(request):
 
 @token_required
 def get_nulos(request):
-    nulos = Historialnulos.objects.all()[:200]
+    nulos = Historialnulos.objects.all()[200:500]
     objs = []
     obj = None
     linea = None
@@ -77,6 +77,7 @@ def get_nulos(request):
                 "nomMesa":nomMesa,
                 "lineas": [],
                 "hora": n.lineapedido.infmesa.hora,
+                "fecha": n.lineapedido.infmesa.fecha,
                 "camarero": camarero.nombre + " " + camarero.apellidos
                 }
             objs.append(obj)
@@ -99,7 +100,7 @@ def get_nulos(request):
 
 @token_required
 def get_list_mesas(request):
-    lista = Infmesa.objects.all()[:50]
+    lista = Infmesa.objects.all()[:200]
     r = []
     for l in lista:
         r.append(l.serialize())
