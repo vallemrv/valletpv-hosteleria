@@ -16,7 +16,7 @@
             android:name=".ValleTPV"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="landscape">
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +28,7 @@
             android:name=".Arqueo"
             android:exported="true"
             android:label="@string/title_activity_arqueo"
-            android:screenOrientation="landscape">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +39,7 @@
             android:name=".PreferenciasTPV"
             android:exported="true"
             android:label="@string/title_activity_preferencias_tpv"
-            android:screenOrientation="landscape">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,32 +50,32 @@
             android:name=".Camareros"
             android:exported="false"
             android:label="@string/title_activity_camareros"
-            android:screenOrientation="landscape" />
+            />
         <activity
             android:name=".Mesas"
             android:label="@string/title_activity_mesas"
-            android:screenOrientation="landscape" />
+            />
         <activity
             android:name=".Cuenta"
             android:label="@string/title_activity_cuenta"
             android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="landscape" />
+             />
         <activity
             android:name=".OpMesas"
             android:label="@string/title_activity_op_mesas"
-            android:screenOrientation="landscape" />
+            />
         <activity
             android:name=".cashlogyActivitis.CobroCashlogyActivity"
             android:label="@string/cobro_por_cashlgoy"
-            android:screenOrientation="landscape" />
+            />
         <activity
             android:name=".cashlogyActivitis.CambioCashlogyActivity"
             android:label="@string/cambio_cashlogy"
-            android:screenOrientation="landscape" />
+          />
         <activity
             android:name=".cashlogyActivitis.ArqueoCashlogyActivity"
             android:label="@string/arqueo_de_caja"
-            android:screenOrientation="landscape" />
+         />
 
         <service
             android:name=".tools.ServicioCom"

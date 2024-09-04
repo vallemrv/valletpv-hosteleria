@@ -6,6 +6,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -20,7 +23,10 @@ import java.net.URLEncoder;
 
 public class HTTPRequest {
 
+    private static final Logger log = LoggerFactory.getLogger(HTTPRequest.class);
+
     public String getParams(ContentValues params){
+
         StringBuilder sbParams = new StringBuilder();
         int i = 0;
         for (String key : params.keySet()) {
@@ -43,7 +49,6 @@ public class HTTPRequest {
     public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler handlerExternal){
         // Create a new HttpClient and Post Header
         HttpURLConnection conn = null;
-
         try {
 
             if(!strUrl.contains("http://")) strUrl = "http://"+ strUrl;

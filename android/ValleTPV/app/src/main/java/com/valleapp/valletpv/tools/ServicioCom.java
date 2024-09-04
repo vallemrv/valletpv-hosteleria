@@ -120,6 +120,7 @@ public class ServicioCom extends Service {
                 @Override
                 public void onMessage(String message) {
                     try {
+                        Log.e("CASHLOGY", message);
                         JSONObject o = new JSONObject(message);
                         updateTables(o);
                     }catch (Exception e){

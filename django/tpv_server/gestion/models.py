@@ -135,6 +135,8 @@ class Arqueocaja(models.Model):
     cierre = models.ForeignKey('Cierrecaja', on_delete=models.CASCADE, db_column='IDCierre')  # Field name made lowercase.
     cambio = models.FloatField(db_column='Cambio')  # Field name made lowercase.
     descuadre = models.FloatField(db_column='Descuadre')  # Field name made lowercase.
+    stacke = models.FloatField(db_column='Stacke')
+    cambio_real = models.FloatField(db_column="CambioReal", default=0)
 
     class Meta:
         db_table = 'arqueocaja'
@@ -952,21 +954,34 @@ class Mesasabiertas(models.Model):
 
     @staticmethod
     def cambiar_mesas_abiertas(idp, ids):
-        if idp != ids:
-            mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
-            mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
+        if idp == ids:
+            return  # No need to do anything if both IDs are the same
+
+        mesaP = Mesasabiertas.objects.filter(mesa__pk=idp).first()
+        mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
+
+        if mesaP:
             if mesaS:
-                infmesa = mesaS.infmesa
-                mesaS.infmesa = mesaP.infmesa
-                mesaS.save()
-                mesaP.infmesa = infmesa;
+                # Swap the infmesa between Mesa P and Mesa S
+                mesaP.infmesa, mesaS.infmesa = mesaS.infmesa, mesaP.infmesa
                 mesaP.save()
-            elif mesaP:
+                mesaS.save()
+
+                mesaS.infmesa.componer_articulos()
+                mesaS.infmesa.unir_en_grupos()
+            else:
+                # If Mesa S doesn't exist, move Mesa P to the new ID (ids)
                 mesaP.mesa_id = ids
                 mesaP.save()
-                comunicar_cambios_devices("md", "mesasabiertas", [mesaP.serialize(), {"ID":idp,"num":0, "abierta":0}])
-            else:
-                Sync.actualizar("mesasabiertas")
+                mesaP.infmesa.componer_articulos()
+                mesaP.infmesa.unir_en_grupos()
+
+                # Notify devices of the change and close the original mesa
+                comunicar_cambios_devices("md", "mesasabiertas", [mesaP.serialize(), {"ID": idp, "num": 0, "abierta": 0}])
+        else:
+            # If Mesa P doesn't exist, ensure sync is updated
+            Sync.actualizar("mesasabiertas")
+
 
     @staticmethod
     def juntar_mesas_abiertas(idp, ids):
@@ -975,6 +990,7 @@ class Mesasabiertas(models.Model):
             mesaS = Mesasabiertas.objects.filter(mesa__pk=ids).first()
             if mesaS:
                 infmesa = mesaS.infmesa
+                infmesaP = mesaP.infmesa
                 pedidos = Pedidos.objects.filter(infmesa__pk=infmesa.pk)
                 for pedido in pedidos:
                     pedido.infmesa_id = mesaP.infmesa.pk
@@ -989,6 +1005,9 @@ class Mesasabiertas(models.Model):
                 obj["num"] = 0
                 comunicar_cambios_devices("md", "mesasabiertas", obj)
                 infmesa.delete()
+                infmesaP.componer_articulos()
+                infmesaP.unir_en_grupos()
+
     
     def serialize(self):
         obj = self.infmesa.serialize()

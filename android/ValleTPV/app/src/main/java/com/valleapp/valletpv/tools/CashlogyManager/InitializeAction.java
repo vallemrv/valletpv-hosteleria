@@ -11,7 +11,7 @@ public class InitializeAction extends CashlogyAction {
     public void execute() {
         // Enviar el comando #I# para inicializar la máquina
         socketManager.setCurrentAction(this);
-        //socketManager.sendCommand("#I#");
+        socketManager.sendCommand("#I#");
     }
 
     @Override

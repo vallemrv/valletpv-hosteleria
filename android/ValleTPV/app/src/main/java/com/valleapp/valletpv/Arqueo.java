@@ -298,14 +298,18 @@ public class Arqueo extends Activity {
                                     // Recoge los datos del servidor
                                     double cambio = obj.getDouble("cambio");
                                     boolean hayArqueo = obj.getBoolean("hay_arqueo");
+                                    double stacke = obj.getDouble("stacke");
+                                    double cambio_real = obj.getDouble("cambio_real");
 
                                     // Inicia ArqueoCashlogyActivity pasando los datos
                                     Intent intent = new Intent(Arqueo.this, ArqueoCashlogyActivity.class);
                                     intent.putExtra("cambio", cambio);
                                     intent.putExtra("hayArqueo", hayArqueo);
+                                    intent.putExtra("stacke", stacke);
+                                    intent.putExtra("cambio_real", cambio_real);
 
                                     // Añadir preferencias al Intent
-                                    intent.putExtra("URL", pref.getString("URL"));
+                                    intent.putExtra("URL", server);
                                     intent.putExtra("URL_Cashlogy", pref.getString("URL_Cashlogy"));
                                     intent.putExtra("usaCashlogy", pref.getBoolean("usaCashlogy"));
 

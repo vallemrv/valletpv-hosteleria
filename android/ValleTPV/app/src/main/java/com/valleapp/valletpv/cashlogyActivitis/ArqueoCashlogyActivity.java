@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -21,19 +20,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class ArqueoCashlogyActivity extends Activity {
 
-    private TextView tvInformacionSalida;
-    private ImageButton btnSalir;
-    private ImageButton btnArquearCaja;
+     TextView tvInformacionSalida;
+     ImageButton btnSalir;
+     ImageButton btnArquearCaja;
 
-    private CashlogySocketManager cashlogySocketManager;
-    private ArqueoAction arqueoAction;
+     CashlogySocketManager cashlogySocketManager;
+     ArqueoAction arqueoAction;
 
-    private double cambio;
-    private String server;
+     double cambio;
+     String server;
+     double stacke;
+     double cambio_real;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,10 @@ public class ArqueoCashlogyActivity extends Activity {
         Intent intent = getIntent();
         server = intent.getStringExtra("URL");
         cambio = intent.getDoubleExtra("cambio", 0.0);
+        stacke = intent.getDoubleExtra("stacke", 0.0);
+        cambio_real = intent.getDoubleExtra("cambio_real", 0.0);
         boolean hayArqueo = intent.getBooleanExtra("hayArqueo", false);
+
 
         // Verificar si se puede hacer el arqueo
         if (hayArqueo) {
@@ -64,7 +69,10 @@ public class ArqueoCashlogyActivity extends Activity {
 
         btnSalir.setOnClickListener(v -> finish());
 
-        btnArquearCaja.setOnClickListener(v -> realizarArqueo());
+        btnArquearCaja.setOnClickListener(v -> {
+            realizarArqueo();
+            v.setVisibility(View.GONE);
+        });
     }
 
     private void inicializarCashlogyManager() {
@@ -81,41 +89,49 @@ public class ArqueoCashlogyActivity extends Activity {
 
         cashlogySocketManager.setUiHandler(uiHandler);
         cashlogySocketManager.setCurrentAction(arqueoAction);
+        arqueoAction.setCambioStacker(cambio);
         arqueoAction.execute();
     }
 
     private void realizarArqueo() {
         // Paso 1: Obtener las denominaciones desde ArqueoAction
         JSONArray objEfectivo = new JSONArray();
-        double totalEfectivo = 0.0;
 
         Map<Integer, Integer> denominaciones = arqueoAction.getDenominaciones();
+        double total_efectivo_anterior = stacke + cambio_real;
+        double total_efectivo_ahora = arqueoAction.getTotalRecicladores() + arqueoAction.getTotalAlmacenes();
+        double totalCaja = total_efectivo_ahora - total_efectivo_anterior;
 
         // Paso 2: Convertir las denominaciones a objetos JSON y calcular el total de efectivo
-        for (Map.Entry<Integer, Integer> entry : denominaciones.entrySet()) {
-            int cantidad = entry.getValue();
-            double moneda = entry.getKey() / 100.0;
+        try {
+            for (Map.Entry<Integer, Integer> entry : denominaciones.entrySet()) {
+                int cantidad = entry.getValue();
+                double moneda = entry.getKey() / 100.0;
 
-            JSONObject obj = new JSONObject();
-            try {
+                JSONObject obj = new JSONObject();
                 obj.put("Can", cantidad);
-                obj.put("Moneda", moneda);
+                obj.put("Moneda", String.format(Locale.getDefault(), "%.2f", moneda)); // Formatear moneda a dos decimales
                 objEfectivo.put(obj);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-            totalEfectivo += cantidad * moneda;
+            }
+            JSONObject obj = new JSONObject();
+            obj.put("Can", 1);
+            obj.put("Moneda", String.format(Locale.getDefault(),
+                    "%.2f", (totalCaja+cambio) - arqueoAction.getTotalRecicladores())); // Formatear moneda a dos decimales
+            objEfectivo.put(obj);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         // Paso 3: Crear ContentValues para enviar los datos al servidor
         ContentValues p = new ContentValues();
-        p.put("cambio", Double.toString(cambio));
-        p.put("efectivo", Double.toString(totalEfectivo));
-        p.put("gastos", Double.toString(0.0));
+        p.put("cambio", String.format(Locale.getDefault(), "%.2f", cambio));  // Formatear cambio a dos decimales
+        p.put("efectivo", String.format(Locale.getDefault(),"%.2f", totalCaja+cambio));  // Formatear totalEfectivo a dos decimales
+        p.put("gastos", String.format(Locale.getDefault(), "%.2f", 0.0));  // Formatear gastos a dos decimales
         p.put("des_efectivo", objEfectivo.toString());
-        p.put("es_cashlogy", true);
-        p.put("des_gastos", "[]"); // Asume que objGastos está vacío o usa objGastos si tiene datos
+        p.put("usaCashlogy", "true");
+        p.put("des_gastos", "[]");
 
         // Enviar la solicitud al servidor para cerrar el arqueo
         new HTTPRequest(server + "/arqueos/arquear", p, "arqueo", new Handler(Looper.getMainLooper()) {
@@ -123,7 +139,6 @@ public class ArqueoCashlogyActivity extends Activity {
             public void handleMessage(Message msg) {
                 String response = msg.getData().getString("RESPONSE");
                 if ("success".equals(response)) {
-                    // Paso 4: Ejecutar el comando para cerrar Cashlogy
                     arqueoAction.cerrarCashlogy();
                 } else {
                     mostrarMensaje("Error al realizar el cierre de caja en el servidor.");
@@ -142,13 +157,12 @@ public class ArqueoCashlogyActivity extends Activity {
                 case "CASHLOGY_DENOMINACIONES_LISTAS":
                     mostrarMensaje("La contabilidad está lista para cerrar caja. Puede pulsar el botón de cierre de caja.");
                     btnArquearCaja.setVisibility(View.VISIBLE);
-                    Log.d("CASHLOGY", String.format("Último cambio registrado: %f", cambio));
                     break;
-                case "CASHLOGY_ARQUEADA":
-                    arqueoAction.getTotalCashlogy();
+                case "CASHLOGY_CIERRE_COMPLETADO":
+                    mostrarMensaje("Cierre completado ya puedes pulsar salir. Gracias por su colaboracion.");
                     break;
                 case "CASHLOGY_CASH":
-                    actualizarEfectivoEnServidor(value);
+                     actualizarEfectivoEnServidor();
                     break;
                 case "CASHLOGY_ERR":
                     mostrarMensaje(value);
@@ -162,19 +176,32 @@ public class ArqueoCashlogyActivity extends Activity {
         tvInformacionSalida.setText(mensaje);
     }
 
-    private void actualizarEfectivoEnServidor(String totalCashlogy) {
-        ContentValues updateCashValues = new ContentValues();
-        updateCashValues.put("cambio", totalCashlogy);
-        new HTTPRequest(server + "/arqueos/setcambio", updateCashValues, "updateCash", new Handler(Looper.getMainLooper()) {
+    private void actualizarEfectivoEnServidor() {
+        ContentValues p = new ContentValues();
+        p.put("cambio", String.valueOf(cambio));
+        p.put("stacke", String.valueOf(arqueoAction.getTotalAlmacenes()));
+        p.put("cambio_real", String.valueOf(arqueoAction.getTotalRecicladores()));
+
+        new HTTPRequest(server + "/arqueos/setcambio", p, "updateCash", new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 String updateResponse = msg.getData().getString("RESPONSE");
                 if ("success".equals(updateResponse)) {
-                    mostrarMensaje("Cierre completado correctamente.");
+                    arqueoAction.cashLogyCerrado();
                 } else {
                     mostrarMensaje("Error al actualizar el efectivo en el servidor.");
                 }
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        if(cashlogySocketManager != null) {
+            cashlogySocketManager.stop();
+        }
+        super.onDestroy();
+    }
 }
+
+
