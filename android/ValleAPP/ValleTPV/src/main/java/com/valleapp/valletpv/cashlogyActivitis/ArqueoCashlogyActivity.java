@@ -12,9 +12,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.tools.CashlogyManager.ArqueoAction;
-import com.valleapp.valletpv.tools.CashlogyManager.CashlogySocketManager;
-import com.valleapp.valletpv.tools.HTTPRequest;
+import com.valleapp.valletpvlib.tools.CashlogyManager.ArqueoAction;
+import com.valleapp.valletpvlib.tools.CashlogyManager.CashlogySocketManager;
+import com.valleapp.valletpvlib.tools.HTTPRequest;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;

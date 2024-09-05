@@ -15,8 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.tools.CashlogyManager.PaymentAction;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.tools.CashlogyManager.PaymentAction;
+import com.valleapp.valletpvlib.tools.ServicioCom;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;

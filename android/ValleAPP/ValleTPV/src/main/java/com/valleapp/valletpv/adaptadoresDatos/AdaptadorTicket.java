@@ -27,7 +27,7 @@ public class AdaptadorTicket extends ArrayAdapter<JSONObject> implements View.On
     IControladorCuenta controlador;
 
     public AdaptadorTicket(Context context, ArrayList<JSONObject> values, IControladorCuenta controlador) {
-        super(context, R.layout.item_art, (java.util.List<JSONObject>) values);
+        super(context, R.layout.item_art, values);
         this.context = context;
         this.controlador = controlador;
         this.values = values;

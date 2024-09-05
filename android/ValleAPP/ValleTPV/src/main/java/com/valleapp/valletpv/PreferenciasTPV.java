@@ -8,7 +8,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpvlib.tools.JSON;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -12,10 +12,11 @@ import android.widget.ListView;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorCamNotificaciones;
-import com.valleapp.valletpv.db.DBCamareros;
+
 import com.valleapp.valletpv.interfaces.IAutoFinish;
-import com.valleapp.valletpv.interfaces.IBaseDatos;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
+import com.valleapp.valletpvlib.DBs.DBCamareros;
+import com.valleapp.valletpvlib.interfaces.IBaseDatos;
 
 import org.json.JSONObject;
 

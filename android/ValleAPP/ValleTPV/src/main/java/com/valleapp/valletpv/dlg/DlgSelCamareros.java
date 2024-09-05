@@ -8,9 +8,10 @@ import android.widget.ListView;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
-import com.valleapp.valletpv.db.DBCamareros;
+
 import com.valleapp.valletpv.interfaces.IAutoFinish;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.DBs.DBCamareros;
+import com.valleapp.valletpvlib.tools.ServicioCom;
 
 import org.json.JSONException;
 import org.json.JSONObject;

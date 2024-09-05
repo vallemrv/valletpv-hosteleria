@@ -30,12 +30,7 @@ import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
-import com.valleapp.valletpv.db.DBCamareros;
-import com.valleapp.valletpv.db.DBCuenta;
-import com.valleapp.valletpv.db.DBMesas;
-import com.valleapp.valletpv.db.DBSecciones;
-import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DBTeclas;
+
 import com.valleapp.valletpv.dlg.DlgCobrar;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSepararTicket;
@@ -43,8 +38,15 @@ import com.valleapp.valletpv.dlg.DlgVarios;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
 import com.valleapp.valletpv.interfaces.IControladorCuenta;
-import com.valleapp.valletpv.tools.JSON;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.DBs.DBCamareros;
+import com.valleapp.valletpvlib.DBs.DBCuenta;
+import com.valleapp.valletpvlib.DBs.DBMesas;
+import com.valleapp.valletpvlib.DBs.DBSecciones;
+import com.valleapp.valletpvlib.DBs.DBSubTeclas;
+import com.valleapp.valletpvlib.DBs.DBTeclas;
+import com.valleapp.valletpvlib.tools.JSON;
+import com.valleapp.valletpvlib.tools.ServicioCom;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -119,7 +121,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     }, 1000);
 
                 }
-                myServicio.setMesa_abierta(mesa);
+                myServicio.setMesaAbierta(mesa);
                 get_cuenta();
             }catch (Exception e){
                 e.printStackTrace();
@@ -355,7 +357,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                                 JSONObject sub = (JSONObject) view.getTag();
                                 Intent it = getIntent();
                                 String des = sub.getString("descripcion_r");
-                                if (!des.equals("null") && !des.equals("")){
+                                if (!des.equals("null") && !des.isEmpty()){
                                     artSel.put("Descripcion", des);
                                 }else{
                                     String nom = artSel.getString("Descripcion");
@@ -364,7 +366,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
                                 }
                                 des = sub.getString("descripcion_t");
-                                if (!des.equals("null") && !des.equals("")){
+                                if (!des.equals("null") && !des.isEmpty()){
                                     artSel.put("descripcion_t", des);
                                 }else if(artSel.getString("descripcion_t").equals(artSel.getString("Nombre"))){
                                     String nom = artSel.getString("descripcion_t");
@@ -403,7 +405,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         String aux = "";
         try {
             String des = o.getString(descipcion);
-            if (!des.equals("null") && !des.equals("")) {
+            if (!des.equals("null") && !des.isEmpty()) {
                 aux = des;
             }else{
                 aux = o.getString("Nombre");
@@ -493,7 +495,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     public void abrirCajon(View v){
         setEstadoAutoFinish(true,false);
         DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-        if(dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
+        assert dbCamareros != null;
+        if(!dbCamareros.getConPermiso("abrir_cajon").isEmpty()) {
             try {
                 JSONObject p = new JSONObject();
                 p.put("idc", cam.getString("ID"));
@@ -659,7 +662,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             timerAutoCancel.cancel();
             timerAutoCancel=null;
         }
-        myServicio.setMesa_abierta(null);
+        myServicio.setMesaAbierta(null);
         unbindService(mConexion);
         super.onDestroy();
     }
@@ -741,7 +744,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dlgCobrar = null;
             }
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-            if(dbCamareros.getConPermiso("cobrar_ticket").size() > 0) {
+            assert dbCamareros != null;
+            if(!dbCamareros.getConPermiso("cobrar_ticket").isEmpty()) {
                 JSONObject p = new JSONObject();
                 p.put("idm", mesa.getString("ID"));
                 p.put("idc", cam.getString("ID"));
@@ -898,7 +902,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             reset = true;
             if (myServicio != null){
                 DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                if(dbCamareros.getConPermiso("borrar_linea").size() > 0) {
+                assert dbCamareros != null;
+                if(!dbCamareros.getConPermiso("borrar_linea").isEmpty()) {
                     JSONObject p = new JSONObject();
                     p.put("idm",  mesa.getString("ID"));
                     p.put("Precio", art.getString("Precio"));
