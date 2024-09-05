@@ -22,7 +22,7 @@ public class AdaptadorCamNotificaciones extends ArrayAdapter<JSONObject> {
 
 
     private final List<JSONObject> objects;
-    private IControladorAutorizaciones controlador;
+    private final IControladorAutorizaciones controlador;
 
     public AdaptadorCamNotificaciones(Context context, int resource,
                                       List<JSONObject> objects,
@@ -33,19 +33,18 @@ public class AdaptadorCamNotificaciones extends ArrayAdapter<JSONObject> {
     }
 
 
+
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("ViewHolder") View v = inflater.inflate(R.layout.item_camarero_notificable, parent, false);
         try {
-            TextView n = (TextView) v.findViewById(R.id.txt_nombre_camarero_notificaciones);
+            TextView n = v.findViewById(R.id.txt_nombre_camarero_notificaciones);
             JSONObject o = objects.get(position);
-            n.setText(o.getString("Nombre"));
-            ImageView btn = (ImageView) v.findViewById(R.id.btn_send_cam_autorizado);
+            n.setText(String.format("%s %s", o.getString("nombre"), o.getString("apellidos")));
+            ImageView btn = v.findViewById(R.id.btn_send_cam_autorizado);
             btn.setTag(o.getString("ID"));
-            btn.setOnClickListener(view -> {
-                  controlador.pedirAutorizacion(view.getTag().toString());
-            });
+            btn.setOnClickListener(view -> controlador.pedirAutorizacion(view.getTag().toString()));
 
         }catch (Exception e){
             e.printStackTrace();

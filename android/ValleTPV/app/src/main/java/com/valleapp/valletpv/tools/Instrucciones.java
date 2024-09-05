@@ -26,9 +26,7 @@ public class Instrucciones {
     ContentValues params;
     String op = "";
 
-    public Instrucciones(ContentValues params, String url, Handler handler, String op){
-        this.params = params; this.url = url; this.handler = handler; this.op = op;
-    }
+
     public Instrucciones(ContentValues params, String url){
         this.params = params; this.url = url; this.handler = null;
     }

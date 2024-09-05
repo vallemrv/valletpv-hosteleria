@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,6 +50,7 @@ public class DBCamareros extends DBBase{
             cam.put("pass_field", res.getString(res.getColumnIndex("pass_field")));
             cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
             cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
+            Log.e("AUTORIZACiON", cam.toString());
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -48,16 +49,14 @@ public class DlgPedirAutorizacion extends Dialog implements IControladorAutoriza
         super.onCreate(savedInstanceState);
         setContentView(R.layout.lista_camareos_para_notificaciones);
         setTitle("Confirmar autorizacion");
-        ListView l = (ListView) findViewById(R.id.lista_camareros_notificables);
+        ListView l =  findViewById(R.id.lista_camareros_notificables);
         AdaptadorCamNotificaciones ad = new AdaptadorCamNotificaciones(getContext(),
                 R.layout.item_camarero_notificable,
                 dbCamareros.getConPermiso(accion), this);
 
         l.setAdapter(ad);
         ImageButton btn = findViewById(R.id.btn_salir_notificaciones_camareros);
-        btn.setOnClickListener(view -> {
-            cancel();
-        });
+        btn.setOnClickListener(view -> cancel());
     }
 
 
@@ -94,5 +93,7 @@ public class DlgPedirAutorizacion extends Dialog implements IControladorAutoriza
         }
     }
 
-    public void pedirAutorizacion(ContentValues params){}
+    public void pedirAutorizacion(ContentValues params){
+        Log.e("AUTORIZACION", params.toString());
+    }
 }

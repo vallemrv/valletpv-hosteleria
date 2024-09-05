@@ -120,7 +120,7 @@ public class ServicioCom extends Service {
                 @Override
                 public void onMessage(String message) {
                     try {
-                        Log.e("CASHLOGY", message);
+                        Log.e("WEBSOCKET_INFO", message);
                         JSONObject o = new JSONObject(message);
                         updateTables(o);
                     }catch (Exception e){
@@ -131,21 +131,21 @@ public class ServicioCom extends Service {
                 @Override
                 public void onError(Exception ex) {
                     // devolución de llamada por error de conexión
-                    Log.i("Websocket", "Error de conexion....");
+                    Log.i("WEBSOCKET_INFO", "Error de conexion....");
                     isWebsocketClose = true;
                 }
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
                     // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
-                    Log.i("Websocket", "Websocket close....");
+                    Log.i("WEBSOCKET_INFO", "Websocket close....");
                     isWebsocketClose = true;
                 }
 
                 @Override
                 public void onMessage(ByteBuffer bytes) {
                     // El mensaje de flujo de bytes devuelto
-                    Log.i("Websocket","socket bytebuffer bytes");
+                    Log.i("WEBSOCKET_INFO","socket bytebuffer bytes");
                 }
             };
 
