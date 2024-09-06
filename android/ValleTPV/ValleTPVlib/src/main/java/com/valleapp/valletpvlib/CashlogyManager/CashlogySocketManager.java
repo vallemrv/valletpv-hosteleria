@@ -1,4 +1,4 @@
-package com.valleapp.valletpvlib.comunicacion.CashlogyManager;
+package com.valleapp.valletpvlib.CashlogyManager;
 
 import android.os.Bundle;
 import android.os.Handler;

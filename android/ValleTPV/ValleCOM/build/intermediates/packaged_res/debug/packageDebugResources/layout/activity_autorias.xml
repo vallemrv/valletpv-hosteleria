@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10sp">
+
+    <ListView
+        android:id="@+id/lista_peticiones"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="0.8" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="0.1">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="107dp"
+            android:layout_height="51dp"
+            android:layout_gravity="center_vertical|end"
+            android:background="@drawable/bg_pink"
+            android:onClick="salirAutorias"
+            android:text="Salir" />
+    </FrameLayout>
+
+</LinearLayout>

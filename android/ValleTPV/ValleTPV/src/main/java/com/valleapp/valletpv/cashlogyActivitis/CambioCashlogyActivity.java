@@ -10,23 +10,16 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.tools.CashlogyManager.ChangeAction;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.CashlogyManager.ChangeAction;
+import com.valleapp.valletpvlib.ServicioCom;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CambioCashlogyActivity extends Activity {

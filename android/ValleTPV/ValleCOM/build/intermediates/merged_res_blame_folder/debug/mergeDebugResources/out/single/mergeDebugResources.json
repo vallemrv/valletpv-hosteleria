@@ -1,0 +1,406 @@
+[
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_varios.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/varios.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_plato_combinado.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/plato_combinado.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_autoria.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_autoria.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_check.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/check.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_cornesredondeados_press.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/cornesredondeados_press.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_cocktel.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/cocktel.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_dialog_create_pass.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/dialog_create_pass.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_sugerencias.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_sugerencias.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_black_semitransparent.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_black_semitransparent.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_salir.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/salir.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_tapas.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/tapas.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_fondo_redondo.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/fondo_redondo.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_cobrar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/cobrar.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_preferencias.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_preferencias.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_pedido_interno.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_pedido_interno.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_item_empresa.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/item_empresa.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_imprimirticket.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/imprimirticket.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_gris.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_gris.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bocadillo.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bocadillo.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_fondo_redondo_pres.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/fondo_redondo_pres.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_btn_art.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/btn_art.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_add_camareros.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/add_camareros.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_comanda.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/comanda.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_red.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_red.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_refill.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_refill.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_cuenta.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_cuenta.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_toast.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_toast.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_buscar_pedidos.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_buscar_pedidos.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_mesas.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/mesas.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_fondo_btn_xml.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/fondo_btn_xml.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_abrircajon.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/abrircajon.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_carne.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/carne.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_menu.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/menu.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_fondo_btn.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/fondo_btn.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_fondo_redondeado_btn_xml.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/fondo_redondeado_btn_xml.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_papelera.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/papelera.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_title_subtiltle.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_title_subtiltle.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_blue_light.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_blue_light.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_donut.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/donut.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_cancel.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/cancel.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_ic_icon_com.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/ic_icon_com.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_send_men.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/send_men.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_settings.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/settings.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_jarra_cerveza.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/jarra_cerveza.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_sopa.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/sopa.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_cubalibre.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/cubalibre.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_fondo_redondo_btn_xml.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/fondo_redondo_btn_xml.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_guardar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/guardar.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_mas.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/mas.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_copa_con_limon.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/copa_con_limon.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_tarjeta.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/tarjeta.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bar.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_art.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_art.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_aperitivo.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/aperitivo.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_taza_cafe.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/taza_cafe.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_reconect.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/reconect.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_pedido.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/pedido.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_editar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/editar.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_bg_pink.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/bg_pink.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_listaticket.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/listaticket.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/raw_mail.wav.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/raw/mail.wav"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_autorias.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_autorias.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_item_pedido.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/item_pedido.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_copa_vino.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/copa_vino.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_app_icon.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/app_icon.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_texto_toast_simple.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/texto_toast_simple.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_varios.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/varios.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_plato.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/plato.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_pincho.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/pincho.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_dialog_mensaje.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/dialog_mensaje.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_llevar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/llevar.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_grupos_pedidos.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/grupos_pedidos.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_refill.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/refill.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_user_key.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/user_key.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_mensajes.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_mensajes.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_pedido_externo.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_pedido_externo.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_buscador.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_buscador.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_separarticket.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/separarticket.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_hacer_comanda.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_hacer_comanda.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_cornesredondeados.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/cornesredondeados.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_teclados.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/teclados.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_camareros.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_camareros.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_boton_mesa.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/boton_mesa.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_dialog_enter_pass.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/dialog_enter_pass.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_dialog_crear_empresa.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/dialog_crear_empresa.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_cambiarmesa.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/cambiarmesa.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_magdalena.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/magdalena.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_fondo_btn_press.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/fondo_btn_press.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_sopa_cuchara.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/sopa_cuchara.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_sobre.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/sobre.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_mostrar_pedidos.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_mostrar_pedidos.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_lupa.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/lupa.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_fab_label_background.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/fab_label_background.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_pizza.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/pizza.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_pescado.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/pescado.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_op_mesas.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_op_mesas.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_pedidos.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/pedidos.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable_tarta.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable/tarta.png"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_activity_mesas.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/activity_mesas.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/layout_linea_simple.xml.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/layout/linea_simple.xml"
+    },
+    {
+        "merged": "com.valleapp.vallecom.ValleCOM-debug-17:/drawable-hdpi_enviar.png.flat",
+        "source": "com.valleapp.vallecom.ValleCOM-main-19:/drawable-hdpi/enviar.png"
+    }
+]

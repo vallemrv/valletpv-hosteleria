@@ -8,8 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpv.tools.ServicioCom;
-import com.valleapp.valletpv.db.DBCamareros;
+import com.valleapp.valletpvlib.ServicioCom;
+import com.valleapp.valletpvlib.db.DBCamareros;
 
 /**
  * Created by valle on 19/10/14.

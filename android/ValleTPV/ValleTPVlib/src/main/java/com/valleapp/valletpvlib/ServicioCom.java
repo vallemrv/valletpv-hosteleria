@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.valletpvlib;
 
 import android.app.Service;
 import android.content.ContentValues;
@@ -10,33 +10,33 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.valleapp.valletpv.db.DBCamareros;
-import com.valleapp.valletpv.db.DBCuenta;
-import com.valleapp.valletpv.db.DBMesas;
-import com.valleapp.valletpv.db.DBMesasAbiertas;
-import com.valleapp.valletpv.db.DBSecciones;
-import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DBTeclas;
-import com.valleapp.valletpv.db.DBZonas;
-import com.valleapp.valletpv.interfaces.IBaseDatos;
-import com.valleapp.valletpv.interfaces.IBaseSocket;
-import com.valleapp.valletpv.tareas.TareaManejarInstrucciones;
-import com.valleapp.valletpv.tools.CashlogyManager.CashlogyManager;
-import com.valleapp.valletpv.tools.CashlogyManager.CashlogySocketManager;
-import com.valleapp.valletpv.tools.CashlogyManager.ChangeAction;
-import com.valleapp.valletpv.tools.CashlogyManager.PaymentAction;
-import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
+import androidx.annotation.NonNull;
 
-import org.java_websocket.WebSocket;
+import com.valleapp.valletpvlib.CashlogyManager.CashlogyManager;
+import com.valleapp.valletpvlib.CashlogyManager.CashlogySocketManager;
+import com.valleapp.valletpvlib.CashlogyManager.ChangeAction;
+import com.valleapp.valletpvlib.CashlogyManager.PaymentAction;
+import com.valleapp.valletpvlib.Interfaces.IBaseDatos;
+import com.valleapp.valletpvlib.Interfaces.IBaseSocket;
+import com.valleapp.valletpvlib.Interfaces.IControllerWS;
+import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
+import com.valleapp.valletpvlib.db.DBCamareros;
+import com.valleapp.valletpvlib.db.DBCuenta;
+import com.valleapp.valletpvlib.db.DBMesas;
+import com.valleapp.valletpvlib.db.DBMesasAbiertas;
+import com.valleapp.valletpvlib.db.DBSecciones;
+import com.valleapp.valletpvlib.db.DBSubTeclas;
+import com.valleapp.valletpvlib.db.DBTeclas;
+import com.valleapp.valletpvlib.db.DBZonas;
+import com.valleapp.valletpvlib.tareas.TareaManejarInstrucciones;
+import com.valleapp.valletpvlib.tools.Instrucciones;
+import com.valleapp.valletpvlib.comunicacion.WSClinet;
+
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.Framedata;
-import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -45,7 +45,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ServicioCom extends Service {
+public class ServicioCom extends Service implements IControllerWS {
 
 
     final IBinder myBinder = new MyBinder();
@@ -73,6 +73,8 @@ public class ServicioCom extends Service {
     WebSocketClient client;
     boolean isWebsocketClose = false;
 
+    WSClinet wsClient;
+
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             String op = msg.getData().getString("op");
@@ -82,7 +84,7 @@ public class ServicioCom extends Service {
                     if ("update_socket".equals(op)) {
                         JSONArray objs = new JSONArray(res);
                         for (int i = 0; i < objs.length(); i++) {
-                            updateTables(objs.getJSONObject(i));
+                            procesarRespose(objs.getJSONObject(i));
                         }
                     }else {
                         if ( op != null && op.equals("camareros")) {
@@ -97,64 +99,6 @@ public class ServicioCom extends Service {
         }
     };
 
-
-    public void crearWebsocket() {
-        super.onCreate();
-        try {
-            client = new WebSocketClient(new URI("ws://"+server.replace("api", "ws")+
-                    "/comunicacion/devices")) {
-
-                @Override
-                public void onWebsocketPong(WebSocket conn, Framedata f) {
-                    super.onWebsocketPong(conn, f);
-                }
-
-                @Override
-                public void onOpen(ServerHandshake serverHandshake) {
-                    // Devolución de llamada después de que se abre la conexión
-                    isWebsocketClose = false;
-                    Log.i("WEBSOCKET_INFO", "Websocket open.....");
-                    sync_device(new String[]{"mesasabiertas", "lineaspedido", "camareros"}, 500);
-                }
-
-
-                @Override
-                public void onMessage(String message) {
-                    try {
-                        Log.e("WEBSOCKET_INFO", message);
-                        JSONObject o = new JSONObject(message);
-                        updateTables(o);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onError(Exception ex) {
-                    // devolución de llamada por error de conexión
-                    Log.i("WEBSOCKET_INFO", "Error de conexion....");
-                    isWebsocketClose = true;
-                }
-
-                @Override
-                public void onClose(int code, String reason, boolean remote) {
-                    // Devolución de llamada de conexión cerrada, si remoto es verdadero, significa que fue cortado por el servidor
-                    Log.i("WEBSOCKET_INFO", "Websocket close....");
-                    isWebsocketClose = true;
-                }
-
-                @Override
-                public void onMessage(ByteBuffer bytes) {
-                    // El mensaje de flujo de bytes devuelto
-                    Log.i("WEBSOCKET_INFO","socket bytebuffer bytes");
-                }
-            };
-
-            client.connect();
-        } catch (Exception ignored) {
-
-        }
-    }
 
 
     private void sync_device(String[] tbs, long timeout) {
@@ -173,7 +117,7 @@ public class ServicioCom extends Service {
                         try {
                             Thread.sleep(timeout);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            Log.e("SERVICE_COM", e.toString());
                         }
                     }
                 }
@@ -181,13 +125,17 @@ public class ServicioCom extends Service {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("SERVICE_COM", e.toString());
         }
     }
 
+    @Override
+    public void sincronizar() {
 
+    }
 
-    private void updateTables(JSONObject o){
+    @Override
+    public void procesarRespose(@NonNull JSONObject o) {
         try {
             String tb = o.getString("tb");
             String op = o.getString("op");
@@ -221,7 +169,7 @@ public class ServicioCom extends Service {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("SERVICE_COM", e.toString());
         }
     }
 
@@ -239,7 +187,9 @@ public class ServicioCom extends Service {
         if (url != null) {
             server = url;
             IniciarDB();
-            crearWebsocket();
+
+            //crearWebsocket();
+            wsClient = new WSClinet(server, "/comunicacion/devices/", this);
 
             // Iniciar CashlogySocketManager si está habilitado
             if (usarCashlogy && urlCashlogy != null) {
@@ -487,6 +437,7 @@ public class ServicioCom extends Service {
     public void setMesa_abierta(JSONObject m){
         this.mesa_abierta = m;
     }
+
 
 
     public class MyBinder extends Binder{

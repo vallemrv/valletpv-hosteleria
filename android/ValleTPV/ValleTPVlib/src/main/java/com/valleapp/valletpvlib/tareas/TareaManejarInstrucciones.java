@@ -1,15 +1,15 @@
-package com.valleapp.valletpv.tareas;
+package com.valleapp.valletpvlib.tareas;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 
-import com.valleapp.valletpv.tools.Instrucciones;
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
+import com.valleapp.valletpvlib.tools.Instrucciones;
 
 import java.util.Queue;
 import java.util.TimerTask;

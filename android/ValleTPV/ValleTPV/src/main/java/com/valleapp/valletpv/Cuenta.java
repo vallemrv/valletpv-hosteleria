@@ -30,12 +30,12 @@ import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
-import com.valleapp.valletpv.db.DBCamareros;
-import com.valleapp.valletpv.db.DBCuenta;
-import com.valleapp.valletpv.db.DBMesas;
-import com.valleapp.valletpv.db.DBSecciones;
-import com.valleapp.valletpv.db.DBSubTeclas;
-import com.valleapp.valletpv.db.DBTeclas;
+import com.valleapp.valletpvlib.db.DBCamareros;
+import com.valleapp.valletpvlib.db.DBCuenta;
+import com.valleapp.valletpvlib.db.DBMesas;
+import com.valleapp.valletpvlib.db.DBSecciones;
+import com.valleapp.valletpvlib.db.DBSubTeclas;
+import com.valleapp.valletpvlib.db.DBTeclas;
 import com.valleapp.valletpv.dlg.DlgCobrar;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSepararTicket;
@@ -44,7 +44,7 @@ import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
 import com.valleapp.valletpv.interfaces.IControladorCuenta;
 import com.valleapp.valletpvlib.tools.JSON;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

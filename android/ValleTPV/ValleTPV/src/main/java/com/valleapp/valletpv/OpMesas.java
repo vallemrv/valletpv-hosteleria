@@ -17,10 +17,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.valleapp.valletpv.db.DBCuenta;
-import com.valleapp.valletpv.db.DBMesas;
-import com.valleapp.valletpv.db.DBZonas;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.db.DBCuenta;
+import com.valleapp.valletpvlib.db.DBMesas;
+import com.valleapp.valletpvlib.db.DBZonas;
+import com.valleapp.valletpvlib.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

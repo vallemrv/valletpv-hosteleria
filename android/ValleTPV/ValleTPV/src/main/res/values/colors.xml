@@ -7,4 +7,8 @@
     <color name="red">#FB6664</color>
     <color name="red_press">#FC1310</color>
     <color name="white">#FFFFF5</color>
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="black">#000000</color>
 </resources>

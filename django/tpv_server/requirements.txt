@@ -1,7 +1,0 @@
-Django
-channels
-channels-redis
-django-tokenapi
-Jinja2
-django-cors-headers
-trml2pdf

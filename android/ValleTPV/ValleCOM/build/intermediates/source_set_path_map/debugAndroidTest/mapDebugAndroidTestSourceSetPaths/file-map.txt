@@ -1,0 +1,4 @@
+com.valleapp.vallecom.test.ValleCOM-androidTest-0 /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/generated/res/resValues/androidTest/debug
+com.valleapp.vallecom.test.ValleCOM-mergeDebugAndroidTestResources-1 /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.valleapp.vallecom.test.ValleCOM-mergeDebugAndroidTestResources-2 /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.valleapp.vallecom.test.ValleCOM-debugAndroidTest-3 /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/merged_res/debugAndroidTest/mergeDebugAndroidTestResources

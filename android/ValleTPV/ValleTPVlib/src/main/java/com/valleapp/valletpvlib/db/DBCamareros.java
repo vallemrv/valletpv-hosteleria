@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.db;
+package com.valleapp.valletpvlib.db;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;

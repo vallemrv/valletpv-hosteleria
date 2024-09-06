@@ -30,17 +30,17 @@ import android.widget.TextView;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
 import com.valleapp.valletpv.cashlogyActivitis.CambioCashlogyActivity;
-import com.valleapp.valletpv.db.DBCamareros;
-import com.valleapp.valletpv.db.DBCuenta;
-import com.valleapp.valletpv.db.DBMesas;
-import com.valleapp.valletpv.db.DBZonas;
+import com.valleapp.valletpvlib.db.DBCamareros;
+import com.valleapp.valletpvlib.db.DBCuenta;
+import com.valleapp.valletpvlib.db.DBMesas;
+import com.valleapp.valletpvlib.db.DBZonas;
 import com.valleapp.valletpv.dlg.DlgMensajes;
 import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
 import com.valleapp.valletpv.dlg.DlgSelCamareros;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControlMensajes;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;

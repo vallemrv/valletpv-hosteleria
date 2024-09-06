@@ -1,11 +1,11 @@
-package com.valleapp.valletpv.interfaces;
+package com.valleapp.valletpvlib.Interfaces;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public interface IBaseDatos {
-    public JSONArray filter(String cWhere);
-    public void rellenarTabla(JSONArray objs);
-    public void inicializar();
+    JSONArray filter(String cWhere);
 
+    void rellenarTabla(JSONArray objs);
+
+    void inicializar();
 }

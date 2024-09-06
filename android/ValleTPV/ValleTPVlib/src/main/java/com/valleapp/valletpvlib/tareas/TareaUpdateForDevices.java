@@ -1,8 +1,7 @@
-package com.valleapp.valletpv.tareas;
+package com.valleapp.valletpvlib.tareas;
 
 import android.content.ContentValues;
 import android.os.Handler;
-
 
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
 

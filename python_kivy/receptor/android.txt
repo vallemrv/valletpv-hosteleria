@@ -1,3 +1,0 @@
-title=Receptor tpv
-author=Manuel Rodriguez
-orientation=landscape

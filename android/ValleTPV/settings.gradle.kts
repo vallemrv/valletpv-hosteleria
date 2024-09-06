@@ -20,6 +20,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ValleTPV"
-include(":ValleTPV")
 include(":ValleCOM")
 include(":ValleTPVlib")
+include(":ValleTPV")

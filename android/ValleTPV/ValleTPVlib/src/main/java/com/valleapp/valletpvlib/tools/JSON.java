@@ -1,4 +1,4 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.valletpvlib.tools;
 
 import android.content.Context;
 import android.util.Log;
@@ -18,28 +18,28 @@ public class JSON {
             fos.write(obj.toString());
             fos.close();
         }catch(Exception e){
-            Log.e("JSON", e.getMessage());
+            Log.e("JSON", e.toString());
         }
     }
 
     public JSONObject deserializar(String file, Context context) throws JSONException {
-        String strJSON = "";
+        StringBuilder strJSON = new StringBuilder();
 
         try{
             BufferedReader fos = new BufferedReader(new InputStreamReader(context.openFileInput(file)));
             String tmp = fos.readLine();
             while (tmp!=null) {
-                strJSON += tmp;
+                strJSON.append(tmp);
                 tmp = fos.readLine();
             }
             fos.close();
         }catch(Exception e){
-            Log.e("JSON", e.getMessage());
+            Log.e("JSON", e.toString());
         }
 
-        if(strJSON == "") return null;
+        if (strJSON.length() == 0) return null;
         else {
-            return new JSONObject(strJSON);
+            return new JSONObject(strJSON.toString());
         }
 
     }

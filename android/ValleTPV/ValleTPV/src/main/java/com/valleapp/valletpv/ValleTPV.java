@@ -16,10 +16,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
-import com.valleapp.valletpv.db.DBCamareros;
+import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
 import com.valleapp.valletpvlib.tools.JSON;
-import com.valleapp.valletpv.tools.ServicioCom;
+import com.valleapp.valletpvlib.ServicioCom;
 
 import org.json.JSONException;
 import org.json.JSONObject;

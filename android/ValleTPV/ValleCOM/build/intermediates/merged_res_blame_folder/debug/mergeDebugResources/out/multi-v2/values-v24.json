@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.valleapp.vallecom.ValleCOM-mergeDebugResources-15:/values-v24/values-v24.xml",
+            "map": [
+                {
+                    "source": "/Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/res/values-v24/values-v24.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,212",
+                        "endColumns": "156,134",
+                        "endOffsets": "207,342"
+                    }
+                }
+            ]
+        }
+    ]
+}

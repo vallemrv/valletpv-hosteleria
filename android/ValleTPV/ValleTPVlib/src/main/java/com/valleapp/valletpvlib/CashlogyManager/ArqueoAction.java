@@ -1,4 +1,4 @@
-package com.valleapp.valletpvlib.comunicacion.CashlogyManager;
+package com.valleapp.valletpvlib.CashlogyManager;
 
 
 import java.util.HashMap;
