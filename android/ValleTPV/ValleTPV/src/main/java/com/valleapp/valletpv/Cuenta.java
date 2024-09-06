@@ -43,7 +43,7 @@ import com.valleapp.valletpv.dlg.DlgVarios;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
 import com.valleapp.valletpv.interfaces.IControladorCuenta;
-import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpvlib.tools.JSON;
 import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONArray;

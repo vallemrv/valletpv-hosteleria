@@ -19,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.cashlogyActivitis.ArqueoCashlogyActivity;
-import com.valleapp.valletpv.tools.HTTPRequest;
-import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
+import com.valleapp.valletpvlib.tools.JSON;
 
 import org.json.JSONException;
 import org.json.JSONObject;

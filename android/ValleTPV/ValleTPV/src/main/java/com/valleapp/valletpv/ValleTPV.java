@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpv.db.DBCamareros;
 import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
-import com.valleapp.valletpv.tools.JSON;
+import com.valleapp.valletpvlib.tools.JSON;
 import com.valleapp.valletpv.tools.ServicioCom;
 
 import org.json.JSONException;
