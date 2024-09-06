@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+@Author: Manuel Rodriguez <valle>
+@Date:   2018-10-08T10:52:34+02:00
+@Email:  valle.mrv@gmail.com
+@Last modified by:   valle
+@Last modified time: 2018-12-29T15:19:20+01:00
+@License: Apache License v2.0
+-->
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ImageButton
+        android:id="@+id/btn_salir_monedas"
+        android:layout_width="80sp"
+        android:layout_height="80sp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/salir"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/salir" />
+
+    <ImageButton
+        android:id="@+id/btnImprimir"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/btn_salir_monedas"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/imprimir"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/imprimirticket"
+       />
+
+    <ImageButton
+        android:id="@+id/btnImprimirFactura"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/btnImprimir"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/imprimir_factura"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/factura" />
+
+    <ImageButton
+        android:id="@+id/btnListado"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toStartOf="@+id/btnImprimirFactura"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/lista_nticket"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/listaticket" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn_salir_monedas"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="5dp"
+        android:contentDescription="@string/boton_listado_ticket">
+
+        <LinearLayout
+            android:id="@+id/pneListados"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
+</RelativeLayout>
