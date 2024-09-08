@@ -10,8 +10,8 @@ import java.util.Timer
 import kotlin.concurrent.schedule
 
 class WSClinet(
-    private val serverUrl: String, // La URL del servidor (por ejemplo, "api.server.com")
-    private val endpoint: String,  // El endpoint (por ejemplo, "/comunicacion/devices")
+    serverUrl: String, // La URL del servidor (por ejemplo, "api.server.com")
+    endpoint: String,  // El endpoint (por ejemplo, "/comunicacion/devices")
     private val controller: IControllerWS // Interfaz para sincronizar datos perdidos
 ) : WebSocketClient(constructUri(serverUrl, endpoint)) {
 
@@ -24,6 +24,7 @@ class WSClinet(
         private fun constructUri(serverUrl: String, endpoint: String): URI {
             val wsUrl = serverUrl.replace("api", "ws") // Reemplaza "api" por "ws"
             val fullUrl = "ws://$wsUrl$endpoint" // Construye la URL completa
+            println("Constructed URI: $fullUrl")
             return URI(fullUrl)
         }
     }

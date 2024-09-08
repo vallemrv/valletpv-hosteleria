@@ -410,7 +410,7 @@ class Efectivo(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     arqueo = models.ForeignKey(Arqueocaja,  on_delete=models.CASCADE, db_column='IDArqueo')  # Field name made lowercase.
     can = models.IntegerField(db_column='Can')  # Field name made lowercase.
-    moneda = models.DecimalField(db_column='Moneda', max_digits=5, decimal_places=2)  # Field name made lowercase.
+    moneda = models.DecimalField(db_column='Moneda', max_digits=10, decimal_places=2)  # Field name made lowercase.
 
 
     def save(self, *args, **kwargs):

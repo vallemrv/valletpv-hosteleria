@@ -80,6 +80,7 @@ def update_from_devices(request):
 
 @csrf_exempt
 def sync_devices(request):
+    
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
     if (tb_name == "lineaspedido"): return comparar_lineaspedido(request)
@@ -87,6 +88,7 @@ def sync_devices(request):
     model = apps.get_model(app_name, tb_name)
     result = []
     pks = []
+    print(tb_name)
    
     for r in reg:
         try:
@@ -138,17 +140,18 @@ def sync_devices(request):
 
     return JsonResponse(result)
 
-
-
 def equals(k, obj1, obj2):
+    # Manejo de valores numéricos
     if k.lower() in ["p1", "p2", "precio", "incremento", "entrega"]:
-        return float(obj1) == float(obj2)
-
-    if obj1 in ["None", "null"]:
-        if obj2 in ["None", "null"]:
-            return True
-        else:
+        try:
+            # Intentamos convertir ambos valores a float, si alguno falla, se consideran diferentes
+            return float(obj1) == float(obj2)
+        except (ValueError, TypeError):
             return False
 
-    
-    return obj1.lower() == obj2.lower()
+    # Manejo de None
+    if obj1 in [None, "None", "null"] or obj2 in [None, "None", "null"]:
+        return obj1 in [None, "None", "null"] and obj2 in [None, "None", "null"]
+
+    # Comparación de strings normalizados
+    return str(obj1).strip().lower() == str(obj2).strip().lower()

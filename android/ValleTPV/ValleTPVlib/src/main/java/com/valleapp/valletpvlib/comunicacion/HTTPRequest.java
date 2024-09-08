@@ -33,12 +33,12 @@ public class HTTPRequest {
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "UTF-8");
-
             // Execute HTTP Post Request
             HttpURLConnection finalConn = conn;
             new Thread(() -> {
                 int statusCode = -1;
                 try {
+                    Log.d("HTTPRequeest", getParams(params));
                     DataOutputStream wr = new DataOutputStream(finalConn.getOutputStream());
                     wr.writeBytes(getParams(params));
                     wr.flush();
@@ -58,6 +58,7 @@ public class HTTPRequest {
                     if (handlerExternal != null) sendMessage(handlerExternal, "no_connexion", null);
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
+                    Log.e("HTTPRequeest", e.toString());
                     if (handlerExternal != null && statusCode == 500)
                         sendMessage(handlerExternal, "ERROR", null);
 

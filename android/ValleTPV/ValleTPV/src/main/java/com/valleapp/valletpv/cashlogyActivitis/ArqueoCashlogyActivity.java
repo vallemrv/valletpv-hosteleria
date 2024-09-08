@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -58,7 +59,7 @@ public class ArqueoCashlogyActivity extends Activity {
         stacke = intent.getDoubleExtra("stacke", 0.0);
         cambio_real = intent.getDoubleExtra("cambio_real", 0.0);
         boolean hayArqueo = intent.getBooleanExtra("hayArqueo", false);
-
+        hayArqueo = true;
 
         // Verificar si se puede hacer el arqueo
         if (hayArqueo) {
@@ -134,6 +135,7 @@ public class ArqueoCashlogyActivity extends Activity {
         p.put("usaCashlogy", "true");
         p.put("des_gastos", "[]");
 
+        Log.d("ArqueoCashlogyActivity", p.toString());
         // Enviar la solicitud al servidor para cerrar el arqueo
         new HTTPRequest(server + "/arqueos/arquear", p, "arqueo", new Handler(Looper.getMainLooper()) {
             @Override

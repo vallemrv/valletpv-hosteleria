@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,9 +51,9 @@ public class DBCamareros extends DBBase{
             cam.put("pass_field", res.getString(res.getColumnIndex("pass_field")));
             cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
             cam.put("permisos", res.getString(res.getColumnIndex("permisos")));
-            Log.e("AUTORIZACiON", cam.toString());
+
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("DB_CAMAREROS", e.toString());
         }
         return cam;
     }
@@ -70,7 +71,7 @@ public class DBCamareros extends DBBase{
             v.put("apellidos",  obj.getString("apellidos"));
             v.put("permisos", obj.getString("permisos"));
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("DB_CAMAREROS", e.toString());
         }
         return v;
     }
@@ -128,7 +129,7 @@ public class DBCamareros extends DBBase{
             v.put("permisos", "");
             db.insert("camareros", null, v);
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("DB_CAMAREROS", e.toString());
         }
     }
 }

@@ -158,9 +158,11 @@ public class CambioCashlogyActivity extends Activity {
 
         for (String denominacion : denominacionesArray) {
             String[] parts = denominacion.split(":");
-            int denominacionEnCentimos = Integer.parseInt(parts[0]);
-            int cantidad = Integer.parseInt(parts[1]);
-            denominacionesMap.put(denominacionEnCentimos, cantidad);
+            if (!parts[0].isEmpty()) {
+                int denominacionEnCentimos = Integer.parseInt(parts[0]);
+                int cantidad = Integer.parseInt(parts[1]);
+                denominacionesMap.put(denominacionEnCentimos, cantidad);
+            }
         }
 
         return denominacionesMap;

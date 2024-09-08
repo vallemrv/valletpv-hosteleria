@@ -122,7 +122,6 @@ public class CashlogySocketManager {
         } else if (response.startsWith("#ER:")) {
             // Error
             currentAction.handleResponse(command, "CASHLOGY_ERR");
-            Log.e("CASHLOGY", response);
             handleErrors(command, response);
         } else {
             // Respuesta desconocida

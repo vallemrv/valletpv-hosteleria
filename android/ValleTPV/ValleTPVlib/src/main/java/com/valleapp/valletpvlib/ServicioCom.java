@@ -32,7 +32,6 @@ import com.valleapp.valletpvlib.tareas.TareaManejarInstrucciones;
 import com.valleapp.valletpvlib.tools.Instrucciones;
 import com.valleapp.valletpvlib.comunicacion.WSClinet;
 
-import org.java_websocket.client.WebSocketClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,17 +60,12 @@ public class ServicioCom extends Service implements IControllerWS {
 
     Timer timerUpdateLow = new Timer();
     Timer timerManejarInstrucciones = new Timer();
-    Timer checkWebsocket = new Timer();
-
 
     Map<String, Handler> exHandler = new HashMap<>();
     Map<String, IBaseDatos> dbs;
 
     final Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
     String[] tbNameUpdateLow;
-
-    WebSocketClient client;
-    boolean isWebsocketClose = false;
 
     WSClinet wsClient;
 
@@ -83,6 +77,7 @@ public class ServicioCom extends Service implements IControllerWS {
                 try {
                     if ("update_socket".equals(op)) {
                         JSONArray objs = new JSONArray(res);
+                        
                         for (int i = 0; i < objs.length(); i++) {
                             procesarRespose(objs.getJSONObject(i));
                         }
@@ -93,7 +88,7 @@ public class ServicioCom extends Service implements IControllerWS {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("SERVICE_COM", e.toString());
                 }
             }
         }
@@ -113,6 +108,7 @@ public class ServicioCom extends Service implements IControllerWS {
                         IBaseDatos db =  getDb(tb);
                         p.put("tb", tb);
                         p.put("reg", db.filter(null).toString());
+                        Log.d("TEST_SYNC", p.toString());
                         new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
                         try {
                             Thread.sleep(timeout);
@@ -131,7 +127,7 @@ public class ServicioCom extends Service implements IControllerWS {
 
     @Override
     public void sincronizar() {
-
+        sync_device(new String[]{"mesasabiertas", "lineaspedido", "camareros"}, 500);
     }
 
     @Override
@@ -188,8 +184,12 @@ public class ServicioCom extends Service implements IControllerWS {
             server = url;
             IniciarDB();
 
-            //crearWebsocket();
-            wsClient = new WSClinet(server, "/comunicacion/devices/", this);
+            if(wsClient == null) {
+                //crearWebsocket();
+                Log.d("SERVICE_COM", "Creando websocket: "+server);
+                wsClient = new WSClinet(server, "/comunicacion/devices", this);
+                wsClient.connect();
+            }
 
             // Iniciar CashlogySocketManager si está habilitado
             if (usarCashlogy && urlCashlogy != null) {
@@ -208,15 +208,6 @@ public class ServicioCom extends Service implements IControllerWS {
             timerManejarInstrucciones.schedule(
                     new TareaManejarInstrucciones(colaInstrucciones, 1000), 2000, 1);
 
-            // Programar la verificación de la conexión WebSocket
-            checkWebsocket.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (isWebsocketClose && client != null) {
-                        client.reconnect();
-                    }
-                }
-            }, 2000, 5000);
 
             return START_STICKY;
         }
@@ -244,8 +235,9 @@ public class ServicioCom extends Service implements IControllerWS {
     public void onDestroy() {
         timerUpdateLow.cancel();
         timerManejarInstrucciones.cancel();
-        checkWebsocket.cancel();
-
+        if (wsClient != null){
+            wsClient.stopReconnection();
+        }
         if (cashlogySocketManager != null) {
             cashlogySocketManager.stop(); // Detener el socket de Cashlogy si está en uso
         }
@@ -266,7 +258,7 @@ public class ServicioCom extends Service implements IControllerWS {
         try {
             return exHandler.get(nombre);
         }catch (NullPointerException e){
-            e.printStackTrace();
+            Log.e("SERVICE_COM", e.toString());
         }
 
         return  null;

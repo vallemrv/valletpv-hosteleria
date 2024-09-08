@@ -15,7 +15,7 @@ public class ChangeAction extends CashlogyAction {
     boolean isAceptar = true;
     boolean isWaitingForFinalQ = false;
 
-    int denominacionMinima = 1;
+    int denominacionMinima = 0;
 
     boolean esBloqueado = false;
      Map<Integer, Integer> denominacionesDisponibles = new HashMap<>();
@@ -27,6 +27,7 @@ public class ChangeAction extends CashlogyAction {
     @Override
     public void execute() {
         importeAdmitido = 0;
+        denominacionMinima = 0;
         isAceptar = true;
         isWaitingForFinalQ = false;
         isCancel = false;
@@ -36,7 +37,6 @@ public class ChangeAction extends CashlogyAction {
 
     @Override
     public void handleResponse(String comando, String response) {
-
         if (comando.startsWith("#Y")) {
             manejarRespuestaDenominaciones(response);
         } else if (comando.startsWith("#B")) {
@@ -47,31 +47,27 @@ public class ChangeAction extends CashlogyAction {
             isWaitingForFinalQ = true;    // Indica que estamos esperando la última respuesta #Q#
             sendQCommand();              // Después de #J#, enviar un último #Q#
         }else if (comando.startsWith("#U")){
-            manejarDispensacionCambio(response);
+            manejarDispensacionCambio();
         } else if (comando.startsWith("#P")) {
             manejarRespuestaP(response);
         }
     }
 
     private void sendQCommand() {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            socketManager.sendCommand("#Q#");
-        }, 200);  // Esperar 200ms antes de volver a enviar #Q#
+        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                socketManager.sendCommand("#Q#"), 200);  // Esperar 200ms antes de volver a enviar #Q#
     }
 
     private void sendJCommand() {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            socketManager.sendCommand("#J#");
-        }, 200);  // Esperar 300ms antes de enviar #J#
+        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                socketManager.sendCommand("#J#"), 200);  // Esperar 300ms antes de enviar #J#
     }
 
     private void sendPCommand(Double importe) {
         int centimosADevolver = (int) Math.round(importe * 100);
-        Log.i("CASHLOGY", "Iniciando dispensación de cambio");
         String comandoDispensar = "#P#" + centimosADevolver + "#0#0#0#";
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            socketManager.sendCommand(comandoDispensar);
-        }, 200);  // Enviar comando #P# después de un pequeño retraso
+        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                socketManager.sendCommand(comandoDispensar), 200);  // Enviar comando #P# después de un pequeño retraso
     }
 
     private void manejarRespuestaDenominaciones(String response) {
@@ -110,8 +106,7 @@ public class ChangeAction extends CashlogyAction {
                 if (denomination.length == 2) {
                     int valorEnCentimos = Integer.parseInt(denomination[0]);
                     int cantidad = Integer.parseInt(denomination[1]);
-
-                     denominacionesDisponibles.put(valorEnCentimos, cantidad);
+                    denominacionesDisponibles.put(valorEnCentimos, cantidad);
                 }
             }
 
@@ -127,13 +122,12 @@ public class ChangeAction extends CashlogyAction {
     private void manejarRespuestaImporteAdmitido(String response) {
         String[] parts = response.split("#");
         if (parts.length >= 3) {
-            double nuevoImporteAdmitido = 0;
-            double importe = Double.parseDouble(parts[2]);
-
-            if (importe < 0.01) nuevoImporteAdmitido = 0;
-            else nuevoImporteAdmitido =importe / 100;
-
-            Log.d("CASHLOGY", String.valueOf(Double.parseDouble(parts[2])));
+            double nuevoImporteAdmitido = 0.0;
+            if (parts[2].isEmpty()) {
+                nuevoImporteAdmitido= 0.0;
+            }else {
+                nuevoImporteAdmitido = Double.parseDouble(parts[2]) / 100;
+            }
 
             // Solo notificar a la UI si el importe recibido es diferente al guardado
             if (nuevoImporteAdmitido != importeAdmitido) {
@@ -192,15 +186,13 @@ public class ChangeAction extends CashlogyAction {
 
     private void calcularYDispensarCambio() {
         if (isCancel) {
-            sendPCommand(importeAdmitido);
+            if (importeAdmitido > 0) {
+                sendPCommand(importeAdmitido);
+            }
+            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
             return;
         }
-
-        // Restar la denominación mínima a importeAdmitido
-        double importeRestante = importeAdmitido - (denominacionMinima / 100.0);
-
-        // Ejecutar el comando P con la diferencia
-        sendPCommand(importeRestante);
+        sendUCommand();
     }
 
 
@@ -208,22 +200,22 @@ public class ChangeAction extends CashlogyAction {
 
     private void manejarRespuestaP(String response) {
         if (response.contains("#0#") || response.contains("WR:")) {
-            // Si la respuesta de P es exitosa, enviar el comando U
-            sendUCommand();
-        } else {
-            // Si hay un error en el comando P, cancelar la operación
-            isCancel = true;
-            isAceptar = false;
-            isWaitingForFinalQ = true;
-            sendQCommand();
+            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación finalizada.");
+            return;
         }
+        // Si hay un error en el comando P, cancelar la operación
+        isCancel = true;
+        isAceptar = false;
+        isWaitingForFinalQ = true;
+        sendQCommand();
     }
 
-    private void manejarDispensacionCambio(String response) {
+    private void manejarDispensacionCambio() {
         if (isCancel) {
-            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
+            sendPCommand(importeAdmitido);
         } else {
-            socketManager.notifyUI("CASHLOGY_CAMBIO", "Cambio ejecutado.");
+            double importeRestante = importeAdmitido - (denominacionMinima / 100.0);
+            sendPCommand(importeRestante);
         }
     }
 
