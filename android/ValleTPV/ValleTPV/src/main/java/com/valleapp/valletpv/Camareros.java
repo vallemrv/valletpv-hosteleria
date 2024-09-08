@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -107,19 +108,19 @@ public class Camareros extends Activity {
                    btn.setSingleLine(false);
                    String n = cam.getString("nombre");
                    String a = cam.getString("apellidos");
-                   btn.setText(String.format("%s %s", n, a));
+                   btn.setText(String.format("%s\n%s", n, a));
                    btn.setBackgroundResource(R.drawable.fondo_btn_xml);
                    btn.setOnClickListener(view -> {
                        try {
                            final JSONObject obj =  lscam.getJSONObject(view.getId());
                            entrar_en_mesas((obj));
                        } catch (JSONException e) {
-                           e.printStackTrace();
+                           Log.e("ERROR", "Error al acceder al camarero");
                        }
                       });
                       row.addView(btn, rowparams);
 
-                      if (((i+1) % 6) == 0) {
+                      if (((i+1) % 5) == 0) {
                           row = new TableRow(cx);
                           ll.addView(row, params);
                       }
@@ -127,7 +128,7 @@ public class Camareros extends Activity {
            }
 
        }catch (Exception e){
-          e.printStackTrace();
+         Log.e("ERROR", "Error al acceder al camarero");
        }
     }
 
