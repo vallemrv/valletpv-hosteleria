@@ -1,0 +1,6 @@
+{
+  "appId": "con.valleapp.vallercp",
+  "appName": "ValleRCP",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
