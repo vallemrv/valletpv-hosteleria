@@ -382,10 +382,8 @@ public class ServicioCom extends Service implements IControllerWS {
         }
     }
 
-    public void get_cuenta(Handler controller, String mesa_id) {
-        ContentValues p = new ContentValues();
-        p.put("mesa_id", mesa_id);
-        new HTTPRequest(server + "/cuenta/get_cuenta", p, "", controller);
+    public void get_cuenta(Handler controller, ContentValues p) {
+        new HTTPRequest(server + "/cuenta/get_cuenta", p, "get_cuenta", controller);
     }
 
     public void addCamNuevo(String n, String a) {

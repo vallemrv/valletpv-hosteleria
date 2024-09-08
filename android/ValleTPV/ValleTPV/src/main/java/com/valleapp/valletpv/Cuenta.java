@@ -17,6 +17,7 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
+import com.valleapp.valletpvlib.Interfaces.IBaseSocket;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpvlib.db.DBCuenta;
 import com.valleapp.valletpvlib.db.DBMesas;
@@ -122,7 +124,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 myServicio.setMesa_abierta(mesa);
                 get_cuenta();
             }catch (Exception e){
-                e.printStackTrace();
+                Log.e("ERROR_CUENTA", e.toString());
             }
         }
 
@@ -142,7 +144,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 mostrarCobrar(dbCuenta.filterGroup("IDMesa=" + id_mesa), totalMesa);
                 findViewById(R.id.loading).setVisibility(View.GONE);
             }catch (Exception e ){
-                e.printStackTrace();
+                Log.e("ERROR_CUENTA", e.toString());
             }
         }
     };
@@ -175,10 +177,14 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 reset=true;
                 String res = msg.getData().getString("RESPONSE");
                 if (res != null) {
-                    JSONArray datos = new JSONArray(res);
+                    JSONObject datos = new JSONObject(res);
+                    if (datos.getBoolean("soniguales")){
+                        return;
+                    }
                     synchronized (dbCuenta) {
-                       dbCuenta.replaceMesa(datos, mesa.getString("ID"));
-                       rellenarTicket();
+                        JSONArray reg = datos.getJSONArray("reg");
+                        dbCuenta.replaceMesa(reg, mesa.getString("ID"));
+                        rellenarTicket();
                    }
                 }else{
                     if (can_refresh) rellenarTicket();
@@ -270,7 +276,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("ERROR_CUENTA", "Error al cargar las preferencias");
         }
 
     }
@@ -278,9 +284,12 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     private void get_cuenta(){
         if(myServicio!=null & mesa != null) {
             try {
-                myServicio.get_cuenta(handlerHttp, mesa.getString("ID"));
+                ContentValues p = new ContentValues();
+                p.put("reg", dbCuenta.filter("IDMesa=" + mesa.getString("ID")).toString());
+                p.put("idm", mesa.getString("ID"));
+                myServicio.get_cuenta(handlerHttp, p);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("ERROR_CUENTA", "Error al cargar la cuenta");
             }
         }
     }

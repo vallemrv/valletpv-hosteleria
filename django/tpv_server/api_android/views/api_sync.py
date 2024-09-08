@@ -89,7 +89,7 @@ def sync_devices(request):
     model = apps.get_model(app_name, tb_name)
     result = []
     pks = []
-    print(tb_name)
+   
    
     for r in reg:
         try:
@@ -118,8 +118,7 @@ def sync_devices(request):
 
         except Exception as e:
             print(e)
-            print(tb_name, r)  
-        
+            
    
    
     op = "insert"

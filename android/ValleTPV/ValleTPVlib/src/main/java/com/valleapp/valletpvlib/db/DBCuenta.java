@@ -47,7 +47,7 @@ public class DBCuenta extends DBBase{
             try {
                 insert(objs.getJSONObject(i));
             } catch (JSONException e) {
-                e.printStackTrace();
+               Log.e("ERROR_DB_CUENTA", e.toString());
             }
         }
     }
@@ -70,7 +70,7 @@ public class DBCuenta extends DBBase{
             }
 
         }catch (SQLiteException e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
         return lista;
     }
@@ -93,7 +93,7 @@ public class DBCuenta extends DBBase{
             }
 
         }catch (SQLiteException e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
         return lista;
     }
@@ -114,7 +114,7 @@ public class DBCuenta extends DBBase{
             values.put("Estado", o.getString("Estado"));
             values.put("servido", o.getString("servido"));
         }catch (Exception e){
-            Log.d("CUENTA-CARGARVALUES",  e.getMessage());
+            Log.e("CUENTA-CARGARVALUES",  e.toString());
         }
         return values;
     }
@@ -134,7 +134,7 @@ public class DBCuenta extends DBBase{
                 s = cursor.getDouble(0);
             }
         } catch (SQLiteException e) {
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
         return s;
     }
@@ -146,7 +146,7 @@ public class DBCuenta extends DBBase{
             values.put("IDMesa", id1);
             db.update("cuenta", values, "IDMesa="+id +" AND estado != 'N'", null);
         }catch (SQLiteException e){
-            e.printStackTrace();
+           Log.e("ERROR_DB_CUENTA", e.toString());
         }
     }
 
@@ -176,7 +176,7 @@ public class DBCuenta extends DBBase{
             obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
             obj.put("IDMesa", res.getString(res.getColumnIndex("IDMesa")));
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
         return obj;
     }
@@ -192,7 +192,7 @@ public class DBCuenta extends DBBase{
                 insert(datos.getJSONObject(i));
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
     }
 
@@ -215,7 +215,7 @@ public class DBCuenta extends DBBase{
             }
 
         }catch (JSONException e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
     }
 
@@ -232,7 +232,7 @@ public class DBCuenta extends DBBase{
                 db.execSQL(sql);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
     }
 
@@ -241,7 +241,7 @@ public class DBCuenta extends DBBase{
         try {
             db.execSQL("DELETE FROM cuenta WHERE IDMesa=" + IDMesa);
         }catch (SQLiteException e) {
-            e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
     }
 
@@ -261,7 +261,7 @@ public class DBCuenta extends DBBase{
                 res.moveToNext();
             }
         }catch (SQLiteException e){
-           e.printStackTrace();
+            Log.e("ERROR_DB_CUENTA", e.toString());
         }
         return lista;
     }

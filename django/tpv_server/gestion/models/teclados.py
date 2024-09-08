@@ -156,7 +156,7 @@ class Teclas(BaseModels):
     def serialize(self):
         r = self
         teclasseccion = r.teclaseccion_set.all()
-        row = super.serialize()
+        row = super().serialize()
         row["p1"] = float(r.p1)
         row["p2"] = float(r.p2)
         row["Precio"] = float(r.p1) 

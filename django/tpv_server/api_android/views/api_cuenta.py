@@ -25,14 +25,37 @@ import json
 
 @csrf_exempt
 def get_cuenta(request):
-    id = request.POST['mesa_id']
+    id = request.POST['idm']  # ID de la mesa
+    reg = json.loads(request.POST['reg'])  # Datos recibidos del cliente
+    
+    # Obtener las líneas de pedido del servidor
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
+
     if m_abierta:
         lstArt = m_abierta.get_lineaspedido()
 
-    
-    return JsonResponse(lstArt)
+    # Función para comparar dos diccionarios campo por campo
+    def comparar_lineas(linea_cliente, linea_servidor):
+        for key in linea_cliente:
+            if str(linea_cliente[key]) != str(linea_servidor.get(key, None)):
+                return False
+        return True
+
+    # Comparar las dos listas línea por línea
+    if len(reg) != len(lstArt):
+        # Si las listas tienen diferente longitud, son diferentes
+        return JsonResponse({'soniguales': False, 'reg': lstArt})
+
+    # Comparar cada línea por su contenido
+    for i in range(len(reg)):
+        if not comparar_lineas(reg[i], lstArt[i]):
+            # Si alguna línea es diferente, devuelve la lista completa del servidor
+            return JsonResponse({'soniguales': False, 'reg': lstArt})
+
+    # Si todas las líneas son iguales
+    return JsonResponse({'soniguales': True, 'reg': []})
+
 
 @csrf_exempt
 def juntarmesas(request):
