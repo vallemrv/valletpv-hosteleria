@@ -9,11 +9,20 @@ from .mesasabiertas import Mesasabiertas
  
 
 class Infmesa(BaseModels):
-    uid = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100)  # Field name made lowercase.
+    id = models.CharField(db_column='UID', primary_key=True, unique=True, max_length=100)  # Field name made lowercase.
     camarero = models.ForeignKey('Camareros',  on_delete=models.CASCADE, db_column='IDCam')  # Field name made lowercase.
     fecha = models.CharField(db_column='Fecha', max_length=10)  # Field name made lowercase.
     hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
     numcopias = models.IntegerField(db_column='NumCopias', default=0)  # Field name made lowercase
+    
+
+    @property
+    def uid(self):
+        return self.id  # Definir alias para acceder a `uid` como `id`
+    
+    @property
+    def pk(self):
+        return self.id  # Definir alias para acceder a `uid` como `pk`
 
     def unir_en_grupos(self):
         grupos = self.lineaspedido_set.filter(tecla_id__in=ComposicionTeclas.objects.values_list("tecla_id"))

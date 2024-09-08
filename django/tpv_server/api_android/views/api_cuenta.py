@@ -86,9 +86,9 @@ def mvlinea(request):
              
          comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
 
-         numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__uid=uid)).count()
+         numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__pk=uid)).count()
          if numart<=0:
-            for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
+            for m in Mesasabiertas.objects.filter(infmesa__pk=uid):
                 obj = m.serialize()
                 obj["abierta"] = 0
                 obj["num"] = 0

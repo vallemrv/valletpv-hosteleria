@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import  Q
 from .historiales import Historialnulos
 from .basemodels import BaseModels
 from comunicacion.tools import comunicar_cambios_devices

@@ -28,7 +28,7 @@ class Pedidos(BaseModels):
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
             infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
-            infmesa.uid = idm + '-' + str(uuid4())
+            infmesa.id = idm + '-' + str(uuid4())
             infmesa.save()
             
             mesa = Mesasabiertas()
@@ -222,7 +222,7 @@ class Lineaspedido(models.Model):
 
             num = Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
             if num <= 0:
-                for m in Mesasabiertas.objects.filter(infmesa__uid=uid):
+                for m in Mesasabiertas.objects.filter(infmesa__pk=uid):
                     obj = m.serialize()
                     obj["abierta"] = 0
                     obj["num"] = 0

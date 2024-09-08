@@ -18,6 +18,7 @@ class Ticket(BaseModels):
 
     @staticmethod
     def cerrar_cuenta(idm, idc, entrega, art):
+        from .pedidos import Lineaspedido
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         total = 0
         numart = -1

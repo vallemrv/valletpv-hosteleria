@@ -58,7 +58,7 @@ class Familias(BaseModels):
         db_table = 'familias'
         ordering = ['-id']
 
-class Secciones(models.Model):
+class Secciones(BaseModels):
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
     rgb = models.CharField("Color", db_column='RGB', max_length=11)  # Field name made lowercase.
     orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase.
