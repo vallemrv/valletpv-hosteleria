@@ -1,0 +1,13 @@
+DEBUG 2024-09-02 21:14:15,152 utils (0.000) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+DEBUG 2024-09-02 21:14:15,153 utils (0.000) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+DEBUG 2024-09-02 21:14:15,153 utils (0.000) SELECT `arqueocaja`.`ID`, `arqueocaja`.`IDCierre`, `arqueocaja`.`Cambio`, `arqueocaja`.`Descuadre`, `arqueocaja`.`Stacke` FROM `arqueocaja` ORDER BY `arqueocaja`.`ID` DESC LIMIT 1; args=(); alias=default
+DEBUG 2024-09-02 21:14:15,153 utils (0.000) SELECT `cierrecaja`.`ID`, `cierrecaja`.`TicketCom`, `cierrecaja`.`TicketFinal`, `cierrecaja`.`Fecha`, `cierrecaja`.`Hora` FROM `cierrecaja` ORDER BY `cierrecaja`.`ID` DESC LIMIT 1; args=(); alias=default
+DEBUG 2024-09-02 21:14:15,154 utils (0.000) SELECT `ticket`.`ID`, `ticket`.`Fecha`, `ticket`.`IDCam`, `ticket`.`Hora`, `ticket`.`Entrega`, `ticket`.`UID`, `ticket`.`Mesa`, `ticket`.`url_factura` FROM `ticket` ORDER BY `ticket`.`ID` DESC LIMIT 1; args=(); alias=default
+ERROR 2024-09-02 21:14:15,154 log Internal Server Error: /api/arqueos/getcambio
