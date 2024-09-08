@@ -1,5 +1,5 @@
 from django.urls import path
-from api_android import views as api_views
+from api_android.views import api_nulos as api_views
 
 urlpatterns  = [
   path("get_nulos", api_views.get_nulos, name="get_nulos"),

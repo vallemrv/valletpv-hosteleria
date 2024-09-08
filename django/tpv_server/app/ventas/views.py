@@ -1,8 +1,12 @@
 from .utils import get_total_by_horas, get_total
 from tokenapi.http import JsonResponse
-from gestion.models import Arqueocaja, Camareros, Historialnulos, Infmesa, Mesas, Ticket
+from gestion.models.arqueos import Arqueocaja
+from gestion.models.camareros import Camareros
+from gestion.models.historiales import Historialnulos
+from gestion.models.infmesa import Infmesa, Mesas
+from gestion.models.ticket import Ticket
 from tokenapi.decorators import token_required
-from gestion.models import Mesasabiertas
+from gestion.models.mesasabiertas import Mesasabiertas
 
 @token_required
 def get_pedidos_by_hora(request):

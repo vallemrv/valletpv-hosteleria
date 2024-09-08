@@ -1,8 +1,8 @@
 from django.urls import path
-from api_android import views as api_views
+from api_android.views.api_camareros import crear_password, camarero_add, listado
 
 urlpatterns  = [
-  path("crear_password", api_views.crear_password, name="crear_password" ),
-  path("camarero_add", api_views.camarero_add, name="camarero_add"),
-  path("listado", api_views.listado, name="listado")
+  path("crear_password", crear_password, name="crear_password" ),
+  path("camarero_add", camarero_add, name="camarero_add"),
+  path("listado", listado, name="listado")
 ]

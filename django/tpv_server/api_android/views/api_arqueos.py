@@ -11,8 +11,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from api_android.tools import send_mensaje_impresora
 from api_android.tools.mails import send_cierre, getUsuariosMail
-from gestion.models import (Arqueocaja, Cierrecaja, Efectivo, Gastos,
-                            Receptores, Ticket)
+from gestion.models.arqueos import (Arqueocaja, Cierrecaja, Efectivo, Gastos)
+from gestion.models.familias import Receptores
+from gestion.models.ticket import Ticket
 from datetime import datetime
 import json
 import threading

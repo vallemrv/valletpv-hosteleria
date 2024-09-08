@@ -8,9 +8,8 @@
 from tokenapi.http import JsonError, JsonResponse
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import Teclas
+from gestion.models.teclados import Teclas
 
-from datetime import datetime
 
 @csrf_exempt
 def art_listado(request):

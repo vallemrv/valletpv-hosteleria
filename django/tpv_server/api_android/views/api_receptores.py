@@ -6,7 +6,7 @@
 # @License: Apache License v2.0
 
 from tokenapi.http import JsonResponse
-from gestion.models import Receptores
+from gestion.models.familias import Receptores
 from django.views.decorators.csrf import csrf_exempt
 import json
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from api_android import views as api_views
+from api_android.views import api_mesas as api_views
 
 urlpatterns  =[
     path("lszonas", api_views.ls_zonas, name="mesas_ls_zonas"),

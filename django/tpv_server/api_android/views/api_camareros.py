@@ -1,6 +1,6 @@
 from django.forms import model_to_dict
 from comunicacion.tools import comunicar_cambios_devices
-from gestion.models import Camareros
+from gestion.models.camareros import Camareros
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json

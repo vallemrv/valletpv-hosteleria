@@ -1,5 +1,5 @@
 from django.urls import path
-from api_android import views as api_views
+from api_android.views import api_sync as api_views
 
 urlpatterns  =[
     path("update_for_devices", api_views.update_for_devices, name="update_for_devices"),

@@ -9,7 +9,13 @@ from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import  Camareros, Lineaspedido, Mesasabiertas, Pedidos, Receptores, Servidos
+
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.camareros import Camareros
+from gestion.models.familias import Receptores
+from gestion.models.pedidos import Pedidos, Lineaspedido, Servidos
+
+
 from api_android.tools import is_float
 import json
 
@@ -55,7 +61,6 @@ def  get_pendientes(request):
         result.append({'op':'rm', 'tb':"lineaspedido", 'obj': {"ID":l["ID"]}})  
 
    
-    
     return JsonResponse(result)
 
 

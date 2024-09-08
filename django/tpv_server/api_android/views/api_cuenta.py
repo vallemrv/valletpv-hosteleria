@@ -12,8 +12,11 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from api_android.tools import (send_imprimir_ticket)
 from comunicacion.tools import comunicar_cambios_devices
-from gestion.models import (Mesasabiertas, Lineaspedido, Pedidos, 
-                            Infmesa,  Sync, Ticket)
+from gestion.models.infmesa import Infmesa
+from gestion.models.pedidos import Lineaspedido, Pedidos
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.sync import Sync
+from gestion.models.ticket import Ticket
 from datetime import datetime
 from uuid import uuid4
 import json

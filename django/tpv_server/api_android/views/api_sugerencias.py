@@ -7,7 +7,7 @@
 
 from django.forms import model_to_dict
 from django.http import HttpResponse
-from gestion.models import Sugerencias
+from gestion.models.teclados import Sugerencias
 from django.views.decorators.csrf import csrf_exempt
 from comunicacion.tools import comunicar_cambios_devices
 

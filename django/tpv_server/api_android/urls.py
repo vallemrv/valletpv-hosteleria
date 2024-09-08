@@ -8,6 +8,7 @@
 from django.urls import path, include
 
 from api_android import views
+from api_android.views import api_pedidos
 
 urlpatterns = [
     path("camareros/", include('api_android.set_urls.camareros'), name="api_android_camareros"),
@@ -20,9 +21,8 @@ urlpatterns = [
     path('sugerencias/', include("api_android.set_urls.sugerencias"), name="api_android_sugerencias"),
     path('receptores/', include("api_android.set_urls.receptores"), name="api_android_receptores"),
     path("autorizaciones/", include("api_android.set_urls.autorizaciones"), name="api_android_autorizaciones"),
-    path("tests/", include("api_android.tests.tests_urls"), name="tests"),
     path("get_datos_empresa", views.get_datos_empresa, name="get_datos_empresa"),
-    path("get_pedidos_by_receptor", views.get_pedidos_by_receptor, name="get_pedidos_by_receptor"),
-    path("recuperar_pedido", views.recuperar_pedido, name="recuperar_pedido"),
+    path("get_pedidos_by_receptor", api_pedidos.get_pedidos_by_receptor, name="get_pedidos_by_receptor"),
+    path("recuperar_pedido", api_pedidos.recuperar_pedido, name="recuperar_pedido"),
     path("get_uuid_factura/<int:num>", views.get_uuid_factura, name="get_uuid_factura"),
 ] 

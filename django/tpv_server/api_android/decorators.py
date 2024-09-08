@@ -9,7 +9,7 @@
 
 from functools import wraps
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import Camareros
+from gestion.models.camareros import Camareros
 from tokenapi.http import JsonResponseForbidden
 
 def token_required(view_func):

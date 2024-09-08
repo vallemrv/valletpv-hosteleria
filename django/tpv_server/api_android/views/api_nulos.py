@@ -1,7 +1,11 @@
 from django.db.models import Count, Sum
 from tokenapi.http import JsonResponse, JsonError
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models import (Historialnulos, Infmesa, Mesasabiertas, Camareros, Mesas)
+from gestion.models.historiales import Historialnulos
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.camareros import Camareros
+from gestion.models.mesas import Mesas
+from gestion.models.infmesa import Infmesa
 
 
 import datetime

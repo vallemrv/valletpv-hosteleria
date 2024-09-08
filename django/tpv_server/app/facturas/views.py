@@ -5,7 +5,7 @@ from django.http import  HttpResponse
 from django.shortcuts import render, redirect
 from django.template.loader import get_template
 from io import BytesIO as OpenIO
-from gestion.models import Ticket
+from gestion.models.ticket import Ticket
 import os
 
 import trml2pdf

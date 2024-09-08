@@ -1,7 +1,7 @@
 from django.urls import path
-from api_android import views as api_views
+from api_android.views.api_articulos import ls_todos, art_listado
 
 urlpatterns  =[
-  path("lstodos", api_views.ls_todos, name="articulos_ls_todos"),
-  path('listado', api_views.art_listado, name="articulos_listado"),
+  path("lstodos", ls_todos, name="articulos_ls_todos"),
+  path('listado', art_listado, name="articulos_listado"),
 ]

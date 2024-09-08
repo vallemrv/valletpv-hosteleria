@@ -8,10 +8,11 @@
 import json
 from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
-from gestion.models import *
 from django.apps import apps
 from datetime import datetime
-from api_android.views.api_pedidos import comparar_lineaspedido
+from gestion.models.pedidos import Lineaspedido
+from gestion.models.sync import Sync
+from gestion.models.teclados import SeccionesCom
 
 
 @csrf_exempt
@@ -80,7 +81,7 @@ def update_from_devices(request):
 
 @csrf_exempt
 def sync_devices(request):
-    
+    from api_android.views.api_pedidos import comparar_lineaspedido
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
     if (tb_name == "lineaspedido"): return comparar_lineaspedido(request)
@@ -107,10 +108,8 @@ def sync_devices(request):
            
             pks.append(v)
            
-            if hasattr(obj, "serialize"):
-                obj = obj.serialize()
-            else:
-                obj = model_to_dict(obj)
+            obj = obj.serialize()
+            
             for k, v in r.items():
                 obj_v =  obj[k] if k in obj else obj[k.lower()]
                 if not equals(k, str(obj_v), str(v)):
@@ -132,10 +131,8 @@ def sync_devices(request):
         
 
     for obj in objs:
-        if hasattr(obj, "serialize"):
-            obj = obj.serialize()
-        else:
-            obj = model_to_dict(obj)
+        obj = obj.serialize()
+        
         result.append({"tb":tb_name, "op": op, "obj":obj})     
 
     return JsonResponse(result)
