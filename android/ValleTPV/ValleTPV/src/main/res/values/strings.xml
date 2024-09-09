@@ -102,5 +102,7 @@
     <string name="cambio_cashlogy">Cambiar monedas</string>
     <string name="fraccionado">cambio fraccionado?</string>
     <string name="lista_monedas">Informacion de cambio</string>
+    <string name="gastos">Gastos</string>
+    <string name="conteo_monedas">Conteo monedas</string>
 
 </resources>

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.valleapp.valletpv.cashlogyActivitis.ArqueoCashlogyActivity;
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
@@ -61,7 +64,7 @@ public class Arqueo extends Activity {
                                 "Este arqueo remplaza al ultimo");
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                   Log.e("ARQUEO_ERR", e.toString());
                 }
 
             } else if(op.equals("arqueo")){
@@ -111,14 +114,14 @@ public class Arqueo extends Activity {
             double cantidad = gasto.getDouble("Importe");
             String descrip = gasto.getString("Des");
 
-            if (cantidad > 0 && descrip.length() > 0) {
+            if (cantidad > 0 && !descrip.isEmpty()) {
                 can.setText(String.format("%.2f €", cantidad));
                 des.setText(descrip);
                 gastos += cantidad;
                 pneGastos.addView(v, params);
               }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("ARQUEO_ERR", e.toString());
             }
         }
         txtGastos.setText(String.format("%.2f €", gastos));
@@ -154,7 +157,7 @@ public class Arqueo extends Activity {
                 efectivo += cantidad * moneda;
                 pneEfectivo.addView(v, params);
             } catch (JSONException x) {
-                x.printStackTrace();
+                Log.e("ARQUEO_ERR", x.toString());
             }
         }
         txtEfectivo.setText(String.format("%.2f €", efectivo));
@@ -175,6 +178,8 @@ public class Arqueo extends Activity {
         txtEfectivo = findViewById(R.id.lblEfectivo);
         txtGastos = findViewById(R.id.lblGastos);
         this.cx = this;
+        ImageButton btnSalir = findViewById(R.id.btnSalir);
+        btnSalir.setOnClickListener(view -> finish());
     }
 
     public void addEfectivo(View v){
@@ -198,12 +203,12 @@ public class Arqueo extends Activity {
                         objEfectivo.add(obj);
                         rellenarEfectivo();
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.e("ARQUEO_ERR", e.toString());
                     }
                 }
                 dlg.cancel();
             }catch(Exception exp){
-              exp.printStackTrace();
+              Log.e("ARQUEO_ERR", exp.toString());
             }
           });
           dlg.show();
@@ -222,7 +227,7 @@ public class Arqueo extends Activity {
               try {
                   Double Importe = Double.parseDouble(imp.getText().toString().replace(",", "."));
                   String des = txtDes.getText().toString();
-                  if(Importe>0 &&  des.length()>0){
+                  if(Importe>0 && !des.isEmpty()){
                           JSONObject obj = new JSONObject();
                           obj.put("Des",des);
                           obj.put("Importe", Importe);
@@ -232,7 +237,7 @@ public class Arqueo extends Activity {
                   }
                   dlg.cancel();
               } catch (Exception e) {
-                  e.printStackTrace();
+                  Log.e("ARQUEO_ERR", e.toString());
               }
           });
           dlg.show();
@@ -252,7 +257,7 @@ public class Arqueo extends Activity {
               txtCambio.setText(String.format("%s €", cambio));
               dlg.cancel();
             } catch (Exception e) {
-                e.printStackTrace();
+               Log.e("ARQUEO_ERR", e.toString());
             }
           });
          dlg.show();
@@ -290,7 +295,7 @@ public class Arqueo extends Activity {
                     // Solicita los datos del servidor primero
                     new HTTPRequest(server + "/arqueos/getcambio", new ContentValues(), "cambio", new Handler(Looper.getMainLooper()) {
                         @Override
-                        public void handleMessage(Message msg) {
+                        public void handleMessage(@NonNull Message msg) {
                             String res = msg.getData().getString("RESPONSE");
                             if (res != null) {
                                 try {
@@ -316,7 +321,7 @@ public class Arqueo extends Activity {
                                     startActivity(intent);
                                     finish(); // Finaliza la actividad actual
                                 } catch (JSONException e) {
-                                    e.printStackTrace();
+                                    Log.e("ARQUEO_ERR", e.toString());
                                 }
                             }
                         }
@@ -328,7 +333,7 @@ public class Arqueo extends Activity {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("ARQUEO_ERR", e.toString());
         }
     }
 

@@ -47,10 +47,50 @@ public class CashlogySocketManager {
 
         } catch (Exception e) {
             Log.e("CASHLOGY", "Error al inicializar Cashlogy: " + e.getMessage());
-            e.printStackTrace();
             notifyUI("CASHLOGY_ERR","Error al conectar con Cashlogy");
         }
     }
+
+
+    public void sendCommand(final String command, Handler esteHandler) {
+        if (!isConnected()) {
+            Log.e("CASHLOGY", "El socket no está conectado, esperando...");
+            waitForConnectionAndSend(command);
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                writer.write((command + "\r\n").getBytes());
+                writer.flush();
+
+                // Leer la respuesta de manera no bloqueante
+                char[] buffer = new char[4096];
+
+                int charsRead = reader.read(buffer);
+
+                if (charsRead != -1) {
+                    String response = new String(buffer, 0, charsRead);
+                    if (uiHandler != null) {
+                        Message msg = uiHandler.obtainMessage();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("key", "CASHLOGY_RESPONSE");
+                        bundle.putString("value", response); // Poner el mensaje en un Bundle
+                        msg.setData(bundle);
+                        uiHandler.sendMessage(msg);
+                    }
+                } else {
+                    Log.e("CASHLOGY", "No se pudo leer la respuesta o el socket está cerrado.");
+                }
+
+
+            } catch (Exception e) {
+                Log.e("CASHLOGY", "Error al enviar comando: " + e.getMessage(), e);
+            }
+
+        }).start();
+    }
+
 
     public void sendCommand(final String command) {
         if (!isConnected()) {
@@ -79,7 +119,6 @@ public class CashlogySocketManager {
 
             } catch (Exception e) {
                 Log.e("CASHLOGY", "Error al enviar comando: " + e.getMessage(), e);
-                e.printStackTrace();
             }
 
         }).start();
@@ -93,7 +132,7 @@ public class CashlogySocketManager {
                 try {
                     Thread.sleep(1000); // Espera 1 segundo antes de reintentar
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.e("CASHLOGY", "Error al esperar: " + e.getMessage());
                 }
                 attempts--;
             }
@@ -121,15 +160,15 @@ public class CashlogySocketManager {
             }
         } else if (response.startsWith("#ER:")) {
             // Error
-            currentAction.handleResponse(command, "CASHLOGY_ERR");
-            handleErrors(command, response);
+            currentAction.handleResponse(command,"CASHLOGY_ERR");
+            handleErrors( response);
         } else {
             // Respuesta desconocida
             Log.e("CASHLOGY", "Respuesta desconocida: " + response);
         }
     }
 
-    private void handleErrors(String command, String errorResponse) {
+    private void handleErrors(String errorResponse) {
         String errorMessage;
         if (errorResponse.contains("GENERIC")) {
             errorMessage = "Error genérico: Problema en la comunicación o devolución.";

@@ -3,9 +3,11 @@ package com.valleapp.valletpv;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.valleapp.valletpvlib.tools.JSON;
@@ -51,7 +53,7 @@ public class PreferenciasTPV extends Activity {
                 }
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("PREFERENCIAS_ERR", e.toString());
             }
         }
 
@@ -79,9 +81,13 @@ public class PreferenciasTPV extends Activity {
                 finish();
 
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("PREFERENCIAS_ERR", e.toString());
             }
         });
+
+
+        ImageButton btnSalir = findViewById(R.id.btn_salir);
+        btnSalir.setOnClickListener(view -> finish());
     }
 
     private JSONObject cargarPreferencias() {

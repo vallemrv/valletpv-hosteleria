@@ -29,22 +29,14 @@
             android:exported="true"
             android:label="@string/title_activity_arqueo"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".PreferenciasTPV"
             android:exported="true"
             android:label="@string/title_activity_preferencias_tpv"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".Camareros"

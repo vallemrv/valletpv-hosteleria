@@ -41,7 +41,7 @@ public class AdaptadorCamMensajes extends ArrayAdapter<JSONObject> {
         try {
             TextView n = (TextView) v.findViewById(R.id.txt_nombre_camarero_notificaciones);
             JSONObject o = objects.get(position);
-            n.setText(o.getString("Nombre"));
+            n.setText(o.getString("nombre")+" "+o.getString("apellidos"));
             ImageView btn = (ImageView) v.findViewById(R.id.btn_send_cam_autorizado);
             btn.setTag(o.getString("ID"));
             btn.setOnClickListener(view -> {

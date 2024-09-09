@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -285,7 +286,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                setEstadoAutoFinish(true, false);
             });
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
 
     }
@@ -498,7 +499,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             // Si no usa Cashlogy, proceder con la lógica actual
             assert myServicio != null;
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-            if (dbCamareros.getConPermiso("abrir_cajon").size() > 0) {
+            if (!dbCamareros.getConPermiso("abrir_cajon").isEmpty()) {
                 try {
                     JSONObject p = new JSONObject();
                     p.put("idc", cam.getString("ID"));
@@ -507,7 +508,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                             p, "abrir_cajon");
                     dlg.show();
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e("MESAS_ERR", e.toString());
                 }
             } else {
                 if (myServicio != null) {
@@ -614,9 +615,9 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
             cam = new JSONObject(getIntent().getStringExtra("cam"));
             TextView title = findViewById(R.id.lblTitulo);
-            title.setText(cam.getString("apellidos")+" "+cam.getString("apellidos"));
+            title.setText(cam.getString("nombre")+" "+cam.getString("apellidos"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
 
 

@@ -108,7 +108,6 @@ public class ServicioCom extends Service implements IControllerWS {
                         IBaseDatos db =  getDb(tb);
                         p.put("tb", tb);
                         p.put("reg", db.filter(null).toString());
-                        Log.d("TEST_SYNC", p.toString());
                         new HTTPRequest(server + "/sync/sync_devices", p, "update_socket", controller_http);
                         try {
                             Thread.sleep(timeout);
@@ -194,6 +193,7 @@ public class ServicioCom extends Service implements IControllerWS {
             // Iniciar CashlogySocketManager si está habilitado
             if (usarCashlogy && urlCashlogy != null) {
                 iniciarCashlogySocketManager(urlCashlogy);
+                cashlogyManager.openWS(url);
             }
 
             // Programar la sincronización periódica
@@ -240,6 +240,7 @@ public class ServicioCom extends Service implements IControllerWS {
         }
         if (cashlogySocketManager != null) {
             cashlogySocketManager.stop(); // Detener el socket de Cashlogy si está en uso
+            cashlogyManager.closeWS();
         }
 
         super.onDestroy();

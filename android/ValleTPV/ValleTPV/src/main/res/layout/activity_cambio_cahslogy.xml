@@ -272,14 +272,15 @@
                     android:layout_rowWeight="1"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
+                    android:adjustViewBounds="true"
                     android:background="@drawable/bg_pink_with_border"
                     android:contentDescription="@string/moneda"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
                     android:src="@drawable/doscentimos"
                     android:tag="2"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:padding="8dp"
-                    android:textSize="44sp" />
+                    android:textSize="44sp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
                     android:id="@+id/btnUnCentimo"

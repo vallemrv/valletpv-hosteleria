@@ -40,7 +40,7 @@ public class DlgMensajes extends Dialog implements IControlMensajes {
     @Override
     public void sendMensaje(String IDRecptor, String mensaje) {
         TextView t = findViewById(R.id.txt_mensaje);
-        if (!t.getText().toString().equals("")) {
+        if (!t.getText().toString().isEmpty()) {
             this.controlador.sendMensaje(IDRecptor, t.getText().toString());
             cancel();
         }

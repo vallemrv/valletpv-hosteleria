@@ -22,7 +22,7 @@
         <Button
             android:id="@+id/btnInv"
             android:layout_width="0sp"
-            android:layout_height="match_parent"
+            android:layout_height="100sp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/fondo_btn_xml"
@@ -31,7 +31,7 @@
         <Button
             android:id="@+id/btnSimpa"
             android:layout_width="0sp"
-            android:layout_height="match_parent"
+            android:layout_height="100sp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/fondo_btn_xml"
@@ -40,17 +40,18 @@
         <Button
             android:id="@+id/btnError"
             android:layout_width="0sp"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp"
+            android:layout_height="100sp"
             android:layout_weight="1"
+            android:layout_marginTop="-5sp"
             android:background="@drawable/fondo_btn_xml"
             android:singleLine="false"
+
             android:text="@string/error_pedido" />
 
         <ImageButton
             android:id="@+id/btnEdit"
             android:layout_width="0sp"
-            android:layout_height="match_parent"
+            android:layout_height="100sp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/fondo_btn_xml"
@@ -62,7 +63,7 @@
         <ImageButton
             android:id="@+id/btn_salir_monedas"
             android:layout_width="0sp"
-            android:layout_height="match_parent"
+            android:layout_height="100sp"
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/fondo_btn_xml"
@@ -79,14 +80,15 @@
         android:layout_width="match_parent"
         android:layout_height="0sp"
         android:layout_weight="0.4"
+        android:padding="5sp"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/txtMotivo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0sp"
+            android:layout_weight=".78"
+            android:layout_height="100sp"
             android:layout_gravity="bottom"
-            android:layout_weight="1"
             android:autofillHints="Motivo"
             android:hint="@string/editar_motivo"
             android:inputType="text"
@@ -94,11 +96,11 @@
 
         <ImageButton
             android:id="@+id/btn_ok"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="90sp"
             android:layout_gravity="end"
             android:layout_margin="5dp"
-            android:layout_weight="4"
+            android:layout_weight=".18"
             android:background="@drawable/fondo_btn_xml"
             android:contentDescription="@string/ok"
             android:padding="10dp"

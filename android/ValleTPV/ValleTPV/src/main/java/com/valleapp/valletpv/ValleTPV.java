@@ -43,7 +43,6 @@ public class ValleTPV extends Activity {
     private final Handler handleHttp = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
-            Log.e("CASHLOGY", bundle.toString());
             if (bundle.containsKey("CashlogyMsg")) {
                 String toastMessage = bundle.getString("CashlogyMsg");
                 if (toastMessage != null) {
@@ -59,7 +58,7 @@ public class ValleTPV extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.seleccionar_camareros);
+        setContentView(R.layout.activity_valletpv);
 
         ImageButton s = findViewById(R.id.salir);
         lstautorizados = findViewById(R.id.lstautorizados);
@@ -73,6 +72,18 @@ public class ValleTPV extends Activity {
             startActivity(i);
         });
 
+        ImageButton btnPref = findViewById(R.id.btn_aceptar_preferencias);
+        btnPref.setOnClickListener(view -> {
+            Intent i = new Intent(getApplicationContext(), PreferenciasTPV.class);
+            startActivity(i);
+        });
+
+        ImageButton btnArqueo = findViewById(R.id.btn_arqueo_caja);
+        btnArqueo.setOnClickListener(view -> {
+            Intent i = new Intent(getApplicationContext(), Arqueo.class);
+            startActivity(i);
+        });
+
         lsnoautorizados.setOnItemClickListener((adapterView, view, i, l) -> {
             JSONObject obj = (JSONObject)view.getTag();
             try {
@@ -80,7 +91,7 @@ public class ValleTPV extends Activity {
                 obj.put("autorizado", "1");
                 myServicio.autorizarCam(obj);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("VALLETPV_ERR", e.toString());
             }
             rellenarListas();
         });
@@ -98,7 +109,7 @@ public class ValleTPV extends Activity {
                 dbCamareros.setAutorizado(obj.getInt("ID"), false);
                 myServicio.autorizarCam(obj);
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("VALLETPV_ERR", e.toString());
             }
             rellenarListas();
 
@@ -117,7 +128,7 @@ public class ValleTPV extends Activity {
             myServicio.setExHandler("camareros", handleHttp);
             rellenarListas();
         }
-        if (server != null && !server.equals("") && myServicio == null) {
+        if (server != null && !server.isEmpty() && myServicio == null) {
             Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
             intent.putExtra("url", server);
             intent.putExtra("url_cashlogy", urlCashlogy);  // Agregar URL de Cashlogy
@@ -150,7 +161,7 @@ public class ValleTPV extends Activity {
                 usarCashlogy = pref.optBoolean("usaCashlogy", false); // Leer usarCashlogy
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           Log.e("VALLETPV_ERR", e.toString());
         }
     }
 
