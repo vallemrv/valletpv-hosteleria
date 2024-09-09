@@ -36,7 +36,7 @@ class WSClinet(
     }
 
     override fun onMessage(message: String?) {
-        Log.e("WEBSOCKET_INFO", message!!)
+        Log.d("WEBSOCKET_INFO", message!!)
         val o = JSONObject(message)
         controller.procesarRespose(o)
     }

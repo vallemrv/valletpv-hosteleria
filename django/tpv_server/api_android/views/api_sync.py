@@ -97,12 +97,14 @@ def sync_devices(request):
             if (tb_name == "mesasabiertas"):
                 obj = model.objects.filter(mesa__id=v).first()
                 if not obj:
+                    print(v)
                     result.append({"tb":tb_name, "op": "md", "obj":{ 'ID':v, 'abierta': 0, "num":0 }})
                     continue
            
             else:
                 obj = model.objects.filter(pk=v).first()
                 if not obj:
+                    print(v)
                     result.append({"tb":tb_name, "op": "rm", "obj":{key:v}})
                     continue
            
@@ -113,6 +115,7 @@ def sync_devices(request):
             for k, v in r.items():
                 obj_v =  obj[k] if k in obj else obj[k.lower()]
                 if not equals(k, str(obj_v), str(v)):
+                    print(k, str(obj_v), str(v))
                     result.append({"tb":tb_name, "op": "md", "obj":obj})
                     break
 
@@ -131,7 +134,7 @@ def sync_devices(request):
 
     for obj in objs:
         obj = obj.serialize()
-        
+        print(obj)
         result.append({"tb":tb_name, "op": op, "obj":obj})     
 
     return JsonResponse(result)

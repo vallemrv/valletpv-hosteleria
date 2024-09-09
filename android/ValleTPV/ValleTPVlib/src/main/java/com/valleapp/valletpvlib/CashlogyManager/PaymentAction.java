@@ -39,6 +39,7 @@ public class PaymentAction extends CashlogyAction {
         } else if (comando.startsWith("#Q")) {
             String[] parts = response.split("#");
             if (parts.length >= 3) {
+
                 double importeRecibido = Double.parseDouble(parts[2]) / 100;
 
                 if (importeRecibido != admittedAmount) {
@@ -64,7 +65,7 @@ public class PaymentAction extends CashlogyAction {
             isWaitingForFinalQ = true;  // Indica que estamos esperando la última respuesta #Q#
             sendQCommand();      // Después de #J#, enviar un último #Q#
         } else if (comando.startsWith("#P")) {
-            Log.e("CASHLOGY", response);
+
             if (response.contains("#0#") || response.contains("WR:")) {
                 if (!isCancel) {
                     socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado sin errores.");

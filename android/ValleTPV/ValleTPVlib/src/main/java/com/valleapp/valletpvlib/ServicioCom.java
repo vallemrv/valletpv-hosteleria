@@ -112,7 +112,7 @@ public class ServicioCom extends Service implements IControllerWS {
                         try {
                             Thread.sleep(timeout);
                         } catch (InterruptedException e) {
-                            Log.e("SERVICE_COM", e.toString());
+                            Log.e("SERVICE_COM", "Error en sync_device: " + e);
                         }
                     }
                 }
@@ -164,7 +164,7 @@ public class ServicioCom extends Service implements IControllerWS {
             }
 
         }catch (Exception e){
-            Log.e("SERVICE_COM", e.toString());
+            Log.e("SERVICE_COM", "Error en procesarRespose: " + e);
         }
     }
 

@@ -122,6 +122,7 @@ public class ChangeAction extends CashlogyAction {
     private void manejarRespuestaImporteAdmitido(String response) {
         String[] parts = response.split("#");
         if (parts.length >= 3) {
+
             double nuevoImporteAdmitido = 0.0;
             if (parts[2].isEmpty()) {
                 nuevoImporteAdmitido= 0.0;
