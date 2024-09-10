@@ -68,7 +68,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
             try {
                 list.put(cursorToJSON(res));
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("DBBase", e.toString());
             }
             res.moveToNext();
         }
@@ -84,7 +84,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
             try {
                 insert(objs.getJSONObject(i));
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("DBBase", e.toString());
             }
         }
     }
@@ -117,7 +117,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("DBBase", e.toString());
         }
 
     }
@@ -141,7 +141,7 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
                 }
             }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("DBBase", e.toString());
         }
 
     }
@@ -156,22 +156,4 @@ public abstract class DBBase extends SQLiteOpenHelper implements IBaseDatos, IBa
         return  mCount.getInt(0);
     }
 
-    public void showDatos(String cWhere){
-        SQLiteDatabase db = getReadableDatabase();
-        String w = "";
-        if (cWhere != null){
-            w = " WHERE "+cWhere;
-        }
-        @SuppressLint("Recycle") Cursor res= db.rawQuery("select * from  "+ tb_name +" "+ w, null);
-        res.moveToFirst();
-        while (!res.isAfterLast()){
-            StringBuilder dta = new StringBuilder();
-            for (int i=0; i< res.getColumnCount(); i++) {
-                dta.append(res.getColumnName(i)).append("=").append(res.getString(i)).append(" - ");
-            }
-            Log.i("SHOWDATA", dta.toString());
-            res.moveToNext();
-        }
-
-    }
 }

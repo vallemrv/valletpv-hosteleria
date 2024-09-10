@@ -41,7 +41,7 @@ public class DBMesas extends DBBase {
             obj.put("Nombre", nom == null ? "" : nom);
             obj.put("Nombre", res.getString(res.getColumnIndex("Nombre")));
             obj.put("IDZona", res.getString(res.getColumnIndex("IDZona")));
-            obj.put("RGB", num <= 0 ? RGB : "255,0,0");
+            obj.put("RGB", num <= 0 ? RGB : "251,255,162");
             obj.put("abierta", res.getString(res.getColumnIndex("abierta")));
             obj.put("ID", res.getString(res.getColumnIndex("ID")));
             obj.put("num", num);

@@ -1,6 +1,7 @@
 from django.db import models
 from comunicacion.tools import comunicar_cambios_devices
 from .basemodels import BaseModels
+import json
 
 PERMISOS_CHOICES = ["imprimir_factura", 
 "abrir_cajon", 
@@ -25,6 +26,19 @@ class Camareros(BaseModels):
     autorizado = models.IntegerField(db_column='Autorizado', default=1)  # Field name made lowercase.
     permisos = models.CharField(db_column='Permisos', max_length=150, null=True, default="")  # Field name made lowercase. Field renamed because it was a Python reserved word.
     
+    @classmethod
+    def get_normalization_rules(cls):
+        """
+        Reglas personalizadas para la tabla 'Camareros'.
+        """
+        return {
+            'activo': {'type': 'int'},
+            'permisos': {'type': 'str', 'remove_quotes': True},
+        }
+    
+
+
+   
     @staticmethod
     def update_from_device(row):
         c = Camareros.objects.filter(id=row["ID"]).first()

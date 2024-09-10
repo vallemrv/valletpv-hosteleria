@@ -85,7 +85,7 @@ ESTADO_CHOICES=[
     ("C", "Linea cobrada"),
     ("M", "Pertenece a promocion o grupo")
 ]
-class Lineaspedido(models.Model):
+class Lineaspedido(BaseModels):
     pedido = models.ForeignKey('Pedidos',  on_delete=models.CASCADE, db_column='IDPedido')  # Field name made lowercase.
     infmesa = models.ForeignKey('Infmesa', on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
     idart = models.IntegerField(db_column='IDArt')  # Field name made lowercase.
@@ -163,6 +163,98 @@ class Lineaspedido(models.Model):
         self.estado = "P"
         self.save()
 
+    @classmethod
+    def get_normalization_rules(cls):
+        """
+        Reglas personalizadas para la tabla 'Camareros'.
+        """
+        return {
+            'precio': {'type': 'float'},
+        }
+    
+    @classmethod
+    def compare_regs(cls, regs):
+        from gestion.models.mesasabiertas import Mesasabiertas
+        """
+        Compara los datos del cliente con los datos del servidor buscando por ID directamente en la base de datos
+        y asegurando que el idmesa esté en mesas abiertas.
+        """
+        result = []
+        ids_procesados = []
+
+        # Recorrer los registros recibidos del cliente
+        for r in regs:
+            key_id = next((k for k in ['id', 'ID'] if k in r), None)
+            client_id = r.get(key_id)
+            idmesa = r.get('IDMesa')  # Asumimos que 'idmesa' está presente en el registro
+            
+            if client_id and idmesa:
+                try:
+                    # Verificar si la mesa está abierta en Mesasabiertas
+                    mesa_abierta = Mesasabiertas.objects.filter(mesa__id=idmesa).exists()
+
+                    if mesa_abierta:
+                        # Buscar el registro en cls que esté vinculado a esa mesa abierta
+                        try:
+                            server_record = cls.objects.get(id=client_id).serialize()
+                        except cls.DoesNotExist:
+                            server_record = None
+                        except Exception as e:
+                            # Manejar otros posibles errores de la base de datos
+                            print(f"Error al consultar la base de datos: {e}")
+                            continue
+
+                        if server_record:
+                            # Si el registro existe y está vinculado a una mesa abierta, normalizar y comparar
+                            if not cls.normalize_and_compare(r, server_record):
+                                result.append({
+                                    'tb': cls.__name__.lower(),
+                                    'op': 'md',  # Operación de modificación
+                                    'obj': server_record
+                                })
+                        else:
+                            # Si no existe en la base de datos, el registro debe ser eliminado
+                            result.append({
+                                'tb': cls.__name__.lower(),
+                                'op': 'rm',  # Operación de eliminación
+                                'obj': {'id': client_id}
+                            })
+                    else:
+                        # Si no está vinculado a una mesa abierta, eliminar
+                        result.append({
+                            'tb': cls.__name__.lower(),
+                            'op': 'rm',  # Operación de eliminación
+                            'obj': {'id': client_id}
+                        })
+
+                    # Agregar el ID a la lista de procesados
+                    ids_procesados.append(client_id)
+
+                except Exception as e:
+                    print(f"Error al verificar mesa abierta: {e}")
+                    continue
+
+        
+        # Buscar registros en la base de datos que no están en los registros del cliente
+        # Excluir registros que:
+        # - Tienen estado "C"
+        # - Cuya idmesa no esté en mesas abiertas
+        server_records = cls.objects.exclude(id__in=ids_procesados).exclude(
+                estado='C'  # Excluir registros con estado "C"
+            ).filter(
+                infmesa__in=Mesasabiertas.objects.values_list('infmesa', flat=True)  # Solo los infmesa que están en mesas abiertas
+            )
+
+        # Procesar los registros que cumplen los criterios anteriores
+        for server_record in server_records:
+            result.append({
+                'tb': cls.__name__.lower(),
+                'op': 'insert',  # Operación de inserción
+                'obj': server_record.serialize()
+            })
+
+        return result
+
 
     def serialize(self):
         from .mesasabiertas import Mesasabiertas
@@ -187,7 +279,7 @@ class Lineaspedido(models.Model):
             'IDZona': mesa.mesaszona_set.all().first().zona.pk if mesa else -1,
             'servido': Servidos.objects.filter(linea__pk=self.pk).count(),
             'descripcion_t': self.descripcion_t,
-            'receptor': self.tecla.familia.receptor.pk if self.tecla else "",
+            'receptor': self.tecla.familia.receptor.pk if self.tecla else -1,
             'camarero': self.pedido.camarero_id,
             }
         return obj

@@ -99,6 +99,17 @@ class Subteclas(BaseModels):
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     orden = models.IntegerField(db_column='Orden', default=0, blank=True)  # Field name made lowercase.
     
+    @classmethod
+    def get_normalization_rules(cls):
+        """
+        Devuelve las reglas de normalización que debe seguir cada campo.
+        Si no se define una regla, por defecto se trata como 'str'.
+        """
+        return {
+            'descripcion_t': {'type': 'str', 'null_to_empty': True},  # Regla para descripcion_t
+            'descripcion_r': {'type': 'str', 'null_to_empty': True},
+            "incremento": {'type': 'float'},
+        }
 
     @staticmethod
     def update_for_devices():
@@ -143,7 +154,20 @@ class Teclas(BaseModels):
     descripcion_r = models.CharField("Descripción recepción", db_column='Descripcion_r', max_length=300, null=True, blank=True)
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     tipo = models.CharField(max_length=2, choices=TIPO_TECLA_CHOICE, default="SP")
-
+   
+    @classmethod
+    def get_normalization_rules(cls):
+        """
+        Devuelve las reglas de normalización que debe seguir cada campo.
+        Si no se define una regla, por defecto se trata como 'str'.
+        """
+        return {
+            'descripcion_t': {'type': 'str', 'null_to_empty': True},  # Regla para descripcion_t
+            'descripcion_r': {'type': 'str', 'null_to_empty': True},
+            "p1": {'type': 'float'},
+            "p2": {'type': 'float'},
+            "precio": {'type': 'float'},
+        }
 
     @staticmethod
     def update_for_devices():

@@ -23,6 +23,7 @@ from datetime import datetime
 
 @csrf_exempt
 def preimprimir(request):
+    from gestion.models.mesasabiertas import Mesasabiertas
     idm = request.POST["idm"]
     mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
     if mesa_abierta:

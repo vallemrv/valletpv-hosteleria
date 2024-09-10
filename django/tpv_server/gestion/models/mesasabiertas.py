@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import  Q
 from .historiales import Historialnulos
-from .basemodels import BaseModels
+from .basemodels import BaseModels, Sync
 from comunicacion.tools import comunicar_cambios_devices
 from datetime import datetime
 
@@ -99,7 +99,69 @@ class Mesasabiertas(BaseModels):
                 infmesaP.componer_articulos()
                 infmesaP.unir_en_grupos()
 
+    @classmethod
+    def get_normalization_rules(cls):
+        """
+        Reglas personalizadas para la tabla 'Camareros'.
+        """
+        return {
+            'abierta': {'type': 'int'},
+            'num': {'type': 'int'},
+        }
     
+    @classmethod
+    def compare_regs(cls, regs):
+        """
+        Compara los datos del cliente con los datos del servidor buscando por ID directamente en la base de datos.
+        """
+        result = []
+        ids_procesados = []
+
+        # Recorrer los registros recibidos del cliente
+        for r in regs:
+            key_id = "ID"
+            if "id" in r.keys():
+                key_id = "id"
+            client_id = r.get(key_id)
+        
+            if client_id:
+                # Buscar el registro en la base de datos por ID
+                server_record = cls.objects.filter(mesa__id=client_id).first().serialize()
+                
+                if server_record:
+                    # Si el registro existe, normalizamos y comparamos clave por clave
+                    if not cls.normalize_and_compare(r, server_record):
+                         result.append({
+                            'tb': cls.__name__.lower(),
+                            'op': 'md',  # Operación de modificación
+                            'obj': server_record
+                        })
+                else:
+                    # Si no existe en la base de datos, el registro debe ser eliminado
+                    result.append({
+                        'tb': cls.__name__.lower(),
+                        'op': 'rm',  # Operación de eliminación
+                        'obj': {'id': client_id}
+                    })
+
+                # Agregar el ID a la lista de procesados
+                ids_procesados.append(client_id)
+
+        # Buscar registros en la base de datos que no están en los registros del cliente
+        server_records = cls.objects.exclude(mesa__id__in=ids_procesados)
+
+        for server_record in server_records:
+            result.append({
+                'tb': cls.__name__.lower(),
+                'op': 'md',  # Operación de inserción
+                'obj': server_record.serialize()
+            })
+
+       
+        return result
+
+
+
     def serialize(self):
         obj = self.infmesa.serialize()
         obj["PK"] = self.pk

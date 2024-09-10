@@ -24,7 +24,6 @@ class WSClinet(
         private fun constructUri(serverUrl: String, endpoint: String): URI {
             val wsUrl = serverUrl.replace("api", "ws") // Reemplaza "api" por "ws"
             val fullUrl = "ws://$wsUrl$endpoint" // Construye la URL completa
-            println("Constructed URI: $fullUrl")
             return URI(fullUrl)
         }
     }

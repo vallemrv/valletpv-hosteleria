@@ -81,76 +81,23 @@ def update_from_devices(request):
 
 @csrf_exempt
 def sync_devices(request):
-    from api_android.views.api_pedidos import comparar_lineaspedido
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
-    if (tb_name == "lineaspedido"): return comparar_lineaspedido(request)
     reg = json.loads(request.POST["reg"])
+    
+    # Obtener el modelo usando apps.get_model
     model = apps.get_model(app_name, tb_name)
     result = []
-    pks = []
-   
-   
-    for r in reg:
-        try:
-            key, v = ("ID", r["ID"]) if "ID" in r.keys() else ("id", r['id'])
-            if (tb_name == "mesasabiertas"):
-                obj = model.objects.filter(mesa__id=v).first()
-                if not obj:
-                    result.append({"tb":tb_name, "op": "md", "obj":{ 'ID':v, 'abierta': 0, "num":0 }})
-                    continue
-           
-            else:
-                obj = model.objects.filter(pk=v).first()
-                if not obj:
-                    result.append({"tb":tb_name, "op": "rm", "obj":{key:v}})
-                    continue
-           
-            pks.append(v)
-           
-            obj = obj.serialize()
-            
-            for k, v in r.items():
-                obj_v =  obj[k] if k in obj else obj[k.lower()]
-                if not equals(k, str(obj_v), str(v)):
-                    result.append({"tb":tb_name, "op": "md", "obj":obj})
-                    break
-
-        except Exception as e:
-            print(e)
-            
-   
-   
-    op = "insert"
-    if (tb_name == "mesasabiertas"):
-        objs = model.objects.exclude(mesa__id__in=pks)
-        op = "md"
-    else:    
-        objs = model.objects.exclude(pk__in=pks)
-        
-
-    for obj in objs:
-        obj = obj.serialize()
-        result.append({"tb":tb_name, "op": op, "obj":obj})  
-
-    #if(len(result) != len(reg)):
-    #  print("Datos servidor: ", result)
-    #  print("Datos device: ", reg)   
-
+    
+    # Delegar la lógica de comparación al modelo
+    try:
+        compare_func = getattr(model, 'compare_regs', None)
+        if compare_func is not None:
+            result = model.compare_regs(reg)  # Llamar a la función específica de comparación del modelo
+        else:
+            raise NotImplementedError(f"El modelo {tb_name} no tiene el método 'compare_regs' implementado.")
+    
+    except Exception as e:
+        print(f"Error comparando registros: {e}")
+    
     return JsonResponse(result)
-
-def equals(k, obj1, obj2):
-    # Manejo de valores numéricos
-    if k.lower() in ["p1", "p2", "precio", "incremento", "entrega"]:
-        try:
-            # Intentamos convertir ambos valores a float, si alguno falla, se consideran diferentes
-            return float(obj1) == float(obj2)
-        except (ValueError, TypeError):
-            return False
-
-    # Manejo de None
-    if obj1 in [None, "None", "null"] or obj2 in [None, "None", "null"]:
-        return obj1 in [None, "None", "null"] and obj2 in [None, "None", "null"]
-
-    # Comparación de strings normalizados
-    return str(obj1).strip().lower() == str(obj2).strip().lower()

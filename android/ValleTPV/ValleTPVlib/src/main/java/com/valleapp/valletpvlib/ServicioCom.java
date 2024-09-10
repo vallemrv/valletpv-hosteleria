@@ -127,7 +127,7 @@ public class ServicioCom extends Service implements IControllerWS {
 
     @Override
     public void sincronizar() {
-        sync_device(new String[]{"mesasabiertas", "lineaspedido", "camareros"}, 500);
+        sync_device(new String[]{"camareros", "mesasabiertas", "lineaspedido"}, 500);
     }
 
     @Override

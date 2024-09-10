@@ -23,6 +23,21 @@ import json
 
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 @csrf_exempt
 def get_cuenta(request):
     id = request.POST['idm']  # ID de la mesa
@@ -35,11 +50,39 @@ def get_cuenta(request):
     if m_abierta:
         lstArt = m_abierta.get_lineaspedido()
 
-    # Función para comparar dos diccionarios campo por campo
+    # Campos a comparar y sus tipos de datos
+    campos_a_comparar = {
+        'ID': int,
+        'IDPedido': int,
+        'IDArt': int,
+        'Estado': str,
+        'Precio': float,  # Precio siempre será comparado como float
+        'Descripcion': str,
+        'IDMesa': int,
+        'nomMesa': str,
+        'IDZona': int,
+        'servido': int,
+        'descripcion_t': str
+    }
+
+    # Función para comparar dos diccionarios con conversiones de tipo específicas
     def comparar_lineas(linea_cliente, linea_servidor):
-        for key in linea_cliente:
-            if str(linea_cliente[key]) != str(linea_servidor.get(key, None)):
+        for campo, tipo in campos_a_comparar.items():
+            valor_cliente = linea_cliente.get(campo, None)
+            valor_servidor = linea_servidor.get(campo, None)
+            
+            # Convertir a tipo específico si ambos valores están presentes
+            if valor_cliente is not None and valor_servidor is not None:
+                try:
+                    valor_cliente = tipo(valor_cliente)
+                    valor_servidor = tipo(valor_servidor)
+                except (ValueError, TypeError):
+                    return False  # Si falla la conversión, consideramos los valores diferentes
+            
+            if valor_cliente != valor_servidor:
+                print(valor_cliente, valor_servidor)
                 return False
+
         return True
 
     # Comparar las dos listas línea por línea
@@ -129,7 +172,7 @@ def cuenta_add(request):
     idc = request.POST["idc"]
     uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
-    print(lineas)
+    
     Pedidos.agregar_nuevas_lineas(idm, idc, lineas, uid_device)
     return HttpResponse('success')
 
@@ -139,7 +182,7 @@ def cuenta_cobrar(request):
     idc = request.POST["idc"]
     entrega = request.POST["entrega"]
     art = json.loads(request.POST["art"])
-    print(art)
+    
     total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
            
     if (id > 0):

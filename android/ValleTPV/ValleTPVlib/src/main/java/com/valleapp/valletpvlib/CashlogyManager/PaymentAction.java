@@ -99,12 +99,14 @@ public class PaymentAction extends CashlogyAction {
         }
     }
 
-    public void cancelarCobro() {
+    public boolean  cancelarCobro() {
         if(!esBloqueado) {
             esBloqueado = true;
             isCancel = true;
             isAceptar = false;
+            return true;
         }
+        return false;
     }
 
     public void cobrar() {

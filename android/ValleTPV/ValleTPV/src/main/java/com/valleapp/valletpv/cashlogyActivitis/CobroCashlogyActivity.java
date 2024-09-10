@@ -59,7 +59,7 @@ public class CobroCashlogyActivity extends Activity {
         try {
             lineas = new JSONArray(lineasString);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("COBRO_CASHLOGY", e.toString());
         }
 
 
@@ -82,9 +82,10 @@ public class CobroCashlogyActivity extends Activity {
         // Configurar los botones
         btnCobrar.setOnClickListener(this::finalizarCobroParcial);
         btnCancelar.setOnClickListener(view -> {
-            paymentAction.cancelarCobro();
-            setResult(Activity.RESULT_CANCELED);
-            finish();
+            if(paymentAction.cancelarCobro()){
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+            }
         } ); // Cancelar y cerrar la actividad
     }
 

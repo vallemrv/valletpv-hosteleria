@@ -38,7 +38,6 @@ public class HTTPRequest {
             new Thread(() -> {
                 int statusCode = -1;
                 try {
-                    Log.d("HTTPRequeest", getParams(params));
                     DataOutputStream wr = new DataOutputStream(finalConn.getOutputStream());
                     wr.writeBytes(getParams(params));
                     wr.flush();
