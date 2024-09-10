@@ -84,20 +84,18 @@ def sync_devices(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
     reg = json.loads(request.POST["reg"])
-    
+    print(tb_name)
     # Obtener el modelo usando apps.get_model
     model = apps.get_model(app_name, tb_name)
     result = []
     
     # Delegar la lógica de comparación al modelo
-    try:
-        compare_func = getattr(model, 'compare_regs', None)
-        if compare_func is not None:
-            result = model.compare_regs(reg)  # Llamar a la función específica de comparación del modelo
-        else:
-            raise NotImplementedError(f"El modelo {tb_name} no tiene el método 'compare_regs' implementado.")
     
-    except Exception as e:
-        print(f"Error comparando registros: {e}")
+    compare_func = getattr(model, 'compare_regs', None)
+    if compare_func is not None:
+        result = model.compare_regs(reg)  # Llamar a la función específica de comparación del modelo
+    else:
+        raise NotImplementedError(f"El modelo {tb_name} no tiene el método 'compare_regs' implementado.")
+   
     
     return JsonResponse(result)

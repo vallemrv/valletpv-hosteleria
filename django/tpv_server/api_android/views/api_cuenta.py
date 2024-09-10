@@ -22,22 +22,6 @@ from uuid import uuid4
 import json
 
 
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-
 @csrf_exempt
 def get_cuenta(request):
     id = request.POST['idm']  # ID de la mesa

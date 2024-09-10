@@ -47,7 +47,7 @@ public class DBCamareros extends DBBase{
         try {
             cam.put("nombre", res.getString(res.getColumnIndex("nombre")));
             cam.put("apellidos", res.getString(res.getColumnIndex("apellidos")));
-            cam.put("id", res.getString(res.getColumnIndex("ID")));
+            cam.put("ID", res.getString(res.getColumnIndex("ID")));
             cam.put("pass_field", res.getString(res.getColumnIndex("pass_field")));
             cam.put("autorizado", res.getString(res.getColumnIndex("autorizado")));
             cam.put("permisos", res.getString(res.getColumnIndex("permisos")));

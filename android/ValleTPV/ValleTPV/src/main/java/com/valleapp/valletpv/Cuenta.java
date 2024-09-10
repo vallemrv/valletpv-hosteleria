@@ -471,11 +471,17 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             try {
                 setEstadoAutoFinish(true, true);
                 aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+                final Context con = this;
+                final IControladorCuenta activity = this;
+                Log.d("ERROR_CUENTA", "mostrarSeparados");
+                handlerMostrarCobrar.sendEmptyMessage(0);
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
-                DlgSepararTicket dlg = new DlgSepararTicket(this,this);
+                DlgSepararTicket dlg = new DlgSepararTicket(con, activity);
                 dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
                 dlg.setLineasTicket(lineas);
                 dlg.show();
+
+
             } catch (JSONException e) {
                 Log.e("ERROR_CUENTA", e.toString());
             }
@@ -487,6 +493,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         try{
             setEstadoAutoFinish(true, false);
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+
             lineas = dbCuenta.getAll(mesa.getString("ID"));
 
             if(totalMesa>0) {
@@ -554,8 +561,22 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     public void cobrarMesa(View v) {
         try {
             aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            JSONArray l = dbCuenta.filterGroup("IDMesa=" + mesa.getString("ID"));
-            mostrarCobrar(l, totalMesa);
+            Timer t = new Timer();
+            findViewById(R.id.loading).setVisibility(View.VISIBLE);
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    handlerMostrarCobrar.sendEmptyMessage(0);
+                    try {
+                        JSONArray l = dbCuenta.filterGroup("IDMesa=" + mesa.getString("ID"));
+                        mostrarCobrar(l, totalMesa);
+                    }catch (Exception e){
+                        Log.e("ERROR_CUENTA", e.toString());
+                    }
+                }
+            }, 1000);
+
+
         } catch (JSONException e) {
             Log.e("ERROR_CUENTA", e.toString());
         }

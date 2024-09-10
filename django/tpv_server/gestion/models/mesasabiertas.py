@@ -126,8 +126,11 @@ class Mesasabiertas(BaseModels):
         
             if client_id:
                 # Buscar el registro en la base de datos por ID
-                server_record = cls.objects.filter(mesa__id=client_id).first().serialize()
-                
+                try:
+                    server_record = cls.objects.filter(mesa__id=client_id).first().serialize()
+                except:
+                    server_record = None
+        
                 if server_record:
                     # Si el registro existe, normalizamos y comparamos clave por clave
                     if not cls.normalize_and_compare(r, server_record):

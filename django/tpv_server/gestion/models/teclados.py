@@ -184,7 +184,7 @@ class Teclas(BaseModels):
         row["p1"] = float(r.p1)
         row["p2"] = float(r.p2)
         row["Precio"] = float(r.p1) 
-        row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "207,182,212"
+        row['RGB'] = teclasseccion[0].seccion.rgb if teclasseccion.count() > 0 else "255,0,0"
         row['IDSeccion'] = teclasseccion[0].seccion.id if teclasseccion.count() > 0 else -1
         row["IDSec2"] = teclasseccion[1].seccion.id if teclasseccion.count() > 1 else -1
         seccioncom = r.teclascom_set.first()

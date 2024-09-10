@@ -199,10 +199,7 @@ class Lineaspedido(BaseModels):
                             server_record = cls.objects.get(id=client_id).serialize()
                         except cls.DoesNotExist:
                             server_record = None
-                        except Exception as e:
-                            # Manejar otros posibles errores de la base de datos
-                            print(f"Error al consultar la base de datos: {e}")
-                            continue
+                        
 
                         if server_record:
                             # Si el registro existe y está vinculado a una mesa abierta, normalizar y comparar

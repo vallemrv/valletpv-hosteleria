@@ -84,8 +84,8 @@ class BaseModels(models.Model):
 
         for key in reg1_normalized:
             if not cls.compare_value_by_key(reg1_normalized[key], reg2_normalized.get(key)):
-                print(key, reg1_normalized[key])
-                print(key, reg2_normalized[key])
+                print("servidor: "+key+" "+str(reg2_normalized[key]))
+                print("cliente: "+key+" "+str(reg1_normalized[key]))
                 return False
 
         return True
@@ -110,10 +110,7 @@ class BaseModels(models.Model):
                     server_record = cls.objects.get(id=client_id).serialize()
                 except cls.DoesNotExist:
                     server_record = None
-                except Exception as e:
-                    # Manejar otros posibles errores de la base de datos
-                    print(f"Error al consultar la base de datos: {e}")
-                    continue
+                
              
         
                 if server_record:
