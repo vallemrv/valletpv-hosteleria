@@ -66,15 +66,10 @@ public class PaymentAction extends CashlogyAction {
             sendQCommand();      // Después de #J#, enviar un último #Q#
         } else if (comando.startsWith("#P")) {
 
-            if (response.contains("#0#") || response.contains("WR:")) {
                 if (!isCancel) {
                     socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado sin errores.");
                 }
-            } else if (response.contains("CASHLOGY_ERR")) {
-                isCancel = true;
-                socketManager.notifyUI("CASHLOGY_ERR", "Error en Cashlogy: Operación cancelada y cantidad devuelta.");
-                sendQCommand();
-            }
+
         }
     }
 

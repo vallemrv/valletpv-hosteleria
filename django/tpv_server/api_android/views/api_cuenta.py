@@ -129,6 +129,7 @@ def cuenta_add(request):
     idc = request.POST["idc"]
     uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
+    print(lineas)
     Pedidos.agregar_nuevas_lineas(idm, idc, lineas, uid_device)
     return HttpResponse('success')
 
@@ -138,7 +139,7 @@ def cuenta_cobrar(request):
     idc = request.POST["idc"]
     entrega = request.POST["entrega"]
     art = json.loads(request.POST["art"])
-
+    print(art)
     total, id = Ticket.cerrar_cuenta(idm, idc, entrega, art)
            
     if (id > 0):

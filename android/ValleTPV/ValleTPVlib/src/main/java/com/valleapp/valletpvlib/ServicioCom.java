@@ -12,6 +12,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction;
 import com.valleapp.valletpvlib.CashlogyManager.CashlogyManager;
 import com.valleapp.valletpvlib.CashlogyManager.CashlogySocketManager;
 import com.valleapp.valletpvlib.CashlogyManager.ChangeAction;
@@ -193,7 +194,6 @@ public class ServicioCom extends Service implements IControllerWS {
             // Iniciar CashlogySocketManager si está habilitado
             if (usarCashlogy && urlCashlogy != null) {
                 iniciarCashlogySocketManager(urlCashlogy);
-                cashlogyManager.openWS(url);
             }
 
             // Programar la sincronización periódica
@@ -214,18 +214,6 @@ public class ServicioCom extends Service implements IControllerWS {
         return START_NOT_STICKY;
     }
 
-    private void iniciarCashlogySocketManager(String urlCashlogy) {
-        // Inicializar el CashlogySocketManager con la URL de Cashlogy y el handler para la UI
-        cashlogySocketManager = new CashlogySocketManager(urlCashlogy);
-        cashlogySocketManager.start(); // Iniciar la conexión con Cashlogy
-
-        // Ejecutar la acción de inicialización de Cashlogy
-        cashlogyManager = new CashlogyManager(cashlogySocketManager);
-        cashlogyManager.initialize();
-    }
-
-
-
     @Override
     public void onCreate() {
        super.onCreate();
@@ -238,11 +226,7 @@ public class ServicioCom extends Service implements IControllerWS {
         if (wsClient != null){
             wsClient.stopReconnection();
         }
-        if (cashlogySocketManager != null) {
-            cashlogySocketManager.stop(); // Detener el socket de Cashlogy si está en uso
-            cashlogyManager.closeWS();
-        }
-
+        cerrarCashlogySocketManager();
         super.onDestroy();
     }
 
@@ -430,16 +414,41 @@ public class ServicioCom extends Service implements IControllerWS {
     }
 
 
-
-    public class MyBinder extends Binder{
-        public ServicioCom getService() {
-            return ServicioCom.this;
-        }
-    }
-
      /*
      Metodos para la integracion del cashlogy
      */
+
+    private void iniciarCashlogySocketManager(String urlCashlogy) {
+        if (cashlogySocketManager == null){
+            // Inicializar el CashlogySocketManager con la URL de Cashlogy y el handler para la UI
+            cashlogySocketManager = new CashlogySocketManager(urlCashlogy);
+            cashlogySocketManager.start(); // Iniciar la conexión con Cashlogy
+
+            // Ejecutar la acción de inicialización de Cashlogy
+            cashlogyManager = new CashlogyManager(cashlogySocketManager);
+            cashlogyManager.initialize();
+            cashlogyManager.openWS(server);
+        }
+    }
+
+    private void cerrarCashlogySocketManager() {
+        if (cashlogySocketManager != null) {
+            cashlogySocketManager.stop(); // Detener el socket de Cashlogy si está en uso
+            cashlogyManager.closeWS();
+        }
+    }
+
+    public void executeCaslogy(boolean usarCashlogy, String urlCashlogy1) {
+        this.usarCashlogy = usarCashlogy;
+        this.urlCashlogy = urlCashlogy1;
+        if(cashlogySocketManager != null) {
+            if (usarCashlogy) {
+                iniciarCashlogySocketManager(urlCashlogy);
+            } else {
+                cerrarCashlogySocketManager();
+            }
+        }
+    }
 
     // Método para actualizar el Handler cashlogy desde una Activity o Fragment
     public void setUiHandlerCashlogy(Handler handler) {
@@ -458,9 +467,20 @@ public class ServicioCom extends Service implements IControllerWS {
         return cashlogyManager.makePayment(amount, uiHandler );
     }
 
+    public ArqueoAction cashlogyArqueo(double cambio, Handler uiHandler){
+        return cashlogyManager.makeArqueo(cambio, uiHandler );
+    }
+
 
     public ChangeAction cashLogyChange(Handler uiHandler) {
         return cashlogyManager.makeChange( uiHandler );
+    }
+
+
+    public class MyBinder extends Binder{
+        public ServicioCom getService() {
+            return ServicioCom.this;
+        }
     }
 
 }

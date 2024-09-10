@@ -55,6 +55,15 @@ public class CashlogyManager implements IControllerWS {
         return action;
     }
 
+    public  ArqueoAction makeArqueo(Double cambio, Handler uiHandler) {
+        ArqueoAction arqueoAction = new ArqueoAction(socketManager);
+        socketManager.setUiHandler(uiHandler);
+        socketManager.setCurrentAction(arqueoAction);
+        arqueoAction.setCambioStacker(cambio);
+        arqueoAction.execute();
+        return  arqueoAction;
+    }
+
 
     @Override
     public void sincronizar() {
@@ -71,11 +80,14 @@ public class CashlogyManager implements IControllerWS {
                         super.handleMessage(msg);
                         String key = msg.getData().getString("key");
                         String value = msg.getData().getString("value");
+                        Log.d("CASHLOGY", "key: " + key + " value: " + value);
                         assert key != null;
                         if (key.equals("CASHLOGY_RESPONSE")) {
                             try {
                                 assert value != null;
-                                ws.sendMessage(String.valueOf(new JSONObject(value)));
+                                JSONObject res = new JSONObject();
+                                res.put("respuesta", value);
+                                ws.sendMessage(res.toString());
                             }catch (Exception e){
                                 Log.e("CASHLOGY", "Error al procesar respuesta: " + e.getMessage());
                             }

@@ -77,7 +77,7 @@ public class CashlogySocketManager {
                         bundle.putString("key", "CASHLOGY_RESPONSE");
                         bundle.putString("value", response); // Poner el mensaje en un Bundle
                         msg.setData(bundle);
-                        uiHandler.sendMessage(msg);
+                        esteHandler.sendMessage(msg);
                     }
                 } else {
                     Log.e("CASHLOGY", "No se pudo leer la respuesta o el socket está cerrado.");

@@ -1,10 +1,14 @@
 package com.valleapp.valletpv.cashlogyActivitis;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
@@ -14,8 +18,9 @@ import android.widget.TextView;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction;
-import com.valleapp.valletpvlib.CashlogyManager.CashlogySocketManager;
+import com.valleapp.valletpvlib.ServicioCom;
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
+import com.valleapp.valletpvlib.db.DBCamareros;
 
 
 import org.json.JSONArray;
@@ -27,17 +32,35 @@ import java.util.Map;
 
 public class ArqueoCashlogyActivity extends Activity {
 
-     TextView tvInformacionSalida;
-     ImageButton btnSalir;
-     ImageButton btnArquearCaja;
+    TextView tvInformacionSalida;
+    ImageButton btnSalir;
+    ImageButton btnArquearCaja;
 
-     CashlogySocketManager cashlogySocketManager;
-     ArqueoAction arqueoAction;
+    ArqueoAction arqueoAction;
 
-     double cambio;
-     String server;
-     double stacke;
-     double cambio_real;
+    double cambio;
+    String server;
+    double stacke;
+    double cambio_real;
+
+    ServicioCom myServicio;
+
+
+    private final ServiceConnection mConexion = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
+            if(myServicio!=null){
+                inicializarCashlogyManager();
+            }
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            myServicio = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +82,15 @@ public class ArqueoCashlogyActivity extends Activity {
         stacke = intent.getDoubleExtra("stacke", 0.0);
         cambio_real = intent.getDoubleExtra("cambio_real", 0.0);
         boolean hayArqueo = intent.getBooleanExtra("hayArqueo", false);
-        hayArqueo = true;
 
         // Verificar si se puede hacer el arqueo
-        if (hayArqueo) {
-            inicializarCashlogyManager();
-        } else {
+        if (!hayArqueo) {
             mostrarMensaje("No se puede realizar el arqueo porque no hay ticket de cierre.");
             btnArquearCaja.setVisibility(View.GONE);
+        }else{
+            Intent intent_service = new Intent(getApplicationContext(), ServicioCom.class);
+            bindService(intent_service, mConexion, Context.BIND_AUTO_CREATE);
+
         }
 
         btnSalir.setOnClickListener(v -> finish());
@@ -78,22 +102,17 @@ public class ArqueoCashlogyActivity extends Activity {
     }
 
     private void inicializarCashlogyManager() {
-        // Iniciar el CashlogySocketManager con los datos obtenidos
-        String urlCashlogy = getIntent().getStringExtra("URL_Cashlogy");
-        cashlogySocketManager = new CashlogySocketManager(urlCashlogy);
-        cashlogySocketManager.start();
-
-        // Crear la acción de arqueo
-        arqueoAction = new ArqueoAction(cashlogySocketManager);
-
         // Configurar el Handler para recibir las respuestas del Cashlogy
         Handler uiHandler = new Handler(Looper.getMainLooper(), this::manejarMensajeCashlogy);
-
-        cashlogySocketManager.setUiHandler(uiHandler);
-        cashlogySocketManager.setCurrentAction(arqueoAction);
-        arqueoAction.setCambioStacker(cambio);
-        arqueoAction.execute();
+        arqueoAction = myServicio.cashlogyArqueo(cambio, uiHandler);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+     }
+
+
 
     private void realizarArqueo() {
         // Paso 1: Obtener las denominaciones desde ArqueoAction
@@ -200,8 +219,8 @@ public class ArqueoCashlogyActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if(cashlogySocketManager != null) {
-            cashlogySocketManager.stop();
+        if (myServicio != null) {
+            unbindService(mConexion);
         }
         super.onDestroy();
     }

@@ -125,7 +125,6 @@ public class ValleTPV extends Activity {
     protected void onResume() {
         cargarPreferencias();
         if (myServicio != null) {
-            myServicio.setExHandler("camareros", handleHttp);
             rellenarListas();
         }
         if (server != null && !server.isEmpty() && myServicio == null) {
@@ -142,6 +141,7 @@ public class ValleTPV extends Activity {
 
     @Override
     protected void onDestroy() {
+        Log.d("TEST", "onDestroy");
         unbindService(mConexion);
         Intent intent = new Intent(cx, ServicioCom.class);
         stopService(intent);
@@ -150,6 +150,7 @@ public class ValleTPV extends Activity {
 
     private void cargarPreferencias() {
         JSON json = new JSON();
+        Log.d("TEST", "estoy aqui");
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
             if (pref == null) {
@@ -174,6 +175,8 @@ public class ValleTPV extends Activity {
                 myServicio.setUiHandlerCashlogy(handleHttp);
                 myServicio.setExHandler("camareros", handleHttp);
                 dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+                myServicio.executeCaslogy(usarCashlogy, urlCashlogy);
+                myServicio.setExHandler("camareros", handleHttp);
                 rellenarListas();
             }
         }

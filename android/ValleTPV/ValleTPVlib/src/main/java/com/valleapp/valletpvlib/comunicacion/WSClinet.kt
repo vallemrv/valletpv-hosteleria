@@ -30,15 +30,16 @@ class WSClinet(
     }
 
     override fun onOpen(handshakedata: ServerHandshake?) {
-        println("Connected to server: ${uri}")
+        println("Connected to server: $uri")
         reconnectAttempts = 0 // Reiniciamos el contador de intentos de reconexión
         controller.sincronizar() // Sincronizar datos perdidos al reconectar
     }
 
     override fun onMessage(message: String?) {
-        Log.d("WEBSOCKET_INFO", message!!)
-        val o = JSONObject(message)
-        controller.procesarRespose(o)
+        val o = message?.let { JSONObject(it) }
+        if (o != null) {
+            controller.procesarRespose(o)
+        }
     }
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -75,14 +76,15 @@ class WSClinet(
 
     private fun calculateReconnectDelay(): Long {
         // Calcula el retraso con base en el número de intentos, sin superar el máximo
-        val delay = (Math.min(maxReconnectDelay, (1000L * reconnectAttempts)))
+        val delay = (maxReconnectDelay.coerceAtMost((1000L * reconnectAttempts)))
         return delay.coerceAtMost(maxReconnectDelay)
     }
 
     fun sendMessage(message: String) {
         if (isOpen) {
-            send(message)
-            println("Message sent: $message")
+            val o =  JSONObject();
+            o.put("content", message);
+            send(o.toString());
         } else {
             println("WebSocket is not open")
         }
