@@ -100,21 +100,7 @@ public class CobroCashlogyActivity extends Activity {
                     String value = data.getString("value", "");
 
                     switch (key) {
-                        case "CASHLOGY_WR":
-                            // Mostrar un Toast con la advertencia
-                            Toast.makeText(this, "Advertencia: " + value, Toast.LENGTH_LONG).show();
-                            break;
-
-                        case "CASHLOGY_ERR":
-                            // Mostrar un Toast con el error
-                            if (!value.startsWith("Error de ocupación")) {
-                                setResult(Activity.RESULT_CANCELED);
-                                finish();
-                                Toast.makeText(this, "Error: " + value, Toast.LENGTH_LONG).show();
-                            }
-                            break;
-
-                        case "CASHLOGY_IMPORTE_ADMITIDO":
+                          case "CASHLOGY_IMPORTE_ADMITIDO":
                             // Actualizar el TextView para el importe admitido
                             double importeAdmitido = Double.parseDouble(value);
                             tvTotalIngresado.setText(String.format("%01.2f €", (importeAdmitido)));
@@ -127,7 +113,7 @@ public class CobroCashlogyActivity extends Activity {
 
 
                         case "CASHLOGY_COBRO_COMPLETADO":
-                            // Manejar el cobro completado
+                            Toast.makeText(CobroCashlogyActivity.this, value, Toast.LENGTH_SHORT).show();
                             finalizarCobro();
                             break;
 

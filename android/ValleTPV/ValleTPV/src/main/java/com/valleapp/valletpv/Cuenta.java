@@ -474,13 +474,11 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 final Context con = this;
                 final IControladorCuenta activity = this;
                 Log.d("ERROR_CUENTA", "mostrarSeparados");
-                handlerMostrarCobrar.sendEmptyMessage(0);
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
                 DlgSepararTicket dlg = new DlgSepararTicket(con, activity);
                 dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
                 dlg.setLineasTicket(lineas);
                 dlg.show();
-
 
             } catch (JSONException e) {
                 Log.e("ERROR_CUENTA", e.toString());

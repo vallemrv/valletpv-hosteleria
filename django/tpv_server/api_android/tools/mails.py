@@ -12,13 +12,18 @@ from django.conf import settings
 from datetime import datetime
 
 
+from datetime import datetime
+
 def getUsuariosMail():
     now = datetime.now().strftime("%H:%M")
-    users = User.objects.filter(horariousr__hora_fin__gte=now, horariousr__hora_ini__lte=now)
-    if users.count() > 0:
+    # Usar el related_name para acceder a los horarios de cada usuario
+    users = User.objects.filter(horariousr__hora_fin__gte=now, horariousr__hora_ini__lte=now).distinct()
+    
+    if users.exists():  # Esto es más eficiente que count()
         return users
     else:
         return User.objects.all()
+
 
 def  send_cierre(user, desglose):
     now = datetime.now()
