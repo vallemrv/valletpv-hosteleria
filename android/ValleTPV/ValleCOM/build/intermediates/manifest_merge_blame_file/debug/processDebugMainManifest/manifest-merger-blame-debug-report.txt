@@ -13,11 +13,11 @@
 11-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:5:22-64
 12
 13    <application
-13-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-112:22
+13-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-99:22
 14        android:allowBackup="true"
 14-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:8:9-35
 15        android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
-15-->[com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
+15-->[com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
 16        android:debuggable="true"
 17        android:extractNativeLibs="true"
 18        android:icon="@drawable/ic_icon_com"
@@ -29,188 +29,160 @@
 21        android:usesCleartextTraffic="true" >
 21-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:12:9-44
 22        <uses-library
-22-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:12-91
+22-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:12-91
 23            android:name="org.apache.http.legacy"
-23-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:26-63
+23-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:26-63
 24            android:required="false" />
-24-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:64-88
+24-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:64-88
 25
 26        <activity
-26-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:17:12-28:20
+26-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:18:12-27:20
 27            android:name="com.valleapp.vallecom.Activitys.Camareros"
-27-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:18:13-69
+27-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:19:13-69
 28            android:configChanges="orientation"
 28-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:20:13-48
-29            android:exported="true"
-29-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:22:16-39
-30            android:label="@string/app_name"
-30-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:19:13-45
-31            android:screenOrientation="portrait" >
-31-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:21:13-49
-32            <intent-filter>
-32-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:13-27:29
-33                <action android:name="android.intent.action.MAIN" />
-33-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:17-69
-33-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:25-66
-34
-35                <category android:name="android.intent.category.LAUNCHER" />
-35-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:17-77
-35-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:27-74
-36            </intent-filter>
-37        </activity>
-38        <activity
-38-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:29:9-40:20
-39            android:name="com.valleapp.vallecom.Activitys.Preferencias"
-39-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:30:13-72
-40            android:configChanges="orientation"
-40-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:32:13-48
-41            android:exported="true"
-41-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:34:13-36
-42            android:label="PreferenciasTpv"
-42-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:31:13-44
-43            android:screenOrientation="portrait" >
-43-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:33:13-49
-44            <intent-filter>
-44-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:13-27:29
-45                <action android:name="android.intent.action.MAIN" />
-45-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:17-69
-45-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:25-66
-46
-47                <category android:name="android.intent.category.LAUNCHER" />
-47-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:17-77
-47-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:27-74
-48            </intent-filter>
-49        </activity>
-50        <activity
-50-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:41:9-46:20
-51            android:name="com.valleapp.vallecom.Activitys.Mesas"
-51-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:42:13-65
-52            android:configChanges="orientation"
-52-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:44:13-48
-53            android:label="Elegir Mesa"
-53-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:43:13-40
-54            android:screenOrientation="portrait" >
-54-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:45:13-49
-55        </activity>
-56        <activity
-56-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:47:9-52:20
-57            android:name="com.valleapp.vallecom.Activitys.HacerComandas"
-57-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:48:13-73
-58            android:configChanges="orientation"
-58-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:50:13-48
-59            android:label="@string/title_activity_comanda"
-59-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:49:13-59
-60            android:screenOrientation="portrait" >
-60-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:51:13-49
+29            android:exported="true" >
+29-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:21:13-36
+30            <intent-filter>
+30-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:22:13-26:29
+31                <action android:name="android.intent.action.MAIN" />
+31-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:17-69
+31-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:25-66
+32
+33                <category android:name="android.intent.category.LAUNCHER" />
+33-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:17-77
+33-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:27-74
+34            </intent-filter>
+35        </activity>
+36        <activity
+36-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:28:9-38:20
+37            android:name="com.valleapp.vallecom.Activitys.Preferencias"
+37-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:29:13-72
+38            android:configChanges="orientation"
+38-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:31:13-48
+39            android:exported="true"
+39-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:32:13-36
+40            android:label="PreferenciasTpv" >
+40-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:30:13-44
+41            <intent-filter>
+41-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:22:13-26:29
+42                <action android:name="android.intent.action.MAIN" />
+42-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:17-69
+42-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:25-66
+43
+44                <category android:name="android.intent.category.LAUNCHER" />
+44-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:17-77
+44-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:27-74
+45            </intent-filter>
+46        </activity>
+47        <activity
+47-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:39:9-43:20
+48            android:name="com.valleapp.vallecom.Activitys.Mesas"
+48-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:40:13-65
+49            android:configChanges="orientation"
+49-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:42:13-48
+50            android:label="Elegir Mesa" >
+50-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:41:13-40
+51        </activity>
+52        <activity
+52-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:44:9-48:20
+53            android:name="com.valleapp.vallecom.Activitys.HacerComandas"
+53-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:45:13-73
+54            android:configChanges="orientation"
+54-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:47:13-48
+55            android:label="@string/title_activity_comanda" >
+55-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:46:13-59
+56        </activity>
+57        <activity
+57-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:49:9-53:20
+58            android:name="com.valleapp.vallecom.Activitys.BuscadorTeclas"
+58-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:50:13-74
+59            android:configChanges="orientation"
+59-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:52:13-48
+60            android:label="@string/title_activity_buscador" >
+60-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:51:13-60
 61        </activity>
 62        <activity
-62-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:53:9-58:20
-63            android:name="com.valleapp.vallecom.Activitys.BuscadorTeclas"
-63-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:54:13-74
+62-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:54:9-58:20
+63            android:name="com.valleapp.vallecom.Activitys.OpMesas"
+63-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:55:13-67
 64            android:configChanges="orientation"
-64-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:56:13-48
-65            android:label="@string/title_activity_buscador"
-65-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:55:13-60
-66            android:screenOrientation="portrait" >
-66-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:57:13-49
-67        </activity>
-68        <activity
-68-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:59:9-64:20
-69            android:name="com.valleapp.vallecom.Activitys.OpMesas"
-69-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:60:13-67
-70            android:configChanges="orientation"
-70-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:62:13-48
-71            android:label="@string/title_activity_op_mesas"
-71-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:61:13-60
-72            android:screenOrientation="portrait" >
-72-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:63:13-49
-73        </activity>
-74        <activity
-74-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:65:9-70:20
-75            android:name="com.valleapp.vallecom.Activitys.BuscarPedidos"
-75-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:66:13-73
-76            android:configChanges="orientation"
-76-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:68:13-48
-77            android:label="Buscar pedidos"
-77-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:67:13-43
-78            android:screenOrientation="portrait" >
-78-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:69:13-49
-79        </activity>
-80        <activity
-80-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:71:9-76:20
-81            android:name="com.valleapp.vallecom.Activitys.Cuenta"
-81-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:72:13-66
-82            android:configChanges="orientation"
-82-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:74:13-48
-83            android:label="@string/title_activity_cuenta"
-83-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:73:13-58
-84            android:screenOrientation="portrait" >
-84-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:75:13-49
-85        </activity>
-86        <activity
-86-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:77:9-82:20
-87            android:name="com.valleapp.vallecom.Activitys.MostrarPedidos"
-87-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:78:13-74
-88            android:configChanges="orientation"
-88-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:80:13-48
-89            android:label="@string/title_activity_mostrar_pedidos"
-89-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:79:13-67
-90            android:screenOrientation="portrait" >
-90-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:81:13-49
+64-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:57:13-48
+65            android:label="@string/title_activity_op_mesas" >
+65-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:56:13-60
+66        </activity>
+67        <activity
+67-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:59:9-63:20
+68            android:name="com.valleapp.vallecom.Activitys.BuscarPedidos"
+68-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:60:13-73
+69            android:configChanges="orientation"
+69-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:62:13-48
+70            android:label="Buscar pedidos" >
+70-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:61:13-43
+71        </activity>
+72        <activity
+72-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:64:9-68:20
+73            android:name="com.valleapp.vallecom.Activitys.Cuenta"
+73-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:65:13-66
+74            android:configChanges="orientation"
+74-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:67:13-48
+75            android:label="@string/title_activity_cuenta" >
+75-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:66:13-58
+76        </activity>
+77        <activity
+77-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:69:9-73:20
+78            android:name="com.valleapp.vallecom.Activitys.MostrarPedidos"
+78-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:70:13-74
+79            android:configChanges="orientation"
+79-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:72:13-48
+80            android:label="@string/title_activity_mostrar_pedidos" >
+80-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:71:13-67
+81        </activity>
+82        <activity
+82-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:74:9-78:20
+83            android:name="com.valleapp.vallecom.Activitys.Sugerencias"
+83-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:75:13-71
+84            android:configChanges="orientation"
+84-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:77:13-48
+85            android:label="@string/title_activity_sugerencias" >
+85-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:76:13-63
+86        </activity>
+87        <activity
+87-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:79:12-83:23
+88            android:name="com.valleapp.vallecom.Activitys.Autorias"
+88-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:80:16-71
+89            android:configChanges="orientation"
+89-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:82:16-51
+90            android:label="@string/title_activity_autorias" >
+90-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:81:16-63
 91        </activity>
 92        <activity
-92-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:83:9-88:20
-93            android:name="com.valleapp.vallecom.Activitys.Sugerencias"
-93-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:84:13-71
+92-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:84:12-88:23
+93            android:name="com.valleapp.vallecom.Activitys.Refill"
+93-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:85:16-69
 94            android:configChanges="orientation"
-94-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:86:13-48
-95            android:label="@string/title_activity_sugerencias"
-95-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:85:13-63
-96            android:screenOrientation="portrait" >
-96-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:87:13-49
-97        </activity>
-98        <activity
-98-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:89:12-94:23
-99            android:name="com.valleapp.vallecom.Activitys.Autorias"
-99-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:90:16-71
-100            android:configChanges="orientation"
-100-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:92:16-51
-101            android:label="@string/title_activity_autorias"
-101-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:91:16-63
-102            android:screenOrientation="portrait" >
-102-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:93:16-52
-103        </activity>
-104        <activity
-104-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:95:12-100:23
-105            android:name="com.valleapp.vallecom.Activitys.Refill"
-105-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:96:16-69
-106            android:configChanges="orientation"
-106-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:98:16-51
-107            android:label="@string/title_activity_refill"
-107-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:97:16-61
-108            android:screenOrientation="portrait" >
-108-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:99:16-52
-109        </activity>
-110        <activity
-110-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:101:12-106:23
-111            android:name="com.valleapp.vallecom.Activitys.SendMensajes"
-111-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:102:16-75
-112            android:configChanges="orientation"
-112-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:104:16-51
-113            android:label="@string/title_activity_sendmensajes"
-113-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:103:16-67
-114            android:screenOrientation="portrait" >
-114-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:105:16-52
-115        </activity>
-116
-117        <service
-117-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:107:8-110:39
-118            android:name="com.valleapp.vallecom.utilidades.ServicioCom"
-118-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:108:12-71
-119            android:enabled="true"
-119-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:109:12-34
-120            android:exported="false" />
-120-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:110:12-36
-121    </application>
-122
-123</manifest>
+94-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:87:16-51
+95            android:label="@string/title_activity_refill" >
+95-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:86:16-61
+96        </activity>
+97        <activity
+97-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:89:12-93:23
+98            android:name="com.valleapp.vallecom.Activitys.SendMensajes"
+98-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:90:16-75
+99            android:configChanges="orientation"
+99-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:92:16-51
+100            android:label="@string/title_activity_sendmensajes" >
+100-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:91:16-67
+101        </activity>
+102
+103        <service
+103-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:94:8-97:39
+104            android:name="com.valleapp.vallecom.utilidades.ServicioCom"
+104-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:95:12-71
+105            android:enabled="true"
+105-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:96:12-34
+106            android:exported="false" />
+106-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:97:12-36
+107    </application>
+108
+109</manifest>

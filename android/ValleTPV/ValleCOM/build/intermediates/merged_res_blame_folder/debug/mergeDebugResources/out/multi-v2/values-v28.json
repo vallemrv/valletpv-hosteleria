@@ -4,7 +4,7 @@
             "outputFile": "com.valleapp.vallecom.ValleCOM-mergeDebugResources-15:/values-v28/values-v28.xml",
             "map": [
                 {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/res/values-v28/values-v28.xml",
+                    "source": "/Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/res/values-v28/values-v28.xml",
                     "from": {
                         "startLines": "2,3,4,8",
                         "startColumns": "4,4,4,4",

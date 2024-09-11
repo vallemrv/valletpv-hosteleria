@@ -3,32 +3,32 @@
 3    package="com.valleapp.vallecom.test" >
 4
 5    <uses-sdk
-5-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:5:5-74
+5-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:5:5-74
 6        android:minSdkVersion="15"
-6-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:5:15-41
+6-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:5:15-41
 7        android:targetSdkVersion="15" />
-7-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:5:42-71
+7-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:5:42-71
 8
 9    <instrumentation
-9-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:11:5-15:71
+9-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:11:5-15:71
 10        android:name="android.support.test.runner.AndroidJUnitRunner"
-10-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:11:22-83
+10-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:11:22-83
 11        android:functionalTest="false"
-11-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:14:22-52
+11-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:14:22-52
 12        android:handleProfiling="false"
-12-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:13:22-53
+12-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:13:22-53
 13        android:label="Tests for com.valleapp.vallecom"
-13-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:15:22-69
+13-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:15:22-69
 14        android:targetPackage="com.valleapp.vallecom" />
-14-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:12:22-67
+14-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:12:22-67
 15
 16    <application
-16-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:7:5-9:19
+16-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:7:5-9:19
 17        android:debuggable="true"
 18        android:extractNativeLibs="true" >
 19        <uses-library android:name="android.test.runner" />
-19-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:8:9-60
-19-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest6309264787630343111.xml:8:23-57
+19-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:8:9-60
+19-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/tmp/manifest/androidTest/debug/tempFile1ProcessTestManifest2183294981774965996.xml:8:23-57
 20    </application>
 21
 22</manifest>

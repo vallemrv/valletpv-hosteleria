@@ -4,7 +4,17 @@
             "outputFile": "com.valleapp.vallecom.ValleCOM-mergeDebugResources-15:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/res/values-v16/values-v16.xml",
+                    "source": "/Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                },
+                {
+                    "source": "/Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -20,16 +30,6 @@
                         "endLines": "6",
                         "endColumns": "12",
                         "endOffsets": "289"
-                    }
-                },
-                {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/res/values-v16/values-v16.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "65",
-                        "endOffsets": "116"
                     }
                 }
             ]

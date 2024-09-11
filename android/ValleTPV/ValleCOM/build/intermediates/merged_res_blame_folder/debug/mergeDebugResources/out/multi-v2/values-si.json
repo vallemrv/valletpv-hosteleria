@@ -4,24 +4,7 @@
             "outputFile": "com.valleapp.vallecom.ValleCOM-mergeDebugResources-15:/values-si/values-si.xml",
             "map": [
                 {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/res/values-si/values-si.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "100",
-                        "endOffsets": "151"
-                    },
-                    "to": {
-                        "startLines": "32",
-                        "startColumns": "4",
-                        "startOffsets": "3131",
-                        "endColumns": "100",
-                        "endOffsets": "3227"
-                    }
-                },
-                {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/res/values-si/values-si.xml",
+                    "source": "/Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/res/values-si/values-si.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/d89524f29034ad6c6459f256952eb54d/transformed/navigation-ui-1.0.0/res/values-si/values-si.xml",
+                    "source": "/Users/valle/.gradle/caches/transforms-4/d80e104172769b9b6448ea1814dd40e7/transformed/navigation-ui-1.0.0/res/values-si/values-si.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -52,6 +35,23 @@
                         "startOffsets": "2821,2932",
                         "endColumns": "110,116",
                         "endOffsets": "2927,3044"
+                    }
+                },
+                {
+                    "source": "/Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/res/values-si/values-si.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "100",
+                        "endOffsets": "151"
+                    },
+                    "to": {
+                        "startLines": "32",
+                        "startColumns": "4",
+                        "startOffsets": "3131",
+                        "endColumns": "100",
+                        "endOffsets": "3227"
                     }
                 }
             ]

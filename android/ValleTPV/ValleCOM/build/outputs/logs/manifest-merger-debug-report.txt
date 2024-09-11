@@ -1,45 +1,45 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-114:12
-INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-114:12
-INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-114:12
-INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-114:12
-MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/14c170a5c113e8a7fe961538e3bd8c38/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:2:1-14:12
-MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/5f1a6c974308bc785066636300c0cbea/transformed/constraint-layout-2.0.4/AndroidManifest.xml:2:1-11:12
-MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/ea28bd8bc31e708273a0d3998c58400c/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d89524f29034ad6c6459f256952eb54d/transformed/navigation-ui-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/156b38a75534ab990953d5d6e03cd2e8/transformed/design-28.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/7841643323f245714d005bce3c90b9c0/transformed/support-fragment-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/79e2c63bef50ed1341ec22a8add001c2/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/128098796a7738aa39dff6694c27739b/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/440a214bf2a639ed8b4662a79f6cd9b6/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/f9756435e217adfc67138d837425ec34/transformed/support-core-ui-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/b31c68250cec2289c77dc6a8049cbf84/transformed/support-core-utils-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/23f7f9807d2bd0bdf6916dd4109f9ef6/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c8d6a98b35cb114787bb38c3b05eaf2/transformed/loader-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/6c69b3f9c82b36178eceba3f2db111de/transformed/navigation-common-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/6038b793b11fd4da00684bb773268ef6/transformed/transition-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/73068082f1f85ca82fecfeccd7ef3696/transformed/viewpager-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/a7e186c73454cf8e3273c046bea4ff82/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/b45c8895bc5d70db6037967deac235b9/transformed/drawerlayout-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/6b4cbc7877653ee0275d45344122883e/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/f752f307d22c3207f0a9c37f27f8c72a/transformed/customview-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/fe9857e2d0e0b6c52279d4691ab47941/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/adfc9bc831eb85a050f9f1fa46d0bab3/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/9c4e0fd27008d2d3853316743cdaced3/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:17:1-25:12
-MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/d6ba9bc76c6f36f92c44df455f8e3902/transformed/cursoradapter-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/7f394f94e4a813b94d602ca145595a2b/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/00aab785b4472d9374c011ac12207fc6/transformed/viewmodel-1.1.1/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/c209ab7eeaf64efd454ab393942b978a/transformed/cardview-v7-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/2857737c9f0ff1bf5ec1c3bc5b4ed853/transformed/documentfile-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/dde12c4d855ab693e2af05635f91fc53/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/c87ac58f1ca7fb185b6b5ebf99703e8a/transformed/print-28.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/e62f02283409f0f7e028370360bab6d1/transformed/livedata-1.1.1/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/4bb0e02a38077131e9c1c3b19dc6064f/transformed/livedata-core-1.1.1/AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/451505301693a35c1bd875e36c06c6fe/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/16e722e546c989793daffdb1c5b80824/transformed/interpolator-28.0.0/AndroidManifest.xml:17:1-22:12
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-101:12
+INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-101:12
+INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-101:12
+INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:2:1-101:12
+MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/a2f9f590ef947186ad1e23c6204e4b1f/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:2:1-14:12
+MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/b9f257101996fab304b0165ed5b51f44/transformed/constraint-layout-2.0.4/AndroidManifest.xml:2:1-11:12
+MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/30201b96ea9ad4c5ffd662aad15897e7/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d80e104172769b9b6448ea1814dd40e7/transformed/navigation-ui-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/d460295acaba2b2341f6bc0063cc3e69/transformed/support-fragment-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/8eac8eea4cde7f1ba38e38c20abe383c/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/5930fe3b3772d20a756041067323b45e/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/43f2f248be13a146d32d6952b1d03dab/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/4994ba04a2e8ccda071f2739aa516ab4/transformed/support-core-ui-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/24bad7fe94683ed7a8f39c7b7f41d1ce/transformed/support-core-utils-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/0b08687155b04b4e93af0f8a646003e4/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/8836e7011fa13544651334457aadd0a8/transformed/loader-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/1b32c349b9092fa6493ae636edceaa0e/transformed/navigation-common-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/18d7bcebc3beea32b0c70a66311ddfe4/transformed/transition-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/53a849f161669b8bb911467ee101fb25/transformed/viewpager-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/d49b7561db7f62d33047f35e1c4d3532/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/640a8a2fb43f6ef2da0f203bde42ad12/transformed/drawerlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/7916a4e102fe7d7d7ef73fe99689c13a/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/dad0c63baf3013b8bed11bc322f9241f/transformed/customview-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/24b05b102670d3efd7544c7356fbfba5/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/1fc04ed8a9d6fdc5e743d10b512a7ffd/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/f36934b69d40f7469bd99d3a75b21d84/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/e28a38b2a39d53080d1521ef16f8481c/transformed/cursoradapter-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/1bb4009c5687a9fb6fc84a7bfd053a51/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/9a43b311080efc2825c3a83a53c4b99e/transformed/viewmodel-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/18b6ed2e709ed845c4e6bdd6634558b8/transformed/cardview-v7-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/ba13d9bf3f5655823f42f2a190c84ecb/transformed/documentfile-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/f57a6a42f4b052045d1d06361acf3d11/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/86cee6d640b899239ab98b9f8fd0d25b/transformed/print-28.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/88cc163e24ce400eb549b4451ac80769/transformed/livedata-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/978f27184fa64133cee07e219564a2a2/transformed/livedata-core-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/653f476670d002d3df3fb509322c4180/transformed/runtime-1.1.1/AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/64a07a9419a04b93bd8ce2710a6566f3/transformed/interpolator-28.0.0/AndroidManifest.xml:17:1-22:12
 	package
 		INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml
 	android:versionName
@@ -55,26 +55,28 @@ ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/Va
 	android:name
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:5:22-64
 application
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-112:22
-INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-112:22
-MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/14c170a5c113e8a7fe961538e3bd8c38/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:12:5-20
-MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/14c170a5c113e8a7fe961538e3bd8c38/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:12:5-20
-MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/5f1a6c974308bc785066636300c0cbea/transformed/constraint-layout-2.0.4/AndroidManifest.xml:9:5-20
-MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/5f1a6c974308bc785066636300c0cbea/transformed/constraint-layout-2.0.4/AndroidManifest.xml:9:5-20
-MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/156b38a75534ab990953d5d6e03cd2e8/transformed/design-28.0.0/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/156b38a75534ab990953d5d6e03cd2e8/transformed/design-28.0.0/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
-MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
-MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/9c4e0fd27008d2d3853316743cdaced3/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
-MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/9c4e0fd27008d2d3853316743cdaced3/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-99:22
+INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:7:8-99:22
+MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/a2f9f590ef947186ad1e23c6204e4b1f/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:12:5-20
+MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/a2f9f590ef947186ad1e23c6204e4b1f/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:12:5-20
+MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/b9f257101996fab304b0165ed5b51f44/transformed/constraint-layout-2.0.4/AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/b9f257101996fab304b0165ed5b51f44/transformed/constraint-layout-2.0.4/AndroidManifest.xml:9:5-20
+MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
+MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:22:5-94
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/f36934b69d40f7469bd99d3a75b21d84/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/f36934b69d40f7469bd99d3a75b21d84/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:22:5-23:19
 	android:extractNativeLibs
 		INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml
 	android:appComponentFactory
-		ADDED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
+		ADDED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
 	android:label
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:10:9-41
 	tools:ignore
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:11:9-48
+	tools:targetApi
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:14:12-31
 	android:icon
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:9:9-45
 	android:allowBackup
@@ -84,239 +86,211 @@ MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradl
 	android:usesCleartextTraffic
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:12:9-44
 uses-library#org.apache.http.legacy
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:12-91
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:12-91
 	android:required
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:64-88
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:64-88
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:15:26-63
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:16:26-63
 activity#com.valleapp.vallecom.Activitys.Camareros
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:17:12-28:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:21:13-49
-	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:19:13-45
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:18:12-27:20
 	android:exported
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:22:16-39
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:21:13-36
 	android:configChanges
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:20:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:18:13-69
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:19:13-69
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:13-27:29
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:22:13-26:29
 action#android.intent.action.MAIN
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:17-69
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:17-69
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:24:25-66
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:23:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:17-77
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:17-77
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:26:27-74
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:25:27-74
 activity#com.valleapp.vallecom.Activitys.Preferencias
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:29:9-40:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:33:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:28:9-38:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:31:13-44
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:30:13-44
 	android:exported
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:34:13-36
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:32:13-36
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:32:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:31:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:30:13-72
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:29:13-72
 activity#com.valleapp.vallecom.Activitys.Mesas
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:41:9-46:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:45:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:39:9-43:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:43:13-40
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:41:13-40
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:44:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:42:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:42:13-65
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:40:13-65
 activity#com.valleapp.vallecom.Activitys.HacerComandas
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:47:9-52:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:51:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:44:9-48:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:49:13-59
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:46:13-59
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:50:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:47:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:48:13-73
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:45:13-73
 activity#com.valleapp.vallecom.Activitys.BuscadorTeclas
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:53:9-58:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:57:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:49:9-53:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:55:13-60
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:51:13-60
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:56:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:52:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:54:13-74
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:50:13-74
 activity#com.valleapp.vallecom.Activitys.OpMesas
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:59:9-64:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:63:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:54:9-58:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:61:13-60
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:56:13-60
+	android:configChanges
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:57:13-48
+	android:name
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:55:13-67
+activity#com.valleapp.vallecom.Activitys.BuscarPedidos
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:59:9-63:20
+	android:label
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:61:13-43
 	android:configChanges
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:62:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:60:13-67
-activity#com.valleapp.vallecom.Activitys.BuscarPedidos
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:65:9-70:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:69:13-49
-	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:67:13-43
-	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:68:13-48
-	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:66:13-73
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:60:13-73
 activity#com.valleapp.vallecom.Activitys.Cuenta
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:71:9-76:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:75:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:64:9-68:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:73:13-58
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:66:13-58
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:74:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:67:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:72:13-66
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:65:13-66
 activity#com.valleapp.vallecom.Activitys.MostrarPedidos
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:77:9-82:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:81:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:69:9-73:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:79:13-67
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:71:13-67
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:80:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:72:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:78:13-74
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:70:13-74
 activity#com.valleapp.vallecom.Activitys.Sugerencias
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:83:9-88:20
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:87:13-49
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:74:9-78:20
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:85:13-63
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:76:13-63
 	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:86:13-48
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:77:13-48
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:84:13-71
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:75:13-71
 activity#com.valleapp.vallecom.Activitys.Autorias
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:89:12-94:23
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:93:16-52
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:79:12-83:23
 	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:91:16-63
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:81:16-63
+	android:configChanges
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:82:16-51
+	android:name
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:80:16-71
+activity#com.valleapp.vallecom.Activitys.Refill
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:84:12-88:23
+	android:label
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:86:16-61
+	android:configChanges
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:87:16-51
+	android:name
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:85:16-69
+activity#com.valleapp.vallecom.Activitys.SendMensajes
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:89:12-93:23
+	android:label
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:91:16-67
 	android:configChanges
 		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:92:16-51
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:90:16-71
-activity#com.valleapp.vallecom.Activitys.Refill
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:95:12-100:23
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:99:16-52
-	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:97:16-61
-	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:98:16-51
-	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:96:16-69
-activity#com.valleapp.vallecom.Activitys.SendMensajes
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:101:12-106:23
-	android:screenOrientation
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:105:16-52
-	android:label
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:103:16-67
-	android:configChanges
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:104:16-51
-	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:102:16-75
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:90:16-75
 service#com.valleapp.vallecom.utilidades.ServicioCom
-ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:107:8-110:39
+ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:94:8-97:39
 	android:enabled
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:109:12-34
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:96:12-34
 	android:exported
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:110:12-36
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:97:12-36
 	android:name
-		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:108:12-71
+		ADDED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:95:12-71
 uses-sdk
 INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml
 INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml
-MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/14c170a5c113e8a7fe961538e3bd8c38/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:8:5-10:41
-MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/14c170a5c113e8a7fe961538e3bd8c38/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:8:5-10:41
-MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/5f1a6c974308bc785066636300c0cbea/transformed/constraint-layout-2.0.4/AndroidManifest.xml:5:5-7:41
-MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/5f1a6c974308bc785066636300c0cbea/transformed/constraint-layout-2.0.4/AndroidManifest.xml:5:5-7:41
-MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/ea28bd8bc31e708273a0d3998c58400c/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/ea28bd8bc31e708273a0d3998c58400c/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d89524f29034ad6c6459f256952eb54d/transformed/navigation-ui-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d89524f29034ad6c6459f256952eb54d/transformed/navigation-ui-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/156b38a75534ab990953d5d6e03cd2e8/transformed/design-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/156b38a75534ab990953d5d6e03cd2e8/transformed/design-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/339636271854fa6f1c8ebdcbb08fd8e6/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/7841643323f245714d005bce3c90b9c0/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/7841643323f245714d005bce3c90b9c0/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/79e2c63bef50ed1341ec22a8add001c2/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/79e2c63bef50ed1341ec22a8add001c2/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/128098796a7738aa39dff6694c27739b/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/128098796a7738aa39dff6694c27739b/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/440a214bf2a639ed8b4662a79f6cd9b6/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/440a214bf2a639ed8b4662a79f6cd9b6/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/f9756435e217adfc67138d837425ec34/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/f9756435e217adfc67138d837425ec34/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/b31c68250cec2289c77dc6a8049cbf84/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/b31c68250cec2289c77dc6a8049cbf84/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/23f7f9807d2bd0bdf6916dd4109f9ef6/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/23f7f9807d2bd0bdf6916dd4109f9ef6/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c8d6a98b35cb114787bb38c3b05eaf2/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c8d6a98b35cb114787bb38c3b05eaf2/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/6c69b3f9c82b36178eceba3f2db111de/transformed/navigation-common-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/6c69b3f9c82b36178eceba3f2db111de/transformed/navigation-common-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/6038b793b11fd4da00684bb773268ef6/transformed/transition-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/6038b793b11fd4da00684bb773268ef6/transformed/transition-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/73068082f1f85ca82fecfeccd7ef3696/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/73068082f1f85ca82fecfeccd7ef3696/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/a7e186c73454cf8e3273c046bea4ff82/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/a7e186c73454cf8e3273c046bea4ff82/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/b45c8895bc5d70db6037967deac235b9/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/b45c8895bc5d70db6037967deac235b9/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/6b4cbc7877653ee0275d45344122883e/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/6b4cbc7877653ee0275d45344122883e/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/f752f307d22c3207f0a9c37f27f8c72a/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/f752f307d22c3207f0a9c37f27f8c72a/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/fe9857e2d0e0b6c52279d4691ab47941/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/fe9857e2d0e0b6c52279d4691ab47941/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/adfc9bc831eb85a050f9f1fa46d0bab3/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/adfc9bc831eb85a050f9f1fa46d0bab3/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/bdaa8f59bfb86afb406b887ffb01bab8/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/9c4e0fd27008d2d3853316743cdaced3/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/9c4e0fd27008d2d3853316743cdaced3/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/d6ba9bc76c6f36f92c44df455f8e3902/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/d6ba9bc76c6f36f92c44df455f8e3902/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/7f394f94e4a813b94d602ca145595a2b/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/7f394f94e4a813b94d602ca145595a2b/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/00aab785b4472d9374c011ac12207fc6/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/00aab785b4472d9374c011ac12207fc6/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/c209ab7eeaf64efd454ab393942b978a/transformed/cardview-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/c209ab7eeaf64efd454ab393942b978a/transformed/cardview-v7-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/2857737c9f0ff1bf5ec1c3bc5b4ed853/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/2857737c9f0ff1bf5ec1c3bc5b4ed853/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/dde12c4d855ab693e2af05635f91fc53/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/dde12c4d855ab693e2af05635f91fc53/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/c87ac58f1ca7fb185b6b5ebf99703e8a/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/c87ac58f1ca7fb185b6b5ebf99703e8a/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/e62f02283409f0f7e028370360bab6d1/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/e62f02283409f0f7e028370360bab6d1/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/4bb0e02a38077131e9c1c3b19dc6064f/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/4bb0e02a38077131e9c1c3b19dc6064f/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/451505301693a35c1bd875e36c06c6fe/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/451505301693a35c1bd875e36c06c6fe/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/16e722e546c989793daffdb1c5b80824/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/16e722e546c989793daffdb1c5b80824/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/a2f9f590ef947186ad1e23c6204e4b1f/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:8:5-10:41
+MERGED from [com.getbase:floatingactionbutton:1.10.1] /Users/valle/.gradle/caches/transforms-4/a2f9f590ef947186ad1e23c6204e4b1f/transformed/floatingactionbutton-1.10.1/AndroidManifest.xml:8:5-10:41
+MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/b9f257101996fab304b0165ed5b51f44/transformed/constraint-layout-2.0.4/AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:2.0.4] /Users/valle/.gradle/caches/transforms-4/b9f257101996fab304b0165ed5b51f44/transformed/constraint-layout-2.0.4/AndroidManifest.xml:5:5-7:41
+MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/30201b96ea9ad4c5ffd662aad15897e7/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-fragment:1.0.0] /Users/valle/.gradle/caches/transforms-4/30201b96ea9ad4c5ffd662aad15897e7/transformed/navigation-fragment-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d80e104172769b9b6448ea1814dd40e7/transformed/navigation-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-ui:1.0.0] /Users/valle/.gradle/caches/transforms-4/d80e104172769b9b6448ea1814dd40e7/transformed/navigation-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:design:28.0.0] /Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:appcompat-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/d460295acaba2b2341f6bc0063cc3e69/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:28.0.0] /Users/valle/.gradle/caches/transforms-4/d460295acaba2b2341f6bc0063cc3e69/transformed/support-fragment-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/8eac8eea4cde7f1ba38e38c20abe383c/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-runtime:1.0.0] /Users/valle/.gradle/caches/transforms-4/8eac8eea4cde7f1ba38e38c20abe383c/transformed/navigation-runtime-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/5930fe3b3772d20a756041067323b45e/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:animated-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/5930fe3b3772d20a756041067323b45e/transformed/animated-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/43f2f248be13a146d32d6952b1d03dab/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/43f2f248be13a146d32d6952b1d03dab/transformed/recyclerview-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/4994ba04a2e8ccda071f2739aa516ab4/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:28.0.0] /Users/valle/.gradle/caches/transforms-4/4994ba04a2e8ccda071f2739aa516ab4/transformed/support-core-ui-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/24bad7fe94683ed7a8f39c7b7f41d1ce/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:28.0.0] /Users/valle/.gradle/caches/transforms-4/24bad7fe94683ed7a8f39c7b7f41d1ce/transformed/support-core-utils-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/0b08687155b04b4e93af0f8a646003e4/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:28.0.0] /Users/valle/.gradle/caches/transforms-4/0b08687155b04b4e93af0f8a646003e4/transformed/support-vector-drawable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/8836e7011fa13544651334457aadd0a8/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:loader:28.0.0] /Users/valle/.gradle/caches/transforms-4/8836e7011fa13544651334457aadd0a8/transformed/loader-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/1b32c349b9092fa6493ae636edceaa0e/transformed/navigation-common-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.navigation:navigation-common:1.0.0] /Users/valle/.gradle/caches/transforms-4/1b32c349b9092fa6493ae636edceaa0e/transformed/navigation-common-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/18d7bcebc3beea32b0c70a66311ddfe4/transformed/transition-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:transition:28.0.0] /Users/valle/.gradle/caches/transforms-4/18d7bcebc3beea32b0c70a66311ddfe4/transformed/transition-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/53a849f161669b8bb911467ee101fb25/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:viewpager:28.0.0] /Users/valle/.gradle/caches/transforms-4/53a849f161669b8bb911467ee101fb25/transformed/viewpager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/d49b7561db7f62d33047f35e1c4d3532/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:coordinatorlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/d49b7561db7f62d33047f35e1c4d3532/transformed/coordinatorlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/640a8a2fb43f6ef2da0f203bde42ad12/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:drawerlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/640a8a2fb43f6ef2da0f203bde42ad12/transformed/drawerlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/7916a4e102fe7d7d7ef73fe99689c13a/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:slidingpanelayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/7916a4e102fe7d7d7ef73fe99689c13a/transformed/slidingpanelayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/dad0c63baf3013b8bed11bc322f9241f/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:customview:28.0.0] /Users/valle/.gradle/caches/transforms-4/dad0c63baf3013b8bed11bc322f9241f/transformed/customview-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/24b05b102670d3efd7544c7356fbfba5/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:swiperefreshlayout:28.0.0] /Users/valle/.gradle/caches/transforms-4/24b05b102670d3efd7544c7356fbfba5/transformed/swiperefreshlayout-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/1fc04ed8a9d6fdc5e743d10b512a7ffd/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:asynclayoutinflater:28.0.0] /Users/valle/.gradle/caches/transforms-4/1fc04ed8a9d6fdc5e743d10b512a7ffd/transformed/asynclayoutinflater-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/f36934b69d40f7469bd99d3a75b21d84/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:versionedparcelable:28.0.0] /Users/valle/.gradle/caches/transforms-4/f36934b69d40f7469bd99d3a75b21d84/transformed/versionedparcelable-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/e28a38b2a39d53080d1521ef16f8481c/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cursoradapter:28.0.0] /Users/valle/.gradle/caches/transforms-4/e28a38b2a39d53080d1521ef16f8481c/transformed/cursoradapter-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/1bb4009c5687a9fb6fc84a7bfd053a51/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/1bb4009c5687a9fb6fc84a7bfd053a51/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/9a43b311080efc2825c3a83a53c4b99e/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.1] /Users/valle/.gradle/caches/transforms-4/9a43b311080efc2825c3a83a53c4b99e/transformed/viewmodel-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/18b6ed2e709ed845c4e6bdd6634558b8/transformed/cardview-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:cardview-v7:28.0.0] /Users/valle/.gradle/caches/transforms-4/18b6ed2e709ed845c4e6bdd6634558b8/transformed/cardview-v7-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/ba13d9bf3f5655823f42f2a190c84ecb/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:documentfile:28.0.0] /Users/valle/.gradle/caches/transforms-4/ba13d9bf3f5655823f42f2a190c84ecb/transformed/documentfile-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/f57a6a42f4b052045d1d06361acf3d11/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:localbroadcastmanager:28.0.0] /Users/valle/.gradle/caches/transforms-4/f57a6a42f4b052045d1d06361acf3d11/transformed/localbroadcastmanager-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/86cee6d640b899239ab98b9f8fd0d25b/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:print:28.0.0] /Users/valle/.gradle/caches/transforms-4/86cee6d640b899239ab98b9f8fd0d25b/transformed/print-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/88cc163e24ce400eb549b4451ac80769/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata:1.1.1] /Users/valle/.gradle/caches/transforms-4/88cc163e24ce400eb549b4451ac80769/transformed/livedata-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/978f27184fa64133cee07e219564a2a2/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.1] /Users/valle/.gradle/caches/transforms-4/978f27184fa64133cee07e219564a2a2/transformed/livedata-core-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/653f476670d002d3df3fb509322c4180/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.1] /Users/valle/.gradle/caches/transforms-4/653f476670d002d3df3fb509322c4180/transformed/runtime-1.1.1/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/64a07a9419a04b93bd8ce2710a6566f3/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:interpolator:28.0.0] /Users/valle/.gradle/caches/transforms-4/64a07a9419a04b93bd8ce2710a6566f3/transformed/interpolator-28.0.0/AndroidManifest.xml:20:5-44
 	android:targetSdkVersion
 		INJECTED from /Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml
 	android:minSdkVersion
