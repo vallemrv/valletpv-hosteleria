@@ -1,6 +1,5 @@
 package com.valleapp.valletpvlib.comunicacion
 
-import android.util.Log
 import com.valleapp.valletpvlib.Interfaces.IControllerWS
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -9,7 +8,7 @@ import java.net.URI
 import java.util.Timer
 import kotlin.concurrent.schedule
 
-class WSClinet(
+class WSClient(
     serverUrl: String, // La URL del servidor (por ejemplo, "api.server.com")
     endpoint: String,  // El endpoint (por ejemplo, "/comunicacion/devices")
     private val controller: IControllerWS // Interfaz para sincronizar datos perdidos

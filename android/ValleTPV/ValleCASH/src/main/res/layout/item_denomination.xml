@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- Nombre de la moneda o billete -->
+    <TextView
+        android:id="@+id/text_denomination_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Denominación"
+        android:textSize="16sp"
+        android:paddingEnd="8dp" />
+
+    <!-- EditText para ingresar la cantidad -->
+    <EditText
+        android:id="@+id/edit_amount"
+        android:layout_height="wrap_content"
+        android:hint="0"
+        android:inputType="number"
+        android:layout_width="60dp"
+        android:gravity="center" />
+</LinearLayout>

@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/server_address_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Dirección del servidor"
-        android:textSize="18sp" />
+    <!-- Incluir la barra de herramientas desde app_bar_valle_cash -->
+    <include
+        layout="@layout/app_bar_valle_cash" />
 
-    <EditText
-        android:id="@+id/server_address_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Introduce la dirección del servidor"
-        android:inputType="textUri" />
+    <!-- Contenido de la actividad de configuraciones -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="?attr/actionBarSize">
 
-        <Button
-            android:id="@+id/save_button"
+        <TextView
+            android:id="@+id/server_address_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Guardar"
-            android:layout_marginEnd="8dp"
-            android:padding="10dp" />
+            android:text="Dirección del servidor"
+            android:textSize="18sp" />
 
-        <Button
-            android:id="@+id/exit_button"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/server_address_input"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Salir"
-            android:padding="10dp" />
+            android:hint="Introduce la dirección del servidor"
+            android:inputType="textUri" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:padding="16dp"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Guardar"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp" />
+
+            <Button
+                android:id="@+id/exit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Salir"
+                android:padding="10dp" />
+        </LinearLayout>
+
     </LinearLayout>
-
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

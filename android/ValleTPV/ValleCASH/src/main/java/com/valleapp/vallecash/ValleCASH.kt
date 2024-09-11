@@ -14,6 +14,9 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.valleapp.vallecash.databinding.ActivityValleCashBinding
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONException
+import org.json.JSONObject
 
 class ValleCASH : AppCompatActivity() {
 
@@ -45,6 +48,38 @@ class ValleCASH : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+
+        // Cargar las preferencias al iniciar la actividad
+        val preferencias = cargarPreferencias()
+
+        if (preferencias != null && preferencias.has("URL")) {
+            val serverUrl = preferencias.getString("URL")
+
+            // Iniciar el servicio WebSocket con la URL cargada
+            iniciarWebSocketService(serverUrl)
+        } else {
+            // Si no hay preferencias, lanzar la SettingsActivity para configurar la URL
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+
+    private fun cargarPreferencias(): JSONObject? {
+        val json = JSON()
+        return try {
+            json.deserializar("settings.dat", this)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun iniciarWebSocketService(serverUrl: String) {
+        val intent = Intent(this, WebSocketService::class.java)
+        intent.putExtra("SERVER_URL", serverUrl) // Pasar la URL al servicio si lo necesitas
+        startService(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

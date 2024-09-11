@@ -7,7 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.valleapp.valletpvlib.Interfaces.IControllerWS;
-import com.valleapp.valletpvlib.comunicacion.WSClinet;
+import com.valleapp.valletpvlib.comunicacion.WSClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,10 +15,10 @@ import org.json.JSONObject;
 
 public class CashlogyManager implements IControllerWS {
     private final CashlogySocketManager socketManager;
-    WSClinet ws;
+    WSClient ws;
 
     public void openWS(String server){
-        if (ws == null) ws = new WSClinet(server, "/comunicacion/cashlogy", this);
+        if (ws == null) ws = new WSClient(server, "/comunicacion/cashlogy", this);
         ws.connect();
     }
 

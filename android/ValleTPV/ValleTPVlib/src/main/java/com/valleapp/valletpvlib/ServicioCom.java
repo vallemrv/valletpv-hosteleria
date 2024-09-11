@@ -31,7 +31,7 @@ import com.valleapp.valletpvlib.db.DBTeclas;
 import com.valleapp.valletpvlib.db.DBZonas;
 import com.valleapp.valletpvlib.tareas.TareaManejarInstrucciones;
 import com.valleapp.valletpvlib.tools.Instrucciones;
-import com.valleapp.valletpvlib.comunicacion.WSClinet;
+import com.valleapp.valletpvlib.comunicacion.WSClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,7 +68,7 @@ public class ServicioCom extends Service implements IControllerWS {
     final Queue<Instrucciones> colaInstrucciones = new LinkedList<>();
     String[] tbNameUpdateLow;
 
-    WSClinet wsClient;
+    WSClient wsClient;
 
     private final Handler controller_http = new Handler(Looper.getMainLooper()) {
         public void handleMessage(Message msg) {
@@ -187,7 +187,7 @@ public class ServicioCom extends Service implements IControllerWS {
             if(wsClient == null) {
                 //crearWebsocket();
                 Log.d("SERVICE_COM", "Creando websocket: "+server);
-                wsClient = new WSClinet(server, "/comunicacion/devices", this);
+                wsClient = new WSClient(server, "/comunicacion/devices", this);
                 wsClient.connect();
             }
 
