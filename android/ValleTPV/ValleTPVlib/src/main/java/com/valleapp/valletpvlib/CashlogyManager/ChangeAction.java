@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class ChangeAction extends CashlogyAction {
@@ -14,6 +15,7 @@ public class ChangeAction extends CashlogyAction {
     boolean isCancel = false;
     boolean isAceptar = true;
     boolean isWaitingForFinalQ = false;
+    boolean isSending = false;
 
     int denominacionMinima = 0;
 
@@ -32,6 +34,7 @@ public class ChangeAction extends CashlogyAction {
         isWaitingForFinalQ = false;
         isCancel = false;
         esBloqueado = false;
+        isSending = false;
         socketManager.sendCommand("#Y#");
     }
 
@@ -132,7 +135,7 @@ public class ChangeAction extends CashlogyAction {
 
             // Solo notificar a la UI si el importe recibido es diferente al guardado
             if (nuevoImporteAdmitido != importeAdmitido) {
-                importeAdmitido = nuevoImporteAdmitido;
+                importeAdmitido =Double.parseDouble( String.format(Locale.getDefault(),"%.2f", nuevoImporteAdmitido));
                 socketManager.notifyUI("CASHLOGY_IMPORTE_ADMITIDO", String.valueOf(importeAdmitido));
 
 
@@ -186,38 +189,30 @@ public class ChangeAction extends CashlogyAction {
 
 
     private void calcularYDispensarCambio() {
+        if (isSending) {
+            return;
+        }
+
+        isSending = true;
         if (isCancel) {
             if (importeAdmitido > 0) {
                 sendPCommand(importeAdmitido);
             }
             socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
-            return;
+        } else {
+            sendUCommand();
         }
-        sendUCommand();
+
     }
 
-
-
-
     private void manejarRespuestaP(String response) {
-        if (response.contains("#0#") || response.contains("WR:")) {
-            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación finalizada.");
-            return;
-        }
-        // Si hay un error en el comando P, cancelar la operación
-        isCancel = true;
-        isAceptar = false;
-        isWaitingForFinalQ = true;
-        sendQCommand();
+        socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación finalizada.");
     }
 
     private void manejarDispensacionCambio() {
-        if (isCancel) {
-            sendPCommand(importeAdmitido);
-        } else {
-            double importeRestante = importeAdmitido - (denominacionMinima / 100.0);
-            sendPCommand(importeRestante);
-        }
+        double importeRestante = Double.parseDouble(String.format(Locale.getDefault(),
+                "%.2f", importeAdmitido - (denominacionMinima / 100.0)));
+        sendPCommand(importeRestante);
     }
 
     private void sendUCommand() {

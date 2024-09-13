@@ -6,8 +6,25 @@ import androidx.lifecycle.ViewModel
 
 class HomeViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    // MutableLiveData para el total dispensado (solo modificable desde el ViewModel)
+    private val _totalDispensado = MutableLiveData<Double>()
+
+    // LiveData para observar el total dispensado desde la vista
+    val totalDispensado: LiveData<Double> get() = _totalDispensado
+
+    // MutableLiveData para el total del almacén (solo modificable desde el ViewModel)
+    private val _totalAlmacen = MutableLiveData<Double>()
+
+    // LiveData para observar el total del almacén desde la vista
+    val totalAlmacen: LiveData<Double> get() = _totalAlmacen
+
+    // Función para actualizar el total dispensado
+    fun setTotalDispensado(value: Double) {
+        _totalDispensado.value = value
     }
-    val text: LiveData<String> = _text
+
+    // Función para actualizar el total del almacén
+    fun setTotalAlmacen(value: Double) {
+        _totalAlmacen.value = value
+    }
 }

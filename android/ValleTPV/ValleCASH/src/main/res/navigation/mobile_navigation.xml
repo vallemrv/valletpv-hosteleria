@@ -12,14 +12,28 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.valleapp.vallecash.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_modified_coins"
+        android:name="com.valleapp.vallecash.ui.changecambio.ChangeCambioFragment"
+        android:label="Modificar cambio"
+        tools:layout="@layout/fragment_home" />
 
+
+    <!-- Añadir el SettingsFragment -->
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.valleapp.vallecash.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_settings"
+        android:name="com.valleapp.vallecash.ui.settings.SettingsFragment"
+        android:label="Configuraciones"
+        tools:layout="@layout/fragment_settings" >
+        <argument
+            android:name="data"
+            app:argType="string" />
+
+    </fragment>
+
+    <!-- Añadir DispenseCoinsFragment -->
+    <fragment
+        android:id="@+id/nav_dispense_coins"
+        android:name="com.valleapp.vallecash.ui.dispensecoins.DispenseCoinsFragment"
+        android:label="Dispensar cambio"
+        tools:layout="@layout/fragment_dispense_coins" />
 </navigation>

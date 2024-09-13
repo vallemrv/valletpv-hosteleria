@@ -13,6 +13,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import com.valleapp.vallecash.databinding.ActivityValleCashBinding
 import com.valleapp.valletpvlib.tools.JSON
 import org.json.JSONException
@@ -22,6 +23,7 @@ class ValleCASH : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityValleCashBinding
+    private var serverURL: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +33,6 @@ class ValleCASH : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarValleCash.toolbar)
 
-        binding.appBarValleCash.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
-        }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_valle_cash)
@@ -43,25 +40,49 @@ class ValleCASH : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
+                R.id.nav_home, R.id.nav_modified_coins, R.id.nav_dispense_coins
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
 
+        // Intercepta la navegación para pasar datos
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_dispense_coins -> {
+                    // Crear un Bundle con los datos que quieres pasar
+                    val bundle = Bundle().apply {
+                        putString("server", serverURL)
+                    }
+
+                    // Navegar al fragmento con el Bundle
+                    navController.navigate(R.id.nav_dispense_coins, bundle)
+                }
+
+                R.id.nav_home -> {
+                    // Navegar a Home
+                    navController.navigate(R.id.nav_home)
+                }
+            }
+
+            // Cerrar el Drawer después de la selección
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
+
+
         // Cargar las preferencias al iniciar la actividad
         val preferencias = cargarPreferencias()
 
         if (preferencias != null && preferencias.has("URL")) {
-            val serverUrl = preferencias.getString("URL")
+            serverURL = preferencias.getString("URL")
 
             // Iniciar el servicio WebSocket con la URL cargada
-            iniciarWebSocketService(serverUrl)
+            iniciarWebSocketService(serverURL)
         } else {
             // Si no hay preferencias, lanzar la SettingsActivity para configurar la URL
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            navController.navigate(R.id.nav_settings)
         }
     }
 
@@ -82,6 +103,8 @@ class ValleCASH : AppCompatActivity() {
         startService(intent)
     }
 
+
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.valle_c_a_s_h, menu)
@@ -93,12 +116,17 @@ class ValleCASH : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                // Abrir SettingsActivity
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
+                // Navegar al SettingsFragment usando NavController
+                val navController = findNavController(R.id.nav_host_fragment_content_valle_cash)
+
+                // Navega al fragmento y pasa el Bundle con los datos
+                navController.navigate(R.id.nav_settings)
+
                 true
             }
             else -> super.onOptionsItemSelected(item)

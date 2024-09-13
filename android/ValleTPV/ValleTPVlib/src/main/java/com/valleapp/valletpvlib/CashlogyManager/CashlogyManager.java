@@ -73,20 +73,20 @@ public class CashlogyManager implements IControllerWS {
     @Override
     public void procesarRespose(@NonNull JSONObject o) {
         try {
-            if (o.has("instruccion") && o.getString("instruccion").startsWith("#")) {
+            if (!o.has("respuesta") && o.has("instruccion") && o.getString("instruccion").startsWith("#") ) {
                 socketManager.sendCommand(o.getString("instruccion"), new Handler(Looper.getMainLooper()){
                     @Override
                     public void handleMessage(@NonNull android.os.Message msg) {
                         super.handleMessage(msg);
                         String key = msg.getData().getString("key");
                         String value = msg.getData().getString("value");
-                        Log.d("CASHLOGY", "key: " + key + " value: " + value);
                         assert key != null;
                         if (key.equals("CASHLOGY_RESPONSE")) {
                             try {
                                 assert value != null;
                                 JSONObject res = new JSONObject();
                                 res.put("respuesta", value);
+                                res.put("instruccion", o.getString("instruccion"));
                                 ws.sendMessage(res.toString());
                             }catch (Exception e){
                                 Log.e("CASHLOGY", "Error al procesar respuesta: " + e.getMessage());

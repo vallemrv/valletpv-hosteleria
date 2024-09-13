@@ -74,7 +74,7 @@ class WSClient(
 
     private fun calculateReconnectDelay(): Long {
         // Calcula el retraso con base en el número de intentos, sin superar el máximo
-        val delay = (maxReconnectDelay.coerceAtMost((1000L * reconnectAttempts)))
+        val delay = (maxReconnectDelay.coerceAtMost((30000L * reconnectAttempts)))
         return delay.coerceAtMost(maxReconnectDelay)
     }
 
@@ -94,4 +94,6 @@ class WSClient(
         close() // Cierra la conexión WebSocket
         println("Reconnection stopped and WebSocket closed")
     }
+
+
 }

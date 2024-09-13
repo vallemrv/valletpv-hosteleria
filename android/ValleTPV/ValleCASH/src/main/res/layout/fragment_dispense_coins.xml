@@ -4,6 +4,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <TextView
+            android:text="Total: 0.00 €"
+            android:textSize="20sp"
+            android:padding="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/total_text_view" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="20sp"
+            android:gravity="end"
+            android:text="Devolucion: 0.0€"
+            android:id="@+id/devolucion_text_view" />
+    </LinearLayout>
+    <!-- ProgressBar para mostrar el estado de carga -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center" />
+
 
     <!-- RecyclerView para mostrar la lista de denominaciones -->
     <androidx.recyclerview.widget.RecyclerView

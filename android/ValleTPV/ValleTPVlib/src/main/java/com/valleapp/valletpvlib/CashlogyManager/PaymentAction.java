@@ -5,6 +5,8 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import java.util.Locale;
+
 public class PaymentAction extends CashlogyAction {
 
     double amountToCollect;
@@ -17,13 +19,13 @@ public class PaymentAction extends CashlogyAction {
 
     public PaymentAction(CashlogySocketManager socketManager, double amountToCollect) {
         super(socketManager);
-        this.amountToCollect = amountToCollect;
-        this.admittedAmount = 0;
+        this.amountToCollect = Double.parseDouble(String.format(Locale.getDefault(), "%.2f", amountToCollect));
+        this.admittedAmount = 0.0;
     }
 
     @Override
     public void execute() {
-        admittedAmount = 0;
+        admittedAmount = 0.0;
         isAceptar = true;
         isWaitingForFinalQ = false;
         esBloqueado = false;
@@ -86,11 +88,11 @@ public class PaymentAction extends CashlogyAction {
     private void sendPCammand() {
         if (!isPCommandSent) {
             isPCommandSent = true;
-            int importeADevolver;
+            int importeADevolver ;
             if (!isCancel){
-                importeADevolver = (int) Math.floor((admittedAmount - amountToCollect) * 100);
+                importeADevolver = (int) Math.round((admittedAmount - amountToCollect) * 100);
             } else {
-                importeADevolver = (int) Math.floor(admittedAmount * 100);
+                importeADevolver = (int) Math.round(admittedAmount * 100);
             }
 
             if (importeADevolver > 0) {
@@ -104,7 +106,7 @@ public class PaymentAction extends CashlogyAction {
                         @Override
                         public void handleMessage(@NonNull android.os.Message msg) {
                             if (!isCancel) {
-                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado sin errores.");
+                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro cancelado sin errores.");
                             } else {
                                 socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro cancelado sin errores.");
                             }
@@ -137,7 +139,9 @@ public class PaymentAction extends CashlogyAction {
     }
 
     public boolean sePuedeCobrar() {
-        double cambio = admittedAmount - amountToCollect;
+        double cambio = Double.parseDouble(
+                String.format(Locale.getDefault(),
+                        "%.2f",admittedAmount - amountToCollect));
         return cambio >= 0;
     }
 }

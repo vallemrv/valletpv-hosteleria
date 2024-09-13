@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction;
 import com.valleapp.valletpvlib.ServicioCom;
@@ -42,6 +44,7 @@ public class ArqueoCashlogyActivity extends Activity {
     String server;
     double stacke;
     double cambio_real;
+
 
     ServicioCom myServicio;
 
@@ -200,13 +203,13 @@ public class ArqueoCashlogyActivity extends Activity {
 
     private void actualizarEfectivoEnServidor() {
         ContentValues p = new ContentValues();
-        p.put("cambio", String.valueOf(cambio));
-        p.put("stacke", String.valueOf(arqueoAction.getTotalAlmacenes()));
-        p.put("cambio_real", String.valueOf(arqueoAction.getTotalRecicladores()));
+        p.put("cambio", String.format(Locale.getDefault(), "%.2f", cambio));
+        p.put("stacke", String.format(Locale.getDefault(), "%.2f", arqueoAction.getTotalAlmacenes()));
+        p.put("cambio_real", String.format(Locale.getDefault(), "%.2f", arqueoAction.getTotalRecicladores()));
 
         new HTTPRequest(server + "/arqueos/setcambio", p, "updateCash", new Handler(Looper.getMainLooper()) {
             @Override
-            public void handleMessage(Message msg) {
+            public void handleMessage(@NonNull Message msg) {
                 String updateResponse = msg.getData().getString("RESPONSE");
                 if ("success".equals(updateResponse)) {
                     arqueoAction.cashLogyCerrado();

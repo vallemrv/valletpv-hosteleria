@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:paddingTop="100sp"
+    >
 
-    <!-- Incluir la barra de herramientas desde app_bar_valle_cash -->
-    <include
-        layout="@layout/app_bar_valle_cash" />
 
     <!-- Contenido de la actividad de configuraciones -->
     <LinearLayout
