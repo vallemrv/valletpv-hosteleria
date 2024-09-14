@@ -155,7 +155,7 @@ class DenominationViewModel : ViewModel() {
             // Solo incluir billetes de 500, 1000, 2000 sin decimales
             if (valueInCents == 500 || valueInCents == 1000 || valueInCents == 2000) {
                 val denominationDescription = "${valueInCents / 100}"
-                total += ((valueInCents * quantityValue)  / 100)
+                total += valueInCents * quantityValue
                 denominationsList.add(Denomination(denominationDescription, quantityValue, 0))
             }
         }
@@ -174,14 +174,14 @@ class DenominationViewModel : ViewModel() {
                 100, 200 -> "${valueInCents / 100}" // 1€, 2€,  sin decimales
                 else -> String.format(Locale.getDefault(), "%.2f", valueInCents / 100.0) // Otras monedas con dos decimales
             }
-            total += ((valueInCents * quantityValue)  / 100)
+            total += valueInCents * quantityValue
             // Añadir a la lista de denominaciones
             denominationsList.add(Denomination(denominationDescription, quantityValue, 0))
         }
 
         // Actualizar las denominaciones con la lista procesada
         _denominations.value = denominationsList
-        _totalRecicladores.value = total
+        _totalRecicladores.value = total / 100
     }
 
 

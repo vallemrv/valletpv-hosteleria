@@ -41,7 +41,7 @@
             android:contentDescription="Dispensar cambio"
             android:scaleType="centerInside"
             android:layout_gravity="end"
-            android:src="@drawable/cambio"
+            android:src="@drawable/insertar_camibo_mano"
             app:tint="@color/white" />
     </LinearLayout>
 
@@ -78,7 +78,7 @@
             android:layout_gravity="end"
 
             android:scaleType="centerInside"
-            android:src="@drawable/monedas"
+            android:src="@drawable/almacenes"
             app:tint="@color/white" />
     </LinearLayout>
 

@@ -40,7 +40,7 @@ class ValleCASH : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_modified_coins, R.id.nav_dispense_coins
+                R.id.nav_home, R.id.nav_change_cambio, R.id.nav_dispense_coins
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -60,13 +60,22 @@ class ValleCASH : AppCompatActivity() {
                     navController.navigate(R.id.nav_dispense_coins, bundle)
                 }
 
+                R.id.nav_change_cambio -> {
+                    // Crear un Bundle con los datos que quieres pasar
+                    val bundle = Bundle().apply {
+                        putString("server", serverURL)
+                    }
+
+                    // Navegar al fragmento con el Bundle
+                    navController.navigate(R.id.nav_change_cambio, bundle)
+                }
+
                 R.id.nav_home -> {
                     // Navegar a Home
                     navController.navigate(R.id.nav_home)
                 }
             }
 
-            // Cerrar el Drawer después de la selección
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }

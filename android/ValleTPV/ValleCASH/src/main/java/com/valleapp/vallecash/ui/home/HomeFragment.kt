@@ -81,7 +81,7 @@ class HomeFragment : Fragment() {
         // Observar el total dispensado y actualizar la UI
         viewModel.totalDispensado.observe(viewLifecycleOwner) { total ->
             // Actualizar UI, por ejemplo:
-            textViewTotalDispensado.text = String.format(Locale.getDefault(),"Total Almacén: %.2f €", total)
+            textViewTotalDispensado.text = String.format(Locale.getDefault(),"Total Cambio: %.2f €", total)
         }
 
         // Observar el total del almacén y actualizar la UI
@@ -96,12 +96,13 @@ class HomeFragment : Fragment() {
 
         btnDispensarCambio.setOnClickListener {
             // Navegar al Fragmento de "Dispensar Cambio"
+            // Crear un Bundle con los datos que quieres pasar
             navController.navigate(R.id.nav_dispense_coins)
         }
 
         btnModificarCambio.setOnClickListener {
             // Navegar al Fragmento de "Modificar Cambio"
-            navController.navigate(R.id.nav_modified_coins)
+            navController.navigate(R.id.nav_change_cambio)
         }
     }
 
