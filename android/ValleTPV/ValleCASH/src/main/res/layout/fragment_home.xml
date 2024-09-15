@@ -70,7 +70,7 @@
             android:layout_weight="0.8" />
 
         <ImageButton
-            android:id="@+id/button_modificar_cambio"
+            android:id="@+id/buttton_retirar_camion"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="?android:attr/selectableItemBackground"

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -75,7 +73,7 @@ class HomeFragment : Fragment() {
         // Obtener referencias a los TextViews
         val textViewTotalDispensado = view.findViewById<TextView>(R.id.text_total_cambio)
         val textViewTotalAlmacen = view.findViewById<TextView>(R.id.text_total_almacen)
-        val btnModificarCambio = view.findViewById<ImageButton>(R.id.button_modificar_cambio)
+        val btnModificarCambio = view.findViewById<ImageButton>(R.id.buttton_retirar_camion)
         val btnDispensarCambio = view.findViewById<ImageButton>(R.id.button_dispense_cambio)
 
         // Observar el total dispensado y actualizar la UI
