@@ -84,7 +84,7 @@ def sync_devices(request):
     app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
     reg = json.loads(request.POST["reg"])
-    print(tb_name)
+    
     # Obtener el modelo usando apps.get_model
     model = apps.get_model(app_name, tb_name)
     result = []
