@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: HomeViewModel
-    private var isReceiverRegistered = false // Flag para verificar si el receptor está registrado
+    private var isReceiverRegistered = false
 
 
     private val webSocketReceiver = object : BroadcastReceiver() {
@@ -46,6 +46,9 @@ class HomeFragment : Fragment() {
                             // Procesar la cadena con formato #a#b#c#
                             procesarTCadena(it)
                         }
+                        instruction.contains("sincronizar") -> {
+                            sendInstructionToWebSocket("#T#")
+                        }
 
                     }
                 }
@@ -62,7 +65,7 @@ class HomeFragment : Fragment() {
         val navController = findNavController()
 
         // Inicializar el ViewModel correctamente dentro de onViewCreated
-        viewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         // Registrar el receptor solo una vez y marcarlo como registrado
         if (!isReceiverRegistered) {
@@ -71,15 +74,13 @@ class HomeFragment : Fragment() {
             isReceiverRegistered = true
         }
         // Obtener referencias a los TextViews
-        val textViewTotalDispensado = view.findViewById<TextView>(R.id.text_total_cambio)
-        val textViewTotalAlmacen = view.findViewById<TextView>(R.id.text_total_almacen)
-        val btnModificarCambio = view.findViewById<ImageButton>(R.id.buttton_retirar_camion)
-        val btnDispensarCambio = view.findViewById<ImageButton>(R.id.button_dispense_cambio)
+        val textViewTotalRecicladores = view.findViewById<TextView>(R.id.text_total_recicladores)
+        val textViewTotalAlmacen = view.findViewById<TextView>(R.id.text_total_stacker)
 
         // Observar el total dispensado y actualizar la UI
-        viewModel.totalDispensado.observe(viewLifecycleOwner) { total ->
+        viewModel.totalRecicladores.observe(viewLifecycleOwner) { total ->
             // Actualizar UI, por ejemplo:
-            textViewTotalDispensado.text = String.format(Locale.getDefault(),"Total Cambio: %.2f €", total)
+            textViewTotalRecicladores.text = String.format(Locale.getDefault(),"Total Cambio: %.2f €", total)
         }
 
         // Observar el total del almacén y actualizar la UI
@@ -88,20 +89,6 @@ class HomeFragment : Fragment() {
             textViewTotalAlmacen.text = String.format(Locale.getDefault(),"Total Almacén: %.2f €", total)
         }
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            sendInstructionToWebSocket("#T#")
-        }, 1000) // Espera 1 segundo antes de enviar la instrucción
-
-        btnDispensarCambio.setOnClickListener {
-            // Navegar al Fragmento de "Dispensar Cambio"
-            // Crear un Bundle con los datos que quieres pasar
-            navController.navigate(R.id.nav_dispense_coins)
-        }
-
-        btnModificarCambio.setOnClickListener {
-            // Navegar al Fragmento de "Modificar Cambio"
-            navController.navigate(R.id.nav_change_cambio)
-        }
     }
 
     // Método para enviar la instrucción al WebSocketService
@@ -127,7 +114,6 @@ class HomeFragment : Fragment() {
     private fun procesarTCadena(message: String) {
         // Dividir la cadena por "#" para extraer los elementos a, b, c
         val parts = message.split("#")
-
         if (parts.size >= 4) {
             val errorCode = parts[1]  // a: Código de error (puedes manejar esto según sea necesario)
             if (errorCode.startsWith("#ER")) return
@@ -136,7 +122,7 @@ class HomeFragment : Fragment() {
 
             // Verificar que los valores no sean nulos antes de actualizar el ViewModel
             totalRecicladores?.let {
-                viewModel.setTotalDispensado(it/100) // Actualiza total dispensado
+                viewModel.setTotalRecicladores(it/100) // Actualiza total dispensado
             }
 
             totalAlmacen?.let {
@@ -150,12 +136,12 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Solo anular el registro si el receptor está registrado
         if (isReceiverRegistered) {
             LocalBroadcastManager.getInstance(requireContext())
                 .unregisterReceiver(webSocketReceiver)
             isReceiverRegistered = false
         }
         _binding = null
+        println("onDestroyView home")
     }
 }

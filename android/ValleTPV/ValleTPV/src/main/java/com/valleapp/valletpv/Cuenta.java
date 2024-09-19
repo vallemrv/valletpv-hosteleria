@@ -33,6 +33,7 @@ import androidx.annotation.NonNull;
 
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpvlib.db.DBCuenta;
 import com.valleapp.valletpvlib.db.DBMesas;
@@ -47,7 +48,7 @@ import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
 import com.valleapp.valletpv.interfaces.IControladorCuenta;
 import com.valleapp.valletpvlib.tools.JSON;
-import com.valleapp.valletpvlib.ServicioCom;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,7 +88,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     final long autoCancel = 10000;
 
-    ServicioCom myServicio;
+    ServiceCOM myServicio;
 
     final Context cx = this;
 
@@ -98,7 +99,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             try {
-                myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+                myServicio = ((ServiceCOM.MyBinder) iBinder).getService();
                 myServicio.setExHandler("lineaspedido", handlerHttp);
                 myServicio.setExHandler("teclas", handlerSeccionesTeclas);
                 myServicio.setExHandler("secciones", handlerSeccionesTeclas);
@@ -182,11 +183,11 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     if (datos.getBoolean("soniguales")){
                         return;
                     }
-                    synchronized (dbCuenta) {
+
                         JSONArray reg = datos.getJSONArray("reg");
                         dbCuenta.replaceMesa(reg, mesa.getString("ID"));
                         rellenarTicket();
-                   }
+
                 }else{
                     if (can_refresh) rellenarTicket();
                 }
@@ -288,7 +289,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 ContentValues p = new ContentValues();
                 p.put("reg", dbCuenta.filter("IDMesa=" + mesa.getString("ID")).toString());
                 p.put("idm", mesa.getString("ID"));
-                myServicio.get_cuenta(handlerHttp, p);
+                myServicio.getCuenta(handlerHttp, p);
             } catch (JSONException e) {
                 Log.e("ERROR_CUENTA", "Error al cargar la cuenta");
             }
@@ -429,7 +430,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     @SuppressLint("DefaultLocale")
     private void rellenarTicket() {
         try {
-            synchronized (dbCuenta) {
+
                 resetCantidad();
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
                 totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
@@ -450,7 +451,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 ListView lst = findViewById(R.id.lstCamareros);
                 l.setText(String.format("%01.2f €", totalMesa));
                 lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineas, this));
-            }
+
 
         } catch (JSONException e) {
             Log.e("ERROR_CUENTA", e.toString());
@@ -508,6 +509,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     public void abrirCajon(View v){
         setEstadoAutoFinish(true,false);
         DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+        assert dbCamareros != null;
         if(!dbCamareros.getConPermiso("abrir_cajon").isEmpty()) {
             try {
                 JSONObject p = new JSONObject();
@@ -711,7 +713,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                  }, 5000, autoCancel);
              }
 
-            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
             intent.putExtra("url", server);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
             findViewById(R.id.loading).setVisibility(View.GONE);
@@ -770,6 +772,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dlgCobrar = null;
             }
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            assert dbCamareros != null;
             if(!dbCamareros.getConPermiso("cobrar_ticket").isEmpty()) {
                 JSONObject p = new JSONObject();
                 p.put("idm", mesa.getString("ID"));
@@ -927,6 +930,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             reset = true;
             if (myServicio != null){
                 DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+                assert dbCamareros != null;
                 if(!dbCamareros.getConPermiso("borrar_linea").isEmpty()) {
                     JSONObject p = new JSONObject();
                     p.put("idm",  mesa.getString("ID"));
@@ -965,6 +969,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
     private void sendMessageMesaCobrada(Double entrega, double cambio) {
         Handler handlerMesas = myServicio.getExHandler("camareros");
+        assert handlerMesas != null;
         Message msg = handlerMesas.obtainMessage();
         Bundle bundle = msg.getData();
         if (bundle == null) bundle = new Bundle();

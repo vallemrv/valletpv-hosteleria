@@ -4,8 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
 
     <application
         android:allowBackup="true"
@@ -15,10 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ValleTPV"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".ValleCASH"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.ValleTPV.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,18 +29,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="true"
-            android:label="Configuraciones"
-            android:theme="@style/Theme.ValleTPV.NoActionBar">
-
-        </activity>
 
         <service
             android:name=".WebSocketService"
             android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE">
+            android:foregroundServiceType="dataSync"
+            android:permission="andorid.permission.FOREGROUND_SERVICE_DATA_SYNC">
         </service>
 
     </application>

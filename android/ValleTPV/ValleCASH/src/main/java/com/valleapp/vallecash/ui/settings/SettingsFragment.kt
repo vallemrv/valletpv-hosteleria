@@ -3,13 +3,18 @@ package com.valleapp.vallecash.ui.settings
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import com.valleapp.vallecash.R
 import com.valleapp.vallecash.databinding.FragmentSettingsBinding
 import com.valleapp.valletpvlib.tools.JSON
@@ -20,12 +25,12 @@ class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
-
         // Configuración del callback para manejar el botón "Atrás"
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -39,7 +44,18 @@ class SettingsFragment : Fragment() {
 
         val serverAddressInput = binding.root.findViewById<EditText>(R.id.server_address_input)
         val saveButton = binding.root.findViewById<Button>(R.id.save_button)
-        val exitButton = binding.root.findViewById<Button>(R.id.exit_button)
+
+        // Añadir MenuProvider para desactivar el menú
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // No inflar el menú en SettingsFragment
+                menu.clear() // Elimina cualquier menú si lo hubiera
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false // No manejar ninguna acción de menú aquí
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         // Cargar preferencias al iniciar
         val preferencias = cargarPreferencias()
@@ -69,11 +85,6 @@ class SettingsFragment : Fragment() {
             } else {
                 Toast.makeText(context, "Por favor, introduce una dirección válida", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        // Salir del fragmento al hacer clic en "Salir"
-        exitButton.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()  // Ejecutar acción de "atrás"
         }
 
         return binding.root

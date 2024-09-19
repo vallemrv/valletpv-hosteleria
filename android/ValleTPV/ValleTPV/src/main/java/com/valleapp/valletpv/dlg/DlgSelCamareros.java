@@ -2,15 +2,17 @@ package com.valleapp.valletpv.dlg;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
-import com.valleapp.valletpvlib.ServicioCom;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 public class DlgSelCamareros extends Dialog{
 
 
-    private final ServicioCom servicio;
     private final IAutoFinish controlador;
 
 
@@ -35,9 +36,8 @@ public class DlgSelCamareros extends Dialog{
     private ArrayList<JSONObject> autorizados = new ArrayList<>();
 
 
-    public DlgSelCamareros(Context context, ServicioCom servicio, boolean mostrar_add, IAutoFinish controlador) {
+    public DlgSelCamareros(Context context, ServiceCOM servicio, boolean mostrar_add, IAutoFinish controlador) {
         super(context);
-        this.servicio = servicio;
         this.controlador = controlador;
         setContentView(R.layout.seleccionar_camareros);
 
@@ -60,11 +60,12 @@ public class DlgSelCamareros extends Dialog{
                 obj.put("autorizado", "1");
                 servicio.autorizarCam(obj);
                 DBCamareros db = (DBCamareros) servicio.getDb("camareros");
+                assert db != null;
                 db.setAutorizado(obj.getInt("ID"), true);
                 lstautorizados.setAdapter(new AdaptadorSelCam(getContext(), autorizados));
                 lsnoautorizados.setAdapter(new AdaptadorSelCam(getContext(), noautorizados));
             } catch (JSONException e) {
-                e.printStackTrace();
+               Log.e("CAMAREROS", e.toString());
             }
 
         });
@@ -79,11 +80,12 @@ public class DlgSelCamareros extends Dialog{
                 obj.put("autorizado", "0");
                 servicio.autorizarCam(obj);
                 DBCamareros db = (DBCamareros) servicio.getDb("camareros");
+                assert db != null;
                 db.setAutorizado(obj.getInt("ID"), false);
                 lstautorizados.setAdapter(new AdaptadorSelCam(getContext(), autorizados));
                 lsnoautorizados.setAdapter(new AdaptadorSelCam(getContext(), noautorizados));
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e("CAMAREROS", e.toString());
             }
 
         });

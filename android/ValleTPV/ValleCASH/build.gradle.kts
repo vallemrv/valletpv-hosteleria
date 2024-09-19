@@ -50,8 +50,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.java.websocket)
     implementation(project(":ValleTPVlib"))
-    implementation(project(":ValleTPVlib"))
-    testImplementation(libs.junit)
+     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

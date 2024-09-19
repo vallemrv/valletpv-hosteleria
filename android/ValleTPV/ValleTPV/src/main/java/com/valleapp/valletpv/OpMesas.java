@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -17,14 +18,17 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCuenta;
 import com.valleapp.valletpvlib.db.DBMesas;
 import com.valleapp.valletpvlib.db.DBZonas;
-import com.valleapp.valletpvlib.ServicioCom;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 
 public class OpMesas extends Activity {
@@ -33,7 +37,7 @@ public class OpMesas extends Activity {
     DBZonas dbZonas= new DBZonas(this);
     DBCuenta dbCuenta = new DBCuenta(this);
 
-    ServicioCom servicioCom;
+    ServiceCOM servicioCom;
 
     String server="";
     JSONObject mesa ;
@@ -46,7 +50,7 @@ public class OpMesas extends Activity {
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            servicioCom = ((ServicioCom.MyBinder)iBinder).getService();
+            servicioCom = ((ServiceCOM.MyBinder)iBinder).getService();
         }
 
         @Override
@@ -91,7 +95,7 @@ public class OpMesas extends Activity {
                             zn = lszonas.getJSONObject(view.getId());
                             rellenarMesas();
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                           Log.e("OPMESAS_ERR_RELLENARZONA", e.toString());
                         }
 
                     });
@@ -105,7 +109,7 @@ public class OpMesas extends Activity {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           Log.e("OPMESAS_ERR_RELLENARZONA", e.toString());
         }
 
     }
@@ -160,7 +164,7 @@ public class OpMesas extends Activity {
                                     finalizar(m1);
                                 }
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                               Log.e("OPMESAS_ERR_RELLENARMESAS", e.toString());
                             }
 
                         });
@@ -175,7 +179,7 @@ public class OpMesas extends Activity {
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           Log.e("OPMESAS_ERR_RELLENARMESAS", e.toString());
         }
 
     }
@@ -210,16 +214,16 @@ public class OpMesas extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_op_mesas);
         cx = this;
-        server = getIntent().getExtras().getString("url");
+        server = Objects.requireNonNull(getIntent().getExtras()).getString("url");
         op = getIntent().getExtras().getString("op");
         try {
-            mesa = new JSONObject(getIntent().getExtras().getString("mesa"));
+            mesa = new JSONObject(Objects.requireNonNull(getIntent().getExtras().getString("mesa")));
             TextView l = findViewById(R.id.lblTitulo);
             String titulo = op.equals("cambiar") ? "Cambiar mesa "+ mesa.getString("Nombre") : "Juntar mesa "+ mesa.getString("Nombre") ;
             l.setText(titulo);
 
         } catch (JSONException e) {
-            e.printStackTrace();
+           Log.e("OPMESAS_ERR_ONCREATE", e.toString());
         }
 
         rellenarZonas();
@@ -227,7 +231,7 @@ public class OpMesas extends Activity {
 
     @Override
     protected void onResume() {
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
         intent.putExtra("url", server);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         super.onResume();

@@ -188,7 +188,7 @@ public class ArqueoAction extends CashlogyAction {
     }
 
     // Manejo de acceso a cambio y stacker
-    public synchronized void setCambioStacker(double cambio) {
+    public synchronized void setFondoCaja(double cambio) {
         this.cambio = cambio;
     }
 

@@ -15,17 +15,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.CashlogyManager.PaymentAction;
-import com.valleapp.valletpvlib.ServicioCom;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.Locale;
 
 public class CobroCashlogyActivity extends Activity {
 
      double totalMesa;
      JSONArray lineas;
-     ServicioCom myServicio;
+     ServiceCOM myServicio;
      PaymentAction paymentAction;
 
      TextView tvTotalCobro;
@@ -37,7 +40,7 @@ public class CobroCashlogyActivity extends Activity {
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+            myServicio = ((ServiceCOM.MyBinder) iBinder).getService();
             iniciarCobro();  // Iniciar el proceso de cobro después de conectar el servicio
         }
 
@@ -71,12 +74,12 @@ public class CobroCashlogyActivity extends Activity {
         btnCancelar = findViewById(R.id.btnSalir);
 
         // Configurar la UI con los datos iniciales
-        tvTotalCobro.setText(String.format("%01.2f €", totalMesa));
-        tvTotalIngresado.setText(String.format(" %01.2f €", 0.0));
-        tvCambio.setText(String.format("%01.2f €", 0.0));
+        tvTotalCobro.setText(String.format(Locale.UK, "%01.2f €", totalMesa));
+        tvTotalIngresado.setText(String.format(Locale.UK," %01.2f €", 0.0));
+        tvCambio.setText(String.format(Locale.UK,"%01.2f €", 0.0));
 
         // Conectar al ServicioCom
-        Intent intent = new Intent(this, ServicioCom.class);
+        Intent intent = new Intent(this, ServiceCOM.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
 
         // Configurar los botones
@@ -103,12 +106,12 @@ public class CobroCashlogyActivity extends Activity {
                           case "CASHLOGY_IMPORTE_ADMITIDO":
                             // Actualizar el TextView para el importe admitido
                             double importeAdmitido = Double.parseDouble(value);
-                            tvTotalIngresado.setText(String.format("%01.2f €", (importeAdmitido)));
+                            tvTotalIngresado.setText(String.format(Locale.UK,"%01.2f €", (importeAdmitido)));
 
                             // Calcular y actualizar el cambio
                             double cambio = importeAdmitido - totalMesa;
                             if (cambio <= 0) cambio =0;
-                            tvCambio.setText(String.format("%01.2f €", cambio));
+                            tvCambio.setText(String.format(Locale.UK,"%01.2f €", cambio));
                             break;
 
 

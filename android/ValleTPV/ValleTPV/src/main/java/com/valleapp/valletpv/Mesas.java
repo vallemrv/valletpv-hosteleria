@@ -29,8 +29,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSettings;
 import com.valleapp.valletpv.cashlogyActivitis.CambioCashlogyActivity;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpvlib.db.DBCuenta;
 import com.valleapp.valletpvlib.db.DBMesas;
@@ -41,7 +44,6 @@ import com.valleapp.valletpv.dlg.DlgSelCamareros;
 import com.valleapp.valletpv.interfaces.IAutoFinish;
 import com.valleapp.valletpv.interfaces.IControlMensajes;
 import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
-import com.valleapp.valletpvlib.ServicioCom;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,8 +51,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 
 public class Mesas extends Activity implements IAutoFinish, IControladorAutorizaciones, IControlMensajes {
@@ -76,21 +81,19 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
     AdaptadorSettings adaptadorSettings;
     ListView lista_setting;
-    ServicioCom myServicio;
+    ServiceCOM myServicio;
 
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null){
-                myServicio.setExHandler("mesas", handleHttp);
-                myServicio.setExHandler("mesasabiertas", handleHttp);
-                dbMesas = (DBMesas) myServicio.getDb("mesas");
-                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
-                dbZonas = (DBZonas) myServicio.getDb("zonas");
-                zn = myServicio.getZona();
-                rellenarZonas();
-            }
+            myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
+            myServicio.setExHandler("mesas", handleHttp);
+            myServicio.setExHandler("mesasabiertas", handleHttp);
+            dbMesas = (DBMesas) myServicio.getDb("mesas");
+            dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
+            dbZonas = (DBZonas) myServicio.getDb("zonas");
+            zn = myServicio.getZona();
+            rellenarZonas();
         }
 
         @Override
@@ -103,7 +106,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     @SuppressLint("HandlerLeak")
     private final Handler handleHttp = new Handler(Looper.getMainLooper()){
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage(@NonNull Message msg) {
             try {
                 String op = msg.getData().getString("op");
                 if (op == null) {
@@ -133,7 +136,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                     }
                 }
             }catch (Exception e){
-                e.printStackTrace();
+               Log.e("MESAS_ERR", e.toString());
             }
         }
     };
@@ -180,7 +183,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           Log.e("MESAS_ERR", e.toString());
         }
 
     }
@@ -259,7 +262,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+           Log.e("MESAS_ERR", e.toString());
         }
 
     }
@@ -277,6 +280,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             stop = true; //paramos contador
             final DlgSelCamareros sel_cam = new DlgSelCamareros(cx, myServicio, false, this);
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            assert dbCamareros != null;
             sel_cam.setNoautorizados(dbCamareros.getAutorizados(false));
             sel_cam.setAutorizados(dbCamareros.getAutorizados(true));
             sel_cam.setTitle("Elegir camareros");
@@ -323,6 +327,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         dlgListadoTicket.setContentView(R.layout.listado_ticket);
         dlgListadoTicket.setTitle("Lista de ticket");
         Window window = dlgListadoTicket.getWindow();
+        assert window != null;
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         final ImageButton imp = dlgListadoTicket.findViewById(R.id.btnImprimir);
         final ImageButton impFactura = dlgListadoTicket.findViewById(R.id.btnImprimirFactura);
@@ -366,19 +371,21 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         try {
             setEstadoAutoFinish(true, true);
             DlgMensajes dlg = new DlgMensajes(cx, this);
-            dlg.setOnCancelListener(param -> {
-                setEstadoAutoFinish(true, false);
-            });
+            dlg.setOnCancelListener(param -> setEstadoAutoFinish(true, false));
             dlg.show();
-            DBCamareros db = new DBCamareros(cx);
-            List<JSONObject> lista = db.getAutorizados(true);
-            JSONObject o = new JSONObject();
-            o.put("ID", -1);
-            o.put("Nombre", "PARA TODOS");
-            lista.add(o);
-            dlg.mostrarReceptores(lista);
+            try (DBCamareros db = new DBCamareros(cx)) {
+                List<JSONObject> lista = db.getAutorizados(true);
+                JSONObject o = new JSONObject();
+                o.put("ID", UUID.randomUUID().toString());
+                o.put("Nombre", "PARA TODOS");
+                lista.add(o);
+                dlg.mostrarReceptores(lista);
+            } catch (Exception e) {
+                // Manejar la excepción
+               Log.e("MESAS_ERR", e.toString());
+            }
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
     }
 
@@ -421,7 +428,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }
         }
       }catch (Exception e){
-        e.printStackTrace();
+       Log.e("MESAS_ERR", e.toString());
       }
 
     }
@@ -474,7 +481,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }
 
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
 
     }
@@ -499,6 +506,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             // Si no usa Cashlogy, proceder con la lógica actual
             assert myServicio != null;
             DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            assert dbCamareros != null;
             if (!dbCamareros.getConPermiso("abrir_cajon").isEmpty()) {
                 try {
                     JSONObject p = new JSONObject();
@@ -571,7 +579,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                         final String idm = m.getString("ID");
                         borrarMesa(idm, motivo.getText().toString());
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.e("MESAS_ERR", e.toString());
                     }
                 }
             });
@@ -581,7 +589,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                     dlg.cancel();
                     borrarMesa(m.getString("ID"), error.getText().toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                   Log.e("MESAS_ERR", e.toString());
                 }
              });
 
@@ -590,7 +598,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                     dlg.cancel();
                     borrarMesa(m.getString("ID"), simpa.getText().toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                   Log.e("MESAS_ERR", e.toString());
                 }
             });
 
@@ -600,7 +608,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
                     dlg.cancel();
                     borrarMesa(m.getString("ID"), inv.getText().toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e("MESAS_ERR", e.toString());
                 }
             });
 
@@ -613,9 +621,11 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mesas);
         try {
-            cam = new JSONObject(getIntent().getStringExtra("cam"));
+            cam = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("cam")));
             TextView title = findViewById(R.id.lblTitulo);
-            title.setText(cam.getString("nombre")+" "+cam.getString("apellidos"));
+            String nombre = String.format(Locale.getDefault(), "%s %s",
+                    cam.getString("nombre"), cam.getString("apellidos"));
+            title.setText(nombre);
         } catch (JSONException e) {
             Log.e("MESAS_ERR", e.toString());
         }
@@ -649,7 +659,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
     @Override
     protected void onResume() {
         stop = false;
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         if (dbZonas != null) {
             rellenarZonas();
@@ -685,7 +695,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             p.put("autor", cam.getString("Nombre"));
             myServicio.sendMensaje(p);
         }catch (Exception e){
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
     }
 
@@ -695,7 +705,8 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
 
             if (myServicio != null){
                 DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                if(dbCamareros.getConPermiso("borrar_mesa").size() > 0) {
+                assert dbCamareros != null;
+                if(!dbCamareros.getConPermiso("borrar_mesa").isEmpty()) {
                     JSONObject p = new JSONObject();
                     p.put("motivo", motivo);
                     p.put("idm", idm);
@@ -717,7 +728,7 @@ public class Mesas extends Activity implements IAutoFinish, IControladorAutoriza
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("MESAS_ERR", e.toString());
         }
     }
 

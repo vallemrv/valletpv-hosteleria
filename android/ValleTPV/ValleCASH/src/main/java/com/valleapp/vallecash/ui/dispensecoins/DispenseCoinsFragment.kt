@@ -6,16 +6,20 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.Lifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.valleapp.vallecash.R
@@ -58,6 +62,29 @@ class DispenseCoinsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDispenseCoinsBinding.inflate(inflater, container, false)
+        // Configuración del callback para manejar el botón "Atrás"
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Aquí puedes realizar alguna acción antes de volver atrás
+                    activity?.supportFragmentManager?.popBackStack()  // Volver al fragment anterior
+                }
+            }
+        )
+
+        // Añadir MenuProvider para desactivar el menú
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // No inflar el menú en SettingsFragment
+                menu.clear() // Elimina cualquier menú si lo hubiera
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return false // No manejar ninguna acción de menú aquí
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         return binding.root
     }
 
@@ -110,22 +137,22 @@ class DispenseCoinsFragment : Fragment() {
         // Acceder a los botones usando view.findViewById()
         val buttonDispenseSelected = view.findViewById<Button>(R.id.button_dispense_selected)
         val buttonRefresh = view.findViewById<Button>(R.id.button_refresh)
-        val buttonExit = view.findViewById<Button>(R.id.button_exit)
+
 
 
         // Configurar el RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // Observar las denominaciones en el ViewModel
-        viewModel.denominations.observe(viewLifecycleOwner, Observer { denominations ->
+        viewModel.denominations.observe(viewLifecycleOwner) { denominations ->
             val adapter = DenominationAdapter(denominations) { denomination, amount ->
                 viewModel.updateAmount(denomination, amount) // Actualizar las cantidades en el ViewModel
             }
             recyclerView.adapter = adapter
-        })
+        }
 
         // Observar los cambios en el resultado de la actualización
-        viewModel.updateResult.observe(viewLifecycleOwner) { success ->
+        viewModel.updateResult.observe(viewLifecycleOwner) { _ ->
            sendInstructionToWebSocket("#Y#")
         }
 
@@ -137,12 +164,10 @@ class DispenseCoinsFragment : Fragment() {
             if (isOcupado) {
                 progressBar.visibility = View.VISIBLE // Muestra el ProgressBar
                 buttonRefresh.isEnabled = false
-                buttonExit.isEnabled = false
                 buttonDispenseSelected.isEnabled = false
             } else {
                 progressBar.visibility = View.GONE // Oculta el ProgressBar
                 buttonRefresh.isEnabled = true
-                buttonExit.isEnabled = true
                 buttonDispenseSelected.isEnabled = true
             }
         }
@@ -185,12 +210,6 @@ class DispenseCoinsFragment : Fragment() {
 
         }
 
-        // Configurar el botón "Salir"
-        buttonExit.setOnClickListener {
-            // Navegar de vuelta al HomeFragment usando NavController
-            val navController = findNavController()
-            navController.popBackStack()
-        }
     }
 
 

@@ -27,8 +27,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCamareros;
-import com.valleapp.valletpvlib.ServicioCom;
 import com.valleapp.valletpv.tools.ToastShowInfoCuenta;
 
 import org.json.JSONArray;
@@ -43,7 +43,7 @@ public class Camareros extends Activity {
 
     JSONArray lscam = null;
     JSONObject cam_sel = null;
-    ServicioCom myServicio;
+    ServiceCOM myServicio;
 
     DBCamareros dbCamareros;
 
@@ -161,7 +161,7 @@ public class Camareros extends Activity {
     @Override
     protected void onResume() {
         presBack = 0;
-        Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+        Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         if (myServicio != null){
             rellenarCamareros();
@@ -178,12 +178,10 @@ public class Camareros extends Activity {
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null){
-                myServicio.setExHandler("camareros", handleHttp);
-                dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                rellenarCamareros();
-            }
+            myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
+            myServicio.setExHandler("camareros", handleHttp);
+            dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            rellenarCamareros();
 
         }
 

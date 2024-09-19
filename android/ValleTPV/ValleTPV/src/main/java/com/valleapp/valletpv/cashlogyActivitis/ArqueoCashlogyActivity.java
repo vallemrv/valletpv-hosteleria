@@ -19,10 +19,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction;
-import com.valleapp.valletpvlib.ServicioCom;
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
-import com.valleapp.valletpvlib.db.DBCamareros;
+
 
 
 import org.json.JSONArray;
@@ -46,17 +46,14 @@ public class ArqueoCashlogyActivity extends Activity {
     double cambio_real;
 
 
-    ServicioCom myServicio;
+    ServiceCOM myServicio;
 
 
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null){
-                inicializarCashlogyManager();
-            }
-
+            myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
+            inicializarCashlogyManager();
         }
 
         @Override
@@ -91,7 +88,7 @@ public class ArqueoCashlogyActivity extends Activity {
             mostrarMensaje("No se puede realizar el arqueo porque no hay ticket de cierre.");
             btnArquearCaja.setVisibility(View.GONE);
         }else{
-            Intent intent_service = new Intent(getApplicationContext(), ServicioCom.class);
+            Intent intent_service = new Intent(getApplicationContext(), ServiceCOM.class);
             bindService(intent_service, mConexion, Context.BIND_AUTO_CREATE);
 
         }
@@ -145,7 +142,7 @@ public class ArqueoCashlogyActivity extends Activity {
             objEfectivo.put(obj);
 
         } catch (JSONException e) {
-            e.printStackTrace();
+           Log.e("ArqueoCashlogyActivity", e.toString());
         }
 
         // Paso 3: Crear ContentValues para enviar los datos al servidor
@@ -161,7 +158,7 @@ public class ArqueoCashlogyActivity extends Activity {
         // Enviar la solicitud al servidor para cerrar el arqueo
         new HTTPRequest(server + "/arqueos/arquear", p, "arqueo", new Handler(Looper.getMainLooper()) {
             @Override
-            public void handleMessage(Message msg) {
+            public void handleMessage(@NonNull Message msg) {
                 String response = msg.getData().getString("RESPONSE");
                 if ("success".equals(response)) {
                     arqueoAction.cerrarCashlogy();

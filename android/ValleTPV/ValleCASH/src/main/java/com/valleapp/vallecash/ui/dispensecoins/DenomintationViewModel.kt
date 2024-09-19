@@ -73,9 +73,9 @@ class DenominationViewModel : ViewModel() {
 
         val p = ContentValues()
 
-        p.put("cambio",String.format(Locale.getDefault(),"%.2f", _cambio.value) )
-        p.put("stacke", String.format(Locale.getDefault(),"%.2f", almacenes))
-        p.put("cambio_real", String.format(Locale.getDefault(),"%.2f", nuevo_cambio_real))
+        p.put("cambio",String.format(Locale.US,"%.2f", _cambio.value) )
+        p.put("stacke", String.format(Locale.US,"%.2f", almacenes))
+        p.put("cambio_real", String.format(Locale.US,"%.2f", nuevo_cambio_real))
 
         val url = "$server/arqueos/setcambio"
         val handler = Handler(Looper.getMainLooper()) {
@@ -172,7 +172,7 @@ class DenominationViewModel : ViewModel() {
             // Quitar los decimales para monedas de 1 €, 2 €, y 20 €
             val denominationDescription = when (valueInCents) {
                 100, 200 -> "${valueInCents / 100}" // 1€, 2€,  sin decimales
-                else -> String.format(Locale.getDefault(), "%.2f", valueInCents / 100.0) // Otras monedas con dos decimales
+                else -> String.format(Locale.US, "%.2f", valueInCents / 100.0) // Otras monedas con dos decimales
             }
             total += valueInCents * quantityValue
             // Añadir a la lista de denominaciones

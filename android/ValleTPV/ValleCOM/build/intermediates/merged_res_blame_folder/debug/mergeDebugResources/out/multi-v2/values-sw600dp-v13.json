@@ -4,7 +4,17 @@
             "outputFile": "com.valleapp.vallecom.ValleCOM-mergeDebugResources-15:/values-sw600dp-v13/values-sw600dp-v13.xml",
             "map": [
                 {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/69d7e73a7756a763db093bfac4c0225c/transformed/design-28.0.0/res/values-sw600dp-v13/values-sw600dp-v13.xml",
+                    "source": "/Users/valle/.gradle/caches/transforms-4/bba75e5b5e99829dc8ba643774b806f1/transformed/appcompat-v7-28.0.0/res/values-sw600dp-v13/values-sw600dp-v13.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,124,193,263,337,413,472,543",
+                        "endColumns": "68,68,69,73,75,58,70,67",
+                        "endOffsets": "119,188,258,332,408,467,538,606"
+                    }
+                },
+                {
+                    "source": "/Users/valle/.gradle/caches/transforms-4/5bd37fa1d2b1849a4e02c083c89c2367/transformed/design-28.0.0/res/values-sw600dp-v13/values-sw600dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,10,11,12",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
@@ -20,16 +30,6 @@
                         "endLines": "10,11,12,13,14,15,17,18,19,23",
                         "endColumns": "59,69,70,71,57,57,10,63,62,10",
                         "endOffsets": "666,736,807,879,937,995,1104,1168,1231,1403"
-                    }
-                },
-                {
-                    "source": "/Users/valle/.gradle/caches/transforms-4/2c037681df4839208fe02d0bb600c196/transformed/appcompat-v7-28.0.0/res/values-sw600dp-v13/values-sw600dp-v13.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,124,193,263,337,413,472,543",
-                        "endColumns": "68,68,69,73,75,58,70,67",
-                        "endOffsets": "119,188,258,332,408,467,538,606"
                     }
                 }
             ]

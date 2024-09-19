@@ -9,16 +9,21 @@
         android:id="@+id/nav_home"
         android:name="com.valleapp.vallecash.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <argument
+            android:name="server"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_change_cambio"
         android:name="com.valleapp.vallecash.ui.changecambio.ChangeCambioFragment"
         android:label="Modificar cambio"
-        tools:layout="@layout/fragment_home" />
-    <argument
-        android:name="data"
-        app:argType="string" />
+        tools:layout="@layout/fragment_home" >
+        <argument
+            android:name="server"
+            app:argType="string" />
+    </fragment>
 
 
     <!-- Añadir el SettingsFragment -->
@@ -28,7 +33,7 @@
         android:label="Configuraciones"
         tools:layout="@layout/fragment_settings" >
         <argument
-            android:name="data"
+            android:name="server"
             app:argType="string" />
 
     </fragment>

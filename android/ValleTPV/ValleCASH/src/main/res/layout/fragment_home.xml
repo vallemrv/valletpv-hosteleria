@@ -23,26 +23,16 @@
         <!-- ImageButton para Dispensar Cambio -->
 
         <TextView
-            android:id="@+id/text_total_cambio"
+            android:id="@+id/text_total_recicladores"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.8"
             android:gravity="center_vertical"
-            android:padding="5dp"
+            android:padding="10dp"
             android:text="Total Cambio"
             android:textColor="@color/white"
             android:textSize="18sp"/>
 
-        <ImageButton
-            android:id="@+id/button_dispense_cambio"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Dispensar cambio"
-            android:scaleType="centerInside"
-            android:layout_gravity="end"
-            android:src="@drawable/cambio"
-            app:tint="@color/white" />
     </LinearLayout>
 
     <!-- Contenedor para Total Almacén -->
@@ -59,27 +49,16 @@
         <!-- ImageButton para Modificar Cambio -->
 
         <TextView
-            android:id="@+id/text_total_almacen"
+            android:id="@+id/text_total_stacker"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:text="Total Almacén"
-            android:padding="5dp"
+            android:padding="10dp"
             android:gravity="center_vertical"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:layout_weight="0.8" />
 
-        <ImageButton
-            android:id="@+id/buttton_retirar_camion"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Modificar cambio"
-            android:layout_gravity="end"
-
-            android:scaleType="centerInside"
-            android:src="@drawable/monedas"
-            app:tint="@color/white" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

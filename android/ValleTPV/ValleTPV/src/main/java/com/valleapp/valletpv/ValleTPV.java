@@ -19,7 +19,7 @@ import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
 import com.valleapp.valletpvlib.tools.JSON;
-import com.valleapp.valletpvlib.ServicioCom;
+import com.valleapp.valletpv.tools.ServiceCOM;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +30,7 @@ public class ValleTPV extends Activity {
 
     private String server = "";
 
-    ServicioCom myServicio;
+    ServiceCOM myServicio;
     DBCamareros dbCamareros;
 
     ListView lsnoautorizados;
@@ -128,7 +128,7 @@ public class ValleTPV extends Activity {
             rellenarListas();
         }
         if (server != null && !server.isEmpty() && myServicio == null) {
-            Intent intent = new Intent(getApplicationContext(), ServicioCom.class);
+            Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
             intent.putExtra("url", server);
             intent.putExtra("url_cashlogy", urlCashlogy);  // Agregar URL de Cashlogy
             intent.putExtra("usar_cashlogy", usarCashlogy); // Agregar estado del CheckBox
@@ -143,7 +143,7 @@ public class ValleTPV extends Activity {
     protected void onDestroy() {
         Log.d("TEST", "onDestroy");
         unbindService(mConexion);
-        Intent intent = new Intent(cx, ServicioCom.class);
+        Intent intent = new Intent(cx, ServiceCOM.class);
         stopService(intent);
         super.onDestroy();
     }
@@ -170,15 +170,13 @@ public class ValleTPV extends Activity {
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder)iBinder).getService();
-            if(myServicio!=null){
-                myServicio.setUiHandlerCashlogy(handleHttp);
-                myServicio.setExHandler("camareros", handleHttp);
-                dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                myServicio.executeCaslogy(usarCashlogy, urlCashlogy);
-                myServicio.setExHandler("camareros", handleHttp);
-                rellenarListas();
-            }
+            myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
+            myServicio.setUiHandlerCashlogy(handleHttp);
+            myServicio.setExHandler("camareros", handleHttp);
+            dbCamareros = (DBCamareros) myServicio.getDb("camareros");
+            myServicio.executeCaslogy(usarCashlogy, urlCashlogy);
+            myServicio.setExHandler("camareros", handleHttp);
+            rellenarListas();
         }
 
         @Override

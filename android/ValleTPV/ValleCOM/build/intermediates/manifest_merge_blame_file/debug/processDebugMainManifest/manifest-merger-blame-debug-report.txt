@@ -17,7 +17,7 @@
 14        android:allowBackup="true"
 14-->/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/src/main/AndroidManifest.xml:8:9-35
 15        android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
-15-->[com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/0bd7b323b546d35a7d2496342d1e7d00/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
+15-->[com.android.support:support-compat:28.0.0] /Users/valle/.gradle/caches/transforms-4/6535c2c4e1fa796815a2da4f0bbb4778/transformed/support-compat-28.0.0/AndroidManifest.xml:22:18-91
 16        android:debuggable="true"
 17        android:extractNativeLibs="true"
 18        android:icon="@drawable/ic_icon_com"

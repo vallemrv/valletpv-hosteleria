@@ -31,7 +31,7 @@ import java.util.Queue
 import java.util.Timer
 import java.util.TimerTask
 
-abstract class ServicioCom : Service(), IControllerWS {
+abstract class ServiceComBase : Service(), IControllerWS {
 
     var zona: JSONObject? = null
     private var mesa_abierta: JSONObject? = null

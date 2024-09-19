@@ -1,5 +1,6 @@
 package com.valleapp.valletpv.cashlogyActivitis;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,23 +17,25 @@ import android.widget.Toast;
 
 
 import com.valleapp.valletpv.R;
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.CashlogyManager.ChangeAction;
-import com.valleapp.valletpvlib.ServicioCom;
+
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class CambioCashlogyActivity extends Activity {
 
      TextView tvTotalAdmitido;
-     ServicioCom myServicio;
+     ServiceCOM myServicio;
 
      ChangeAction changeAction;
 
     private boolean mensajeMostrado = false;
 
     // Mapa para asociar denominaciones con sus respectivos botones
-    private Map<Integer, ImageButton> botonDenominacionesMap = new HashMap<>();
+    private final Map<Integer, ImageButton> botonDenominacionesMap = new HashMap<>();
 
 
 
@@ -40,7 +43,7 @@ public class CambioCashlogyActivity extends Activity {
     private final ServiceConnection mConexion = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServicioCom.MyBinder) iBinder).getService();
+            myServicio = ((ServiceCOM.MyBinder) iBinder).getService();
             iniciarAccion();
         }
 
@@ -76,7 +79,7 @@ public class CambioCashlogyActivity extends Activity {
                     case "CASHLOGY_IMPORTE_ADMITIDO":
                         // Actualizar el TextView para el importe admitido
                         double importeAdmitido = Double.parseDouble(value);
-                        tvTotalAdmitido.setText(String.format("%01.2f €", (importeAdmitido)));
+                        tvTotalAdmitido.setText(String.format(Locale.UK,"%01.2f €", (importeAdmitido)));
                         break;
 
                     case "CASHLOGY_CAMBIO":
@@ -108,6 +111,7 @@ public class CambioCashlogyActivity extends Activity {
     }
 
 
+    @SuppressLint("FindViewByIdCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,8 +122,8 @@ public class CambioCashlogyActivity extends Activity {
         ImageButton btnSalir = findViewById(R.id.btnSalir);
 
         // Vincular los botones a las variables y agregarlos al mapa
-        botonDenominacionesMap.put(2000, findViewById(R.id.btnVeinteEuros));    // 20 euros -> 2000 céntimos
-        botonDenominacionesMap.put(1000, findViewById(R.id.btnDiezEuros));      // 10 euros -> 1000 céntimos
+        botonDenominacionesMap.put(2000,  findViewById(R.id.btnVeinteEuros));    // 20 euros -> 2000 céntimos
+        botonDenominacionesMap.put(1000,  findViewById(R.id.btnDiezEuros));      // 10 euros -> 1000 céntimos
         botonDenominacionesMap.put(500, findViewById(R.id.btnCincoEuros));      // 5 euros -> 500 céntimos
         botonDenominacionesMap.put(200, findViewById(R.id.btnDosEuros));        // 2 euros -> 200 céntimos
         botonDenominacionesMap.put(100, findViewById(R.id.btnUnEuro));          // 1 euro -> 100 céntimos
@@ -147,7 +151,7 @@ public class CambioCashlogyActivity extends Activity {
 
 
         // Conectar al ServicioCom
-        Intent intent = new Intent(this, ServicioCom.class);
+        Intent intent = new Intent(this, ServiceCOM.class);
         bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
     }
 

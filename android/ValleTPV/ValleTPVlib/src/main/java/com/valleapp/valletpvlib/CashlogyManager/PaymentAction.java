@@ -13,7 +13,6 @@ public class PaymentAction extends CashlogyAction {
     double admittedAmount;
     boolean isCancel = false;
     boolean isAceptar = true;
-    boolean isWaitingForFinalQ = false;
     boolean esBloqueado = false;
     boolean isPCommandSent = false;
 
@@ -27,22 +26,26 @@ public class PaymentAction extends CashlogyAction {
     public void execute() {
         admittedAmount = 0.0;
         isAceptar = true;
-        isWaitingForFinalQ = false;
         esBloqueado = false;
         isPCommandSent = false;
         sendBCommand();
     }
 
+    @Override
+    public void handleResponse(String command, String response) { }
+
     private void sendBCommand() {
-        socketManager.sendCommand("#B#0#0#0#");
+        socketManager.sendCommand("#B#0#0#0#",
+                new Handler(Looper.getMainLooper()){
+                    @Override
+                    public void handleMessage(@NonNull android.os.Message msg) {
+                        String response = msg.getData().getString("value");
+                        assert response != null;
+                        sendQCommand();
+                    }
+                });
     }
 
-    @Override
-    public void handleResponse(String comando, String response) {
-        if (comando.startsWith("#B")) {
-            sendQCommand();
-        }
-    }
 
     private void sendQCommand() {
         new Handler(Looper.getMainLooper()).postDelayed(() ->
@@ -63,8 +66,6 @@ public class PaymentAction extends CashlogyAction {
                 }
                 if (isAceptar) {
                     sendQCommand();
-                }else if(isWaitingForFinalQ){
-                    sendPCammand();
                 }else{
                     sendJCommand();
                 }
@@ -77,10 +78,21 @@ public class PaymentAction extends CashlogyAction {
                 socketManager.sendCommand("#J#", new Handler(Looper.getMainLooper()){
             @Override
             public void handleMessage(@NonNull android.os.Message msg) {
-                isWaitingForFinalQ = true;
-                sendQCommand();
+                String response = msg.getData().getString("value");
+                assert response != null;
+                String[] parts = response.split("#");
+                if (parts.length >= 3) {
+
+                    double importeRecibido = Double.parseDouble(parts[2]) / 100;
+
+                    if (importeRecibido != admittedAmount) {
+                        admittedAmount = importeRecibido;
+                        socketManager.notifyUI("CASHLOGY_IMPORTE_ADMITIDO", String.valueOf(admittedAmount));
+                    }
+                }
+                sendPCammand();
             }
-        }), 300);  // Esperar 300ms antes de enviar #J#
+        }), 200);  // Esperar 200ms antes de enviar #J#
     }
 
 
@@ -96,9 +108,9 @@ public class PaymentAction extends CashlogyAction {
             }
 
             if (importeADevolver > 0) {
-                final int mostrarPantallaPrimaria = 0;  // Cambia a 1 si necesitas mostrar la pantalla en primer plano
-                final int mostrarPantallaDurantePago = 0;  // Cambia a 1 si necesitas mostrar la pantalla durante el pago
-                final int devolverSoloMonedas = 0;  // Cambia a 1 si solo se deben devolver monedas
+                final int mostrarPantallaPrimaria = 0;
+                final int mostrarPantallaDurantePago = 0;
+                final int devolverSoloMonedas = 0;
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     String comandoP = "#P#" + importeADevolver + "#" + mostrarPantallaPrimaria + "#" + mostrarPantallaDurantePago + "#" + devolverSoloMonedas + "#";
@@ -106,15 +118,15 @@ public class PaymentAction extends CashlogyAction {
                         @Override
                         public void handleMessage(@NonNull android.os.Message msg) {
                             if (!isCancel) {
-                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro cancelado sin errores.");
+                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado..");
                             } else {
-                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro cancelado sin errores.");
+                                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro cancelado.");
                             }
                         }
                     });
                 }, 200);
             } else {
-                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado sin errores.");
+                socketManager.notifyUI("CASHLOGY_COBRO_COMPLETADO", "Cobro completado.");
             }
         }
     }

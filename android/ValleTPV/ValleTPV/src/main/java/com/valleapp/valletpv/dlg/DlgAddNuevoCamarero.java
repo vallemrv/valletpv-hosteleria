@@ -3,13 +3,17 @@ package com.valleapp.valletpv.dlg;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.valleapp.valletpv.R;
-import com.valleapp.valletpvlib.ServicioCom;
+
+import com.valleapp.valletpv.tools.ServiceCOM;
 import com.valleapp.valletpvlib.db.DBCamareros;
+
+import java.util.Objects;
 
 /**
  * Created by valle on 19/10/14.
@@ -17,10 +21,10 @@ import com.valleapp.valletpvlib.db.DBCamareros;
 public class DlgAddNuevoCamarero extends Dialog {
 
 
-    ServicioCom servicio;
+    ServiceCOM servicio;
     Context cx;
 
-    public DlgAddNuevoCamarero(Context context, ServicioCom myService) {
+    public DlgAddNuevoCamarero(Context context, ServiceCOM myService) {
         super(context);
         this.servicio = myService;
         cx = context;
@@ -48,13 +52,14 @@ public class DlgAddNuevoCamarero extends Dialog {
                 }else {
                     servicio.addCamNuevo(n, a);
                     DBCamareros db = (DBCamareros) servicio.getDb("camareros");
+                    assert db != null;
                     db.addCamNuevo(n, a);
                     Toast.makeText(cx, "Camarero agregado con exito", Toast.LENGTH_LONG).show();
-                    servicio.getExHandler("camareros").sendEmptyMessage(0);
+                    Objects.requireNonNull(servicio.getExHandler("camareros")).sendEmptyMessage(0);
                     cancel();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+               Log.e("ERROR", e.toString());
             }
 
 

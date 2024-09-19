@@ -14,7 +14,6 @@ public class ChangeAction extends CashlogyAction {
 
     boolean isCancel = false;
     boolean isAceptar = true;
-    boolean isWaitingForFinalQ = false;
     boolean isSending = false;
 
     int denominacionMinima = 0;
@@ -31,7 +30,6 @@ public class ChangeAction extends CashlogyAction {
         importeAdmitido = 0;
         denominacionMinima = 0;
         isAceptar = true;
-        isWaitingForFinalQ = false;
         isCancel = false;
         esBloqueado = false;
         isSending = false;
@@ -45,16 +43,17 @@ public class ChangeAction extends CashlogyAction {
         } else if (comando.startsWith("#B")) {
             sendQCommand();
         } else if (comando.startsWith("#Q#")) {
-            manejarRespuestaImporteAdmitido(response);
+            manejarRespuestaQ(response);
         } else if (comando.startsWith("#J#")) {
-            isWaitingForFinalQ = true;    // Indica que estamos esperando la última respuesta #Q#
-            sendQCommand();              // Después de #J#, enviar un último #Q#
+            manejarRespuestaJ(response);
         }else if (comando.startsWith("#U")){
             manejarDispensacionCambio();
         } else if (comando.startsWith("#P")) {
-            manejarRespuestaP(response);
+            manejarRespuestaP();
         }
     }
+
+
 
     private void sendQCommand() {
         new Handler(Looper.getMainLooper()).postDelayed(() ->
@@ -121,17 +120,26 @@ public class ChangeAction extends CashlogyAction {
         }
     }
 
+    private void manejarRespuestaQ(String response) {
+        manejarRespuestaImporteAdmitido(response);
+        // Si la admisión aún no ha finalizado, continuar consultando el importe
+        if (isAceptar) {
+            sendQCommand();
+        }  else {
+            sendJCommand();
+        }
+    }
+
+    private void manejarRespuestaJ(String response) {
+        manejarRespuestaImporteAdmitido(response);
+        calcularYDispensarCambio();
+    }
+
 
     private void manejarRespuestaImporteAdmitido(String response) {
         String[] parts = response.split("#");
         if (parts.length >= 3) {
-
-            double nuevoImporteAdmitido = 0.0;
-            if (parts[2].isEmpty()) {
-                nuevoImporteAdmitido= 0.0;
-            }else {
-                nuevoImporteAdmitido = Double.parseDouble(parts[2]) / 100;
-            }
+            double nuevoImporteAdmitido = Double.parseDouble(parts[2]) / 100;
 
             // Solo notificar a la UI si el importe recibido es diferente al guardado
             if (nuevoImporteAdmitido != importeAdmitido) {
@@ -157,14 +165,6 @@ public class ChangeAction extends CashlogyAction {
                 notificarDenominacionesDisponiblesUI(denominacionesFiltradas);
             }
 
-            // Si la admisión aún no ha finalizado, continuar consultando el importe
-            if (isAceptar) {
-                sendQCommand();
-            } else if (isWaitingForFinalQ) {
-                calcularYDispensarCambio();
-            } else {
-                sendJCommand();
-            }
         }
     }
 
@@ -197,16 +197,21 @@ public class ChangeAction extends CashlogyAction {
         if (isCancel) {
             if (importeAdmitido > 0) {
                 sendPCommand(importeAdmitido);
+            }else{
+                socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
             }
-            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
         } else {
             sendUCommand();
         }
 
     }
 
-    private void manejarRespuestaP(String response) {
-        socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación finalizada.");
+    private void manejarRespuestaP() {
+        if(!isCancel){
+            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación cancelada.");
+        }else {
+            socketManager.notifyUI("CASHLOGY_CAMBIO", "Operación finalizada.");
+        }
     }
 
     private void manejarDispensacionCambio() {
