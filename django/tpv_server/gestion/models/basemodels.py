@@ -53,7 +53,6 @@ class BaseModels(models.Model):
                 if rule['type'] == 'int':
                     normalized[key] = int(value)
                 elif rule['type'] == 'float':
-
                     normalized[key] = float(value)
                 elif rule['type'] == 'str':
                     if rule.get('remove_quotes', False):

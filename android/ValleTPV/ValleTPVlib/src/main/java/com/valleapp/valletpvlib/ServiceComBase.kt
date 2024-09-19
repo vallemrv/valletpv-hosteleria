@@ -38,7 +38,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
 
     var server: String? = null
 
-
     var timerUpdateLow: Timer = Timer()
     var timerManejarInstrucciones: Timer = Timer()
 
@@ -59,7 +58,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
                 try {
                     if ("update_socket" == op) {
                         val objs = JSONArray(res)
-
                         for (i in 0 until objs.length()) {
                             procesarRespose(objs.getJSONObject(i))
                         }
@@ -75,7 +73,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
             }
         }
     }
-
 
     private fun sync_device(tbs: Array<String>?, timeout: Long) {
         try {
@@ -148,8 +145,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
 
     abstract fun startForegroundService()
 
-
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         // Recoger parámetros del Intent
@@ -184,7 +179,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
         }
         return START_NOT_STICKY
     }
-
 
     override fun onDestroy() {
         timerUpdateLow.cancel()
@@ -245,7 +239,6 @@ abstract class ServiceComBase : Service(), IControllerWS {
     }
 
 
-
     fun opMesas(params: ContentValues?, op: String) {
         synchronized(colaInstrucciones) {
             val url = if (op == "juntarmesas") "/cuenta/juntarmesas" else "/cuenta/cambiarmesas"
@@ -271,7 +264,5 @@ abstract class ServiceComBase : Service(), IControllerWS {
     fun setMesa_abierta(m: JSONObject?) {
         this.mesa_abierta = m
     }
-
-
 
 }

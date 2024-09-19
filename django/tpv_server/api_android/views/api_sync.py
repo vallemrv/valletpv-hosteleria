@@ -20,7 +20,7 @@ def get_tb_up_last(request):
     t = request.POST["tb"]
     tb_sync = Sync.objects.filter(nombre=t).first()
     if not tb_sync:
-        tb_sync = Sync();
+        tb_sync = Sync()
         tb_sync.nombre = t
         tb_sync.last = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
         tb_sync.save()

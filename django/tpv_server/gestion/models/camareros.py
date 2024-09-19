@@ -34,6 +34,7 @@ class Camareros(BaseModels):
         return {
             'activo': {'type': 'int'},
             'permisos': {'type': 'str', 'remove_quotes': True},
+            'pass_field': {'type': 'str', 'null_to_empty': True}
         }
     
 
