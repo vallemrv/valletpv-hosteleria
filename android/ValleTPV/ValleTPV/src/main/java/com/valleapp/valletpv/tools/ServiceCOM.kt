@@ -10,12 +10,13 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.valleapp.valletpv.R
 import com.valleapp.valletpv.ValleTPV
-import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction
-import com.valleapp.valletpvlib.CashlogyManager.CashlogyManager
-import com.valleapp.valletpvlib.CashlogyManager.CashlogySocketManager
-import com.valleapp.valletpvlib.CashlogyManager.ChangeAction
-import com.valleapp.valletpvlib.CashlogyManager.PaymentAction
+import com.valleapp.valletpvlib.cashlogymanager.ArqueoAction
+import com.valleapp.valletpvlib.cashlogymanager.CashlogyManager
+import com.valleapp.valletpvlib.cashlogymanager.CashlogySocketManager
+import com.valleapp.valletpvlib.cashlogymanager.ChangeAction
+import com.valleapp.valletpvlib.cashlogymanager.PaymentAction
 import com.valleapp.valletpvlib.ServiceComBase
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest
 import com.valleapp.valletpvlib.tools.Instrucciones
@@ -26,7 +27,7 @@ class ServiceCOM: ServiceComBase() {
 
     private val myBinder: IBinder = MyBinder()
 
-    private val chanelID = "ValleTPV"
+    private val channelId = "ValleTPV"
 
     private var urlCashlogy: String? = null
     private var usarCashlogy: Boolean = false
@@ -34,28 +35,35 @@ class ServiceCOM: ServiceComBase() {
     private var cashlogyManager: CashlogyManager? = null
 
     override fun startForegroundService() {
-            val channel = NotificationChannel(
-                chanelID,
-                "ValleCASH service",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
 
-            val manager = getSystemService(NotificationManager::class.java)
+        // Verifica si el canal ya existe
+        val channel = NotificationChannel(
+            channelId,
+            "ValleCASH service",
+            NotificationManager.IMPORTANCE_DEFAULT  // IMPORTANCE_HIGH si necesitas más visibilidad
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        if (manager?.getNotificationChannel(channelId) == null) {
             manager?.createNotificationChannel(channel)
-
-            val notificationIntent = Intent(this, ValleTPV::class.java)
-            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_IMMUTABLE)
-
-            val notification: Notification = NotificationCompat.Builder(this, chanelID)
-                .setContentTitle("WebSocket activo")
-                .setContentText("Conectado a $server")
-                .setSmallIcon(com.valleapp.valletpv.R.drawable.ic_launcher_foreground)
-                .setContentIntent(pendingIntent)
-                .build()
-
-            startForeground(1, notification)  // Iniciar el servicio en primer plano
         }
+
+        // Configurar la notificación para el servicio en primer plano
+        val notificationIntent = Intent(this, ValleTPV::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification: Notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle("WebSocket activo")
+            .setContentText("Conectado a $server")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // Ajusta según sea necesario
+            .build()
+
+        // Iniciar el servicio en primer plano con la notificación
+        startForeground(1, notification)
+    }
 
 
 
@@ -201,13 +209,13 @@ class ServiceCOM: ServiceComBase() {
     private fun iniciarCashlogySocketManager(urlCashlogy: String?) {
         if (cashlogySocketManager == null) {
             // Inicializar el CashlogySocketManager con la URL de Cashlogy y el handler para la UI
-            cashlogySocketManager = CashlogySocketManager(urlCashlogy)
+            cashlogySocketManager = urlCashlogy?.let { CashlogySocketManager(it) }
             cashlogySocketManager!!.start() // Iniciar la conexión con Cashlogy
 
             // Ejecutar la acción de inicialización de Cashlogy
-            cashlogyManager = CashlogyManager(cashlogySocketManager)
+            cashlogyManager = CashlogyManager(cashlogySocketManager!!)
             cashlogyManager!!.initialize()
-            cashlogyManager!!.openWS(server)
+            server?.let { cashlogyManager!!.openWS(it) }
         }
     }
 
@@ -230,29 +238,22 @@ class ServiceCOM: ServiceComBase() {
         }
     }
 
-    // Método para actualizar el Handler cashlogy desde una Activity o Fragment
-    fun setUiHandlerCashlogy(handler: Handler?) {
-        // Pasar el nuevo handler al CashlogySocketManager si ya está inicializado
-        if (cashlogySocketManager != null) {
-            cashlogySocketManager!!.setUiHandler(handler)
-        }
-    }
 
     // Saber si utiliza el cashlogy
     fun usaCashlogy(): Boolean {
         return usarCashlogy
     }
 
-    fun cashLogyPayment(amount: Double, uiHandler: Handler?): PaymentAction {
+    fun cashLogyPayment(amount: Double, uiHandler: Handler): PaymentAction {
         return cashlogyManager!!.makePayment(amount, uiHandler)
     }
 
-    fun cashlogyArqueo(cambio: Double, uiHandler: Handler?): ArqueoAction {
+    fun cashlogyArqueo(cambio: Double, uiHandler: Handler): ArqueoAction {
         return cashlogyManager!!.makeArqueo(cambio, uiHandler)
     }
 
 
-    fun cashLogyChange(uiHandler: Handler?): ChangeAction {
+    fun cashLogyChange(uiHandler: Handler): ChangeAction {
         return cashlogyManager!!.makeChange(uiHandler)
     }
 

@@ -10,6 +10,9 @@
     <string name="guardar">Guardar</string>
     <string name="label_direccion_servidor">Introduce la dirección del servidor</string>
     <string name="titulo_menu_modificar_cambio">Modificar Cambio</string>
-    <string name="ti">Dispensar Cambio</string>
+    <string name="titulo_menu_fondo_caja">Fondo de Caja</string>
+    <string name="dispensar">Dispensar</string>
+    <string name="refrescar">Refrescar</string>
+    <string name="insert_money">Insert money</string>
 
 </resources>

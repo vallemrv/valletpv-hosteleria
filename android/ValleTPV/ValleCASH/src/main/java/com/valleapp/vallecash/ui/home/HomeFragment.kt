@@ -5,21 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.fragment.findNavController
 import com.valleapp.vallecash.R
-import com.valleapp.vallecash.WebSocketService
 import com.valleapp.vallecash.databinding.FragmentHomeBinding
+import com.valleapp.vallecash.tools.CommandSender
 import java.util.Locale
 
 class HomeFragment : Fragment() {
@@ -29,6 +25,8 @@ class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
     private var isReceiverRegistered = false
+    private lateinit var commandSender: CommandSender
+
 
 
     private val webSocketReceiver = object : BroadcastReceiver() {
@@ -47,7 +45,7 @@ class HomeFragment : Fragment() {
                             procesarTCadena(it)
                         }
                         instruction.contains("sincronizar") -> {
-                            sendInstructionToWebSocket("#T#")
+                            commandSender.sendInstructionToWebSocket("#T#")
                         }
 
                     }
@@ -61,12 +59,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Navegar de vuelta al HomeFragment usando NavController
-        val navController = findNavController()
-
         // Inicializar el ViewModel correctamente dentro de onViewCreated
         viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
-
+        commandSender = CommandSender(requireContext(), 10000, "#T#")
         // Registrar el receptor solo una vez y marcarlo como registrado
         if (!isReceiverRegistered) {
             LocalBroadcastManager.getInstance(requireContext())
@@ -88,17 +83,10 @@ class HomeFragment : Fragment() {
             // Actualizar UI, por ejemplo:
             textViewTotalAlmacen.text = String.format(Locale.getDefault(),"Total Almacén: %.2f €", total)
         }
+        commandSender.startSendingCommands()
 
     }
 
-    // Método para enviar la instrucción al WebSocketService
-    private fun sendInstructionToWebSocket(instruction: String) {
-        // Crea un Intent para enviar la instrucción al WebSocketService
-        val intent = Intent(requireContext(), WebSocketService::class.java)
-        intent.putExtra("action", "SEND_INSTRUCTION") // Acción que el servicio va a manejar
-        intent.putExtra("instruction", instruction) // Instrucción que se va a enviar
-        requireContext().startService(intent) // Enviar la instrucción al servicio
-    }
 
 
     override fun onCreateView(
@@ -142,6 +130,6 @@ class HomeFragment : Fragment() {
             isReceiverRegistered = false
         }
         _binding = null
-        println("onDestroyView home")
+        commandSender.stopSendingCommands()
     }
 }

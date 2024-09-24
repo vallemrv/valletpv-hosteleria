@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="ValleTPV">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-19T13:46:16.364042Z">
+        <DropdownSelection timestamp="2024-09-23T20:41:00.816276Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/valle/.android/avd/Tablet.avd" />
@@ -18,7 +18,7 @@
       </SelectionState>
       <SelectionState runConfigName="ValleCASH">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-18T21:49:07.617627Z">
+        <DropdownSelection timestamp="2024-09-24T15:35:08.709312Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/valle/.android/avd/movil.avd" />

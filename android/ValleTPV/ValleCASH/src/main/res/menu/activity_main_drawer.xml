@@ -13,16 +13,17 @@
 
 
         <item
-            android:id="@+id/nav_change_cambio"
-            android:icon="@drawable/monedas"
+            android:id="@+id/nav_dispense_coins"
+            android:icon="@drawable/cambio"
             android:title="@string/titulo_menu_modificar_cambio"
             app:showAsAction="never"/>
 
         <item
-            android:id="@+id/nav_dispense_coins"
-            android:icon="@drawable/cambio"
-            android:title="@string/ti"
+            android:id="@+id/nav_change_cambio"
+            android:icon="@drawable/monedas"
+            android:title="@string/titulo_menu_fondo_caja"
             app:showAsAction="never"/>
+
 
 
     </group>

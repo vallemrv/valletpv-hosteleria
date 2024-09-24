@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.valleapp.vallecash.databinding.ActivityValleCashBinding
+import com.valleapp.vallecash.tools.WebSocketService
 import com.valleapp.valletpvlib.tools.JSON
 import org.json.JSONException
 import org.json.JSONObject
@@ -89,7 +90,6 @@ class ValleCASH : AppCompatActivity() {
 
         if (preferencias != null && preferencias.has("URL")) {
             serverURL = preferencias.getString("URL")
-
             // Iniciar el servicio WebSocket con la URL cargada
             iniciarWebSocketService(serverURL)
         } else {

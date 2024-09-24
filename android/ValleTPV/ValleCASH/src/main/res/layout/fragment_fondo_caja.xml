@@ -78,7 +78,7 @@
             android:contentDescription="Modificar cambio"
             android:layout_gravity="end"
             android:scaleType="centerInside"
-            android:src="@drawable/retirar_almacen"
+            android:src="@drawable/retirar_cambio"
             app:tint="@color/white" />
     </LinearLayout>
 

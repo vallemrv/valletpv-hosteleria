@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.tools.ServiceCOM;
-import com.valleapp.valletpvlib.CashlogyManager.ChangeAction;
+import com.valleapp.valletpvlib.cashlogymanager.ChangeAction;
 
 
 import java.util.HashMap;
@@ -178,7 +178,8 @@ public class CambioCashlogyActivity extends Activity {
             Integer valorEnCentimos = entry.getKey();
 
             // Verificar si la denominación está disponible en el mapa
-            if (denominacionesDisponibles.containsKey(valorEnCentimos) && denominacionesDisponibles.get(valorEnCentimos) > 0) {
+            if (denominacionesDisponibles.containsKey(valorEnCentimos) &&
+                    denominacionesDisponibles.get(valorEnCentimos) > 0) {
                 entry.getValue().setVisibility(View.VISIBLE);
             } else {
                 entry.getValue().setVisibility(View.GONE);

@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 
 import com.valleapp.valletpv.R;
 import com.valleapp.valletpv.tools.ServiceCOM;
-import com.valleapp.valletpvlib.CashlogyManager.ArqueoAction;
+import com.valleapp.valletpvlib.cashlogymanager.ArqueoAction;
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest;
 
 
@@ -131,13 +131,13 @@ public class ArqueoCashlogyActivity extends Activity {
 
                 JSONObject obj = new JSONObject();
                 obj.put("Can", cantidad);
-                obj.put("Moneda", String.format(Locale.getDefault(), "%.2f", moneda)); // Formatear moneda a dos decimales
+                obj.put("Moneda", String.format(Locale.US, "%.2f", moneda)); // Formatear moneda a dos decimales
                 objEfectivo.put(obj);
 
             }
             JSONObject obj = new JSONObject();
             obj.put("Can", 1);
-            obj.put("Moneda", String.format(Locale.getDefault(),
+            obj.put("Moneda", String.format(Locale.US,
                     "%.2f", (totalCaja+cambio) - arqueoAction.getTotalRecicladores())); // Formatear moneda a dos decimales
             objEfectivo.put(obj);
 
@@ -147,26 +147,28 @@ public class ArqueoCashlogyActivity extends Activity {
 
         // Paso 3: Crear ContentValues para enviar los datos al servidor
         ContentValues p = new ContentValues();
-        p.put("cambio", String.format(Locale.getDefault(), "%.2f", cambio));  // Formatear cambio a dos decimales
-        p.put("efectivo", String.format(Locale.getDefault(),"%.2f", totalCaja+cambio));  // Formatear totalEfectivo a dos decimales
-        p.put("gastos", String.format(Locale.getDefault(), "%.2f", 0.0));  // Formatear gastos a dos decimales
+        p.put("cambio", String.format(Locale.US, "%.2f", cambio));  // Formatear cambio a dos decimales
+        p.put("efectivo", String.format(Locale.US,"%.2f", totalCaja+cambio));  // Formatear totalEfectivo a dos decimales
+        p.put("gastos", String.format(Locale.US, "%.2f", 0.0));  // Formatear gastos a dos decimales
         p.put("des_efectivo", objEfectivo.toString());
         p.put("usaCashlogy", "true");
         p.put("des_gastos", "[]");
 
         Log.d("ArqueoCashlogyActivity", p.toString());
+
         // Enviar la solicitud al servidor para cerrar el arqueo
-        new HTTPRequest(server + "/arqueos/arquear", p, "arqueo", new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                String response = msg.getData().getString("RESPONSE");
-                if ("success".equals(response)) {
-                    arqueoAction.cerrarCashlogy();
-                } else {
-                    mostrarMensaje("Error al realizar el cierre de caja en el servidor.");
+        new HTTPRequest(server + "/arqueos/arquear", p, "arqueo",
+                new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    String response = msg.getData().getString("RESPONSE");
+                    if ("success".equals(response)) {
+                        arqueoAction.cerrarCashlogy();
+                    } else {
+                        mostrarMensaje("Error al realizar el cierre de caja en el servidor.");
+                    }
                 }
-            }
-        });
+            });
     }
 
     private boolean manejarMensajeCashlogy(Message message) {
@@ -200,21 +202,22 @@ public class ArqueoCashlogyActivity extends Activity {
 
     private void actualizarEfectivoEnServidor() {
         ContentValues p = new ContentValues();
-        p.put("cambio", String.format(Locale.getDefault(), "%.2f", cambio));
-        p.put("stacke", String.format(Locale.getDefault(), "%.2f", arqueoAction.getTotalAlmacenes()));
-        p.put("cambio_real", String.format(Locale.getDefault(), "%.2f", arqueoAction.getTotalRecicladores()));
+        p.put("cambio", String.format(Locale.US, "%.2f", cambio));
+        p.put("stacke", String.format(Locale.US, "%.2f", arqueoAction.getTotalAlmacenes()));
+        p.put("cambio_real", String.format(Locale.US, "%.2f", arqueoAction.getTotalRecicladores()));
 
-        new HTTPRequest(server + "/arqueos/setcambio", p, "updateCash", new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                String updateResponse = msg.getData().getString("RESPONSE");
-                if ("success".equals(updateResponse)) {
-                    arqueoAction.cashLogyCerrado();
-                } else {
-                    mostrarMensaje("Error al actualizar el efectivo en el servidor.");
+        new HTTPRequest(server + "/arqueos/setcambio", p, "updateCash",
+                new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    String updateResponse = msg.getData().getString("RESPONSE");
+                    if ("success".equals(updateResponse)) {
+                        arqueoAction.cashLogyCerrado();
+                    } else {
+                        mostrarMensaje("Error al actualizar el efectivo en el servidor.");
+                    }
                 }
-            }
-        });
+            });
     }
 
     @Override

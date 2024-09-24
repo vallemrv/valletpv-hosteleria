@@ -1,40 +1,40 @@
-package com.valleapp.vallecash.ui.dispensecoins
+package com.valleapp.vallecash.ui.modificarcambio
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.valleapp.vallecash.R
-import com.valleapp.vallecash.WebSocketService
-import com.valleapp.vallecash.databinding.FragmentDispenseCoinsBinding
+import com.valleapp.vallecash.tools.WebSocketService
+import com.valleapp.vallecash.databinding.FragmentModificarCambioBinding
 import java.util.Locale
 
 
-class DispenseCoinsFragment : Fragment() {
+class ModificarCambioFragment : Fragment() {
 
     // Obtener el ViewModel
     private val viewModel: DenominationViewModel by activityViewModels()
-    private var _binding: FragmentDispenseCoinsBinding? = null
+    private var _binding: FragmentModificarCambioBinding? = null
     private val binding get() = _binding!!
     private var serverURL = ""
+    private var isAceptar = false
 
     private val webSocketReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -45,13 +45,22 @@ class DispenseCoinsFragment : Fragment() {
                 if (instruction != null) {
                     if (instruction.contains("#Y#")) {
                         viewModel.processResponseY(it)  // Llamamos al ViewModel para procesar la respuesta
+                        if(isAceptar){
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                sendInstructionToWebSocket("#Y#")
+                            }, 500)
+                            }
+
                     }else if (instruction.contains("#U#")){
-                        val total = procesarWRLevel(it)
-                        viewModel.setTotalDispensao(total)
+                        viewModel.processResponseU(it)
+                        viewModel.updateTotales(serverURL)
+                    }else if (instruction.contains("#A#2#")){
+                        sendInstructionToWebSocket("#Y#")
+                    }else if (instruction.contains("#J#")){
+                        procesarJCadena(it)
                         viewModel.updateTotales(serverURL)
                     }
                 }
-                viewModel.setOcupado(false)
             }
 
         }
@@ -61,7 +70,7 @@ class DispenseCoinsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDispenseCoinsBinding.inflate(inflater, container, false)
+        _binding = FragmentModificarCambioBinding.inflate(inflater, container, false)
         // Configuración del callback para manejar el botón "Atrás"
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -90,8 +99,7 @@ class DispenseCoinsFragment : Fragment() {
 
     // Método para enviar la instrucción al WebSocketService
     private fun sendInstructionToWebSocket(instruction: String) {
-        viewModel.setOcupado(true)
-        // Crea un Intent para enviar la instrucción al WebSocketService
+         // Crea un Intent para enviar la instrucción al WebSocketService
         val intent = Intent(requireContext(), WebSocketService::class.java)
         intent.putExtra("action", "SEND_INSTRUCTION") // Acción que el servicio va a manejar
         intent.putExtra("instruction", instruction) // Instrucción que se va a enviar
@@ -99,27 +107,21 @@ class DispenseCoinsFragment : Fragment() {
         viewModel.getTotales(serverURL)
     }
 
-    // Función para procesar la cadena #WR:LEVEL# y calcular el total en euros
-    private fun procesarWRLevel(message: String): Double {
-        // Limpiar la cadena eliminando el prefijo y sufijo
-        val cleanMessage = message.substringAfter("#WR:LEVEL#").substringBefore("#")
 
-        // Dividir las partes de denominación:cantidad
-        val denominacionesYCantidades = cleanMessage.split(",", ";").map {
-            it.split(":").let { (denominacion, cantidad) ->
-                denominacion.toInt() to cantidad.toInt()
+    private fun procesarJCadena(cadena: String) {
+        val partes = cadena.split("#")
+        if (partes.size >= 3) {
+            val b = partes[2] // Importe recibido
+
+            // Actualizar el total admitido en el ViewModel
+            var nuevoAdmitido = b.toDoubleOrNull() ?: 0.0
+            if (nuevoAdmitido > 0) nuevoAdmitido /= 100
+            val admitido = viewModel.totalAdmitido.value ?: 0.0
+            if (nuevoAdmitido != admitido) {
+                viewModel.setAdmitido(nuevoAdmitido)
             }
         }
-
-        // Calcular el total en céntimos
-        val totalEnCentimos = denominacionesYCantidades
-            .filter { it.second > 0 } // Filtrar donde la cantidad sea mayor que 0
-            .sumOf { it.first * it.second } // Sumar denominación * cantidad
-
-        // Convertir a euros
-        return totalEnCentimos / 100.0
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -131,66 +133,52 @@ class DispenseCoinsFragment : Fragment() {
             .registerReceiver(webSocketReceiver, IntentFilter("WebSocketMessage"))
 
 
-        /// Acceder al RecyclerView usando view.findViewById()
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_denominations)
-
-        // Acceder a los botones usando view.findViewById()
-        val buttonDispenseSelected = view.findViewById<Button>(R.id.button_dispense_selected)
-        val buttonRefresh = view.findViewById<Button>(R.id.button_refresh)
-
-
-
         // Configurar el RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewDenominations.layoutManager = LinearLayoutManager(requireContext())
 
         // Observar las denominaciones en el ViewModel
         viewModel.denominations.observe(viewLifecycleOwner) { denominations ->
             val adapter = DenominationAdapter(denominations) { denomination, amount ->
                 viewModel.updateAmount(denomination, amount) // Actualizar las cantidades en el ViewModel
             }
-            recyclerView.adapter = adapter
+            binding.recyclerViewDenominations.adapter = adapter
         }
 
         // Observar los cambios en el resultado de la actualización
         viewModel.updateResult.observe(viewLifecycleOwner) { _ ->
-           sendInstructionToWebSocket("#Y#")
+            if(isAceptar) return@observe
+            sendInstructionToWebSocket("#Y#")
         }
 
-        // Inicializa el ProgressBar
-        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
 
-        // Observar los cambios  en la variable ocupaco para mostrar o no el loading
-        viewModel.ocupado.observe(viewLifecycleOwner) { isOcupado ->
-            if (isOcupado) {
-                progressBar.visibility = View.VISIBLE // Muestra el ProgressBar
-                buttonRefresh.isEnabled = false
-                buttonDispenseSelected.isEnabled = false
-            } else {
-                progressBar.visibility = View.GONE // Oculta el ProgressBar
-                buttonRefresh.isEnabled = true
-                buttonDispenseSelected.isEnabled = true
-            }
-        }
-
-        val text_recicladores_view = view.findViewById<TextView>(R.id.total_text_view)
         // Observar los cambios  en la variable ocupaco para mostrar o no el loading
         viewModel.totalRecicladores.observe(viewLifecycleOwner) { total ->
            if(total<=0){
-               text_recicladores_view.setText("")
+               binding.totalTextView.text = ""
            }else{
-               text_recicladores_view.setText(String.format(Locale.getDefault(),"Total: %.2f €", total))
+               binding.totalTextView.text = String.format(Locale.getDefault(),"Total: %.2f €", total)
            }
         }
 
-        val text_dipensado_view = view.findViewById<TextView>(R.id.devolucion_text_view)
 
         // Observar los cambios  en la variable ocupaco para mostrar o no el loading
         viewModel.totalDispensado.observe(viewLifecycleOwner) { dispensado ->
             if (dispensado <= 0) {
-                text_dipensado_view.setText("")
+                binding.devolucionTextView.text = ""
             } else {
-                text_dipensado_view.setText(String.format(Locale.getDefault(),"Devolucion: %.2f €", dispensado))
+                binding.devolucionTextView.text =
+                    String.format(Locale.getDefault(),"Devolucion: %.2f €", dispensado)
             }
+        }
+
+        viewModel.totalAdmitido.observe(viewLifecycleOwner) { admitido ->
+            if (admitido <= 0) {
+                binding.devolucionTextView.text = ""
+            } else {
+                binding.devolucionTextView.text =
+                    String.format(Locale.getDefault(),"Admitido: %.2f €", admitido)
+            }
+
         }
 
 
@@ -198,20 +186,38 @@ class DispenseCoinsFragment : Fragment() {
         sendInstructionToWebSocket("#Y#")
 
         // Configurar el botón "Dispensar seleccionado"
-        buttonDispenseSelected.setOnClickListener {
+        binding.buttonDispenseSelected.setOnClickListener {
+            if (isAceptar) return@setOnClickListener
             val command = viewModel.generateDispenseCommand(0, 0, 0)  // Ejemplo con algunos parámetros
             if (command.isNotEmpty()) sendInstructionToWebSocket(command)
         }
 
+        binding.buttonInsertMoney.setOnClickListener {
+            if(isAceptar){
+                isAceptar = false
+                binding.buttonInsertMoney.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.insertar_camibo_mano)
+                )
+                sendInstructionToWebSocket("#J#")
+            }else{
+                isAceptar = true
+                binding.buttonInsertMoney.setImageDrawable(
+                    ContextCompat.getDrawable(requireContext(), R.drawable.cancelar)
+                )
+                sendInstructionToWebSocket("#A#2#")
+            }
+
+        }
+
         // Configurar el botón "Refrescar cambio"
-        buttonRefresh.setOnClickListener {
+        binding.buttonRefresh.setOnClickListener {
+            if (isAceptar) return@setOnClickListener
             // Enviar la instrucción al WebSocketService cuando se muestra el Fragment
             sendInstructionToWebSocket("#Y#")
 
         }
 
     }
-
 
 
     override fun onDestroyView() {
@@ -221,4 +227,5 @@ class DispenseCoinsFragment : Fragment() {
         LocalBroadcastManager.getInstance(requireContext())
             .unregisterReceiver(webSocketReceiver)
     }
+
 }

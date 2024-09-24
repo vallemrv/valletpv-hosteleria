@@ -171,7 +171,6 @@ public class ValleTPV extends Activity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
-            myServicio.setUiHandlerCashlogy(handleHttp);
             myServicio.setExHandler("camareros", handleHttp);
             dbCamareros = (DBCamareros) myServicio.getDb("camareros");
             myServicio.executeCaslogy(usarCashlogy, urlCashlogy);

@@ -1,4 +1,4 @@
-package com.valleapp.vallecash
+package com.valleapp.vallecash.tools
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,48 +10,60 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.valleapp.vallecash.R
+import com.valleapp.vallecash.ValleCASH
 import com.valleapp.valletpvlib.Interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.WSClient
 import org.json.JSONObject
 
+
 class WebSocketService : Service(), IControllerWS {
 
-    private lateinit var wsClient: WSClient
+    private var wsClient: WSClient? = null
     private var serverUrl = ""  // La URL de tu servidor
     private val endpoint = "/comunicacion/cashlogy"  // El endpoint de tu WebSocket
-    private val CHANNEL_ID = "WebSocketServiceChannel"  // ID del canal de notificación
+    private val channelId = "WebSocketServiceChannel"  // ID del canal de notificación
 
     private fun startForegroundService() {
+        // Verifica si el canal ya existe
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            channelId,
             "ValleCASH service",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_DEFAULT  // IMPORTANCE_HIGH si necesitas más visibilidad
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        if (manager?.getNotificationChannel(channelId) == null) {
+            manager?.createNotificationChannel(channel)
+        }
+
+        // Configurar la notificación para el servicio en primer plano
+        val notificationIntent = Intent(this, ValleCASH::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
-        val manager = getSystemService(NotificationManager::class.java)
-        manager?.createNotificationChannel(channel)
-
-        val notificationIntent = Intent(this, ValleCASH::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE)
-
-        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("WebSocket activo")
             .setContentText("Conectado a $serverUrl")
-            .setSmallIcon(R.drawable.ic_cashlogy)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)  // Ajusta según sea necesario
             .build()
 
-        startForeground(1, notification)  // Iniciar el servicio en primer plano
+        // Iniciar el servicio en primer plano con la notificación
+        startForeground(1, notification)
     }
 
 
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!::wsClient.isInitialized) {
-            serverUrl = intent?.getStringExtra("SERVER_URL") ?: ""
+        serverUrl = intent?.getStringExtra("SERVER_URL") ?: ""
+        if (wsClient == null && serverUrl.isNotEmpty()) {
+            println("Intentando conectar al WebSocket... $serverUrl")
             wsClient = WSClient(serverUrl, endpoint, this)
-            wsClient.connect()  // Conectar solo si no está inicializado
+            wsClient!!.connect()
             Log.d("WebSocketService", "WebSocket conectado a $serverUrl")
+            startForegroundService()
         }
 
         // Verificar si el intent contiene una instrucción para enviar
@@ -63,8 +75,8 @@ class WebSocketService : Service(), IControllerWS {
                 sendInstructionToWebSocket(instruction)
             }
         }
-        // Iniciar el servicio en primer plano
-        startForegroundService()
+
+
         return START_STICKY
     }
 
@@ -75,15 +87,13 @@ class WebSocketService : Service(), IControllerWS {
             put("instruccion", instruction)
             put( "device", "ValleCASH")
         }
-        wsClient.sendMessage(jsonMessage.toString()) // Enviar el mensaje al WebSocket
+        wsClient?.sendMessage(jsonMessage.toString()) // Enviar el mensaje al WebSocket
         Log.d("WebSocketService", "Instrucción enviada: $jsonMessage")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Cierra la conexión del WebSocket cuando el servicio se destruye
-        wsClient.stopReconnection()
+        wsClient?.stopReconnection()
         Log.d("WebSocketService", "WebSocket desconectado")
     }
 

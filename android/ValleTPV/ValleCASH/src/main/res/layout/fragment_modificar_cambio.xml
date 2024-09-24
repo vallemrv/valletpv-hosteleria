@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp">
+
         <TextView
             android:text="Total: 0.00 €"
             android:textSize="20sp"
@@ -49,18 +52,37 @@
         android:gravity="end"
         android:padding="8dp">
 
-        <Button
+        <ImageButton
             android:id="@+id/button_dispense_selected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dispensar" />
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@color/purple_500"
+            android:contentDescription="@string/dispensar"
+            android:src="@drawable/retirar_cambio"
+            app:tint="@color/white" />
 
-        <Button
+        <ImageButton
+            android:id="@+id/button_insert_money"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:contentDescription="@string/insert_money"
+            android:layout_marginStart="8dp"
+            android:background="@color/purple_500"
+            android:src="@drawable/insertar_camibo_mano"
+            app:tint="@color/white"
+            />
+
+        <ImageButton
             android:id="@+id/button_refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Refrescar"
-            android:layout_marginStart="8dp" />
+            android:background="@color/purple_500"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:contentDescription="@string/refrescar"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/refresh"
+            app:tint="@color/white"
+            />
+
 
 
     </LinearLayout>

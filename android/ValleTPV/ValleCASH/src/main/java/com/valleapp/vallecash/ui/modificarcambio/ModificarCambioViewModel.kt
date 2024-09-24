@@ -1,4 +1,4 @@
-package com.valleapp.vallecash.ui.dispensecoins
+package com.valleapp.vallecash.ui.modificarcambio
 
 import android.content.ContentValues
 import android.os.Handler
@@ -17,18 +17,18 @@ class DenominationViewModel : ViewModel() {
     private val _denominations = MutableLiveData<List<Denomination>>()
     val denominations: LiveData<List<Denomination>> = _denominations
 
-    private var _cambio = MutableLiveData<Double>(0.0)
+    private var _cambio = 0.0
+    private var _cambioReal = 0.0
+    private var _totalAlmacenes = 0.0
 
-    private var _camibo_real = MutableLiveData<Double>(0.0)
-
-    private var _totalRecicladores = MutableLiveData<Double>(0.0)
+    private var _totalRecicladores = MutableLiveData(0.0)
     val totalRecicladores: LiveData<Double> = _totalRecicladores
 
-    private var _totalAlmacenes = MutableLiveData<Double>(0.0)
-    private var _esActualizado = MutableLiveData<Boolean>(false)
-
-    private var _totalDispensado = MutableLiveData<Double>(0.0)
+    private var _totalDispensado = MutableLiveData(0.0)
     val totalDispensado: LiveData<Double> = _totalDispensado
+
+    private var _totalAdmitido = MutableLiveData(0.0)
+    val totalAdmitido: LiveData<Double> get() = _totalAdmitido
 
     private val _updateResult = MutableLiveData<Boolean>()
     val updateResult: LiveData<Boolean> get() = _updateResult
@@ -50,10 +50,9 @@ class DenominationViewModel : ViewModel() {
             if (res != null) {
                 val obj = JSONObject(res)
                 // Recoge los datos del servidor
-                _cambio = MutableLiveData<Double>(obj.getDouble("cambio"))
-                _totalAlmacenes = MutableLiveData<Double>( obj.getDouble("stacke"))
-                _camibo_real = MutableLiveData<Double>(obj.getDouble("cambio_real"))
-                _esActualizado.postValue(true)
+                _cambio = obj.getDouble("cambio")
+                _totalAlmacenes =  obj.getDouble("stacke")
+                _cambioReal =  obj.getDouble("cambio_real")
             }
             _ocupado.postValue(false)
             true // Esto indica que el mensaje ha sido procesado
@@ -66,23 +65,23 @@ class DenominationViewModel : ViewModel() {
 
     fun updateTotales(server: String){
 
-        val almacenes = _totalAlmacenes.value ?: 0.0
-        val cambio_real = _camibo_real.value ?: 0.0
+        val almacenes = _totalAlmacenes
+        val cambioReal = _cambioReal
         val totalDispensado = _totalDispensado.value ?: 0.0
-        val nuevo_cambio_real = cambio_real - totalDispensado
+        val totalAdmitido = _totalAdmitido.value ?: 0.0
+        val nuevoCambioReal = cambioReal - totalDispensado + totalAdmitido
 
         val p = ContentValues()
 
-        p.put("cambio",String.format(Locale.US,"%.2f", _cambio.value) )
+        p.put("cambio",String.format(Locale.US,"%.2f", _cambio) )
         p.put("stacke", String.format(Locale.US,"%.2f", almacenes))
-        p.put("cambio_real", String.format(Locale.US,"%.2f", nuevo_cambio_real))
+        p.put("cambio_real", String.format(Locale.US,"%.2f", nuevoCambioReal))
 
         val url = "$server/arqueos/setcambio"
         val handler = Handler(Looper.getMainLooper()) {
             val res = it.data.getString("RESPONSE")
             if (res != null) {
-                // Recoge los datos del servidor
-                if ("success".equals(res)) {
+                if ("success" == res) {
                    _updateResult.postValue(true)
                 } else {
                    println("Error al actualizar el efectivo en el servidor.")
@@ -124,24 +123,57 @@ class DenominationViewModel : ViewModel() {
         _amounts.value = currentAmounts // Actualizar el LiveData
     }
 
+
+    fun processResponseU(response: String) {
+        if (response.startsWith("#ER")) {
+            return
+        }
+
+        val cleanedResponse: String = if (response.startsWith("#WR")) {
+            response.substringAfter("#WR:LEVEL#").substringBefore("#")
+        }else{
+            response.substringAfter("#0#").substringBefore("#")
+        }
+
+
+        // Dividir las partes de denominación:cantidad
+        val denominacionesYCantidades = cleanedResponse.split(",", ";").map {
+            it.split(":").let { (denominacion, cantidad) ->
+                denominacion.toInt() to cantidad.toInt()
+            }
+        }
+
+        // Calcular el total en céntimos
+        val totalEnCentimos = denominacionesYCantidades
+            .filter { it.second > 0 } // Filtrar donde la cantidad sea mayor que 0
+            .sumOf { it.first * it.second } // Sumar denominación * cantidad
+
+        // Convertir a euros
+        _totalDispensado.value =  totalEnCentimos / 100.0
+    }
+
     // Método para procesar el JSON
-    fun processResponseY(jsonResponse: String) {
-         if (jsonResponse.startsWith("#ER")) {
+    fun processResponseY(response: String) {
+         if (response.startsWith("#ER")) {
             return
          }
         val denominationsList = mutableListOf<Denomination>()
         var total = 0.0
         _totalDispensado.value = 0.0
 
-        // Eliminar los caracteres no necesarios del JSON
-        val cleanedResponse = jsonResponse.substringAfter("#WR:LEVEL#").substringBefore("#")
+        val cleanedResponse: String = if (response.startsWith("#WR")) {
+            response.substringAfter("#WR:LEVEL#").substringBefore("#")
+        }else{
+            response.substringAfter("#0#").substringBefore("#")
+        }
+
 
         // Partes del JSON separadas por ";"
         val parts = cleanedResponse.split(";")
 
         // Monedas y billetes
-        val monedas = parts[0] // Monedas en formato "2:9,5:57,10:57,..."
-        val billetes = parts[1] // Billetes en formato "500:18,1000:33,2000:4,..."
+        val monedas = parts[0]
+        val billetes = parts[1]
 
         // Procesar billetes primero y ordenarlos de mayor a menor
         val sortedBilletes = billetes.split(",").map {
@@ -152,7 +184,7 @@ class DenominationViewModel : ViewModel() {
         }.sortedByDescending { it.first } // Ordenar de mayor a menor
 
         sortedBilletes.forEach { (valueInCents, quantityValue) ->
-            // Solo incluir billetes de 500, 1000, 2000 sin decimales
+
             if (valueInCents == 500 || valueInCents == 1000 || valueInCents == 2000) {
                 val denominationDescription = "${valueInCents / 100}"
                 total += valueInCents * quantityValue
@@ -169,7 +201,7 @@ class DenominationViewModel : ViewModel() {
         }.sortedByDescending { it.first } // Ordenar de mayor a menor por el valor de la denominación
 
         sortedMonedas.forEach { (valueInCents, quantityValue) ->
-            // Quitar los decimales para monedas de 1 €, 2 €, y 20 €
+
             val denominationDescription = when (valueInCents) {
                 100, 200 -> "${valueInCents / 100}" // 1€, 2€,  sin decimales
                 else -> String.format(Locale.US, "%.2f", valueInCents / 100.0) // Otras monedas con dos decimales
@@ -182,8 +214,9 @@ class DenominationViewModel : ViewModel() {
         // Actualizar las denominaciones con la lista procesada
         _denominations.value = denominationsList
         _totalRecicladores.value = total / 100
-    }
 
+
+    }
 
     // Método para generar el comando de dispensación según especificaciones dadas
     fun generateDispenseCommand(stackBilletes: Int, pantallaFrente: Int, verPantallaPago: Int): String {
@@ -232,12 +265,14 @@ class DenominationViewModel : ViewModel() {
         return stringBuilder.toString()
     }
 
-    fun setTotalDispensao(total: Double) {
-       _totalDispensado.value = total
-    }
+
 
     fun setOcupado(ocupado: Boolean) {
         _ocupado.value = ocupado
+    }
+
+    fun setAdmitido(admitido: Double) {
+        _totalAdmitido.value = admitido
     }
 
 }

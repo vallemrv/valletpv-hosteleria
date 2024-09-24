@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/nav_change_cambio"
-        android:name="com.valleapp.vallecash.ui.changecambio.ChangeCambioFragment"
+        android:name="com.valleapp.vallecash.ui.fondocaja.FondoCajaFragment"
         android:label="Modificar cambio"
         tools:layout="@layout/fragment_home" >
         <argument
@@ -41,7 +41,7 @@
     <!-- Añadir DispenseCoinsFragment -->
     <fragment
         android:id="@+id/nav_dispense_coins"
-        android:name="com.valleapp.vallecash.ui.dispensecoins.DispenseCoinsFragment"
+        android:name="com.valleapp.vallecash.ui.modificarcambio.ModificarCambioFragment"
         android:label="Dispensar cambio"
-        tools:layout="@layout/fragment_dispense_coins" />
+        tools:layout="@layout/fragment_modificar_cambio" />
 </navigation>

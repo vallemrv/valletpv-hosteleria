@@ -1,4 +1,4 @@
-package com.valleapp.vallecash.ui.dispensecoins
+package com.valleapp.vallecash.ui.modificarcambio
 
 import android.text.Editable
 import android.text.TextWatcher

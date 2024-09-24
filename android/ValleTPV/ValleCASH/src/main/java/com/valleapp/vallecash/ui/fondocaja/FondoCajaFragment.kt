@@ -1,4 +1,4 @@
-package com.valleapp.vallecash.ui.changecambio
+package com.valleapp.vallecash.ui.fondocaja
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -22,32 +21,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.valleapp.vallecash.R
-import com.valleapp.vallecash.WebSocketService
-import com.valleapp.vallecash.databinding.FragmentChangeCambioBinding
+import com.valleapp.vallecash.tools.WebSocketService
+import com.valleapp.vallecash.databinding.FragmentFondoCajaBinding
 import java.util.Locale
 
 
-class ChangeCambioFragment : Fragment() {
+class FondoCajaFragment : Fragment() {
 
-    private var _binding: FragmentChangeCambioBinding? = null
+    private var _binding: FragmentFondoCajaBinding? = null
     private val binding get() = _binding!!
     private var serverURL = ""
 
-    private lateinit var viewModel: ChangeCambioViewModel
+    private lateinit var viewModel: FondoCajaViewModel
     private var isAcceptingChange = false
     private var isRetrievingAlmacen = false
     private var isReceiverRegistered = false
-    private var isCanceling = false
+    private var isProcesando = false
 
-
-    private val handler = Handler(Looper.getMainLooper())
-
-    private val sendQCommand = object : Runnable {
-        override fun run() {
-            sendInstructionToWebSocket("#Q#")
-            handler.postDelayed(this, 1000)
-        }
-    }
 
 
 
@@ -55,8 +45,8 @@ class ChangeCambioFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentChangeCambioBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this).get(ChangeCambioViewModel::class.java)
+        _binding = FragmentFondoCajaBinding.inflate(inflater, container, false)
+        viewModel = ViewModelProvider(this)[FondoCajaViewModel::class.java]
         serverURL = arguments?.getString("server").toString()
 
         // Configuración del callback para manejar el botón "Atrás"
@@ -101,7 +91,7 @@ class ChangeCambioFragment : Fragment() {
         // Enviar instrucción #T# después de 1 segundo
         Handler(Looper.getMainLooper()).postDelayed({
             sendInstructionToWebSocket("#T#")
-        }, 1000)
+        }, 200)
 
         return binding.root
     }
@@ -138,9 +128,18 @@ class ChangeCambioFragment : Fragment() {
 
     }
 
+    private fun sendQCommand() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            sendInstructionToWebSocket("#Q#")
+        }, 200)
+    }
+
     private fun setupListeners() {
         binding.buttonAceptarCambo.setOnClickListener {
+
             if (!isAcceptingChange) {
+                if (isProcesando) return@setOnClickListener
+                isProcesando = true
                 // Iniciar admisión de cambio
                 sendInstructionToWebSocket("#A#2#")
                 isAcceptingChange = true
@@ -149,27 +148,19 @@ class ChangeCambioFragment : Fragment() {
                     ContextCompat.getDrawable(requireContext(), R.drawable.cancelar)
                 )
             } else {
-                // Detener el envío de #Q#
-                handler.removeCallbacks(sendQCommand)
-
                 isAcceptingChange = false
-                // Restaurar el ícono original
                 binding.buttonAceptarCambo.setImageDrawable(
                     ContextCompat.getDrawable(requireContext(), R.drawable.insertar_camibo_mano)
                 )
-                Handler(Looper.getMainLooper()).postDelayed({
-                    sendInstructionToWebSocket("#J#")
-                }, 200)
             }
 
-    }
+        }
 
         binding.buttonChangeCambio.setOnClickListener {
             if (!isRetrievingAlmacen) {
-                val newCambio = binding.edittextCambio.text.toString().toDoubleOrNull()
+                val newCambio = binding.edittextCambio.text.toString().replace(",",".").toDoubleOrNull()
                 if (newCambio != null && newCambio != viewModel.cambioReal.value) {
                     viewModel.fondoDeCaja.value = newCambio
-                    // Actualizar el servidor con el nuevo valor de cambio
                     viewModel.updateTotales(serverURL)
                 } else {
                     // Mostrar mensaje de error
@@ -191,20 +182,6 @@ class ChangeCambioFragment : Fragment() {
                 viewModel.message.postValue("La aplicación está bloqueada hasta que se retire el almacén o se pulse cancelar.")
                 // Bloquear otros botones
                 disableButtons(binding.butttonRetirarStacker, true)
-            } else if (isRetrievingAlmacen) {
-
-                // Enviar comando de cancelar
-                sendInstructionToWebSocket("#!#")
-                isRetrievingAlmacen = false
-                isCanceling = true
-                // Restaurar el ícono original
-                binding.butttonRetirarStacker.setImageDrawable(
-                    ContextCompat.getDrawable(requireContext(), R.drawable.retirar_almacen)
-                )
-                // Limpiar mensaje
-                viewModel.message.postValue("")
-                // Desbloquear botones
-                disableButtons(null, false)
             }
         }
     }
@@ -243,26 +220,14 @@ class ChangeCambioFragment : Fragment() {
                         procesarQCadena(it)
                     }
                     instruction?.contains("#A#2#") == true -> {
-                        handler.post(sendQCommand)
+                       sendQCommand()
                     }
                     instruction?.contains("#J#") == true -> {
                         procesarJCadena(it)
                         viewModel.updateTotales(serverURL)
-                        handler.removeCallbacks(sendQCommand)
                     }
                     instruction?.contains("#S#2#") == true -> {
-                        if(!isCanceling) {
-                            isRetrievingAlmacen = false
-                            isCanceling = false
-                            viewModel.message.postValue("El almacén se ha retirado correctamente.")
-                            binding.butttonRetirarStacker.setImageDrawable(
-                                ContextCompat.getDrawable(requireContext(), R.drawable.retirar_almacen)
-                            )
-                            procesarSCadena(it)
-                        }else{
-                            viewModel.message.postValue("Retirada de almacen cancelado.")
-                        }
-                        println("Retirado: $it")
+                        procesarSCadena(it)
                      }
                     instruction?.contains("#!#") == true -> {
                         println("Cancelado: $it")
@@ -294,16 +259,31 @@ class ChangeCambioFragment : Fragment() {
 
     private fun procesarSCadena(cadena: String) {
         // Suponiendo que la cadena es del formato #a#b#
-        Log.d("ProcesarSCadena", "Cadena recibida: $cadena")
+        isRetrievingAlmacen = false
+        binding.butttonRetirarStacker.setImageDrawable(
+            ContextCompat.getDrawable(requireContext(), R.drawable.retirar_cambio)
+        )
+
+        if(cadena.startsWith("#ER") || cadena.startsWith("#WR:CANCEL#")){
+            viewModel.message.postValue("Retirada de almacen cancelado.")
+            sendInstructionToWebSocket("#J#")
+            return
+        }
+        viewModel.message.postValue("El almacén se ha retirado correctamente.")
+
 
         val partes = cadena.split("#")
         if (partes.size >= 3) {
             val b = partes[2] // Importe recibido
             // Actualizar el total admitido en el ViewModel
-            var admitido = b.toDoubleOrNull() ?: 0.0
-            if (admitido > 0) admitido /= 100
-            viewModel.totalRetiradoStacker.postValue(admitido)
+            var retirado = b.toDoubleOrNull() ?: 0.0
+            if (retirado > 0) retirado /= 100
+            viewModel.totalRetiradoStacker.value = retirado
+            viewModel.updateTotales(serverURL)
+            viewModel.getTotales(serverURL)
         }
+        sendInstructionToWebSocket("#T#")
+        disableButtons(binding.butttonRetirarStacker, false)
     }
 
     private fun procesarQCadena(cadena: String) {
@@ -315,10 +295,16 @@ class ChangeCambioFragment : Fragment() {
             // Actualizar el total admitido en el ViewModel
             var nuevoAdmitido = b.toDoubleOrNull() ?: 0.0
             if (nuevoAdmitido > 0) nuevoAdmitido /= 100
-            var admitido = viewModel.totalAdmitido.value ?: 0.0
+            val admitido = viewModel.totalAdmitido.value ?: 0.0
             if (nuevoAdmitido != admitido) {
                 viewModel.totalAdmitido.postValue(nuevoAdmitido)
             }
+        }
+
+        if (isAcceptingChange) {
+            sendQCommand()
+        }else {
+            sendInstructionToWebSocket("#J#")
         }
 
     }
@@ -331,11 +317,14 @@ class ChangeCambioFragment : Fragment() {
             // Actualizar el total admitido en el ViewModel
             var nuevoAdmitido = b.toDoubleOrNull() ?: 0.0
             if (nuevoAdmitido > 0) nuevoAdmitido /= 100
-            var admitido = viewModel.totalAdmitido.value ?: 0.0
+            val admitido = viewModel.totalAdmitido.value ?: 0.0
             if (nuevoAdmitido != admitido) {
                 viewModel.totalAdmitido.postValue(nuevoAdmitido)
+                viewModel.updateTotales(serverURL)
+                isProcesando = false
             }
         }
+
     }
 
     override fun onDestroyView() {
