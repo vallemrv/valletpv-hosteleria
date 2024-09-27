@@ -16,7 +16,7 @@ def get_datos_empresa(request):
 
 @csrf_exempt
 def get_uuid_factura(request, num):
-    from gestion.models.ticket import Ticket
+    from db.models.ticket import Ticket
     ticket = Ticket.objects.filter(id=num).first()
     if ticket:
         return JsonResponse({'id':ticket.id,'uid':ticket.uid})

@@ -11,9 +11,9 @@ from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models.mesasabiertas import Mesasabiertas 
-from gestion.models.sync import Sync
-from gestion.models.pedidos import Pedidos
+from db.models.mesasabiertas import Mesasabiertas 
+from db.models.sync import Sync
+from db.models.pedidos import Pedidos
 
 
 import json

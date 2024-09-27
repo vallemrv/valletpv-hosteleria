@@ -10,9 +10,9 @@ from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from django.apps import apps
 from datetime import datetime
-from gestion.models.pedidos import Lineaspedido
-from gestion.models.sync import Sync
-from gestion.models.teclados import SeccionesCom
+from db.models.pedidos import Lineaspedido
+from db.models.sync import Sync
+from db.models.teclados import SeccionesCom
 
 
 @csrf_exempt
@@ -40,7 +40,7 @@ def update_for_devices(request):
     elif t in  ["seccionescom", "secciones_com"]:
         tbModel = SeccionesCom
     else:
-        tbModel = apps.get_model("gestion", t)
+        tbModel = apps.get_model("db", t)
     
     
     if tbModel and hasattr(tbModel, "update_for_devices"):
@@ -67,7 +67,7 @@ def update_from_devices(request):
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
     
-    model = apps.get_model("gestion", tb)
+    model = apps.get_model("db", tb)
     if hasattr(model, "update_from_device"):
         for row in rows:
             model.update_from_device(row)
@@ -81,7 +81,7 @@ def update_from_devices(request):
 
 @csrf_exempt
 def sync_devices(request):
-    app_name = request.POST["app"] if "app" in request.POST else "gestion"
+    app_name = request.POST["app"] if "app" in request.POST else "db"
     tb_name = request.POST["tb"] 
     reg = json.loads(request.POST["reg"])
     

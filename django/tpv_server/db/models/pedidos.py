@@ -174,7 +174,7 @@ class Lineaspedido(BaseModels):
     
     @classmethod
     def compare_regs(cls, regs):
-        from gestion.models.mesasabiertas import Mesasabiertas
+        from db.models.mesasabiertas import Mesasabiertas
         """
         Compara los datos del cliente con los datos del servidor buscando por ID directamente en la base de datos
         y asegurando que el idmesa esté en mesas abiertas.

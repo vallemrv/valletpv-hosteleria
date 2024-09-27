@@ -7,7 +7,7 @@
 
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from gestion.models.familias import Secciones
+from db.models.familias import Secciones
 
 @csrf_exempt
 def sec_listado(request):

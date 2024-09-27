@@ -15,9 +15,9 @@ from comunicacion.tools import comunicar_cambios_devices
 from api_android.tools import send_mensaje_devices
 from api_android.tools.mails import getUsuariosMail, send_cierre
 
-from gestion.models.teclados import  Teclas, Teclaseccion
-from gestion.models.familias import Secciones
-from gestion.models.arqueos import Arqueocaja
+from db.models.teclados import  Teclas, Teclaseccion
+from db.models.familias import Secciones
+from db.models.arqueos import Arqueocaja
 def inicio(request):
     return render(request, "app/index.html")
 
@@ -61,13 +61,13 @@ def reset_db(request):
     ]
     models = [] 
     for t in tablas:
-        models.append("gestion." + t)
+        models.append("db." + t)
     file = os.path.join(media, datetime.now().strftime("%Y_%m_%d_%H_%M_%S")+".json")
     with open(file, "w") as f:
         call_command("dumpdata", *models,  stdout=f)
     
     for m in tablas:
-        model = apps.get_model("gestion", m)
+        model = apps.get_model("db", m)
         if (m != "camareros"):
             model.objects.all().delete()
         else:
@@ -105,7 +105,7 @@ def mod_sec(request):
 
 @token_required
 def getlistado(request):
-    app_name = request.POST["app"] if "app" in request.POST else "gestion"
+    app_name = request.POST["app"] if "app" in request.POST else "db"
     tb_name = request.POST["tb"]
     filter = json.loads(request.POST["filter"]) if "filter" in request.POST else {}
     model = apps.get_model(app_name, tb_name)
@@ -125,7 +125,7 @@ def get_listado_compuesto(request):
     tbs = json.loads(request.POST["tbs"])
     tablas = []
     for tb_name in tbs:
-        model = apps.get_model("gestion", tb_name)
+        model = apps.get_model("db", tb_name)
         regs = model.update_for_devices()
         tablas.append({"tb": tb_name, "regs": regs})
 
@@ -134,7 +134,7 @@ def get_listado_compuesto(request):
 
 @token_required
 def add_reg(request):
-    app_name = request.POST["app"] if "app" in request.POST else "gestion"
+    app_name = request.POST["app"] if "app" in request.POST else "db"
     tb_name = request.POST["tb_name"]
     reg = json.loads(request.POST["reg"])
     obj = add_reg_handler(app_name, tb_name, reg);
@@ -151,7 +151,7 @@ def mod_regs(request):
         elif inst["tipo"] == "rm":
            delete_reg(inst)
         elif inst["tipo"] == "add":
-            app_name = inst["app"] if "app" in inst else "gestion"
+            app_name = inst["app"] if "app" in inst else "db"
             tb_name = inst["tb"]
             reg = inst["reg"]
             add_reg_handler(app_name, tb_name, reg)
@@ -194,7 +194,7 @@ def add_reg_handler(app_name, tb_name, reg):
     return {"reg":json.dumps(obj)}
 
 def modifcar_reg(inst):
-    app_name = inst["app"] if "app" in inst else "gestion"
+    app_name = inst["app"] if "app" in inst else "db"
     tb_name = inst["tb"]
     reg = inst["reg"]
     filter = ""
@@ -241,7 +241,7 @@ def modifcar_reg(inst):
         send_mensaje_devices(update) 
 
 def delete_reg(inst):
-    app_name = inst["app"] if "app" in inst else "gestion"
+    app_name = inst["app"] if "app" in inst else "db"
     tb_name = inst["tb"]
     filter = inst["filter"] if "filter" in inst else  {"id": inst["id"]}
     model = apps.get_model(app_name, tb_name)
@@ -261,7 +261,7 @@ def delete_reg(inst):
 
 def mod_teclados(inst):
     item = inst["reg"]
-    app_name = inst["app"] if "app" in inst else "gestion"
+    app_name = inst["app"] if "app" in inst else "db"
     tb_name = inst["tb_mod"]
     filter = inst["filter"]
     fl = {}

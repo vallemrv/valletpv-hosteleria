@@ -89,6 +89,7 @@ class DenominationViewModel : ViewModel() {
             }
             _ocupado.postValue(false)
             _totalDispensado.value = 0.0
+            _totalAdmitido.value = 0.0
             true // Esto indica que el mensaje ha sido procesado
         }
         _ocupado.postValue(true)
