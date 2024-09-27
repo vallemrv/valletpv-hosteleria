@@ -10,9 +10,9 @@ from tokenapi.http import  JsonResponse
 from django.views.decorators.csrf import csrf_exempt         
 from django.apps import apps
 from datetime import datetime
-from db.models.pedidos import Lineaspedido
-from db.models.sync import Sync
-from db.models.teclados import SeccionesCom
+from gestion.models.pedidos import Lineaspedido
+from gestion.models.sync import Sync
+from gestion.models.teclados import SeccionesCom
 
 
 @csrf_exempt

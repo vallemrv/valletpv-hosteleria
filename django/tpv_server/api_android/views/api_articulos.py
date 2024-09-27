@@ -8,7 +8,7 @@
 from tokenapi.http import JsonError, JsonResponse
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from db.models.teclados import Teclas
+from gestion.models.teclados import Teclas
 
 
 @csrf_exempt

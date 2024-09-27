@@ -15,9 +15,9 @@ from comunicacion.tools import comunicar_cambios_devices
 from api_android.tools import send_mensaje_devices
 from api_android.tools.mails import getUsuariosMail, send_cierre
 
-from db.models.teclados import  Teclas, Teclaseccion
-from db.models.familias import Secciones
-from db.models.arqueos import Arqueocaja
+from gestion.models.teclados import  Teclas, Teclaseccion
+from gestion.models.familias import Secciones
+from gestion.models.arqueos import Arqueocaja
 def inicio(request):
     return render(request, "app/index.html")
 

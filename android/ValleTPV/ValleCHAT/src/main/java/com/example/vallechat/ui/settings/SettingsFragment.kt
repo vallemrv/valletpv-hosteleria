@@ -59,7 +59,7 @@ class SettingsFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     android.R.id.home -> {
-                        activity?.onBackPressed() // Volver al fragmento principal
+                        activity?.onBackPressedDispatcher?.onBackPressed()
                         true
                     }
                     else -> false
@@ -145,7 +145,7 @@ class SettingsFragment : Fragment() {
 
     // Función para obtener el UID del servidor
     private fun obtenerUID(server: String) {
-        val url = "$server/api/get_device_uid"
+        val url = "$server/api/dispositivos/get_device_uid"
         val p = ContentValues()
         connectionStatus.text = "Conectando al servidor..."
 

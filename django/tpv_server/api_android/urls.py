@@ -6,9 +6,9 @@
 # @License: Apache License v2.0
 
 from django.urls import path, include
-
 from api_android import views
 from api_android.views import api_pedidos
+from api_android.views.api_dispositivos import create_uid
 
 urlpatterns = [
     path("camareros/", include('api_android.set_urls.camareros'), name="api_android_camareros"),
@@ -25,4 +25,5 @@ urlpatterns = [
     path("get_pedidos_by_receptor", api_pedidos.get_pedidos_by_receptor, name="get_pedidos_by_receptor"),
     path("recuperar_pedido", api_pedidos.recuperar_pedido, name="recuperar_pedido"),
     path("get_uuid_factura/<int:num>", views.get_uuid_factura, name="get_uuid_factura"),
+    path("dispositivos/get_device_uid", create_uid, name="create_uid")
 ] 

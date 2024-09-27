@@ -9,8 +9,9 @@
 
 from functools import wraps
 from django.views.decorators.csrf import csrf_exempt
-from db.models.camareros import Camareros
+from gestion.models.camareros import Camareros
 from tokenapi.http import JsonResponseForbidden
+from gestion.models.dispositivos import Dispositivo
 
 def token_required(view_func):
     """Decorator which ensures the user has provided a correct user and token pair."""
@@ -20,6 +21,30 @@ def token_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         return view_func(request, *args, **kwargs)
 
-        if False:
-            return JsonResponseForbidden("Camarero no autorizado....")
+    return _wrapped_view
+
+
+
+@csrf_exempt
+def verificar_uid_activo(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # Verificar si la solicitud es POST
+        if request.method == "POST":
+            uid = request.POST.get('uid')  # Obtener el UID del cuerpo del POST
+            
+            if not uid:
+                return JsonResponseForbidden("UID no proporcionado")
+            
+            # Verificar si el UID existe en la base de datos y está activo
+            try:
+                dispositivo = Dispositivo.objects.get(uid=uid)
+                if not dispositivo.activo:
+                     return JsonResponseForbidden("UID no activo")
+            except Dispositivo.DoesNotExist:
+                return JsonResponseForbidden("UID no válido")
+
+        # Si todo está correcto, proceder con la vista
+        return view_func(request, *args, **kwargs)
+    
     return _wrapped_view

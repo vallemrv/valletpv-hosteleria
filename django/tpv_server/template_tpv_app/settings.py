@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'comunicacion',
-	'db',
+	'gestion',
     'app',
     'api_android',
     'corsheaders',

@@ -5,7 +5,7 @@
 # @Last modified time: 2019-10-06T19:08:26+02:00
 # @License: Apache License v2.0
 
-from db.models.mesas import Mesas, Zonas, Mesasabiertas
+from gestion.models.mesas import Mesas, Zonas, Mesasabiertas
 
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt

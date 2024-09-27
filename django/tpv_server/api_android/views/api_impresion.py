@@ -9,11 +9,11 @@ from api_android.tools import (send_imprimir_ticket, send_mensaje_impresora)
 from tokenapi.http import  JsonResponse
 from comunicacion.tools import comunicar_cambios_devices
 
-from db.models.camareros import Camareros
-from db.models.pedidos import Pedidos
-from db.models.teclados import Teclas
-from db.models.sync import Sync
-from db.models.familias import Receptores
+from gestion.models.camareros import Camareros
+from gestion.models.pedidos import Pedidos
+from gestion.models.teclados import Teclas
+from gestion.models.sync import Sync
+from gestion.models.familias import Receptores
 
 from django.http import HttpResponse
 from django.db.models import Count, Sum
@@ -23,7 +23,7 @@ from datetime import datetime
 
 @csrf_exempt
 def preimprimir(request):
-    from db.models.mesasabiertas import Mesasabiertas
+    from gestion.models.mesasabiertas import Mesasabiertas
     idm = request.POST["idm"]
     mesa_abierta = Mesasabiertas.objects.filter(mesa_id=idm).first()
     if mesa_abierta:

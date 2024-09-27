@@ -3,12 +3,12 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from tokenapi.http import JsonResponse
 from comunicacion.tools import comunicar_cambios_devices
-from db.models.camareros import Camareros
-from db.models.pedidos import Lineaspedido
-from db.models.familias import Receptores
-from db.models.mesasabiertas import Mesasabiertas
-from db.models.peticionesautoria import PeticionesAutoria
-from db.models.ticket import Ticket
+from gestion.models.camareros import Camareros
+from gestion.models.pedidos import Lineaspedido
+from gestion.models.familias import Receptores
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.peticionesautoria import PeticionesAutoria
+from gestion.models.ticket import Ticket
 from api_android.tools import (send_imprimir_ticket, send_mensaje_impresora)
 
 @csrf_exempt

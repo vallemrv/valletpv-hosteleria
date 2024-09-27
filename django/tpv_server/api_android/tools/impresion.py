@@ -7,11 +7,11 @@
 
 from django.db.models import  Count, Sum, F
 from api_android.tools.ws_tools import  send_mensaje_impresora
-from db.models.ticket import Ticket 
-from db.models.teclados import Teclas
-from db.models.familias import Receptores
-from db.models.pedidos import Pedidos
-from db.models.camareros import Camareros
+from gestion.models.ticket import Ticket 
+from gestion.models.teclados import Teclas
+from gestion.models.familias import Receptores
+from gestion.models.pedidos import Pedidos
+from gestion.models.camareros import Camareros
                           
 
 def imprimir_pedido(id):

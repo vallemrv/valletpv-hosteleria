@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from datetime import datetime
-from db.models.pedidos import Lineaspedido
+from gestion.models.pedidos import Lineaspedido
 
 def get_total_by_horas(filter):
     res = []

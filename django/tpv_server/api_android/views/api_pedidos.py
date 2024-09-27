@@ -10,10 +10,10 @@ from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from db.models.mesasabiertas import Mesasabiertas
-from db.models.camareros import Camareros
-from db.models.familias import Receptores
-from db.models.pedidos import Pedidos, Lineaspedido, Servidos
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.camareros import Camareros
+from gestion.models.familias import Receptores
+from gestion.models.pedidos import Pedidos, Lineaspedido, Servidos
 
 
 from api_android.tools import is_float
