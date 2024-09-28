@@ -55,6 +55,7 @@ public class HTTPRequest {
 
                 } catch (ConnectException e) {
                     if (handlerExternal != null) sendMessage(handlerExternal, "no_connexion", null);
+                    Log.e("HTTPRequeest", e.toString());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     Log.e("HTTPRequeest", e.toString());

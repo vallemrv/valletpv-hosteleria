@@ -11,6 +11,7 @@ from api_android.views import api_pedidos
 from api_android.views.api_dispositivos import create_uid
 
 urlpatterns = [
+    path("openai/", include("api_android.set_urls.openai"), name="api_android_openai"),
     path("camareros/", include('api_android.set_urls.camareros'), name="api_android_camareros"),
     path('sync/', include("api_android.set_urls.sync"), name="api_android_sync"),
     path('pedidos/', include("api_android.set_urls.pedidos"), name="api_android_pedidos"),

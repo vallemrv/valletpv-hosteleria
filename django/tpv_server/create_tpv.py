@@ -47,11 +47,12 @@ if __name__ == '__main__':
         if name_db == "":
             name_db = name_tpv.lower()
         sql_mode = input("Tipo de base de datos [lite/mysql] [lite]: ")
-        if sql_mode not in ["mysql", "lite"]:
+        name_user_db = name_tpv
+        password_db = ""
+
+        if sql_mode not in ["lite", "mysql"]:
             sql_mode = "lite"
-            name_user_db = name_tpv
-            password_db = ""
-            
+       
         if sql_mode == "mysql":
             print("Datos de conexion a la base de datos. ")
             name_user_db = input("Nombre del usuario de la base de datos [valletpv]: ")
@@ -73,6 +74,7 @@ if __name__ == '__main__':
 
 
     secret_key = create_secret_key()
+    from template_tpv_app.local_config import *
 
     asgi = open(os.path.join(BASE_DIR, "template_tpv_app", "asgi.py"), "r")
     template_asgi = Template(asgi.read())
@@ -104,6 +106,11 @@ if __name__ == '__main__':
                                               "poblacion":poblacion,
                                               "provincia":provincia,
                                               "cp":codio_cp,
+                                              "openai_key": OPENAI_API_KEY,
+                                              "email_host_password":EMAIL_HOST_PASSWORD,
+                                              "email_host_user":EMAIL_HOST_USER,
+                                              "email_port":EMAIL_PORT,
+                                              "email_host":EMAIL_HOST,
                                               })
 
     manage = open(os.path.join(BASE_DIR, "template_tpv_app",  "manage_template.py"), "r")

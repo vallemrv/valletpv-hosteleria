@@ -81,7 +81,7 @@ def update_from_devices(request):
 
 @csrf_exempt
 def sync_devices(request):
-    app_name = request.POST["app"] if "app" in request.POST else "db"
+    app_name = request.POST["app"] if "app" in request.POST else "gestion"
     tb_name = request.POST["tb"] 
     reg = json.loads(request.POST["reg"])
     

@@ -41,6 +41,7 @@ CP="{{cp}}"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{secret_key}}'
+OPENAI_API_KEY = '{{openai_key}}'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = {{is_debug}}
@@ -164,10 +165,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 #smtp config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST_PASSWORD = 'nitrogeno'
-EMAIL_HOST_USER = 'mails@valleapp.com'
-EMAIL_PORT = '465'
-EMAIL_HOST = 'dallas143.arvixeshared.com'
+EMAIL_HOST_PASSWORD =  "{{email_host_password}}"
+EMAIL_HOST_USER = "{{email_host_user}}"
+EMAIL_PORT = {{email_port}}
+EMAIL_HOST = "{{email_host}}"
 EMAIL_USE_SSL = True
 
 # session expire at browser close

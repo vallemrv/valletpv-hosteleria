@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="ValleTPV">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-13T18:34:36.129538Z">
+        <DropdownSelection timestamp="2024-09-28T09:38:58.817483382Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/valle/.android/avd/movil.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/valle/.android/avd/Tablet.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -22,6 +22,17 @@
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/valle/.android/avd/movil.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="ValleCHAT">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-09-28T10:00:55.428495191Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/valle/.android/avd/Medium_Phone_API_35.avd" />
             </handle>
           </Target>
         </DropdownSelection>

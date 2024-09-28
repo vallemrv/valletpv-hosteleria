@@ -3,7 +3,7 @@ sl_dump.js
 .DS_Store
 dump.rdb
 **/mail_server/constant_config.py
-
+local_config.py
 
 # Directorios y ficheros no necesarios
 .vscode/

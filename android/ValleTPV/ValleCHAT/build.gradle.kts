@@ -1,3 +1,8 @@
+val openAiApiKey: String = System.getenv("OPENAI_API_KEY") ?: ""
+if (openAiApiKey.isEmpty()) {
+    println("No se encontró la clave de API de OpenAI")
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -40,6 +45,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.easypermissions)
+    implementation (libs.okhttp)
+    implementation(libs.okhttp)
+
     implementation(project(":ValleTPVlib"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

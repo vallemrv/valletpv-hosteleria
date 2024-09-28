@@ -31,7 +31,6 @@ class SettingsFragment : Fragment() {
     private lateinit var serverAddressInput: EditText
     private lateinit var saveButton: Button
     private lateinit var getUIDButton: Button
-    private lateinit var connectionStatus: TextView
     private lateinit var explanationText: TextView
     private var preferencias: JSONObject? = null
 
@@ -43,7 +42,6 @@ class SettingsFragment : Fragment() {
         serverAddressInput = view.findViewById(R.id.server_address_input)
         saveButton = view.findViewById(R.id.save_button)
         getUIDButton = view.findViewById(R.id.get_uid_button)
-        connectionStatus = view.findViewById(R.id.connection_status)
         explanationText = view.findViewById(R.id.explanation_text)
 
         // Inicialmente ocultar el botón "Conseguir UID" y la explicación
@@ -80,7 +78,9 @@ class SettingsFragment : Fragment() {
                     mostrarBotonUID() // Si ya hay una URL, mostrar el botón UID
                 }
                 if (preferencias!!.has("UID")) {
-                    connectionStatus.text = "Este dispositivo contiene un UID. Pero puedes conseguir otro si es necesario."
+                    explanationText.text = "Este dispositivo contiene un UID. Pero puedes conseguir otro si es necesario."
+                }else{
+                    explanationText.text = "Este dispositivo no contiene un UID. Para utilizar la aplilcacion necesita un UID activo."
                 }
             } catch (e: JSONException) {
                 Log.e("SETTINGS_ERR", e.toString())
@@ -145,20 +145,21 @@ class SettingsFragment : Fragment() {
 
     // Función para obtener el UID del servidor
     private fun obtenerUID(server: String) {
+
         val url = "$server/api/dispositivos/get_device_uid"
         val p = ContentValues()
-        connectionStatus.text = "Conectando al servidor..."
+        explanationText.text = "Conectando al servidor..."
 
         val handler = Handler(Looper.getMainLooper()) {
             try {
                 val res = it.data.getString("RESPONSE")
                 val json = res?.let { it1 -> JSONObject(it1) }
                 if (json != null) {
-                    if (json.has("UID")) {
-                        val uid = json.getString("UID")
+                    if (json.has("uid")) {
+                        val uid = json.getString("uid")
                         preferencias?.put("UID", uid)
                         preferencias?.let { it1 -> guardarPreferencias(it1) }
-                        connectionStatus.text = "Conexión exitosa. UID recibido."
+                        explanationText.text = "Conexión exitosa. UID recibido."
                     }
                 }
             }catch (e: JSONException){
