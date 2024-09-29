@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db import models
 from .historiales import Historialnulos
 from .basemodels import BaseModels, Sync
@@ -13,30 +14,37 @@ class Pedidos(BaseModels):
     
    
     @staticmethod
+    @transaction.atomic
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
-        from .mesasabiertas import Mesasabiertas
-        from .infmesa import Infmesa
-      
+        # Realizamos las importaciones dentro de la función para evitar ciclos
+        from gestion.models.mesasabiertas import Mesasabiertas
+        from gestion.models.infmesa import Infmesa
 
+        # Verificar si el pedido con el mismo uid_device ya existe
         p = Pedidos.objects.filter(uid_device=uid_device).first()
-        if p: return None
+        if p:
+            return None
         
+        # Verificar si la mesa ya está abierta
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         
         if not mesa:
+            # Si no existe, creamos una nueva instancia de Infmesa
             infmesa = Infmesa()
             infmesa.camarero_id = idc
             infmesa.hora = datetime.now().strftime("%H:%M")
             infmesa.fecha = datetime.now().strftime("%Y/%m/%d")
-            infmesa.id = idm + '-' + str(uuid4())
+            infmesa.id = f"{idm}-{str(uuid4())}"
             infmesa.save()
-            
+
+            # Crear una nueva mesa abierta
             mesa = Mesasabiertas()
             mesa.mesa_id = idm
             mesa.infmesa_id = infmesa.pk
             mesa.save()
             Sync.actualizar("mesasabiertas")
 
+        # Crear un nuevo pedido
         pedido = Pedidos()
         pedido.infmesa_id = mesa.infmesa.pk
         pedido.hora = datetime.now().strftime("%H:%M")
@@ -44,33 +52,40 @@ class Pedidos(BaseModels):
         pedido.uid_device = uid_device
         pedido.save()
 
+        # Añadir las líneas al pedido
         for pd in lineas:
-            can = int(pd["Can"])
-            for i in range(0, can):
-                linea = Lineaspedido()
-                linea.infmesa_id = mesa.infmesa.pk
-                linea.idart = pd["IDArt"] if "IDArt" in pd else pd["ID"]
-                linea.pedido_id = pedido.pk
-                linea.descripcion = pd["Descripcion"]
-                linea.descripcion_t = pd["descripcion_t"]
-                linea.precio = pd["Precio"]
-                linea.estado =  'P'
-                linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
-                linea.save()
-               
-                
-        
+            try:
+                can = int(pd["Can"])
+                if can <= 0:
+                    raise ValueError(f"Cantidad inválida: {can}")
+
+                for _ in range(can):
+                    linea = Lineaspedido()
+                    linea.infmesa_id = mesa.infmesa.pk
+                    linea.idart = pd.get("IDArt", pd["ID"])
+                    linea.pedido_id = pedido.pk
+                    linea.descripcion = pd.get("Descripcion", "")
+                    linea.descripcion_t = pd.get("descripcion_t", "")
+                    linea.precio = pd["Precio"]
+                    linea.estado = 'P'
+                    linea.tecla_id = linea.idart if int(linea.idart) > 0 else None
+                    linea.save()
+            except KeyError as e:
+                raise ValueError(f"Campo requerido faltante: {str(e)}")
+            except ValueError as ve:
+                raise ve  # Manejar errores de validación de datos
+
+        # Actualizar el número de copias y componer artículos
         pedido.infmesa.numcopias = 0
-        pedido.infmesa.save()   
+        pedido.infmesa.save()
         pedido.infmesa.componer_articulos()
         pedido.infmesa.unir_en_grupos()
-        comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
-           
-        lineas = []
-        for l in pedido.lineaspedido_set.all():
-            lineas.append(l.serialize())
 
-        comunicar_cambios_devices("insert", "lineaspedido", lineas)
+        # Notificar los cambios a los dispositivos conectados
+        comunicar_cambios_devices("md", "mesasabiertas", mesa.serialize())
+
+        lineas_serializadas = [l.serialize() for l in pedido.lineaspedido_set.all()]
+        comunicar_cambios_devices("insert", "lineaspedido", lineas_serializadas)
 
         return pedido
 

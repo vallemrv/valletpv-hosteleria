@@ -1,11 +1,35 @@
+import openai
+import tempfile
+import logging
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
+from pydub import AudioSegment
+from pydub.utils import which
+from django.views.decorators.csrf import csrf_exempt
+
 from api_android.decorators import verificar_uid_activo
+AudioSegment.converter = which("ffmpeg")
 
+client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
-@verificar_uid_activo  # Utiliza tu decorador para verificar el UID
+def convertir_audio_a_mp3(audio_file):
+    """
+    Convierte un archivo de audio 3GP a MP3 usando un archivo temporal y lo devuelve.
+    """
+    try:
+        # Crear un archivo temporal para el archivo 3GP
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_mp3:
+            audio = AudioSegment.from_file(audio_file, format="3gp")
+            audio.export(temp_mp3.name, format="mp3")  # Convertir a MP3 y guardar
+            return temp_mp3.name  # Devolver la ruta del archivo MP3 convertido
+
+    except Exception as e:
+        logging.error(f"Error al convertir el archivo a MP3: {e}")
+        raise
+
+@verificar_uid_activo
 def subir_audio(request):
     if request.method == 'POST':
         # Verificar si se recibió el archivo
@@ -14,33 +38,39 @@ def subir_audio(request):
 
         # Obtener el archivo de audio del request
         audio_file = request.FILES['audio']
-        file_name = audio_file.name
 
-        # Definir la carpeta "whisper" dentro de MEDIA_ROOT
-        whisper_folder = os.path.join(settings.MEDIA_ROOT, 'whisper')
+        # Verificar que el archivo sea 3GP
+        if audio_file.content_type != 'audio/3gp':
+            return JsonResponse({'error': 'Formato de archivo no permitido. Solo se admite 3GP.'}, status=400)
 
-        # Asegurarse de que la carpeta exista
-        if not os.path.exists(whisper_folder):
-            os.makedirs(whisper_folder)
+        try:
+            # Convertir el archivo a MP3
+            audio_mp3_path = convertir_audio_a_mp3(audio_file)
 
-        # Crear una instancia de FileSystemStorage con la carpeta correcta
-        fs = FileSystemStorage(location=whisper_folder)
+            # Enviar el archivo MP3 convertido a Whisper
+            with open(audio_mp3_path, 'rb') as f:
+                response = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    response_format="text",
+                    language="es"  # Especifica el idioma si es necesario
+                )
 
-        # Verificar si ya existe un archivo con el mismo nombre y eliminarlo si existe
-        existing_file_path = os.path.join(whisper_folder, file_name)
-        if os.path.exists(existing_file_path):
-            os.remove(existing_file_path)
+            # Obtener la transcripción del archivo de audio
+            transcription = response
 
+            # Eliminar el archivo MP3 temporal después de usarlo
+            os.remove(audio_mp3_path)
+            print(transcription)
 
-        # Guardar el archivo usando FileSystemStorage
-        saved_file_path = fs.save(file_name, audio_file)
+            # Responder con la transcripción
+            return JsonResponse({
+                'message': 'Transcripción exitosa',
+                'transcription': transcription
+            }, status=200)
 
-        # Obtener la URL pública del archivo
-        file_url = fs.url(saved_file_path)
-
-        return JsonResponse({
-            'message': 'Archivo de audio subido correctamente',
-            'file_url': file_url
-        }, status=200)
+        except Exception as e:
+            logging.error(f"Error en el proceso de transcripción: {e}")
+            return JsonResponse({'error': 'Error durante la transcripción'}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)

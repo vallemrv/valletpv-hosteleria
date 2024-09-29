@@ -11,6 +11,7 @@ from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from api_android.decorators import verificar_uid_activo
 from gestion.models.mesasabiertas import Mesasabiertas 
 from gestion.models.sync import Sync
 from gestion.models.pedidos import Pedidos
@@ -33,7 +34,7 @@ def marcar_rojo(request):
 
 
 
-@csrf_exempt
+@verificar_uid_activo
 def pedir(request):
     idm = request.POST["idm"]
     idc = request.POST["idc"]
