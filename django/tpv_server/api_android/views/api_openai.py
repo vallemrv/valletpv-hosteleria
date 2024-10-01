@@ -15,9 +15,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 
 
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-
 import json
 from uuid import uuid4
 
@@ -87,7 +84,7 @@ def subir_audio(request):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-@csrf_exempt
+@verificar_uid_activo
 def buscar_ids(request):
     if request.method == 'POST':
         teclas = Teclas.objects.all()
@@ -115,52 +112,42 @@ def buscar_ids(request):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-
-@csrf_exempt
+@verificar_uid_activo
 def procesar_pedido(request):
-    # Recibir el JSON completo del pedido
+    # Intentar decodificar el cuerpo del request a JSON
 
-    print(request.body)
-    return JsonResponse({})
-    data = json.loads(request.body)
-
-    # Extraer el pedido del JSON
-    pedido_data = data.get("pedido", {})
-
-    # Obtener el nombre de la mesa desde el JSON y buscar su ID
-    nombre_mesa = pedido_data.get("mesa", "")
-    mesa = get_object_or_404(Mesas, nombre=nombre_mesa)
-
-    # Usar el ID de camarero por defecto (1)
-    idc = 1
-
-    # Obtener o generar el UID del dispositivo
-    uid_device = request.POST.get("uid_device", str(uuid4()))
-
-    # Parsear y transformar las líneas del pedido desde el JSON
-    lineas = pedido_data.get("items", [])
-    lineas_transformadas = transformar_lineas(lineas)
-
-    # Llamar a agregar_nuevas_lineas con el formato adecuado
-    pedido = Pedidos.agregar_nuevas_lineas(mesa.id, idc, lineas_transformadas, uid_device)
     
-    if pedido:
-        # Imprimir el pedido si se ha creado correctamente
-        imprimir_pedido(pedido.id)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    
 
-    return HttpResponse("success")
+    # Verificar que las claves 'mesa' y 'items' están presentes
+    if 'mesa' not in data or 'pedido' not in data:
+        return JsonResponse({"error": "Missing 'mesa' or 'pedido' in request"}, status=400)
 
+    # Verificar que 'mesa' es una cadena
+    if not isinstance(data['mesa'], str):
+        return JsonResponse({"error": "'mesa' debe ser una cadena"}, status=400)
 
-# Función que transforma las líneas del JSON de entrada al formato que agregar_nuevas_lineas necesita
-def transformar_lineas(items):
-    lineas_transformadas = []
-    for item in items:
-        linea = {
-            "IDArt": item.get("id", ""),  # El ID del artículo
-            "Descripcion": item.get("descripcion", ""),  # Descripción del artículo
-            "descripcion_t": item.get("descripcion_ticket", ""),  # Descripción para el ticket
-            "Precio": item.get("precio_normal", 0.0),  # Usar el precio normal
-            "cantidad": item.get("cantidad", 1)  # Cantidad del artículo
-        }
-        lineas_transformadas.append(linea)
-    return lineas_transformadas
+    # Verificar que 'items' es una lista
+    if not isinstance(data['pedido'], list):
+        return JsonResponse({"error": "'items' debe ser una lista"}, status=400)
+
+    # Verificar que cada item en 'items' tiene las claves necesarias
+    required_keys = {'id_articulo', 'cantidad', 'sugerencia', 'nombre'}
+    for item in data['pedido']:
+        if not isinstance(item, dict):
+            return JsonResponse({"error": "Cada item debe ser un diccionario"}, status=400)
+        missing_keys = required_keys - item.keys()
+        if missing_keys:
+            return JsonResponse({"error": f"Faltan las claves {missing_keys} en uno o más items"}, status=400)
+
+        print(item)
+        tecla = Teclas.objects.get(id=item["id_articulo"])
+        print(tecla.serialize())
+        for s in Subteclas.objects.filter(tecla__id=tecla.id):
+            print(s.serialize())
+    # Retornar éxito si todo está correcto
+    return JsonResponse({"success": True})
