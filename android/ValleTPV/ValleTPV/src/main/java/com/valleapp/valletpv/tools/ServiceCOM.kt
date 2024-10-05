@@ -33,6 +33,8 @@ class ServiceCOM: ServiceComBase() {
     private var usarCashlogy: Boolean = false
     private var cashlogySocketManager: CashlogySocketManager? = null
     private var cashlogyManager: CashlogyManager? = null
+    private var usarTPV: Boolean = false
+    private var ipTPV: String? = null
 
     override fun startForegroundService() {
 
@@ -71,6 +73,8 @@ class ServiceCOM: ServiceComBase() {
         val out = super.onStartCommand(intent, flags, startId)
         urlCashlogy = intent.getStringExtra("url_cashlogy") // Recoger URL de Cashlogy
         usarCashlogy = intent.getBooleanExtra("usar_cashlogy", false) // Recoger estado del CheckBox
+        usarTPV = intent.getBooleanExtra("usar_tpvpc", false) // Recoger estado del CheckBox
+        ipTPV = intent.getStringExtra("ip_tpvpc") // Recoger IP del servidor TPVPC
 
         // Iniciar CashlogySocketManager si está habilitado
         if (usarCashlogy && urlCashlogy != null) {

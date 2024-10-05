@@ -38,6 +38,8 @@ public class ValleTPV extends Activity {
 
     private String urlCashlogy = "";
     private boolean usarCashlogy = false;
+    private boolean usarTPVPC = false;
+    private String ipTPVPC = "";
 
 
     private final Handler handleHttp = new Handler(Looper.getMainLooper()) {
@@ -132,6 +134,8 @@ public class ValleTPV extends Activity {
             intent.putExtra("url", server);
             intent.putExtra("url_cashlogy", urlCashlogy);  // Agregar URL de Cashlogy
             intent.putExtra("usar_cashlogy", usarCashlogy); // Agregar estado del CheckBox
+            intent.putExtra("usar_tpvpc", usarTPVPC); // Agregar estado del CheckBox
+            intent.putExtra("ip_tpvpc", ipTPVPC); // Agregar IP del servidor TPVPC
             startService(intent);
             bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
         }
@@ -154,17 +158,26 @@ public class ValleTPV extends Activity {
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
             if (pref == null) {
+                // Si no hay preferencias guardadas, redirigir a la actividad de preferencias
                 Intent intent = new Intent(this, PreferenciasTPV.class);
                 startActivity(intent);
             } else {
+                // Cargar URL del servidor
                 server = pref.getString("URL");
-                urlCashlogy = pref.optString("URL_Cashlogy", ""); // Leer URL_Cashlogy
-                usarCashlogy = pref.optBoolean("usaCashlogy", false); // Leer usarCashlogy
+
+                // Cargar preferencias de Cashlogy
+                urlCashlogy = pref.optString("URL_Cashlogy", "");  // Leer URL de Cashlogy
+                usarCashlogy = pref.optBoolean("usaCashlogy", false);  // Leer si se usa Cashlogy
+
+                // Cargar preferencias de TPVPC (nuevos elementos)
+                usarTPVPC = pref.optBoolean("usaTPVPC", false);  // Leer si se usa TPVPC
+                ipTPVPC = pref.optString("IP_TPVPC", "");  // Leer la IP del servidor TPVPC
             }
         } catch (Exception e) {
-           Log.e("VALLETPV_ERR", e.toString());
+            Log.e("VALLETPV_ERR", e.toString());
         }
     }
+
 
 
     private final ServiceConnection mConexion = new ServiceConnection() {

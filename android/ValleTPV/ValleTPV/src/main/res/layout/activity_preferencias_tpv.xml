@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
@@ -56,8 +57,45 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Botones OK y Salir en la parte inferior derecha -->
+    <!-- Espacio entre los componentes -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/txtCashlogyConnector"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- CheckBox para usar TPVPC -->
+    <CheckBox
+        android:id="@+id/chkUseTPVPC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:text="@string/usar_tpvpc"
+        android:textSize="34sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtCashlogyConnector" />
+
+    <!-- Espacio entre los componentes -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/chkUseTPVPC"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- EditText para la IP del servidor TPVPC -->
+    <EditText
+        android:id="@+id/txtTPVPCServer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/ip_del_servidor_tpvpc"
+        android:importantForAutofill="no"
+        android:inputType="textUri"
+        android:textSize="34sp"
+        app:layout_constraintTop_toBottomOf="@+id/chkUseTPVPC"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Botones OK y Salir en la parte inferior derecha -->
     <Button
         android:id="@+id/btn_aceptar_preferencias"
         android:layout_width="100dp"
