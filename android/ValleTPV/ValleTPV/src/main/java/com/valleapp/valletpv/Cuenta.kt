@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
 import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
 import com.valleapp.valletpv.tools.ServiceCOM;
+import com.valleapp.valletpv.tpvcremoto.CobroTarjetaActivity;
 import com.valleapp.valletpvlib.db.DBCamareros;
 import com.valleapp.valletpvlib.db.DBCuenta;
 import com.valleapp.valletpvlib.db.DBMesas;
@@ -126,7 +127,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 myServicio.setMesa_abierta(mesa);
                 get_cuenta();
             }catch (Exception e){
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "Error al conectar con el servicio: ${e}");
             }
         }
 
@@ -146,7 +147,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 mostrarCobrar(dbCuenta.filterGroup("IDMesa=" + id_mesa), totalMesa);
                 findViewById(R.id.loading).setVisibility(View.GONE);
             }catch (Exception e ){
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "Error al mostrar cobrar: $e");
             }
         }
     };
@@ -168,7 +169,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             rellenarSecciones();
         }
     };
-
 
     @SuppressLint("HandlerLeak")
     private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
@@ -193,12 +193,10 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 }
 
             } catch (JSONException e) {
-               Log.e("ERROR_CUENTA", e.toString());
+               Log.e("ERROR_CUENTA", "Error al cargar la cuenta: $e");
             }
         }
     };
-
-
 
     //Inicializacion de estados y vista
     private void rellenarSecciones() {
@@ -246,7 +244,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                             rellenarArticulos(lsart);
                             lsartresul = lsart;
                         } catch (JSONException e) {
-                            Log.e("ERROR_CUENTA", e.toString());
+                            Log.e("ERROR_CUENTA", "Error al cargar las secciones: $e");
                         }
                     });
 
@@ -265,7 +263,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
 
         }catch (Exception e){
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar las secciones: $e");
         }
     }
 
@@ -278,7 +276,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
 
         } catch (Exception e) {
-            Log.e("ERROR_CUENTA", "Error al cargar las preferencias");
+            Log.e("ERROR_CUENTA", "Error al cargar las preferencias: $e");
         }
 
     }
@@ -291,7 +289,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 p.put("idm", mesa.getString("ID"));
                 myServicio.getCuenta(handlerHttp, p);
             } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "Error al cargar la cuenta");
+                Log.e("ERROR_CUENTA", "Error al cargar la cuenta: $e");
             }
         }
     }
@@ -388,7 +386,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                                 pedirArt(artSel);
                                 rellenarArticulos(lsartresul);
                             }catch (Exception e){
-                               Log.e("ERROR_CUENTA", e.toString());
+                               Log.e("ERROR_CUENTA", "Error al cargar el articulo: $e");
                             }
                         });
                     }
@@ -405,10 +403,9 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
 
         }catch (Exception e){
-           Log.e("ERROR_CUENTA", e.toString());
+           Log.e("ERROR_CUENTA", "Error al cargar los articulos: $e");
         }
     }
-
 
     private String componerDescripcion(JSONObject o, String descipcion){
         String aux = "";
@@ -420,12 +417,10 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 aux = o.getString("Nombre");
             }
         }catch (Exception e){
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar la descripcion: $e");
         }
         return  aux;
     }
-
-
 
     @SuppressLint("DefaultLocale")
     private void rellenarTicket() {
@@ -454,7 +449,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
 
         } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
         }
 
     }
@@ -474,7 +469,6 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
                 final Context con = this;
                 final IControladorCuenta activity = this;
-                Log.d("ERROR_CUENTA", "mostrarSeparados");
                 lineas = dbCuenta.getAll(mesa.getString("ID"));
                 DlgSepararTicket dlg = new DlgSepararTicket(con, activity);
                 dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
@@ -482,7 +476,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dlg.show();
 
             } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
             }
         }
     }
@@ -502,7 +496,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 dbMesas.marcarRojo(mesa.getString("ID"));
             }
         } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
         }
     }
 
@@ -519,7 +513,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                         p, "abrir_cajon");
                 dlg.show();
             } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
             }
         }else {
             if (myServicio != null) myServicio.abrirCajon();
@@ -529,10 +523,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1) { // Este es el código que usamos en startActivityForResult
-            if (resultCode == Activity.RESULT_OK) {
-                // Cobro exitoso
+        if (requestCode == 1 || resultCode == 2) { // Este es el código que usamos en startActivityForResult
+               // Cobro exitoso
                 double totalIngresado = data.getDoubleExtra("totalIngresado", 0.0);
 
                 // Recibir los datos adicionales
@@ -544,7 +536,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 try {
                     lst = new JSONArray(lineasString);
                 } catch (JSONException e) {
-                    Log.e("ERROR_CUENTA", e.toString());
+                    Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
                 }
 
                 cobrar(lst, totalMesa, totalIngresado);
@@ -554,9 +546,8 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 // Cobro cancelado
                 Toast.makeText(this, "Cobro cancelado", Toast.LENGTH_LONG).show();
             }
-        }
-    }
 
+    }
 
     public void cobrarMesa(View v) {
         try {
@@ -571,7 +562,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                         JSONArray l = dbCuenta.filterGroup("IDMesa=" + mesa.getString("ID"));
                         mostrarCobrar(l, totalMesa);
                     }catch (Exception e){
-                        Log.e("ERROR_CUENTA", e.toString());
+                        Log.e("ERROR_CUENTA", "Error al mostrar cobrar: $e");
                     }
                 }
             }, 1000);
@@ -619,7 +610,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             dbCuenta.addArt(mesa.getInt("ID"), art);
             rellenarTicket();
         } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
         }
     }
 
@@ -640,7 +631,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
            title.setText(cam.getString("nombre") +" "+
                    cam.getString("apellidos")+  " -- "+mesa.getString("Nombre"));
         } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "Error al cargar los datos de la cuenta: $e");
         }
     }
 
@@ -658,13 +649,13 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                       Log.e("ERROR_CUENTA", e.toString());
+                       Log.e("ERROR_CUENTA", "En onTextChanged: $e");
                     }
                     lsartresul = dbTeclas.findLike(str, t);
                     mostrarBusqueda.sendEmptyMessage(1);
                  }).start();
              } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "En onTextChanged: $e");
             }
         }
     }
@@ -679,7 +670,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             String idm = mesa.getString("ID");
             aparcar(idm, dbCuenta.getNuevos(idm));
         }catch (Exception e){
-           Log.e("ERROR_CUENTA", e.toString());
+           Log.e("ERROR_CUENTA", "En onPause:  $e");
         }
         super.onPause();
     }
@@ -719,7 +710,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             findViewById(R.id.loading).setVisibility(View.GONE);
 
         } catch (Exception e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "En onResume:  $e");
         }
        super.onResume();
     }
@@ -736,14 +727,15 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             try {
                 setEstadoAutoFinish(true, true);
                 if (dlgCobrar != null) dlgCobrar.dismiss();
-                dlgCobrar = new DlgCobrar(this, this, myServicio.usaCashlogy());
+                dlgCobrar = new DlgCobrar(this, this,
+                        myServicio.usaCashlogy(), myServicio.usarTPV());
                 dlgCobrar.setTitle("Cobrar " + mesa.getString("Nombre"));
                 dlgCobrar.setDatos(lsart, totalCobro);
                 dlgCobrar.setOnDismissListener(dialogInterface -> dlgCobrar = null);
                 dlgCobrar.show();
 
             } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA", "En mostrar cobrar: "+ e);
             }
         }
     }
@@ -758,6 +750,18 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
 
         // Iniciar la Activity y esperar un resultado (usando el código 1 para identificarla)
         startActivityForResult(intent, 1);
+    }
+
+    @Override
+    public void cobrarConTpvPC(JSONArray lsart, Double totalCobro) {
+        Intent intent = new Intent(this, CobroTarjetaActivity.class);
+
+        intent.putExtra("totalMesa", totalCobro);
+        intent.putExtra("lineas", lsart.toString());
+        intent.putExtra("urlTPVPC", myServicio.getIPTPV());
+
+        // Iniciar la Activity y esperar un resultado (usando el código 1 para identificarla)
+        startActivityForResult(intent, 2);
     }
 
 
@@ -803,7 +807,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             }
 
         } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "En cobrar: $e");
         }
 
     }
@@ -874,7 +878,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                });
 
             }catch (Exception e){
-                Log.e("ERROR_CUENTA", e.toString());
+                Log.e("ERROR_CUENTA",  "En clickMostrarBorrar: $e");
             }
 
             dlg.show();
@@ -920,7 +924,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
             toast.show();
         } catch (Exception e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "En asociarBotonera: $e");
         }
 
     }
@@ -963,7 +967,7 @@ public class Cuenta extends Activity implements TextWatcher, IControladorCuenta,
                 }
             }
         }catch (Exception e){
-            Log.e("ERROR_CUENTA", e.toString());
+            Log.e("ERROR_CUENTA", "En borrarLinea: $e");
         }
     }
 
