@@ -34,23 +34,23 @@ import java.util.TimerTask
 abstract class ServiceComBase : Service(), IControllerWS {
 
     var zona: JSONObject? = null
-    private var mesa_abierta: JSONObject? = null
+    private var mesaAbierta: JSONObject? = null
 
     var server: String? = null
 
-    var timerUpdateLow: Timer = Timer()
-    var timerManejarInstrucciones: Timer = Timer()
+    private var timerUpdateLow: Timer = Timer()
+    private var timerManejarInstrucciones: Timer = Timer()
 
-    var exHandler: MutableMap<String, Handler> = HashMap()
-    var dbs: MutableMap<String?, IBaseDatos>? = null
+    private var exHandler: MutableMap<String, Handler> = HashMap()
+    private var dbs: MutableMap<String?, IBaseDatos>? = null
 
     val colaInstrucciones: Queue<Instrucciones> = LinkedList()
     var tbNameUpdateLow: Array<String>? = null
 
-    var wsClient: WSClient? = null
+    private var wsClient: WSClient? = null
 
 
-    protected val controller_http: Handler = object : Handler(Looper.getMainLooper()) {
+    protected val controllerHttp: Handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val op = msg.data.getString("op")
             val res = msg.data.getString("RESPONSE")
@@ -68,13 +68,13 @@ abstract class ServiceComBase : Service(), IControllerWS {
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("SERVICE_COM", e.toString())
+                Log.e("SERVICE_COM", "CONTROLLER_HTTP  $e")
                 }
             }
         }
     }
 
-    private fun sync_device(tbs: Array<String>?, timeout: Long) {
+    private fun syncDevice(tbs: Array<String>?, timeout: Long) {
         try {
             val t = Timer()
             t.schedule(object : TimerTask() {
@@ -88,7 +88,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
                             "$server/sync/sync_devices",
                             p,
                             "update_socket",
-                            controller_http
+                            controllerHttp
                         )
                         try {
                             Thread.sleep(timeout)
@@ -99,12 +99,12 @@ abstract class ServiceComBase : Service(), IControllerWS {
                 }
             }, 50)
         } catch (e: Exception) {
-            Log.e("SERVICE_COM", e.toString())
+            Log.e("SERVICE_COM", "Error en sync_device try pincipal: $e")
         }
     }
 
     override fun sincronizar() {
-        sync_device(arrayOf("camareros", "mesasabiertas", "lineaspedido"), 500)
+        syncDevice(arrayOf("camareros", "mesasabiertas", "lineaspedido"), 500)
     }
 
     override fun procesarRespose(o: JSONObject) {
@@ -113,29 +113,43 @@ abstract class ServiceComBase : Service(), IControllerWS {
             val op = o.getString("op")
             val db = getDb(tb) as IBaseSocket?
             if (db != null) {
-                var objs = JSONArray()
+                var objs: JSONArray
+
+                // Verificar si "obj" es un JSONArray o un JSONObject
                 try {
                     val obj = o.getJSONObject("obj")
+                    objs = JSONArray()
                     objs.put(obj)
                 } catch (ignored: JSONException) {
+                    // Si es un JSONArray
                     objs = o.getJSONArray("obj")
                 }
 
+                // Procesar cada objeto en el JSONArray
                 for (i in 0 until objs.length()) {
                     val obj = objs.getJSONObject(i)
-                    if (op == "insert") db.insert(obj)
-                    if (op == "md") db.update(obj)
-                    if (op == "rm") db.rm(obj)
+                    when (op) {
+                        "insert" -> db.insert(obj)
+                        "md" -> db.update(obj)
+                        "rm" -> db.rm(obj)
+                    }
                 }
 
+                // Manejo del handler si es necesario
                 val h = getExHandler(tb)
-                if (h != null) {
-                    if (tb == "lineaspedido" && op != "rm" && mesa_abierta != null) {
-                        val obj_idmesa = o.getJSONObject("obj").getString("IDMesa")
-                        val id_mesa_abierta = mesa_abierta!!.getString("ID")
-                        if (obj_idmesa != id_mesa_abierta) return
+                if (h != null && objs.length() > 0) {
+                    if (tb == "lineaspedido" && op != "rm" && mesaAbierta != null) {
+                        val idMesaAbierta = mesaAbierta!!.getString("ID")
+                        for (i in 0 until objs.length()) {
+                            val objIdmesa = objs.getJSONObject(i).getString("IDMesa")
+                            if (objIdmesa == idMesaAbierta) {
+                                h.sendEmptyMessage(0)
+                                break
+                            }
+                        }
+                    } else {
+                        h.sendEmptyMessage(0)
                     }
-                    h.sendEmptyMessage(0)
                 }
             }
         } catch (e: Exception) {
@@ -152,7 +166,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
 
         if (url != null) {
             server = url
-            IniciarDB()
+            iniciarDB()
 
             if (wsClient == null) {
                 //crearWebsocket();
@@ -165,7 +179,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
             // Programar la sincronización periódica
             timerUpdateLow.schedule(object : TimerTask() {
                 override fun run() {
-                    sync_device(tbNameUpdateLow, 1000)
+                    syncDevice(tbNameUpdateLow, 1000)
                 }
             }, 1000, 290000)
 
@@ -206,7 +220,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
         return null
     }
 
-    private fun IniciarDB() {
+    private fun iniciarDB() {
         if (tbNameUpdateLow == null) {
             tbNameUpdateLow = arrayOf(
                 "camareros",
@@ -261,8 +275,8 @@ abstract class ServiceComBase : Service(), IControllerWS {
         )
     }
 
-    fun setMesa_abierta(m: JSONObject?) {
-        this.mesa_abierta = m
+    fun mesaAbierta(m: JSONObject?) {
+        this.mesaAbierta = m
     }
 
 }

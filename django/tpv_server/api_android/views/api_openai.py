@@ -89,34 +89,48 @@ def buscar_ids(request):
     if request.method == 'POST':
         teclas = Teclas.objects.all()
 
-        # Crear la respuesta JSON con el id y nombre de las teclas encontradas
+        # Crear la respuesta JSON con el id, nombre y precio de las teclas encontradas
         items_response = []
         for tecla in teclas:
-            # Obtener subteclas relacionadas con la tecla actual
-            subteclas = Subteclas.objects.filter(tecla=tecla.id)
-            if subteclas.exists():
-                for subtecla in subteclas:
-                    items_response.append({
-                        'nombre': f"{tecla.nombre} {subtecla.nombre}",
-                        'id': tecla.id
-                    })
-            else:
+            
+            # Construcción del nombre y precio según el tipo de tecla
+            if tecla.tipo == 'SP':  # Tipo SP
+                nombre_tecla = tecla.descripcion_r != "" if tecla.descripcion_r else tecla.nombre
+                precio_tecla = tecla.p1
                 items_response.append({
-                    'nombre': tecla.nombre,
-                    'id': tecla.id
+                    'nombre': nombre_tecla,
+                    'id': tecla.id,
+                    'precio': precio_tecla
                 })
+            elif tecla.tipo == 'CM':  # Tipo CM
+                # Obtener subteclas relacionadas con la tecla actual
+                subteclas = Subteclas.objects.filter(tecla=tecla.id)
+
+                for subtecla in subteclas:
+                    if subtecla.descripcion_r != "":  # Si la subtecla tiene descripción_p
+                        nombre_completo = subtecla.descripcion_r
+                    else:
+                        nombre_completo = f"{tecla.nombre} {subtecla.nombre}"
+
+                    # Precio de la tecla + incremento de la subtecla
+                    precio_completo = tecla.p1 + subtecla.incremento 
+
+                    items_response.append({
+                        'nombre': nombre_completo,
+                        'id': tecla.id,
+                        'precio': precio_completo
+                    })
 
         # Devolver el resultado como JSON
         return JsonResponse({'items': items_response})
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
 
 
 @verificar_uid_activo
 def procesar_pedido(request):
     # Intentar decodificar el cuerpo del request a JSON
-
-    
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:

@@ -16,6 +16,7 @@
         android:gravity="center"
         android:padding="14dp"
         android:text="Cobro con tarjeta"
+        android:background="@color/pink"
         android:textColor="@android:color/black"
         android:textSize="52sp"
         android:textStyle="bold" />

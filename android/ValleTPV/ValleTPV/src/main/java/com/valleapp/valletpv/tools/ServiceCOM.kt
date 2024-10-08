@@ -75,7 +75,6 @@ class ServiceCOM: ServiceComBase() {
         usarCashlogy = intent.getBooleanExtra("usar_cashlogy", false) // Recoger estado del CheckBox
         usarTPV = intent.getBooleanExtra("usar_tpvpc", false) // Recoger estado del CheckBox
         ipTPV = intent.getStringExtra("ip_tpvpc") // Recoger IP del servidor TPVPC
-
         // Iniciar CashlogySocketManager si está habilitado
         if (usarCashlogy && urlCashlogy != null) {
             iniciarCashlogySocketManager(urlCashlogy)
@@ -96,7 +95,7 @@ class ServiceCOM: ServiceComBase() {
         if (!usarCashlogy) {
             if (server != null) HTTPRequest(
                 "$server/impresion/abrircajon",
-                ContentValues(), "abrir_cajon", controller_http
+                ContentValues(), "abrir_cajon", controllerHttp
             )
         }
     }
@@ -122,7 +121,7 @@ class ServiceCOM: ServiceComBase() {
         p.put("id", idTicket)
         p.put("abrircajon", "False")
         p.put("receptor_activo", "True")
-        HTTPRequest("$server/impresion/imprimir_ticket", p, "", controller_http)
+        HTTPRequest("$server/impresion/imprimir_ticket", p, "", controllerHttp)
     }
 
     fun imprimirFactura(idTicket: String?) {
@@ -130,7 +129,7 @@ class ServiceCOM: ServiceComBase() {
         p.put("id", idTicket)
         p.put("abrircajon", "False")
         p.put("receptor_activo", "True")
-        HTTPRequest("$server/impresion/imprimir_factura", p, "", controller_http)
+        HTTPRequest("$server/impresion/imprimir_factura", p, "", controllerHttp)
     }
 
     fun getSettings(controller: Handler?) {
@@ -145,7 +144,7 @@ class ServiceCOM: ServiceComBase() {
         p.put("lista", lista)
         HTTPRequest(
             "$server/receptores/set_settings", p,
-            "set_settings", controller_http
+            "set_settings", controllerHttp
         )
     }
 
@@ -207,6 +206,18 @@ class ServiceCOM: ServiceComBase() {
         )
     }
 
+
+    /*
+    Metodos para la integracion de TPVPC
+     */
+    fun usaTPV(): Boolean {
+        return usarTPV
+    }
+
+    fun getIPTPV(): String? {
+        return ipTPV
+    }
+
     /*
     Metodos para la integracion del cashlogy
     */
@@ -247,6 +258,7 @@ class ServiceCOM: ServiceComBase() {
     fun usaCashlogy(): Boolean {
         return usarCashlogy
     }
+
 
     fun cashLogyPayment(amount: Double, uiHandler: Handler): PaymentAction {
         return cashlogyManager!!.makePayment(amount, uiHandler)

@@ -27,7 +27,7 @@ import java.util.Locale;
 public class CobroCashlogyActivity extends Activity {
 
      double totalMesa;
-     JSONArray lineas;
+     String lineas;
      ServiceCOM myServicio;
      PaymentAction paymentAction;
 
@@ -57,13 +57,7 @@ public class CobroCashlogyActivity extends Activity {
 
         // Recoger datos de la Intent
         totalMesa = getIntent().getDoubleExtra("totalMesa", 0.0);
-        String lineasString = getIntent().getStringExtra("lineas");
-
-        try {
-            lineas = new JSONArray(lineasString);
-        } catch (JSONException e) {
-            Log.e("COBRO_CASHLOGY", e.toString());
-        }
+        lineas = getIntent().getStringExtra("lineas");
 
 
         // Inicializar las vistas
@@ -144,7 +138,7 @@ public class CobroCashlogyActivity extends Activity {
 
         // Añadir los datos que recibiste al iniciar la actividad
         resultData.putExtra("totalMesa", totalMesa);
-        resultData.putExtra("lineas", lineas.toString());  // Convertir el JSONArray a String
+        resultData.putExtra("lineas", lineas);  // Convertir el JSONArray a String
 
 
         // Establecer el resultado de la actividad

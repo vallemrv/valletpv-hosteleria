@@ -21,8 +21,20 @@ class WSClient(
     companion object {
         // Método para construir la URI WebSocket con la lógica de reemplazo de "api" por "ws"
         private fun constructUri(serverUrl: String, endpoint: String): URI {
-            val wsUrl = serverUrl.replace("api", "ws") // Reemplaza "api" por "ws"
-            val fullUrl = "ws://$wsUrl$endpoint" // Construye la URL completa
+            val protocolo = when {
+                serverUrl.startsWith("http://") -> "ws://"
+                serverUrl.startsWith("https://") -> "wss://"
+                else -> "ws://"
+            }
+
+            val wsUrl =  when {
+                serverUrl.contains("api") -> serverUrl.replace("api", "ws")
+                endpoint.startsWith("/ws") -> serverUrl.replace("api", "")
+                else -> "$serverUrl/ws"
+            }
+
+
+            val fullUrl = "$protocolo$wsUrl$endpoint" // Construye la URL completa
             return URI(fullUrl)
         }
     }

@@ -14,6 +14,7 @@ import com.valleapp.valletpv.R;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -30,11 +31,15 @@ public class DlgCobrar extends Dialog{
     TextView lblCambio;
     TextView lbltotal;
     boolean usaCashlogy;
+    boolean usaTPVPC;
 
-    public DlgCobrar(Context context, IControladorCuenta controlador, boolean usaCashlogy) {
+    public DlgCobrar(Context context, IControladorCuenta controlador,
+                     boolean usaCashlogy,
+                     boolean usaTPVPC) {
         super(context);
         this.usaCashlogy = usaCashlogy;
         this.controlador = controlador;
+        this.usaTPVPC = usaTPVPC;
         setContentView(R.layout.cobros);
         lbltotal = findViewById(R.id.lblPrecio);
         lblEntrega =  findViewById(R.id.lblEntrega);
@@ -47,6 +52,8 @@ public class DlgCobrar extends Dialog{
         // Ocultar el LinearLayout si usaCashlogy es true
         if (usaCashlogy) {
             pne.setVisibility(View.GONE);
+        }else{
+            pne.setVisibility(View.VISIBLE);
         }
 
         s.setOnClickListener(this::clickSalir);
@@ -56,8 +63,8 @@ public class DlgCobrar extends Dialog{
 
     public void setDatos(JSONArray lineas, Double totalCobro){
         this.lineas = lineas;
-        lbltotal.setText(String.format("%01.2f €", totalCobro));
-        lblEntrega.setText(String.format("%01.2f €", totalCobro));
+        lbltotal.setText(String.format(Locale.getDefault(),"%01.2f €", totalCobro));
+        lblEntrega.setText(String.format(Locale.getDefault(),"%01.2f €", totalCobro));
         this.totalCobro = totalCobro;
         this.entrega = totalCobro;
         this.strEntrega = "";
@@ -66,7 +73,7 @@ public class DlgCobrar extends Dialog{
 
         for (View v : touchables){
             if (v instanceof Button){
-                v.setOnClickListener(view -> clickEntrega(view));
+                v.setOnClickListener(this::clickEntrega);
             }
         }
     }
@@ -80,14 +87,19 @@ public class DlgCobrar extends Dialog{
         }
         if(entrega>=totalCobro) {
             clickSalir(v);
-            controlador.cobrar(lineas, totalCobro, entrega);
+            controlador.cobrar(lineas, totalCobro, entrega, "");
         }
     }
 
     public void clickTarjeta(View v){
+        if (usaTPVPC){
+            controlador.cobrarConTpvPC(lineas, totalCobro);
+            clickSalir(v);
+            return;
+        }
         if (Objects.equals(entrega, totalCobro)) {
             clickSalir(v);
-            controlador.cobrar(lineas, totalCobro, 0.00);
+            controlador.cobrar(lineas, totalCobro, 0.00, "");
         }
     }
 
@@ -99,17 +111,17 @@ public class DlgCobrar extends Dialog{
         String caracter = v.getTag().toString();
         if(caracter.equals("C")){
             entrega = totalCobro; strEntrega="";
-            lblEntrega.setText(String.format("%01.2f €", totalCobro));
+            lblEntrega.setText(String.format(Locale.getDefault(), "%01.2f €", totalCobro));
             lblCambio.setText("0.00 €");
         }else{
             try {
                 strEntrega+=caracter;
                 entrega = Double.parseDouble(strEntrega);
-                lblEntrega.setText(String.format("%01.2f €", entrega));
-                if(entrega>totalCobro)  lblCambio.setText(String.format("%01.2f €", entrega-totalCobro));
+                lblEntrega.setText(String.format(Locale.getDefault(),"%01.2f €", entrega));
+                if(entrega>totalCobro)  lblCambio.setText(String.format(Locale.getDefault(),"%01.2f €", entrega-totalCobro));
             }catch (Exception e){
                 entrega = totalCobro; strEntrega= "";
-                lblEntrega.setText(String.format("%01.2f €", totalCobro));
+                lblEntrega.setText(String.format(Locale.getDefault(),"%01.2f €", totalCobro));
                 lblCambio.setText("0.00 €");
             }
         }

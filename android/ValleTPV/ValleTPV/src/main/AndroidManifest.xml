@@ -60,6 +60,10 @@
             android:label="@string/title_activity_op_mesas"
             />
         <activity
+            android:name=".tpvcremoto.CobroTarjetaActivity"
+            android:label="@string/cobroscontarjeta"
+            />
+        <activity
             android:name=".cashlogyActivitis.CobroCashlogyActivity"
             android:label="@string/cobro_por_cashlgoy"
             />

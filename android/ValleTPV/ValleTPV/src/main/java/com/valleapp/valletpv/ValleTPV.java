@@ -145,7 +145,6 @@ public class ValleTPV extends Activity {
 
     @Override
     protected void onDestroy() {
-        Log.d("TEST", "onDestroy");
         unbindService(mConexion);
         Intent intent = new Intent(cx, ServiceCOM.class);
         stopService(intent);
@@ -154,7 +153,6 @@ public class ValleTPV extends Activity {
 
     private void cargarPreferencias() {
         JSON json = new JSON();
-        Log.d("TEST", "estoy aqui");
         try {
             JSONObject pref = json.deserializar("preferencias.dat", this);
             if (pref == null) {

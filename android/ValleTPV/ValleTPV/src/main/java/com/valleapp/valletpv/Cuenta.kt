@@ -1,989 +1,894 @@
-package com.valleapp.valletpv;
+package com.valleapp.valletpv
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.ComponentName;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Dialog
+import android.content.ComponentName
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.graphics.Color
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.Message
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TableLayout
+import android.widget.TextView
+import android.widget.Toast
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket
+import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity
+import com.valleapp.valletpv.dlg.DlgCobrar
+import com.valleapp.valletpv.dlg.DlgPedirAutorizacion
+import com.valleapp.valletpv.dlg.DlgSepararTicket
+import com.valleapp.valletpv.dlg.DlgVarios
+import com.valleapp.valletpv.interfaces.IAutoFinish
+import com.valleapp.valletpv.interfaces.IControladorAutorizaciones
+import com.valleapp.valletpv.interfaces.IControladorCuenta
+import com.valleapp.valletpv.tools.ServiceCOM
+import com.valleapp.valletpv.tpvcremoto.CobroTarjetaActivity
+import com.valleapp.valletpvlib.db.DBCamareros
+import com.valleapp.valletpvlib.db.DBCuenta
+import com.valleapp.valletpvlib.db.DBMesas
+import com.valleapp.valletpvlib.db.DBSecciones
+import com.valleapp.valletpvlib.db.DBSubTeclas
+import com.valleapp.valletpvlib.db.DBTeclas
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 
-import androidx.annotation.NonNull;
+class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
 
-import com.valleapp.valletpv.adaptadoresDatos.AdaptadorTicket;
-import com.valleapp.valletpv.cashlogyActivitis.CobroCashlogyActivity;
-import com.valleapp.valletpv.tools.ServiceCOM;
-import com.valleapp.valletpv.tpvcremoto.CobroTarjetaActivity;
-import com.valleapp.valletpvlib.db.DBCamareros;
-import com.valleapp.valletpvlib.db.DBCuenta;
-import com.valleapp.valletpvlib.db.DBMesas;
-import com.valleapp.valletpvlib.db.DBSecciones;
-import com.valleapp.valletpvlib.db.DBSubTeclas;
-import com.valleapp.valletpvlib.db.DBTeclas;
-import com.valleapp.valletpv.dlg.DlgCobrar;
-import com.valleapp.valletpv.dlg.DlgPedirAutorizacion;
-import com.valleapp.valletpv.dlg.DlgSepararTicket;
-import com.valleapp.valletpv.dlg.DlgVarios;
-import com.valleapp.valletpv.interfaces.IAutoFinish;
-import com.valleapp.valletpv.interfaces.IControladorAutorizaciones;
-import com.valleapp.valletpv.interfaces.IControladorCuenta;
-import com.valleapp.valletpvlib.tools.JSON;
+    private var server = ""
+    private var dbSecciones: DBSecciones? = null
+    private var dbTeclas: DBTeclas? = null
+    private var dbCuenta: DBCuenta? = null
+    private var dbMesas: DBMesas? = null
+    private var dbSubteclas: DBSubTeclas? = null
 
+    private var cam: JSONObject? = null
+    private var mesa: JSONObject? = null
+    private var artSel: JSONObject? = null
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+    private var lineas: List<JSONObject>? = null
+    private var lsartresul: JSONArray? = null
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+    private var totalMesa = 0.00
 
+    private var tipo = ""
+    private var sec = ""
+    private var cantidad = 1
+    private var reset = true
+    private var stop = false
+    private var timerAutoCancel: Timer? = null
 
-public class Cuenta extends Activity implements TextWatcher, IControladorCuenta, IControladorAutorizaciones, IAutoFinish {
+    private val autoCancel: Long = 10000
 
-    private String server = "";
-    DBSecciones dbSecciones;
-    DBTeclas dbTeclas;
-    DBCuenta dbCuenta;
-    DBMesas dbMesas;
-    DBSubTeclas dbSubteclas;
+    private var myServicio: ServiceCOM? = null
 
-    JSONObject cam = null;
-    JSONObject mesa = null;
-    JSONObject artSel = null;
+    private val cx: Context = this
 
-    List<JSONObject> lineas = null;
-    JSONArray lsartresul = null;
+    private var dlgCobrar: DlgCobrar? = null
+    private var canRefresh = true
 
-    Double totalMesa = 0.00;
-
-    String tipo = "";
-    String sec = "";
-    int cantidad = 1;
-    Boolean reset = true;
-    Boolean stop = false;
-    Timer timerAutoCancel = null;
-
-    final long autoCancel = 10000;
-
-    ServiceCOM myServicio;
-
-    final Context cx = this;
-
-    private DlgCobrar dlgCobrar;
-    private boolean can_refresh = true;
-
-    private final ServiceConnection mConexion = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+    private val mConexion = object : ServiceConnection {
+        override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
             try {
-                myServicio = ((ServiceCOM.MyBinder) iBinder).getService();
-                myServicio.setExHandler("lineaspedido", handlerHttp);
-                myServicio.setExHandler("teclas", handlerSeccionesTeclas);
-                myServicio.setExHandler("secciones", handlerSeccionesTeclas);
-                dbCuenta = (DBCuenta) myServicio.getDb("lineaspedido");
-                dbMesas = (DBMesas) myServicio.getDb("mesas");
-                dbSecciones = (DBSecciones) myServicio.getDb("secciones");
-                dbTeclas = (DBTeclas) myServicio.getDb("teclas");
-                dbSubteclas = (DBSubTeclas) myServicio.getDb("subteclas");
-                rellenarSecciones();
-                rellenarTicket();
+                myServicio = (iBinder as ServiceCOM.MyBinder).service
+                myServicio?.setExHandler("lineaspedido", handlerHttp)
+                myServicio?.setExHandler("teclas", handlerSeccionesTeclas)
+                myServicio?.setExHandler("secciones", handlerSeccionesTeclas)
+                dbCuenta = myServicio?.getDb("lineaspedido") as DBCuenta
+                dbMesas = myServicio?.getDb("mesas") as DBMesas
+                dbSecciones = myServicio?.getDb("secciones") as DBSecciones
+                dbTeclas = myServicio?.getDb("teclas") as DBTeclas
+                dbSubteclas = myServicio?.getDb("subteclas") as DBSubTeclas
+                rellenarSecciones()
+                rellenarTicket()
 
-
-                if (tipo.equals("c")) {
-                    Timer t = new Timer();
-                    findViewById(R.id.loading).setVisibility(View.VISIBLE);
-                    t.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            handlerMostrarCobrar.sendEmptyMessage(0);
+                if (tipo == "c") {
+                    val t = Timer()
+                    findViewById<View>(R.id.loading).visibility = View.VISIBLE
+                    t.schedule(object : TimerTask() {
+                        override fun run() {
+                            handlerMostrarCobrar.sendEmptyMessage(0)
                         }
-                    }, 1000);
-
+                    }, 1000)
                 }
-                myServicio.setMesa_abierta(mesa);
-                get_cuenta();
-            }catch (Exception e){
-                Log.e("ERROR_CUENTA", "Error al conectar con el servicio: ${e}");
+                myServicio?.mesaAbierta(mesa)
+                getCuenta()
+            } catch (e: Exception) {
+                Log.e("ERROR_CUENTA", e.toString())
             }
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            myServicio = null;
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            myServicio = null
         }
-    };
+    }
 
     @SuppressLint("HandlerLeak")
-    private final Handler handlerMostrarCobrar = new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
+    private val handlerMostrarCobrar = @SuppressLint("HandlerLeak")
+    object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
             try {
-                final String id_mesa = mesa.getString("ID");
-                mostrarCobrar(dbCuenta.filterGroup("IDMesa=" + id_mesa), totalMesa);
-                findViewById(R.id.loading).setVisibility(View.GONE);
-            }catch (Exception e ){
-                Log.e("ERROR_CUENTA", "Error al mostrar cobrar: $e");
+                val idMesa = mesa?.getString("ID") ?: return
+                mostrarCobrar(dbCuenta!!.filterGroup("IDMesa=$idMesa"), totalMesa)
+                findViewById<View>(R.id.loading).visibility = View.GONE
+            } catch (e: Exception) {
+                Log.e("ERROR_CUENTA", e.toString())
             }
         }
-    };
+    }
 
     @SuppressLint("HandlerLeak")
-    private final Handler mostrarBusqueda= new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            rellenarArticulos(lsartresul);
+    private val mostrarBusqueda = @SuppressLint("HandlerLeak")
+    object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            rellenarArticulos(lsartresul)
         }
-    };
+    }
 
     @SuppressLint("HandlerLeak")
-    private final Handler handlerSeccionesTeclas= new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            rellenarSecciones();
+    private val handlerSeccionesTeclas = @SuppressLint("HandlerLeak")
+    object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            rellenarSecciones()
         }
-    };
+    }
 
     @SuppressLint("HandlerLeak")
-    private final Handler handlerHttp = new Handler(Looper.getMainLooper()){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
+    private val handlerHttp = @SuppressLint("HandlerLeak")
+    object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
             try {
-                reset=true;
-                String res = msg.getData().getString("RESPONSE");
+                reset = true
+                val res = msg.data.getString("RESPONSE")
                 if (res != null) {
-                    JSONObject datos = new JSONObject(res);
-                    if (datos.getBoolean("soniguales")){
-                        return;
-                    }
+                    val datos = JSONObject(res)
+                    if (datos.getBoolean("soniguales")) return
 
-                        JSONArray reg = datos.getJSONArray("reg");
-                        dbCuenta.replaceMesa(reg, mesa.getString("ID"));
-                        rellenarTicket();
-
-                }else{
-                    if (can_refresh) rellenarTicket();
+                    val reg = datos.getJSONArray("reg")
+                    dbCuenta!!.replaceMesa(reg, mesa!!.getString("ID"))
+                    rellenarTicket()
+                } else {
+                    if (canRefresh) rellenarTicket()
                 }
-
-            } catch (JSONException e) {
-               Log.e("ERROR_CUENTA", "Error al cargar la cuenta: $e");
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", e.toString())
             }
         }
-    };
+    }
 
-    //Inicializacion de estados y vista
-    private void rellenarSecciones() {
+    private fun rellenarSecciones() {
+        try {
+            val lssec = dbSecciones?.all ?: return
+            if (lssec.length() > 0) {
+                val ll = findViewById<LinearLayout>(R.id.pneSecciones)
+                ll.removeAllViews()
 
-        try{
+                val metrics = resources.displayMetrics
 
-            JSONArray lssec = dbSecciones.getAll();
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, Math.round(metrics.density * 100)
+                )
+                params.setMargins(5, 5, 5, 5)
 
-            if(lssec.length()>0){
+                for (i in 0 until lssec.length()) {
+                    val z = lssec.getJSONObject(i)
 
-                LinearLayout ll = findViewById(R.id.pneSecciones);
-                ll.removeAllViews();
+                    if (sec.isEmpty() && i == 0) sec = z.getString("ID")
 
-                DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,Math.round(metrics.density * 100));
-
-                params.setMargins(5,5,5,5);
-
-
-                for (int i = 0; i < lssec.length(); i++) {
-                    JSONObject  z =  lssec.getJSONObject(i);
-
-                    if(sec.isEmpty() && i==0) sec =  z.getString("ID");
-
-                    Button btn = new Button(cx);
-                    btn.setId(z.getInt("ID"));
-                    btn.setSingleLine(false);
-                    btn.setText(z.getString("Nombre"));
-                    btn.setTag(z.getString("ID"));
-                    btn.setTextSize(16);
-                    String rgb_str =  z.getString("RGB");
-                    if (rgb_str.isEmpty()){
-                        btn.setBackgroundResource(R.drawable.bg_pink);
-                    }else {
-                        String[] rgb = rgb_str.trim().split(",");
-                         btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
+                    val btn = Button(cx)
+                    btn.id = z.getInt("ID")
+                    btn.isSingleLine = false
+                    btn.text = z.getString("Nombre")
+                    btn.tag = z.getString("ID")
+                    btn.textSize = 16f
+                    val rgbStr = z.getString("RGB")
+                    if (rgbStr.isEmpty()) {
+                        btn.setBackgroundResource(R.drawable.bg_pink)
+                    } else {
+                        val rgb = rgbStr.trim().split(",").toTypedArray()
+                        btn.setBackgroundColor(
+                            Color.rgb(
+                                rgb[0].toInt(),
+                                rgb[1].toInt(),
+                                rgb[2].toInt()
+                            )
+                        )
                     }
-                    btn.setOnClickListener(view -> {
-                        setEstadoAutoFinish(true, false);
-                        sec =  view.getTag().toString();
+                    btn.setOnClickListener {
+                        setEstadoAutoFinish(r = true, s = false)
+                        sec = it.tag.toString()
                         try {
-                            JSONArray  lsart = dbTeclas.getAll(sec, mesa.getInt("Tarifa"));
-                            rellenarArticulos(lsart);
-                            lsartresul = lsart;
-                        } catch (JSONException e) {
-                            Log.e("ERROR_CUENTA", "Error al cargar las secciones: $e");
+                            val lsart = dbTeclas!!.getAll(sec, mesa!!.getInt("Tarifa"))
+                            rellenarArticulos(lsart)
+                            lsartresul = lsart
+                        } catch (e: JSONException) {
+                            Log.e("ERROR_CUENTA", e.toString())
                         }
-                    });
+                    }
 
-                    btn.setOnLongClickListener(view -> {
-                        asociarBotonera(view);
-                        return false;
-                    });
-                    ll.addView(btn, params);
+                    btn.setOnLongClickListener {
+                        asociarBotonera(it)
+                        false
+                    }
+                    ll.addView(btn, params)
                 }
 
-                JSONArray lsart = dbTeclas.getAll(sec,mesa.getInt("Tarifa"));
-                rellenarArticulos(lsart);
-                lsartresul = lsart;
-
-
+                val lsart = dbTeclas!!.getAll(sec, mesa!!.getInt("Tarifa"))
+                rellenarArticulos(lsart)
+                lsartresul = lsart
             }
-
-        }catch (Exception e){
-            Log.e("ERROR_CUENTA", "Error al cargar las secciones: $e");
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", e.toString())
         }
     }
 
-    private void cargarPreferencias() {
-        JSON json = new JSON();
-        try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
-            if(!pref.isNull("sec")) {
-                sec = pref.getString("sec");
-            }
-
-        } catch (Exception e) {
-            Log.e("ERROR_CUENTA", "Error al cargar las preferencias: $e");
-        }
-
-    }
-
-    private void get_cuenta(){
-        if(myServicio!=null & mesa != null) {
+    private fun getCuenta() {
+        if (myServicio != null && mesa != null) {
             try {
-                ContentValues p = new ContentValues();
-                p.put("reg", dbCuenta.filter("IDMesa=" + mesa.getString("ID")).toString());
-                p.put("idm", mesa.getString("ID"));
-                myServicio.getCuenta(handlerHttp, p);
-            } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "Error al cargar la cuenta: $e");
+                val p = ContentValues()
+                p.put("reg", dbCuenta!!.filter("IDMesa=" + mesa!!.getString("ID")).toString())
+                p.put("idm", mesa!!.getString("ID"))
+                myServicio!!.getCuenta(handlerHttp, p)
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", "Error al cargar la cuenta")
             }
         }
     }
 
-    //Mostrar datos de articulos y ticket
-    @SuppressLint({"DefaultLocale", "SetTextI18n"})
-    private void rellenarArticulos(JSONArray lsart) {
+    private fun rellenarArticulos(lsart: JSONArray?) {
         try {
+            if (lsart != null && lsart.length() > 0) {
+                val ll = findViewById<TableLayout>(R.id.pneArt)
+                ll.removeAllViews()
 
-            if(lsart.length()>0){
+                val metrics = resources.displayMetrics
 
-                TableLayout ll = findViewById(R.id.pneArt);
-                ll.removeAllViews();
+                val params = TableLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, Math.round(metrics.density * 100)
+                )
 
-                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                val rowparams = LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                rowparams.setMargins(5, 5, 5, 5)
+                rowparams.weight = 1f
 
-                TableLayout.LayoutParams params = new TableLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,Math.round(metrics.density * 100));
+                var row = LinearLayout(cx)
+                row.orientation = LinearLayout.HORIZONTAL
 
+                ll.addView(row, params)
 
-                LinearLayout.LayoutParams rowparams = new LinearLayout.LayoutParams(0,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
+                for (i in 0 until lsart.length()) {
+                    val m = lsart.getJSONObject(i)
 
-                rowparams.setMargins(5,5,5,5);
-                rowparams.weight = 1;
+                    val btn = Button(cx)
+                    btn.id = i
+                    btn.tag = m
 
-                LinearLayout row = new LinearLayout(cx);
-                row.setOrientation(LinearLayout.HORIZONTAL);
+                    if (m.has("RGB")) {
+                        btn.text =
+                            String.format(Locale.getDefault(), "%s\n%01.2f €",
+                                m.getString("Nombre"), m.getDouble("Precio"))
 
+                        val rgb = m.getString("RGB").split(",").toTypedArray()
+                        btn.setBackgroundColor(
+                            Color.rgb(
+                                rgb[0].toInt(),
+                                rgb[1].toInt(),
+                                rgb[2].toInt()
+                            )
+                        )
 
-                ll.addView(row, params);
-
-
-                for (int i = 0; i < lsart.length(); i++) {
-
-                    final JSONObject  m =  lsart.getJSONObject(i);
-
-                    Button btn = new Button(cx);
-
-                    btn.setId(i);
-                    btn.setTag(m);
-
-
-                    if (m.has("RGB")){
-                        btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",m.getDouble("Precio")));
-                        String[] rgb = m.getString("RGB").split(",");
-                        btn.setBackgroundColor(Color.rgb(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2])));
-
-                        btn.setOnClickListener(view -> {
+                        btn.setOnClickListener { view ->
                             try {
-                                artSel = (JSONObject) view.getTag();
-                                artSel = new JSONObject(artSel.toString());
-                                artSel.put("Can", cantidad);
-                                artSel.put("Descripcion", componerDescripcion(artSel, "descripcion_r"));
-                                artSel.put("descripcion_t", componerDescripcion(artSel, "descripcion_t"));
-                                if (artSel.getString("tipo").equals("SP")) {
-                                    pedirArt(artSel);
-                                }else{
-                                    rellenarArticulos(dbSubteclas.getAll(artSel.getString("ID")));
+                                artSel = (view.tag as JSONObject).apply {
+                                    put("Can", cantidad)
+                                    put("Descripcion", componerDescripcion(this, "descripcion_r"))
+                                    put("descripcion_t", componerDescripcion(this, "descripcion_t"))
                                 }
-                            }catch (Exception e){
-                               Log.e("ERROR_CUENTA", e.toString());
+                                if (artSel!!.getString("tipo") == "SP") {
+                                    pedirArt(artSel!!)
+                                } else {
+                                    rellenarArticulos(dbSubteclas!!.getAll(artSel!!.getString("ID")))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("ERROR_CUENTA", e.toString())
                             }
-                        });
-                    }else{
-                        final Double precio = this.artSel.getDouble("Precio")+ m.getDouble("Incremento");
-                        btn.setText(m.getString("Nombre")+"\n"+String.format("%01.2f €",precio));
+                        }
+                    } else {
+                        val precio = artSel!!.getDouble("Precio") + m.getDouble("Incremento")
+                        btn.text = String.format(Locale.getDefault(), "%s\n%01.2f €", m.getString("Nombre"), precio)
 
-                        btn.setBackgroundResource(R.drawable.bg_pink);
-                        btn.setOnClickListener(view -> {
+
+                        btn.setBackgroundResource(R.drawable.bg_pink)
+                        btn.setOnClickListener { view ->
                             try {
-                                JSONObject sub = (JSONObject) view.getTag();
-                                Intent it = getIntent();
-                                String des = sub.getString("descripcion_r");
-                                if (!des.equals("null") && !des.isEmpty()){
-                                    artSel.put("Descripcion", des);
-                                }else{
-                                    String nom = artSel.getString("Descripcion");
-                                    String subnom = sub.getString("Nombre");
-                                    artSel.put("Descripcion", nom+" "+subnom);
-
+                                val sub = view.tag as JSONObject
+                                val it = intent
+                                var des = sub.getString("descripcion_r")
+                                if (des != "null" && des.isNotEmpty()) {
+                                    artSel!!.put("Descripcion", des)
+                                } else {
+                                    val nom = artSel!!.getString("Descripcion")
+                                    val subnom = sub.getString("Nombre")
+                                    artSel!!.put("Descripcion", "$nom $subnom")
                                 }
-                                des = sub.getString("descripcion_t");
-                                if (!des.equals("null") && !des.isEmpty()){
-                                    artSel.put("descripcion_t", des);
-                                }else if(artSel.getString("descripcion_t").equals(artSel.getString("Nombre"))){
-                                    String nom = artSel.getString("descripcion_t");
-                                    String subnom = sub.getString("Nombre");
-                                    artSel.put("descripcion_t", nom+" "+subnom);
+                                des = sub.getString("descripcion_t")
+                                if (des != "null" && des.isNotEmpty()) {
+                                    artSel!!.put("descripcion_t", des)
+                                } else if (artSel!!.getString("descripcion_t") == artSel!!.getString("Nombre")) {
+                                    val nom = artSel!!.getString("descripcion_t")
+                                    val subnom = sub.getString("Nombre")
+                                    artSel!!.put("descripcion_t", "$nom $subnom")
                                 }
-                                artSel.put("Precio", precio);
-                                it.putExtra("art", artSel.toString());
-                                setResult(RESULT_OK, it);
-                                pedirArt(artSel);
-                                rellenarArticulos(lsartresul);
-                            }catch (Exception e){
-                               Log.e("ERROR_CUENTA", "Error al cargar el articulo: $e");
+                                artSel!!.put("Precio", precio)
+                                it.putExtra("art", artSel.toString())
+                                setResult(RESULT_OK, it)
+                                pedirArt(artSel!!)
+                                rellenarArticulos(lsartresul)
+                            } catch (e: Exception) {
+                                Log.e("ERROR_CUENTA", e.toString())
                             }
-                        });
+                        }
                     }
-                    row.addView(btn, rowparams);
+                    row.addView(btn, rowparams)
 
-                    if (((i+1) % 5) == 0) {
-                        row = new LinearLayout(cx);
-                        row.setOrientation(LinearLayout.HORIZONTAL);
-                        row.setMinimumHeight(130);
+                    if ((i + 1) % 5 == 0) {
+                        row = LinearLayout(cx)
+                        row.orientation = LinearLayout.HORIZONTAL
+                        row.minimumHeight = 130
 
-                        ll.addView(row, params);
+                        ll.addView(row, params)
                     }
                 }
             }
-
-        }catch (Exception e){
-           Log.e("ERROR_CUENTA", "Error al cargar los articulos: $e");
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", e.toString())
         }
     }
 
-    private String componerDescripcion(JSONObject o, String descipcion){
-        String aux = "";
-        try {
-            String des = o.getString(descipcion);
-            if (!des.equals("null") && !des.isEmpty()) {
-                aux = des;
-            }else{
-                aux = o.getString("Nombre");
-            }
-        }catch (Exception e){
-            Log.e("ERROR_CUENTA", "Error al cargar la descripcion: $e");
+    private fun componerDescripcion(o: JSONObject, descipcion: String): String {
+        return try {
+            val des = o.getString(descipcion)
+            if (des != "null" && des.isNotEmpty()) des else o.getString("Nombre")
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", e.toString())
+            ""
         }
-        return  aux;
+    }
+
+    private fun rellenarTicket() {
+        try {
+            resetCantidad()
+            lineas = dbCuenta?.getAll(mesa!!.getString("ID"))
+            totalMesa = dbCuenta!!.getTotal(mesa!!.getString("ID"))
+
+            if (dlgCobrar != null) {
+                dlgCobrar?.dismiss()
+                val t = Timer()
+                findViewById<View>(R.id.loading).visibility = View.VISIBLE
+                t.schedule(object : TimerTask() {
+                    override fun run() {
+                        handlerMostrarCobrar.sendEmptyMessage(0)
+                    }
+                }, 1000)
+            }
+
+            val l = findViewById<TextView>(R.id.lblPrecio)
+            val lst = findViewById<ListView>(R.id.lstCamareros)
+            l.text = String.format(Locale.getDefault(),"%01.2f €", totalMesa)
+            lst.adapter = AdaptadorTicket(cx, lineas as ArrayList<JSONObject>, this)
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
+
+    fun mostrarSeparados(v: View?) {
+        if (totalMesa > 0) {
+            try {
+                setEstadoAutoFinish(r = true, s = true)
+                aparcar(mesa!!.getString("ID"), dbCuenta!!.getNuevos(mesa!!.getString("ID")))
+                lineas = dbCuenta!!.getAll(mesa!!.getString("ID"))
+                val dlg = DlgSepararTicket(this, this)
+                dlg.setTitle("Separar ticket " + mesa!!.getString("Nombre"))
+                dlg.setLineasTicket(lineas!!)
+                dlg.show()
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", e.toString())
+            }
+        }
+    }
+
+    fun mostrarVarios(v: View?) {
+        setEstadoAutoFinish(true, true)
+        val dlg = DlgVarios(this, this)
+        dlg.show()
+    }
+
+
+    fun preImprimir(v: View?) {
+        try {
+            setEstadoAutoFinish(r = true, s = false)
+            aparcar(mesa!!.getString("ID"), dbCuenta!!.getNuevos(mesa!!.getString("ID")))
+
+            lineas = dbCuenta!!.getAll(mesa!!.getString("ID"))
+
+            if (totalMesa > 0) {
+                val p = ContentValues()
+                p.put("idm", mesa!!.getString("ID"))
+                myServicio?.preImprimir(p)
+                dbMesas?.marcarRojo(mesa!!.getString("ID"))
+            }
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
+
+    fun abrirCajon() {
+        setEstadoAutoFinish(r = true, s = false)
+        val dbCamareros = myServicio?.getDb("camareros") as DBCamareros?
+        if (dbCamareros?.getConPermiso("abrir_cajon")?.isNotEmpty() == true) {
+            try {
+                val p = JSONObject()
+                p.put("idc", cam!!.getString("ID"))
+                val dlg = DlgPedirAutorizacion(cx, this, dbCamareros, this, p, "abrir_cajon")
+                dlg.show()
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", e.toString())
+            }
+        } else {
+            myServicio?.abrirCajon()
+        }
     }
 
     @SuppressLint("DefaultLocale")
-    private void rellenarTicket() {
+    fun cobrarMesa(v: View?) {
         try {
-
-                resetCantidad();
-                lineas = dbCuenta.getAll(mesa.getString("ID"));
-                totalMesa = dbCuenta.getTotal(mesa.getString("ID"));
-
-                if (dlgCobrar != null){
-                    dlgCobrar.dismiss();
-                    Timer t = new Timer();
-                    findViewById(R.id.loading).setVisibility(View.VISIBLE);
-                    t.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                           handlerMostrarCobrar.sendEmptyMessage(0);
-                         }
-                    }, 1000);
+            aparcar(mesa!!.getString("ID"), dbCuenta!!.getNuevos(mesa!!.getString("ID")))
+            val t = Timer()
+            findViewById<View>(R.id.loading).visibility = View.VISIBLE
+            t.schedule(object : TimerTask() {
+                override fun run() {
+                    handlerMostrarCobrar.sendEmptyMessage(0)
+                    try {
+                        val l = dbCuenta!!.filterGroup("IDMesa=" + mesa!!.getString("ID"))
+                        mostrarCobrar(l, totalMesa)
+                    } catch (e: JSONException) {
+                        Log.e("ERROR_CUENTA", e.toString())
+                    }
                 }
-
-                TextView l = findViewById(R.id.lblPrecio);
-                ListView lst = findViewById(R.id.lstCamareros);
-                l.setText(String.format("%01.2f €", totalMesa));
-                lst.setAdapter(new AdaptadorTicket(cx, (ArrayList<JSONObject>) lineas, this));
-
-
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
-        }
-
-    }
-
-    //Dialogos
-    public void mostrarVarios(View v) {
-        setEstadoAutoFinish(true, true);
-        DlgVarios dlg= new DlgVarios(this, this);
-        dlg.show();
-    }
-
-    public void mostrarSeparados(View v) {
-        // TODO Auto-generated method stub
-        if( totalMesa > 0) {
-            try {
-                setEstadoAutoFinish(true, true);
-                aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-                final Context con = this;
-                final IControladorCuenta activity = this;
-                lineas = dbCuenta.getAll(mesa.getString("ID"));
-                DlgSepararTicket dlg = new DlgSepararTicket(con, activity);
-                dlg.setTitle("Separar ticket " + mesa.getString("Nombre"));
-                dlg.setLineasTicket(lineas);
-                dlg.show();
-
-            } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
-            }
+            }, 1000)
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
         }
     }
 
-    //Acciones con el servidor
-    public void preImprimir(View v){
-        try{
-            setEstadoAutoFinish(true, false);
-            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) { // data es opcional
+        super.onActivityResult(requestCode, resultCode, data)
 
-            lineas = dbCuenta.getAll(mesa.getString("ID"));
+        if (requestCode == 1) { // Este es el código que usamos en startActivityForResult
+            Log.d("Cobro", "Cobro finalizado $resultCode")
+            if (resultCode == RESULT_OK) {
+                // Verificar si el Intent no es nulo
+                data?.let {
+                    // Cobro exitoso
+                    val totalIngresado = it.getDoubleExtra("totalIngresado", 0.0)
 
-            if(totalMesa>0) {
-                ContentValues p = new ContentValues();
-                p.put("idm", mesa.getString("ID"));
-                if(myServicio!=null) myServicio.preImprimir(p);
-                dbMesas.marcarRojo(mesa.getString("ID"));
-            }
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
-        }
-    }
+                    // Recibir los datos adicionales
+                    val totalMesa = it.getDoubleExtra("totalMesa", 0.0)
+                    val lineasString = it.getStringExtra("lineas")
+                    val recibo = it.getStringExtra("recibo") ?: ""
 
-    public void abrirCajon(View v){
-        setEstadoAutoFinish(true,false);
-        DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-        assert dbCamareros != null;
-        if(!dbCamareros.getConPermiso("abrir_cajon").isEmpty()) {
-            try {
-                JSONObject p = new JSONObject();
-                p.put("idc", cam.getString("ID"));
-                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                        dbCamareros, this,
-                        p, "abrir_cajon");
-                dlg.show();
-            } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
-            }
-        }else {
-            if (myServicio != null) myServicio.abrirCajon();
-        }
-    }
+                    // Convertir lineasString de vuelta a JSONArray si lo necesitas
+                    var lst: JSONArray? = null
+                    try {
+                        lst = JSONArray(lineasString)
+                    } catch (e: JSONException) {
+                        Log.e("ERROR_CUENTA", "Error al convertir lineasString a JSONArray: $e")
+                    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 || resultCode == 2) { // Este es el código que usamos en startActivityForResult
-               // Cobro exitoso
-                double totalIngresado = data.getDoubleExtra("totalIngresado", 0.0);
+                    lst?.let { jsonArray ->
+                        cobrar(jsonArray, totalMesa, totalIngresado, recibo)
+                    } ?: run {
+                        Log.e("ERROR_CUENTA", "El JSONArray 'lineas' es nulo")
+                    }
 
-                // Recibir los datos adicionales
-                double totalMesa = data.getDoubleExtra("totalMesa", 0.0);
-                String lineasString = data.getStringExtra("lineas");
-
-                // Convertir lineasString de vuelta a JSONArray si lo necesitas
-                JSONArray lst = null;
-                try {
-                    lst = new JSONArray(lineasString);
-                } catch (JSONException e) {
-                    Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
+                    Toast.makeText(this, "Cobro realizado con éxito", Toast.LENGTH_LONG).show()
+                } ?: run {
+                    Log.e("Cobro", "Data es nulo aunque el resultado fue OK")
                 }
-
-                cobrar(lst, totalMesa, totalIngresado);
-
-                Toast.makeText(this, "Cobro realizado con éxito", Toast.LENGTH_LONG).show();
-            } else if (resultCode == Activity.RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 // Cobro cancelado
-                Toast.makeText(this, "Cobro cancelado", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Cobro cancelado", Toast.LENGTH_LONG).show()
             }
-
+        }
     }
 
-    public void cobrarMesa(View v) {
+
+    private fun aparcar(idm: String, nuevos: JSONArray) {
+        if (nuevos.length() > 0) {
+            val p = ContentValues()
+            p.put("idm", idm)
+            p.put("idc", cam!!.getString("ID"))
+            p.put("pedido", nuevos.toString())
+            myServicio?.nuevoPedido(p)
+            dbMesas?.abrirMesa(idm)
+            canRefresh = false
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    canRefresh = true
+                }
+            }, 2000)
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun clickCantidad(v: View) {
+        setEstadoAutoFinish(r = true, s = false)
+        cantidad = (v as Button).text.toString().toInt()
+        val lbl = findViewById<TextView>(R.id.lblCantida)
+        lbl.text = "Cantidad $cantidad"
+    }
+
+    override fun pedirArt(art: JSONObject) {
         try {
-            aparcar(mesa.getString("ID"), dbCuenta.getNuevos(mesa.getString("ID")));
-            Timer t = new Timer();
-            findViewById(R.id.loading).setVisibility(View.VISIBLE);
-            t.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    handlerMostrarCobrar.sendEmptyMessage(0);
+            setEstadoAutoFinish(r = true, s = false)
+            dbCuenta?.addArt(mesa!!.getInt("ID"), art)
+            rellenarTicket()
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_cuenta)
+        cargarPreferencias()
+
+        val bus = findViewById<EditText>(R.id.txtBuscar)
+        bus.addTextChangedListener(this)
+
+        try {
+            server = intent.extras?.getString("url") ?: ""
+            cam = JSONObject(intent.extras?.getString("cam") ?: "{}")
+            mesa = JSONObject(intent.extras?.getString("mesa") ?: "{}")
+            tipo = intent.extras?.getString("op") ?: ""
+
+            val title = findViewById<TextView>(R.id.txtTitulo)
+            title.text = cam!!.getString("nombre") + " " +
+                    cam!!.getString("apellidos") + " -- " + mesa!!.getString("Nombre")
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
+
+    override fun beforeTextChanged(charSequence: CharSequence, start: Int, count: Int, after: Int) {}
+
+    override fun onTextChanged(charSequence: CharSequence, start: Int, before: Int, count: Int) {
+        reset = true
+        if (charSequence.isNotEmpty()) {
+            try {
+                val str = charSequence.toString()
+                val t = mesa!!.getString("Tarifa")
+                Thread {
                     try {
-                        JSONArray l = dbCuenta.filterGroup("IDMesa=" + mesa.getString("ID"));
-                        mostrarCobrar(l, totalMesa);
-                    }catch (Exception e){
-                        Log.e("ERROR_CUENTA", "Error al mostrar cobrar: $e");
+                        Thread.sleep(1000)
+                    } catch (e: InterruptedException) {
+                        Log.e("ERROR_CUENTA", e.toString())
                     }
+                    lsartresul = dbTeclas!!.findLike(str, t)
+                    mostrarBusqueda.sendEmptyMessage(1)
+                }.start()
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", e.toString())
+            }
+        }
+    }
+
+    override fun afterTextChanged(editable: Editable) {}
+
+    override fun onPause() {
+        stop = true
+        try {
+            val idm = mesa!!.getString("ID")
+            aparcar(idm, dbCuenta!!.getNuevos(idm))
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        timerAutoCancel?.cancel()
+        myServicio?.mesaAbierta(null)
+        unbindService(mConexion)
+        super.onDestroy()
+    }
+
+    override fun onResume() {
+        try {
+            stop = false
+            if (timerAutoCancel == null) {
+                timerAutoCancel = Timer()
+                timerAutoCancel!!.schedule(object : TimerTask() {
+                    override fun run() {
+                        if (!stop) {
+                            if (!reset) {
+                                finish()
+                            } else reset = false
+                        }
+                    }
+                }, 5000, autoCancel)
+            }
+
+            val intent = Intent(applicationContext, ServiceCOM::class.java)
+            intent.putExtra("url", server)
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE)
+            findViewById<View>(R.id.loading).visibility = View.GONE
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+        super.onResume()
+    }
+
+    override fun setEstadoAutoFinish(r: Boolean, s: Boolean) {
+        tipo = "m"
+        reset = r
+        stop = s
+    }
+
+    override fun mostrarCobrar(lsart: JSONArray, totalCobro: Double) {
+        if (totalCobro > 0) {
+            try {
+                setEstadoAutoFinish(r = true, s = true)
+                runOnUiThread {  // Asegúrate de que esta parte se ejecute en el hilo principal
+                    if (dlgCobrar != null) dlgCobrar!!.dismiss()
+                    dlgCobrar = DlgCobrar(
+                        this@Cuenta, this@Cuenta,
+                        myServicio!!.usaCashlogy(),
+                        myServicio!!.usaTPV()
+                    )
+                    dlgCobrar!!.setTitle("Cobrar " + mesa!!.getString("Nombre"))
+                    dlgCobrar!!.setDatos(lsart, totalCobro)
+                    dlgCobrar!!.setOnDismissListener { dlgCobrar = null }
+                    dlgCobrar!!.show()
                 }
-            }, 1000);
-
-
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", e.toString());
+            } catch (e: JSONException) {
+                Log.e("ERROR_CUENTA", e.toString())
+            }
         }
     }
 
-    private void aparcar(String idm, JSONArray nuevos) throws JSONException {
-        if(nuevos.length()>0) {
-            ContentValues p = new ContentValues();
-            p.put("idm", idm);
-            p.put("idc", cam.getString("ID"));
-            p.put("pedido", nuevos.toString());
-            if (myServicio != null) {
-                myServicio.nuevoPedido(p);
-                dbMesas.abrirMesa(idm);
-                can_refresh = false;
-                Timer t = new Timer();
-                t.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        can_refresh = true;
-                    }
-                }, 2000);
+    override fun cobrarConCashlogy(lsart: JSONArray, totalCobro: Double) {
+        val intent = Intent(this, CobroCashlogyActivity::class.java)
+        intent.putExtra("totalMesa", totalCobro)
+        intent.putExtra("lineas", lsart.toString())
+        startActivityForResult(intent, 1)
+    }
+
+    override fun cobrarConTpvPC(lsart: JSONArray, totalCobro: Double) {
+        val intent = Intent(this, CobroTarjetaActivity::class.java)
+        intent.putExtra("totalMesa", totalCobro)
+        intent.putExtra("lineas", lsart.toString())
+        intent.putExtra("urlTPVPC", myServicio?.getIPTPV())
+        startActivityForResult(intent, 1)  // Cambia 2 si deseas otro requestCode
+    }
+
+
+    override fun cobrar(lsart: JSONArray, totalCobro: Double, entrega: Double, recibo: String) {
+        try {
+            setEstadoAutoFinish(r = true, s = true)
+            dlgCobrar?.dismiss()
+            dlgCobrar = null
+
+            val p = ContentValues()
+            p.put("idm", mesa!!.getString("ID"))
+            p.put("idc", cam!!.getString("ID"))
+            p.put("entrega", entrega.toString())
+            p.put("art", lsart.toString())
+            p.put("recibo", recibo)
+
+            dbCuenta!!.eliminar(mesa!!.getString("ID"), lsart)
+            myServicio?.cobrarCuenta(p)
+            if (totalCobro - totalMesa == 0.0) {
+                dbMesas!!.cerrarMesa(mesa!!.getString("ID"))
+                finish()
+            } else {
+                rellenarTicket()
             }
+            sendMessageMesaCobrada(entrega, entrega - totalCobro)
+
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
         }
     }
 
     @SuppressLint("SetTextI18n")
-    public void clickCantidad(View v){
-        setEstadoAutoFinish(true, false);
-        cantidad = Integer.parseInt(((Button) v).getText().toString());
-        TextView lbl = findViewById(R.id.lblCantida);
-        lbl.setText("Cantidad "+cantidad);
-    }
+    override fun clickMostrarBorrar(obj: JSONObject) {
+        setEstadoAutoFinish(r = true, s = true)
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void pedirArt(JSONObject art) {
+        val dlg = Dialog(cx)
+        dlg.setContentView(R.layout.borrar_art)
+        dlg.setOnCancelListener { setEstadoAutoFinish(r = true, s = false) }
+
+        dlg.setTitle("Borrar artículos")
+        val motivo = dlg.findViewById<EditText>(R.id.txtMotivo)
+        val error = dlg.findViewById<Button>(R.id.btnError)
+        val simpa = dlg.findViewById<Button>(R.id.btnSimpa)
+        val inv = dlg.findViewById<Button>(R.id.btnInv)
+        val ok = dlg.findViewById<ImageButton>(R.id.btn_ok)
+        val edit = dlg.findViewById<ImageButton>(R.id.btnEdit)
+        val exit = dlg.findViewById<ImageButton>(R.id.btn_salir_monedas)
+        val pneEdit = dlg.findViewById<LinearLayout>(R.id.pneEditarMotivo)
+        val txtInfo = dlg.findViewById<TextView>(R.id.txt_info_borrar)
+
         try {
-            setEstadoAutoFinish(true, false);
-            dbCuenta.addArt(mesa.getInt("ID"), art);
-            rellenarTicket();
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", "Error al cargar el ticket: $e");
-        }
-    }
+            val art = JSONObject(obj.toString())
+            val canArt = art.getInt("Can")
+            cantidad = minOf(cantidad, canArt)
+            art.put("Can", cantidad)
+            txtInfo.text = "Borrar $cantidad " + art.getString("descripcion_t")
+            resetCantidad()
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cuenta);
-        cargarPreferencias();
-        EditText bus = findViewById(R.id.txtBuscar);
-        bus.addTextChangedListener(this);
-        try {
-           server = Objects.requireNonNull(getIntent().getExtras()).getString("url");
-           cam = new JSONObject(Objects.requireNonNull(getIntent().getExtras().getString("cam")));
-           mesa = new JSONObject(Objects.requireNonNull(getIntent().getExtras().getString("mesa")));
-           tipo = getIntent().getExtras().getString("op");
-           TextView title = findViewById(R.id.txtTitulo);
-           title.setText(cam.getString("nombre") +" "+
-                   cam.getString("apellidos")+  " -- "+mesa.getString("Nombre"));
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", "Error al cargar los datos de la cuenta: $e");
-        }
-    }
+            pneEdit.visibility = View.GONE
 
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {  }
-
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-        reset = true;
-        if(charSequence.length()>0) {
-            try {
-                final String str = charSequence.toString();
-                final String t =  mesa.getString("Tarifa");
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                       Log.e("ERROR_CUENTA", "En onTextChanged: $e");
-                    }
-                    lsartresul = dbTeclas.findLike(str, t);
-                    mostrarBusqueda.sendEmptyMessage(1);
-                 }).start();
-             } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "En onTextChanged: $e");
+            exit.setOnClickListener { dlg.cancel() }
+            edit.setOnClickListener {
+                pneEdit.visibility = if (pneEdit.visibility == View.VISIBLE) View.GONE else View.VISIBLE
             }
-        }
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) { }
-
-    @Override
-    protected void onPause() {
-        stop = true;
-        try{
-            String idm = mesa.getString("ID");
-            aparcar(idm, dbCuenta.getNuevos(idm));
-        }catch (Exception e){
-           Log.e("ERROR_CUENTA", "En onPause:  $e");
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if(timerAutoCancel!=null) {
-            timerAutoCancel.cancel();
-            timerAutoCancel=null;
-        }
-        myServicio.setMesa_abierta(null);
-        unbindService(mConexion);
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        try {
-             stop = false;
-             if(timerAutoCancel==null) {
-                 timerAutoCancel = new Timer();
-                 timerAutoCancel.schedule(new TimerTask() {
-                     @Override
-                     public void run() {
-                         if (!stop) {
-                             if (!reset) {
-                                 finish();
-                             } else reset = false;
-                         }
-                     }
-                 }, 5000, autoCancel);
-             }
-
-            Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
-            intent.putExtra("url", server);
-            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
-            findViewById(R.id.loading).setVisibility(View.GONE);
-
-        } catch (Exception e) {
-            Log.e("ERROR_CUENTA", "En onResume:  $e");
-        }
-       super.onResume();
-    }
-
-    @Override
-    public void setEstadoAutoFinish(boolean r, boolean s) {
-        tipo = "m";
-        reset = r;
-        stop = s;
-    }
-
-    public void mostrarCobrar(JSONArray lsart, Double totalCobro) {
-        if(totalCobro>0) {
-            try {
-                setEstadoAutoFinish(true, true);
-                if (dlgCobrar != null) dlgCobrar.dismiss();
-                dlgCobrar = new DlgCobrar(this, this,
-                        myServicio.usaCashlogy(), myServicio.usarTPV());
-                dlgCobrar.setTitle("Cobrar " + mesa.getString("Nombre"));
-                dlgCobrar.setDatos(lsart, totalCobro);
-                dlgCobrar.setOnDismissListener(dialogInterface -> dlgCobrar = null);
-                dlgCobrar.show();
-
-            } catch (JSONException e) {
-                Log.e("ERROR_CUENTA", "En mostrar cobrar: "+ e);
-            }
-        }
-    }
-
-    public void cobrarConCashlogy(JSONArray lsart, Double totalCobro) {
-        // Crear un Intent para iniciar la Activity de Cashlogy
-        Intent intent = new Intent(this, CobroCashlogyActivity.class);
-
-        // Pasar los datos necesarios a la Activity de Cashlogy
-        intent.putExtra("totalMesa", totalCobro);
-        intent.putExtra("lineas", lsart.toString());
-
-        // Iniciar la Activity y esperar un resultado (usando el código 1 para identificarla)
-        startActivityForResult(intent, 1);
-    }
-
-    @Override
-    public void cobrarConTpvPC(JSONArray lsart, Double totalCobro) {
-        Intent intent = new Intent(this, CobroTarjetaActivity.class);
-
-        intent.putExtra("totalMesa", totalCobro);
-        intent.putExtra("lineas", lsart.toString());
-        intent.putExtra("urlTPVPC", myServicio.getIPTPV());
-
-        // Iniciar la Activity y esperar un resultado (usando el código 1 para identificarla)
-        startActivityForResult(intent, 2);
-    }
-
-
-
-    @Override
-    public void cobrar(JSONArray lsart, Double totalCobro, Double entrega) {
-
-        try {
-            setEstadoAutoFinish(true, true);
-            if (dlgCobrar != null){
-                dlgCobrar.dismiss();
-                dlgCobrar = null;
-            }
-            DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-            assert dbCamareros != null;
-            if(!dbCamareros.getConPermiso("cobrar_ticket").isEmpty()) {
-                JSONObject p = new JSONObject();
-                p.put("idm", mesa.getString("ID"));
-                p.put("idc", cam.getString("ID"));
-                p.put("entrega", Double.toString(entrega));
-                p.put("art", lsart.toString());
-                DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                        dbCamareros, this,
-                        p, "cobrar_ticket");
-                dlg.show();
-            }else{
-                ContentValues p = new ContentValues();
-                p.put("idm", mesa.getString("ID"));
-                p.put("idc", cam.getString("ID"));
-                p.put("entrega", Double.toString(entrega));
-                p.put("art", lsart.toString());
-                dbCuenta.eliminar(mesa.getString("ID"), lsart);
-                if (myServicio != null) {
-                    myServicio.cobrarCuenta(p);
-                    if (totalCobro - totalMesa == 0) {
-                        dbMesas.cerrarMesa(mesa.getString("ID"));
-                        finish();
-                    } else {
-                        rellenarTicket();
-                    }
-                    sendMessageMesaCobrada(entrega, entrega - totalCobro);
+            ok.setOnClickListener {
+                if (motivo.text.isNotEmpty()) {
+                    borrarLinea(art, motivo.text.toString())
+                    dlg.cancel()
                 }
             }
 
-        } catch (JSONException e) {
-            Log.e("ERROR_CUENTA", "En cobrar: $e");
-        }
-
-    }
-
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void clickMostrarBorrar(final JSONObject obj) {
-
-            setEstadoAutoFinish(true,true);
-
-            final Dialog dlg = new Dialog(cx);
-            dlg.setContentView(R.layout.borrar_art);
-
-            dlg.setOnCancelListener(dialogInterface -> setEstadoAutoFinish(true,false));
-
-            dlg.setTitle("Borrar articulos");
-            final EditText motivo = dlg.findViewById(R.id.txtMotivo);
-            final Button error =  dlg.findViewById(R.id.btnError);
-            final Button simpa =  dlg.findViewById(R.id.btnSimpa);
-            final Button inv = dlg.findViewById(R.id.btnInv);
-            final ImageButton ok =  dlg.findViewById(R.id.btn_ok);
-            final ImageButton edit =  dlg.findViewById(R.id.btnEdit);
-            final ImageButton exit =  dlg.findViewById(R.id.btn_salir_monedas);
-
-            final LinearLayout pneEdit =  dlg.findViewById(R.id.pneEditarMotivo);
-            final TextView txtInfo = dlg.findViewById(R.id.txt_info_borrar);
-            final JSONObject art;
-            try {
-                art = new JSONObject(obj.toString());
-                int canArt = art.getInt("Can");
-                if (cantidad > canArt) cantidad = canArt;
-                art.put("Can", cantidad);
-                txtInfo.setText("Borrar " + cantidad + " "+art.getString("descripcion_t"));
-                resetCantidad();
-
-                pneEdit.setVisibility(View.GONE);
-
-                exit.setOnClickListener(view -> dlg.cancel());
-
-                edit.setOnClickListener(view -> {
-                    if(pneEdit.getVisibility() == View.VISIBLE)  pneEdit.setVisibility(View.GONE);
-                    else pneEdit.setVisibility(View.VISIBLE);
-                });
-
-                ok.setOnClickListener(view -> {
-                    if (motivo.getText().length() > 0) {
-                        borrarLinea(art, motivo.getText().toString());
-                        dlg.cancel();
-                    }
-                });
-
-                error.setOnClickListener(view -> {
-                    borrarLinea(art, error.getText().toString());
-                    dlg.cancel();
-
-
-                });
-
-                simpa.setOnClickListener(view -> {
-                    borrarLinea(art, simpa.getText().toString());
-                    dlg.cancel();
-                });
-
-                inv.setOnClickListener(view -> {
-                    borrarLinea(art, inv.getText().toString());
-                    dlg.cancel();
-               });
-
-            }catch (Exception e){
-                Log.e("ERROR_CUENTA",  "En clickMostrarBorrar: $e");
+            error.setOnClickListener {
+                borrarLinea(art, error.text.toString())
+                dlg.cancel()
             }
 
-            dlg.show();
+            simpa.setOnClickListener {
+                borrarLinea(art, simpa.text.toString())
+                dlg.cancel()
+            }
 
+            inv.setOnClickListener {
+                borrarLinea(art, inv.text.toString())
+                dlg.cancel()
+            }
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
 
+        dlg.show()
     }
 
-    @Override
-    public void borrarArticulo(JSONObject art) throws JSONException {
-         reset = true;
-         art.put("Can",1);
-         dbCuenta.eliminar(mesa.getString("ID"), new JSONArray().put(art));
-         rellenarTicket();
-    }
-
-    @Override
-    public void pedirAutorizacion(ContentValues params) {
-        myServicio.pedirAutorizacion(params);
-    }
-
-    @Override
-    public void pedirAutorizacion(String id) {
-
-    }
-
-    // Utilidades
-    @SuppressLint("SetTextI18n")
-    public void resetCantidad(){
-        cantidad = 1;
-        TextView lbl = findViewById(R.id.lblCantida);
-        lbl.setText("Cantidad "+ cantidad);
-    }
-
-    private void asociarBotonera(View view) {
-        reset = true;
-        JSON json = new JSON();
+    override fun borrarArticulo(art: JSONObject) {
         try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
-            pref.put("sec",Integer.toString(view.getId()));
-            json.serializar("preferencias.dat", pref, cx);
-            Toast toast= Toast.makeText(getApplicationContext(),
-                    "Asocicion realizada", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 200);
-            toast.show();
-        } catch (Exception e) {
-            Log.e("ERROR_CUENTA", "En asociarBotonera: $e");
+            reset = true
+            art.put("Can", 1)
+            dbCuenta!!.eliminar(mesa!!.getString("ID"), JSONArray().put(art))
+            rellenarTicket()
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
         }
-
     }
 
-    private void borrarLinea(final JSONObject art, String motivo){
-        try{
-            reset = true;
-            if (myServicio != null){
-                DBCamareros dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-                assert dbCamareros != null;
-                if(!dbCamareros.getConPermiso("borrar_linea").isEmpty()) {
-                    JSONObject p = new JSONObject();
-                    p.put("idm",  mesa.getString("ID"));
-                    p.put("Precio", art.getString("Precio"));
-                    p.put("idArt", art.getString("IDArt"));
-                    p.put("can", art.getString("Can"));
-                    p.put("idc", cam.getString("ID"));
-                    p.put("motivo", motivo);
-                    p.put("Estado", art.getString("Estado"));
-                    p.put("Descripcion", art.getString("Descripcion"));
-                    DlgPedirAutorizacion dlg = new DlgPedirAutorizacion(cx, this,
-                            dbCamareros, this,
-                            p, "borrar_linea");
-                    dlg.show();
-                }else{
-                    ContentValues p = new ContentValues();
-                    p.put("idm",  mesa.getString("ID"));
-                    p.put("Precio", art.getString("Precio"));
-                    p.put("idArt", art.getString("IDArt"));
-                    p.put("can", art.getString("Can"));
-                    p.put("idc", cam.getString("ID"));
-                    p.put("motivo", motivo);
-                    p.put("Estado", art.getString("Estado"));
-                    p.put("Descripcion", art.getString("Descripcion"));
-                    JSONArray ls = new JSONArray();
-                    ls.put(new JSONObject(art.toString()));
-                    dbCuenta.eliminar(mesa.getString("ID"), ls);
-                    myServicio.rmLinea(p);
-                    rellenarTicket();
-                }
+
+
+    override fun pedirAutorizacion(params: ContentValues) {
+        myServicio?.pedirAutorizacion(params)
+    }
+
+    override fun pedirAutorizacion(id: String) {
+        // Implementación vacía en este caso
+    }
+
+    private fun cargarPreferencias() {
+        val json = JSON()
+        try {
+            val pref = json.deserializar("preferencias.dat", this)
+            if (!pref.isNull("sec")) {
+                sec = pref.getString("sec")
             }
-        }catch (Exception e){
-            Log.e("ERROR_CUENTA", "En borrarLinea: $e");
+        } catch (e: Exception) {
+            Log.e("ERROR_CUENTA", "Error al cargar las preferencias")
         }
     }
 
-    private void sendMessageMesaCobrada(Double entrega, double cambio) {
-        Handler handlerMesas = myServicio.getExHandler("camareros");
-        assert handlerMesas != null;
-        Message msg = handlerMesas.obtainMessage();
-        Bundle bundle = msg.getData();
-        if (bundle == null) bundle = new Bundle();
-        bundle.putString("op", "show_info_cobro");
-        bundle.putDouble("entrega", entrega );
-        bundle.putDouble("cambio", cambio);
-        msg.setData(bundle);
-        handlerMesas.sendMessage(msg);
+    @SuppressLint("SetTextI18n")
+    private fun resetCantidad() {
+        cantidad = 1
+        val lbl = findViewById<TextView>(R.id.lblCantida)
+        lbl.text = "Cantidad $cantidad"
     }
 
+    private fun asociarBotonera(view: View) {
+        reset = true
+        val json = JSON()
+        try {
+            val pref = json.deserializar("preferencias.dat", this)
+            pref.put("sec", view.id.toString())
+            json.serializar("preferencias.dat", pref, cx)
+            val toast = Toast.makeText(applicationContext, "Asociación realizada", Toast.LENGTH_SHORT)
+            toast.setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0, 200)
+            toast.show()
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
 
+    private fun borrarLinea(art: JSONObject, motivo: String) {
+        try {
+            reset = true
+            val dbCamareros = myServicio?.getDb("camareros") as DBCamareros?
+            if (!dbCamareros?.getConPermiso("borrar_linea").isNullOrEmpty()) {
+                val p = JSONObject()
+                p.put("idm", mesa!!.getString("ID"))
+                p.put("Precio", art.getString("Precio"))
+                p.put("idArt", art.getString("IDArt"))
+                p.put("can", art.getString("Can"))
+                p.put("idc", cam!!.getString("ID"))
+                p.put("motivo", motivo)
+                p.put("Estado", art.getString("Estado"))
+                p.put("Descripcion", art.getString("Descripcion"))
+                val dlg = DlgPedirAutorizacion(cx, this, dbCamareros!!, this, p, "borrar_linea")
+                dlg.show()
+            } else {
+                val p = ContentValues()
+                p.put("idm", mesa!!.getString("ID"))
+                p.put("Precio", art.getString("Precio"))
+                p.put("idArt", art.getString("IDArt"))
+                p.put("can", art.getString("Can"))
+                p.put("idc", cam!!.getString("ID"))
+                p.put("motivo", motivo)
+                p.put("Estado", art.getString("Estado"))
+                p.put("Descripcion", art.getString("Descripcion"))
+                dbCuenta!!.eliminar(mesa!!.getString("ID"), JSONArray().put(art))
+                myServicio?.rmLinea(p)
+                rellenarTicket()
+            }
+        } catch (e: JSONException) {
+            Log.e("ERROR_CUENTA", e.toString())
+        }
+    }
 
+    private fun sendMessageMesaCobrada(entrega: Double, cambio: Double) {
+        val handlerMesas = myServicio?.getExHandler("camareros")
+        val msg = handlerMesas?.obtainMessage()
+        val bundle = msg?.data ?: Bundle()
+        bundle.putString("op", "show_info_cobro")
+        bundle.putDouble("entrega", entrega)
+        bundle.putDouble("cambio", cambio)
+        msg?.data = bundle
+        if (msg != null) {
+            handlerMesas.sendMessage(msg)
+        }
+    }
 }
+

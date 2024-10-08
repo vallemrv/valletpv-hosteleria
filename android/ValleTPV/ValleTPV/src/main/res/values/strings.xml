@@ -106,5 +106,6 @@
     <string name="conteo_monedas">Conteo monedas</string>
     <string name="usar_tpvpc">Usar Tpvpc</string>
     <string name="ip_del_servidor_tpvpc">IP y puerto de tpvpc</string>
+    <string name="cobroscontarjeta">Cobros con tarjeta</string>
 
 </resources>

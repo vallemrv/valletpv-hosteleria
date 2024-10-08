@@ -27,7 +27,7 @@ public class HTTPRequest {
         HttpURLConnection conn = null;
         try {
 
-            if(!strUrl.contains("http://")) strUrl = "http://"+ strUrl;
+            if(!strUrl.contains("http://") && !strUrl.contains("https://")) strUrl = "http://"+ strUrl;
             URL url = new URL(strUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
