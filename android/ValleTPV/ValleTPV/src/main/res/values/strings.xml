@@ -107,5 +107,6 @@
     <string name="usar_tpvpc">Usar Tpvpc</string>
     <string name="ip_del_servidor_tpvpc">IP y puerto de tpvpc</string>
     <string name="cobroscontarjeta">Cobros con tarjeta</string>
+    <string name="cobro_info">Cobro aceptado\ncon tarjeta</string>
 
 </resources>

@@ -15,9 +15,11 @@ class Ticket(BaseModels):
     uid = models.CharField(db_column='UID', max_length=100)  # Field name made lowercase.
     mesa = models.CharField(db_column='Mesa', max_length=40)  # Field name made lowercase.
     url_factura = models.CharField(max_length=140, default="")  # Field name made lowercase.
+    recibo_tarjeta = models.TextField(default="")
+
 
     @staticmethod
-    def cerrar_cuenta(idm, idc, entrega, art):
+    def cerrar_cuenta(idm, idc, entrega, art, recibo=""):
         from .pedidos import Lineaspedido
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).first()
         total = 0
@@ -33,6 +35,7 @@ class Ticket(BaseModels):
             ticket.uid = uid
             ticket.entrega = entrega
             ticket.mesa = mesa.mesa.nombre
+            ticket.recibo_tarjeta = recibo
             ticket.save()
             id = ticket.id
 

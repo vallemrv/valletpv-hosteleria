@@ -12,6 +12,7 @@ from gestion.models.teclados import Teclas
 from gestion.models.familias import Receptores
 from gestion.models.pedidos import Pedidos
 from gestion.models.camareros import Camareros
+import json
                           
 
 def imprimir_pedido(id):
@@ -70,6 +71,22 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, 
     url_factura = ""
     if es_factura:
        url_factura = "http://"+request.get_host()+"/app/facturas/"+id+"/"+ticket.uid
+
+    if ticket.recibo_tarjeta != "":
+        recibo = json.loads(ticket.recibo_tarjeta)
+        
+        # Convertir el recibo en una lista de líneas formato "clave: valor"
+        lineas_recibo = []
+        
+        # Procesar las claves dentro de 'recibo'
+        for key, value in recibo['recibo'].items():
+            lineas_recibo.append(f"{key} {value}")
+        
+        # Añadir la línea con el código de autorización
+        lineas_recibo.append(f"Código autorización: {recibo['codigo_autorizacion']}")
+    else:
+        lineas_recibo = []  # Si no hay recibo, la lista de líneas estará vacía
+
     
     obj = {
         "op": "ticket",
@@ -84,7 +101,8 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, 
         "num": ticket.id,
         "efectivo": ticket.entrega,
         'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total'],
-        "url_factura": url_factura
+        "url_factura": url_factura,
+        "recibo": lineas_recibo
     }
 
  

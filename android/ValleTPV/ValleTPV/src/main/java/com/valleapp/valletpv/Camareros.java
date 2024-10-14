@@ -59,14 +59,17 @@ public class Camareros extends Activity {
             }else{
                 if (op.equals("show_info_cobro")){
                     Bundle datos = msg.getData();
-                    Double entrega = datos.getDouble("entrega");
+                    double entrega = datos.getDouble("entrega");
                     double cambio = datos.getDouble("cambio");
-                    if (cambio > 0) {
-                        LayoutInflater inflater = getLayoutInflater();
-                        View layout = inflater.inflate(R.layout.toast_info_cambio, findViewById(R.id.toast_info_cobro_container));
-                        if (toastShowInfoCuenta != null) toastShowInfoCuenta.cancel();
-                        toastShowInfoCuenta = new ToastShowInfoCuenta();
+                    LayoutInflater inflater = getLayoutInflater();
+                    View layout = inflater.inflate(R.layout.toast_info_cambio, findViewById(R.id.toast_info_cobro_container));
+                    if (toastShowInfoCuenta != null) toastShowInfoCuenta.cancel();
+                    toastShowInfoCuenta = new ToastShowInfoCuenta();
+                    if (entrega > 0) {
                         toastShowInfoCuenta.show(entrega, cambio, 10000, getApplicationContext(), layout);
+                    }else{
+                        toastShowInfoCuenta.showMessageOnly("Cobro aceptado\n" +
+                                                                     "con tarjeta", 10000, getApplicationContext(), layout);
                     }
                 }
             }

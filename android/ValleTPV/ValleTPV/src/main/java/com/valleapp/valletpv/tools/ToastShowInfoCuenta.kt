@@ -1,51 +1,85 @@
-package com.valleapp.valletpv.tools;
+package com.valleapp.valletpv.tools
 
-import android.content.Context;
-import android.os.CountDownTimer;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.content.Context
+import android.os.CountDownTimer
+import android.view.Gravity
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import com.valleapp.valletpv.R
+import java.util.Locale
 
-import com.valleapp.valletpv.R;
+class ToastShowInfoCuenta {
 
-public class ToastShowInfoCuenta {
+    private val SHORT_TOAST_DURATION: Long = 2000
 
-    private final int SHORT_TOAST_DURATION = 2000;
+    private var t: CountDownTimer? = null
 
-    CountDownTimer t;
+    fun show(entrega: Double, cambio: Double, durationInMillis: Long, cx: Context, l: View) {
+        val info = l.findViewById<LinearLayout>(R.id.layout_info)
+                info.visibility = View.GONE
 
+        val txtCambio = l.findViewById<TextView>(R.id.txt_info_cambio)
+                txtCambio.text = String.format(Locale.getDefault(),"%01.2f €", cambio)
 
-    public void show(Double entrega, Double cambio, long durationInMillis, Context cx, View l) {
+        val txtEntrega = l.findViewById<TextView>(R.id.txt_info_entrega)
+                txtEntrega.text = String.format(Locale.getDefault(), "%01.2f €", entrega)
 
-        TextView txtCambio = l.findViewById(R.id.txt_info_cambio);
-        txtCambio.setText(String.format("%01.2f €",cambio));
-        TextView txtEntrega = l.findViewById(R.id.txt_info_entrega);
-        txtEntrega.setText(String.format("%01.2f €",entrega));
-
-
-        if (t == null){
-            t = new CountDownTimer(durationInMillis, SHORT_TOAST_DURATION) {
-                @Override
-                public void onFinish() {
-
+        if (t == null) {
+            t = object : CountDownTimer(durationInMillis, SHORT_TOAST_DURATION) {
+                override fun onFinish() {
+                    // Opcional: puedes agregar algo al finalizar
                 }
 
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    Toast toast = new Toast(cx);
-                    toast.setView(l);
-                    toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 100);
-                    toast.setDuration(Toast.LENGTH_SHORT);
-                    toast.show();
+                override fun onTick(millisUntilFinished: Long) {
+                    val toast = Toast(cx)
+                    toast.view = l
+                    toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 100)
+                    toast.duration = Toast.LENGTH_SHORT
+                    toast.show()
                 }
-            };
-            t.start();
-
+            }
+            t?.start()
         }
     }
 
-    public void cancel(){
-        t.cancel();
+    fun cancel() {
+        t?.cancel()
+    }
+
+    // Nueva función para mostrar solo un string en el Toast y ocultar las otras vistas
+    fun showMessageOnly(message: String, durationInMillis: Long, cx: Context, l: View) {
+
+        val info = l.findViewById<LinearLayout>(R.id.layout_info)
+        info.visibility = View.VISIBLE
+
+        val txtCambio = l.findViewById<LinearLayout>(R.id.layout_cambio)
+                txtCambio.visibility = View.GONE  // Ocultar el campo de cambio
+
+        val txtEntrega = l.findViewById<LinearLayout>(R.id.layout_entrega)
+                txtEntrega.visibility = View.GONE  // Ocultar el campo de entrega
+
+
+        val labelInfo = l.findViewById<TextView>(R.id.label_info)
+                labelInfo.text = message
+
+
+        if (t == null) {
+            t = object : CountDownTimer(durationInMillis, SHORT_TOAST_DURATION) {
+                override fun onFinish() {
+                    // Opcional: agregar lógica al finalizar
+                }
+
+                override fun onTick(millisUntilFinished: Long) {
+                    val toast = Toast(cx)
+                    toast.view = l
+                    toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 100)
+                    toast.duration = Toast.LENGTH_SHORT
+                    toast.show()
+                }
+            }
+            t?.start()
+        }
     }
 }

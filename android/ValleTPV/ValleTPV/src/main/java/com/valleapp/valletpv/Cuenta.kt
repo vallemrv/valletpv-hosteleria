@@ -490,7 +490,6 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == 1) { // Este es el código que usamos en startActivityForResult
-            Log.d("Cobro", "Cobro finalizado $resultCode")
             if (resultCode == RESULT_OK) {
                 // Verificar si el Intent no es nulo
                 data?.let {
@@ -516,7 +515,6 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
                         Log.e("ERROR_CUENTA", "El JSONArray 'lineas' es nulo")
                     }
 
-                    Toast.makeText(this, "Cobro realizado con éxito", Toast.LENGTH_LONG).show()
                 } ?: run {
                     Log.e("Cobro", "Data es nulo aunque el resultado fue OK")
                 }
@@ -551,6 +549,12 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
         cantidad = (v as Button).text.toString().toInt()
         val lbl = findViewById<TextView>(R.id.lblCantida)
         lbl.text = "Cantidad $cantidad"
+    }
+
+    fun abrirCajon(v: View?){
+        if (!myServicio!!.usaCashlogy()){
+            myServicio!!.abrirCajon()
+        }
     }
 
     override fun pedirArt(art: JSONObject) {
@@ -675,7 +679,11 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
                     dlgCobrar!!.setTitle("Cobrar " + mesa!!.getString("Nombre"))
                     dlgCobrar!!.setDatos(lsart, totalCobro)
                     dlgCobrar!!.setOnDismissListener { dlgCobrar = null }
-                    dlgCobrar!!.show()
+                    if (!this.isFinishing && !this.isDestroyed) {
+                        // Mostrar el diálogo o Snackbar
+                        dlgCobrar!!.show()
+                    }
+
                 }
             } catch (e: JSONException) {
                 Log.e("ERROR_CUENTA", e.toString())
@@ -697,6 +705,7 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
         intent.putExtra("urlTPVPC", myServicio?.getIPTPV())
         startActivityForResult(intent, 1)  // Cambia 2 si deseas otro requestCode
     }
+
 
 
     override fun cobrar(lsart: JSONArray, totalCobro: Double, entrega: Double, recibo: String) {
@@ -877,6 +886,7 @@ class Cuenta : Activity(), TextWatcher, IControladorCuenta, IControladorAutoriza
             Log.e("ERROR_CUENTA", e.toString())
         }
     }
+
 
     private fun sendMessageMesaCobrada(entrega: Double, cambio: Double) {
         val handlerMesas = myServicio?.getExHandler("camareros")

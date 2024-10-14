@@ -1,356 +1,251 @@
-package com.valleapp.valletpv;
+package com.valleapp.valletpv
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.util.Log
+import android.widget.ImageButton
+import android.widget.ListView
+import android.widget.Toast
+import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam
+import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero
+import com.valleapp.valletpv.tools.ServiceCOM
+import com.valleapp.valletpv.tpvcremoto.SocketManager
+import com.valleapp.valletpvlib.db.DBCamareros
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONException
+import org.json.JSONObject
 
-import com.valleapp.valletpv.adaptadoresDatos.AdaptadorSelCam;
-import com.valleapp.valletpvlib.db.DBCamareros;
-import com.valleapp.valletpv.dlg.DlgAddNuevoCamarero;
-import com.valleapp.valletpvlib.tools.JSON;
-import com.valleapp.valletpv.tools.ServiceCOM;
+class ValleTPV : Activity() {
 
-import org.json.JSONException;
-import org.json.JSONObject;
+    private var conectado: Boolean = false
+    private val cx = this
+    private var server = ""
 
-public class ValleTPV extends Activity {
+    private var myServicio: ServiceCOM? = null
 
-    final Context cx = this;
+    private lateinit var socketManager: SocketManager
+    private lateinit var dbCamareros: DBCamareros
+    private lateinit var lstNoAutorizados: ListView
+    private lateinit var lstAutorizados: ListView
 
-    private String server = "";
+    private var urlCashlogy = ""
+    private var usarCashlogy = false
+    private var usarTPVPC = false
+    private var ipTPVPC = ""
 
-    ServiceCOM myServicio;
-    DBCamareros dbCamareros;
-
-    ListView lsnoautorizados;
-    ListView lstautorizados;
-
-    private String urlCashlogy = "";
-    private boolean usarCashlogy = false;
-    private boolean usarTPVPC = false;
-    private String ipTPVPC = "";
-
-
-    private final Handler handleHttp = new Handler(Looper.getMainLooper()) {
-        public void handleMessage(Message msg) {
-            Bundle bundle = msg.getData();
-            if (bundle.containsKey("CashlogyMsg")) {
-                String toastMessage = bundle.getString("CashlogyMsg");
-                if (toastMessage != null) {
-                    Toast.makeText(ValleTPV.this, toastMessage, Toast.LENGTH_LONG).show();
-                }
-            }else {
-                rellenarListas();
-            }
+    private val handleHttp = Handler(Looper.getMainLooper()) { msg ->
+            val bundle = msg.data
+        if (bundle.containsKey("CashlogyMsg")) {
+            val toastMessage = bundle.getString("CashlogyMsg")
+            Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show()
+        } else {
+            rellenarListas()
         }
-    };
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_valletpv);
-
-        ImageButton s = findViewById(R.id.salir);
-        lstautorizados = findViewById(R.id.lstautorizados);
-        lsnoautorizados = findViewById(R.id.lstnoautorizados);
-
-        s.setOnClickListener(view -> finish());
-
-        ImageButton btnok = findViewById(R.id.aceptar);
-        btnok.setOnClickListener(view -> {
-            Intent i = new Intent(getApplicationContext(), Camareros.class);
-            startActivity(i);
-        });
-
-        ImageButton btnPref = findViewById(R.id.btn_aceptar_preferencias);
-        btnPref.setOnClickListener(view -> {
-            Intent i = new Intent(getApplicationContext(), PreferenciasTPV.class);
-            startActivity(i);
-        });
-
-        ImageButton btnArqueo = findViewById(R.id.btn_arqueo_caja);
-        btnArqueo.setOnClickListener(view -> {
-            Intent i = new Intent(getApplicationContext(), Arqueo.class);
-            startActivity(i);
-        });
-
-        lsnoautorizados.setOnItemClickListener((adapterView, view, i, l) -> {
-            JSONObject obj = (JSONObject)view.getTag();
-            try {
-                dbCamareros.setAutorizado(obj.getInt("ID"), true);
-                obj.put("autorizado", "1");
-                myServicio.autorizarCam(obj);
-            } catch (JSONException e) {
-                Log.e("VALLETPV_ERR", e.toString());
-            }
-            rellenarListas();
-        });
-
-         findViewById(R.id.btn_add_nuevo_camarero).setOnClickListener(view -> {
-             DlgAddNuevoCamarero dlg = new DlgAddNuevoCamarero(cx, myServicio);
-             dlg.show();
-         });
-
-
-        lstautorizados.setOnItemClickListener((adapterView, view, i, l) -> {
-            JSONObject obj = (JSONObject)view.getTag();
-            try {
-                obj.put("autorizado", "0");
-                dbCamareros.setAutorizado(obj.getInt("ID"), false);
-                myServicio.autorizarCam(obj);
-            } catch (JSONException e) {
-                Log.e("VALLETPV_ERR", e.toString());
-            }
-            rellenarListas();
-
-        });
+        true
     }
 
-    private void rellenarListas(){
-        lstautorizados.setAdapter(new AdaptadorSelCam(cx, dbCamareros.getAutorizados(true)));
-        lsnoautorizados.setAdapter(new AdaptadorSelCam(cx, dbCamareros.getAutorizados(false)));
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_valletpv)
 
-    @Override
-    protected void onResume() {
-        cargarPreferencias();
-        if (myServicio != null) {
-            rellenarListas();
-        }
-        if (server != null && !server.isEmpty()) {
-            Intent intent = new Intent(getApplicationContext(), ServiceCOM.class);
-            intent.putExtra("url", server);
-            intent.putExtra("url_cashlogy", urlCashlogy);  // Agregar URL de Cashlogy
-            intent.putExtra("usar_cashlogy", usarCashlogy); // Agregar estado del CheckBox
-            intent.putExtra("usar_tpvpc", usarTPVPC); // Agregar estado del CheckBox
-            intent.putExtra("ip_tpvpc", ipTPVPC); // Agregar IP del servidor TPVPC
-            startService(intent);
-            bindService(intent, mConexion, Context.BIND_AUTO_CREATE);
-        }
-        super.onResume();
-    }
+        val salirBtn: ImageButton = findViewById(R.id.salir)
+        lstAutorizados = findViewById(R.id.lstautorizados)
+        lstNoAutorizados = findViewById(R.id.lstnoautorizados)
 
-    private fun iniciarConexionSocket(ip: String, port: Int, totalToCobrar: Double) {
-        thread {
+        salirBtn.setOnClickListener { finish() }
+
+        val aceptarBtn: ImageButton = findViewById(R.id.aceptar)
+        aceptarBtn.setOnClickListener {
+            val intent = Intent(applicationContext, Camareros::class.java)
+            startActivity(intent)
+        }
+
+        val prefBtn: ImageButton = findViewById(R.id.btn_aceptar_preferencias)
+        prefBtn.setOnClickListener {
+            val intent = Intent(applicationContext, PreferenciasTPV::class.java)
+            startActivity(intent)
+        }
+
+        val arqueoBtn: ImageButton = findViewById(R.id.btn_arqueo_caja)
+        arqueoBtn.setOnClickListener {
+            val intent = Intent(applicationContext, Arqueo::class.java)
+            startActivity(intent)
+        }
+
+        lstNoAutorizados.setOnItemClickListener { _, view, _, _ ->
+                val obj = view.tag as JSONObject
             try {
-                Log.d("CobroTarjetaActivity", "Iniciando conexión con el servidor TPVPC")
+                dbCamareros.setAutorizado(obj.getInt("ID"), true)
+                obj.put("autorizado", "1")
+                myServicio?.autorizarCam(obj)
+            } catch (e: JSONException) {
+                Log.e("VALLETPV_ERR", e.toString())
+            }
+            rellenarListas()
+        }
 
-                // Conectar al servidor TPVPC con un timeout de 5 segundos
-                socket = Socket()
-                val socketAddress = InetSocketAddress(ip, port)
-                socket!!.connect(socketAddress, 5000)  // Timeout de 5 segundos
+        findViewById<ImageButton>(R.id.btn_add_nuevo_camarero).setOnClickListener {
+            val dlg = DlgAddNuevoCamarero(cx, myServicio)
+            dlg.show()
+        }
 
-                writer = PrintWriter(socket!!.getOutputStream(), true)
+        lstAutorizados.setOnItemClickListener { _, view, _, _ ->
+                val obj = view.tag as JSONObject
+            try {
+                obj.put("autorizado", "0")
+                dbCamareros.setAutorizado(obj.getInt("ID"), false)
+                myServicio?.autorizarCam(obj)
+            } catch (e: JSONException) {
+                Log.e("VALLETPV_ERR", e.toString())
+            }
+            rellenarListas()
+        }
+        cargarPreferencias()
 
-                // Verificar si el socket está conectado
-                if (socket!!.isConnected) {
-                    cancelado = false
+        if (!usarTPVPC) return
 
-                    // Enviar el total a cobrar
-                    val mensajeCobro = "{\"comando\": \"iniciar_cobro\", \"importe\": $totalToCobrar}"
-                    writer?.println(mensajeCobro)
+        val address = ipTPVPC.split(":")
+        if (address.size != 2) return
+        val ip = address[0]
+        val port = address[1].toInt()
 
-                    // Escuchar respuestas del servidor en un hilo separado
-                    recibirRespuestasSocket()
-                } else {
-                    throw Exception("No se pudo conectar al servidor TPVPC")
-                }
+        socketManager = SocketManager(ip, port)
 
-            } catch (e: Exception) {
+        // Iniciar la conexión al servidor TPVPC
+        socketManager.iniciarConexionSocket(
+            onSuccess = {
+                // Iniciar el pinpad
+                socketManager.iniciarPinpad()
+            },
+            onError = { errorMsg ->
                 runOnUiThread {
-                    cancelado = true
-                    Toast.makeText(this, "Error de conexión con el servidor: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(cx, "Error de conexión: $errorMsg", Toast.LENGTH_SHORT).show()
                 }
+            },
+            onRespuesta = { bundle ->
+                manejarRespuesta(bundle)
             }
-        }
+        )
 
     }
 
-    private fun recibirRespuestasSocket() {
-        thread {
-            try {
-                val socketActual = socket ?: throw Exception("El socket no está inicializado")
+    private fun rellenarListas() {
+        lstAutorizados.adapter = AdaptadorSelCam(cx, dbCamareros.getAutorizados(true))
+        lstNoAutorizados.adapter = AdaptadorSelCam(cx, dbCamareros.getAutorizados(false))
+    }
 
-                val inputStream = socketActual.getInputStream()
-                val reader = inputStream.bufferedReader()
+    override fun onResume() {
+        super.onResume()
+        cargarPreferencias()
 
-                val buffer = CharArray(1024)
-                var charsLeidos: Int
-                val respuestaCompleta = StringBuilder()
+        myServicio?.let { rellenarListas() }
+        if (server.isNotEmpty()) {
+            val intent = Intent(applicationContext, ServiceCOM::class.java).apply {
+                putExtra("url", server)
+                putExtra("url_cashlogy", urlCashlogy)
+                putExtra("usar_cashlogy", usarCashlogy)
+                putExtra("usar_tpvpc", usarTPVPC)
+                putExtra("ip_tpvpc", ipTPVPC)
+            }
+            startService(intent)
+            bindService(intent, mConexion, Context.BIND_AUTO_CREATE)
+        }
+    }
 
-                while (socketActual.isConnected) {
-                    try {
-                        charsLeidos = reader.read(buffer)
-                        if (charsLeidos > 0) {
-                            respuestaCompleta.appendRange(buffer, 0, charsLeidos)
 
-                            when {
-                                respuestaCompleta.contains("cancelado") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        setResult(RESULT_CANCELED)
-                                        finish()
-                                    }
+    // Función para procesar las respuestas recibidas desde SocketManager
+    private fun manejarRespuesta(bundle: Bundle) {
+        val estado = bundle.getString("estado")
+        println("estado: $estado")
+        when (estado) {
 
-                                }
-                                respuestaCompleta.contains("denegada") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        tvEstadoCobro.text = "Operación denegada"
-                                    }
-
-                                }
-                                respuestaCompleta.contains("fallo") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        tvEstadoCobro.text = "Pinpad error de conexión, reinicie el sistema"
-                                    }
-                                }
-                                respuestaCompleta.contains("error") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        tvEstadoCobro.text = "Operación cancelada"
-                                    }
-
-                                }
-                                respuestaCompleta.contains("esperando") -> {
-                                    runOnUiThread {
-                                        cancelado = false
-                                        tvEstadoCobro.text = String.format(
-                                                Locale.getDefault(),
-                                                "Esperando tarjeta de crédito %.2f €", totalToCobrar
-                                        )
-                                    }
-                                }
-                                respuestaCompleta.contains("iniciando") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        tvEstadoCobro.text = "Iniciando pinpad, por favor espere."
-                                    }
-                                }
-                                respuestaCompleta.contains("iniciado") -> {
-                                    runOnUiThread {
-                                        cancelado = true
-                                        tvEstadoCobro.text = "El pinpad está iniciado, repita la operación."
-                                    }
-                                }
-                                respuestaCompleta.contains("acpetado") -> {
-                                    runOnUiThread {
-                                        val resultData = Intent()
-
-                                        try {
-                                            val res = JSONObject(respuestaCompleta.toString())
-                                            resultData.putExtra("recibo", res.getString("recibo"))
-                                        } catch (ignored: JSONException) {
-                                            resultData.putExtra("recibo", "0")
-                                        }
-
-                                        resultData.putExtra("totalIngresado", 0.0)
-                                        resultData.putExtra("cambio", 0.0)
-                                        resultData.putExtra("totalMesa", totalToCobrar)
-                                        resultData.putExtra("lineas", lineas)
-
-                                        setResult(RESULT_OK, resultData)
-                                        finish()
-                                    }
-                                    break
-                                }
-                            }
-                            respuestaCompleta.clear()
-                        }
-                    } catch (e: SocketTimeoutException) {
-                        println("No se recibió respuesta del servidor dentro del tiempo esperado.")
-                        break
-                    } catch (e: SocketException) {
-                        println("Socket cerrado inesperadamente.")
-                        runOnUiThread {
-                            cancelado = true
-                            tvEstadoCobro.text = "Conexión cerrada. Operación cancelada."
-                        }
-                        break
-                    } catch (e: IOException) {
-                        println("Error de I/O en la conexión: ${e.message}")
-                        runOnUiThread {
-                            cancelado = true
-                            tvEstadoCobro.text = "Error de conexión. Operación cancelada."
-                        }
-                        break
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            "fallo" -> {
+                conectado = false
+                socketManager.cerrarConexion()
                 runOnUiThread {
-                    cancelado = true
-                    Toast.makeText(this@CobroTarjetaActivity, "Error en la conexión: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(cx, "Pinpad error de conexión, reinicie la aplicacion", Toast.LENGTH_SHORT).show()
+                }
+            }
+            "error" -> {
+                conectado = true
+                socketManager.cerrarConexion()
+                runOnUiThread {
+                    Toast.makeText(cx, "Error en el pinpad. reinicadado...", Toast.LENGTH_SHORT).show()
+                }
+            }
+            "iniciando" -> {
+                conectado = false
+                runOnUiThread {
+                    Toast.makeText(cx, "El pinpad se esta iniciando.....", Toast.LENGTH_SHORT).show()
+                }
+            }
+            "iniciado" -> {
+                conectado = true
+                socketManager.cerrarConexion()
+                runOnUiThread {
+                    Toast.makeText(cx, "El pinpad está iniciado correctamente.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    
-    @Override
-    protected void onDestroy() {
-        unbindService(mConexion);
-        Intent intent = new Intent(cx, ServiceCOM.class);
-        stopService(intent);
-        super.onDestroy();
+    override fun onDestroy() {
+        unbindService(mConexion)
+        socketManager.cerrarConexion()
+
+        Intent(cx, ServiceCOM::class.java).also {
+            stopService(it)
+        }
+        super.onDestroy()
     }
 
-    private void cargarPreferencias() {
-        JSON json = new JSON();
+    private fun cargarPreferencias() {
+        val json = JSON()
         try {
-            JSONObject pref = json.deserializar("preferencias.dat", this);
+            val pref = json.deserializar("preferencias.dat", this)
             if (pref == null) {
                 // Si no hay preferencias guardadas, redirigir a la actividad de preferencias
-                Intent intent = new Intent(this, PreferenciasTPV.class);
-                startActivity(intent);
+                val intent = Intent(this, PreferenciasTPV::class.java)
+                startActivity(intent)
             } else {
                 // Cargar URL del servidor
-                server = pref.getString("URL");
+                server = pref.getString("URL")
 
                 // Cargar preferencias de Cashlogy
-                urlCashlogy = pref.optString("URL_Cashlogy", "");  // Leer URL de Cashlogy
-                usarCashlogy = pref.optBoolean("usaCashlogy", false);  // Leer si se usa Cashlogy
+                urlCashlogy = pref.optString("URL_Cashlogy", "")
+                usarCashlogy = pref.optBoolean("usaCashlogy", false)
 
-                // Cargar preferencias de TPVPC (nuevos elementos)
-                usarTPVPC = pref.optBoolean("usaTPVPC", false);  // Leer si se usa TPVPC
-                ipTPVPC = pref.optString("IP_TPVPC", "");  // Leer la IP del servidor TPVPC
+                // Cargar preferencias de TPVPC
+                usarTPVPC = pref.optBoolean("usaTPVPC", false)
+                ipTPVPC = pref.optString("IP_TPVPC", "")
             }
-        } catch (Exception e) {
-            Log.e("VALLETPV_ERR", e.toString());
+        } catch (e: Exception) {
+            Log.e("VALLETPV_ERR", e.toString())
         }
     }
 
-
-
-    private final ServiceConnection mConexion = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            myServicio = ((ServiceCOM.MyBinder)iBinder).getService();
-            myServicio.setExHandler("camareros", handleHttp);
-            dbCamareros = (DBCamareros) myServicio.getDb("camareros");
-            myServicio.executeCaslogy(usarCashlogy, urlCashlogy);
-            myServicio.setExHandler("camareros", handleHttp);
-            rellenarListas();
+    private val mConexion: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
+            myServicio = (iBinder as ServiceCOM.MyBinder).service
+            myServicio?.setExHandler("camareros", handleHttp)
+            dbCamareros = myServicio?.getDb("camareros") as DBCamareros
+            myServicio?.executeCaslogy(usarCashlogy, urlCashlogy)
+            myServicio?.setExHandler("camareros", handleHttp)
+            rellenarListas()
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            myServicio = null;
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            myServicio = null
         }
-    };
+    }
+
 
 
 

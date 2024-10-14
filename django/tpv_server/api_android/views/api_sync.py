@@ -40,7 +40,7 @@ def update_for_devices(request):
     elif t in  ["seccionescom", "secciones_com"]:
         tbModel = SeccionesCom
     else:
-        tbModel = apps.get_model("db", t)
+        tbModel = apps.get_model("gestion", t)
     
     
     if tbModel and hasattr(tbModel, "update_for_devices"):
@@ -67,7 +67,7 @@ def update_from_devices(request):
     tb = request.POST["tb"]
     rows = json.loads(request.POST["rows"])
     
-    model = apps.get_model("db", tb)
+    model = apps.get_model("gestion", tb)
     if hasattr(model, "update_from_device"):
         for row in rows:
             model.update_from_device(row)

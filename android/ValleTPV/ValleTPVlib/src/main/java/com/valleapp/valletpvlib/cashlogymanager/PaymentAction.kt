@@ -2,7 +2,9 @@ package com.valleapp.valletpvlib.cashlogymanager
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import java.util.Locale
+
 
 class PaymentAction(
         socketManager: CashlogySocketManager,
@@ -58,11 +60,36 @@ class PaymentAction(
         private fun handleQResponse(response: String) {
             val parts = response.split("#")
             if (parts.size >= 3) {
-                val importeRecibido = String.format(Locale.UK, "%.2f", parts[2].toDouble() / 100.0).toDouble()
-                if (importeRecibido != admittedAmount) {
-                    admittedAmount = importeRecibido
-                    notifyUI("CASHLOGY_IMPORTE_ADMITIDO", admittedAmount.toString())
+
+                val importeStr = parts[2]  // Obtener de forma segura parts[2]
+
+                if (importeStr.isNotEmpty()) {
+                    try {
+                        // Convertir a Double dividiendo entre 100 para obtener el valor correcto
+                        val importeRecibido =
+                            String.format(Locale.UK, "%.2f", importeStr.toDouble() / 100.0)
+                                .toDouble()
+
+                        // Comprobar si el importe recibido es diferente del importe admitido
+                        if (importeRecibido != admittedAmount) {
+                            admittedAmount = importeRecibido
+                            notifyUI("CASHLOGY_IMPORTE_ADMITIDO", admittedAmount.toString())
+                        }
+                    } catch (e: NumberFormatException) {
+                        // Manejo del error si la cadena no se puede convertir a Double
+                        Log.e(
+                            "PaymentAction",
+                            "Error al convertir importe: $importeStr a Double",
+                            e
+                        )
+                        // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje en la UI o manejando un valor predeterminado
+                    }
+                } else {
+                    // Manejar el caso donde la cadena está vacía o nula
+                    Log.e("PaymentAction", "parts[2] es nulo o vacío")
+                    // Dependiendo del caso, puedes devolver un valor predeterminado o mostrar un mensaje en la UI
                 }
+
             }
             if (isAceptar) {
                 sendQCommand()
