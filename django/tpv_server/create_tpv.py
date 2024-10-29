@@ -43,7 +43,7 @@ if __name__ == '__main__':
         name_tpv = input("Nombre del servidor tpv [testTPV]: ")
         if name_tpv == "":
             name_tpv = "testTPV"
-        name_db = input("Nombre de la base: [%a]" % name_tpv)
+        name_db = input("Nombre de la base: [%a]: " % name_tpv)
         if name_db == "":
             name_db = name_tpv.lower()
         sql_mode = input("Tipo de base de datos [lite/mysql] [lite]: ")
