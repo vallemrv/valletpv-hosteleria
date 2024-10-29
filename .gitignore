@@ -5,7 +5,7 @@ output.json
 *.DS_Store*
 constant_config.py
 *.rdb
-
+local*
 # Directorios y ficheros no necesarios
 .vscode/
 manage*
