@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.valleapp.valletpv"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.valleapp.valletpv"
