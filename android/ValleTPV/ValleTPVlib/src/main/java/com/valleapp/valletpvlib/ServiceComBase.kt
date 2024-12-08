@@ -8,11 +8,12 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import com.valleapp.valletpvlib.Interfaces.IBaseDatos
-import com.valleapp.valletpvlib.Interfaces.IBaseSocket
-import com.valleapp.valletpvlib.Interfaces.IControllerWS
+import com.valleapp.valletpvlib.interfaces.IBaseDatos
+import com.valleapp.valletpvlib.interfaces.IBaseSocket
+import com.valleapp.valletpvlib.interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest
 import com.valleapp.valletpvlib.comunicacion.WSClient
+import com.valleapp.valletpvlib.db.AppDatabase
 import com.valleapp.valletpvlib.db.DBCamareros
 import com.valleapp.valletpvlib.db.DBCuenta
 import com.valleapp.valletpvlib.db.DBMesas
@@ -23,6 +24,10 @@ import com.valleapp.valletpvlib.db.DBTeclas
 import com.valleapp.valletpvlib.db.DBZonas
 import com.valleapp.valletpvlib.tareas.TareaManejarInstrucciones
 import com.valleapp.valletpvlib.tools.Instrucciones
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -32,6 +37,10 @@ import java.util.Timer
 import java.util.TimerTask
 
 abstract class ServiceComBase : Service(), IControllerWS {
+
+    private lateinit var db: AppDatabase // Instancia de AppDatabase
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob()) // Corrutinas para Room
+
 
     var zona: JSONObject? = null
     private var mesaAbierta: JSONObject? = null
@@ -107,7 +116,33 @@ abstract class ServiceComBase : Service(), IControllerWS {
         syncDevice(arrayOf("camareros", "mesasabiertas", "lineaspedido"), 500)
     }
 
-    override fun procesarRespose(o: JSONObject) {
+    override fun procesarRespose(o: JSONObject)  {
+        scope.launch {
+            try {
+                val tb = o.getString("tb")
+                val op = o.getString("op")
+                // Obtener el DAO correspondiente
+                val dao = when (tb) {
+                    "camareros" -> db.camareroDao()
+                    "mesas" -> db.mesaDao()
+                    "cuentas" -> db.cuentaDao()
+                    // ... otros DAOs ...
+                    else -> throw IllegalArgumentException("Tabla no reconocida: $tb")
+                }
+
+                for (i in 0 until objs.length()) {
+                    val obj = objs.getJSONObject(i)
+                    when (op) {
+                        "insert" -> dao.insert(entityFromJsonObject(obj, tb)) // Convertir JSONObject a entidad
+                        "md" -> dao.update(entityFromJsonObject(obj, tb))
+                        "rm" -> dao.delete(entityFromJsonObject(obj, tb))
+                    }
+                }
+            }catch (e: Exception) {
+                Log.e("SERVICE_COM", "Error en procesarRespose: $e")
+            }
+
+        }
         try {
             val tb = o.getString("tb")
             val op = o.getString("op")
@@ -166,7 +201,8 @@ abstract class ServiceComBase : Service(), IControllerWS {
 
         if (url != null) {
             server = url
-            iniciarDB()
+            db = AppDatabase.getDatabase(applicationContext) // Inicializar AppDatabase
+
 
             if (wsClient == null) {
                 //crearWebsocket();

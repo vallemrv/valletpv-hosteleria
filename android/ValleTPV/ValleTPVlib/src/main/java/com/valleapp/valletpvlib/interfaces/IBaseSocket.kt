@@ -1,11 +1,9 @@
-package com.valleapp.valletpvlib.interfaces;
+package com.valleapp.valletpvlib.interfaces
 
-import org.json.JSONObject;
+import org.json.JSONObject
 
-public interface IBaseSocket {
-    void rm(JSONObject o);
-
-    void insert(JSONObject o);
-
-    void update(JSONObject o);
+interface IBaseSocket {
+    suspend fun rm(o: JSONObject)
+    suspend fun insert(o: JSONObject)
+    suspend fun update(o: JSONObject)
 }

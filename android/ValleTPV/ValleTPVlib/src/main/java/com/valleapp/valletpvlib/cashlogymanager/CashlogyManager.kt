@@ -3,7 +3,7 @@ package com.valleapp.valletpvlib.cashlogymanager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.valleapp.valletpvlib.Interfaces.IControllerWS
+import com.valleapp.valletpvlib.interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.WSClient
 import org.json.JSONException
 import org.json.JSONObject

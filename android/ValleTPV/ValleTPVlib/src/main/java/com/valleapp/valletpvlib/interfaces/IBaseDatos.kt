@@ -1,11 +1,9 @@
-package com.valleapp.valletpvlib.Interfaces;
+package com.valleapp.valletpvlib.interfaces
 
-import org.json.JSONArray;
+import org.json.JSONArray
 
-public interface IBaseDatos {
-    suspend fun JSONArray filter(String cWhere);
-
-    suspend fun rellenarTabla(JSONArray objs);
-
-    void inicializar();
+interface IBaseDatos {
+    suspend fun filter(cWhere: String?): List<Any> // Sustituye Any por una entidad específica
+    suspend fun rellenarTabla(objs: JSONArray)
+    suspend fun inicializar()
 }
