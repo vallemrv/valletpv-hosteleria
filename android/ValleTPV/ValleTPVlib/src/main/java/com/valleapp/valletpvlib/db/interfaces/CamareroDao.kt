@@ -10,7 +10,7 @@ import com.valleapp.valletpvlib.db.entities.Camarero
 
 
 @Dao
-interface CamareroDao {
+interface CamareroDao  {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(camarero: Camarero)
 

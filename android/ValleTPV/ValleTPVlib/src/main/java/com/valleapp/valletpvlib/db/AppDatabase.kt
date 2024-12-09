@@ -18,17 +18,19 @@ import com.valleapp.valletpvlib.db.interfaces.MesaDao
 import com.valleapp.valletpvlib.db.interfaces.SeccionDao
 import com.valleapp.valletpvlib.db.interfaces.SubTeclaDao
 import com.valleapp.valletpvlib.db.interfaces.TeclaDao
+import com.valleapp.valletpvlib.db.interfaces.ZonaDao
 
 @Database(entities = [Cuenta::class, Camarero::class, Mesa::class,
-    Seccion::class, Subtecla::class, Tecla::class], version = 1, exportSchema = false)
+    Seccion::class, Subtecla::class, Tecla::class, ZonaDao::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun cuentaDao(): CuentaDao
     abstract fun camareroDao(): CamareroDao
     abstract fun mesaDao(): MesaDao
-    abstract fun SeccionDao(): SeccionDao
-    abstract fun SubTeclaDao(): SubTeclaDao
-    abstract fun TeclaDao(): TeclaDao
+    abstract fun seccionDao(): SeccionDao
+    abstract fun subTeclaDao(): SubTeclaDao
+    abstract fun teclaDao(): TeclaDao
+    abstract fun zonaDao(): ZonaDao
 
     companion object {
         @Volatile

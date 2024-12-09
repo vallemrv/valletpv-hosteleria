@@ -116,38 +116,24 @@ abstract class ServiceComBase : Service(), IControllerWS {
         syncDevice(arrayOf("camareros", "mesasabiertas", "lineaspedido"), 500)
     }
 
-    override fun procesarRespose(o: JSONObject)  {
-        scope.launch {
+    override fun procesarRespose(o: JSONObject) {
+        scope.launch { // Lanzamos una corrutina para operaciones de la base de datos
             try {
                 val tb = o.getString("tb")
                 val op = o.getString("op")
+
                 // Obtener el DAO correspondiente
                 val dao = when (tb) {
                     "camareros" -> db.camareroDao()
                     "mesas" -> db.mesaDao()
                     "cuentas" -> db.cuentaDao()
-                    // ... otros DAOs ...
+                    "secciones" -> db.seccionDao()
+                    "subteclas" -> db.subTeclaDao()
+                    "teclas" -> db.teclaDao()
+                    "zonas" -> db.zonaDao()
                     else -> throw IllegalArgumentException("Tabla no reconocida: $tb")
                 }
 
-                for (i in 0 until objs.length()) {
-                    val obj = objs.getJSONObject(i)
-                    when (op) {
-                        "insert" -> dao.insert(entityFromJsonObject(obj, tb)) // Convertir JSONObject a entidad
-                        "md" -> dao.update(entityFromJsonObject(obj, tb))
-                        "rm" -> dao.delete(entityFromJsonObject(obj, tb))
-                    }
-                }
-            }catch (e: Exception) {
-                Log.e("SERVICE_COM", "Error en procesarRespose: $e")
-            }
-
-        }
-        try {
-            val tb = o.getString("tb")
-            val op = o.getString("op")
-            val db = getDb(tb) as IBaseSocket?
-            if (db != null) {
                 var objs: JSONArray
 
                 // Verificar si "obj" es un JSONArray o un JSONObject
@@ -160,35 +146,20 @@ abstract class ServiceComBase : Service(), IControllerWS {
                     objs = o.getJSONArray("obj")
                 }
 
-                // Procesar cada objeto en el JSONArray
                 for (i in 0 until objs.length()) {
                     val obj = objs.getJSONObject(i)
                     when (op) {
-                        "insert" -> db.insert(obj)
-                        "md" -> db.update(obj)
-                        "rm" -> db.rm(obj)
+                        "insert" -> dao.insert(entityFromJsonObject(obj, tb))
+                        "md" -> dao.update(entityFromJsonObject(obj, tb))
+                        "rm" -> dao.delete(entityFromJsonObject(obj, tb))
                     }
                 }
 
-                // Manejo del handler si es necesario
-                val h = getExHandler(tb)
-                if (h != null && objs.length() > 0) {
-                    if (tb == "lineaspedido" && op != "rm" && mesaAbierta != null) {
-                        val idMesaAbierta = mesaAbierta!!.getString("ID")
-                        for (i in 0 until objs.length()) {
-                            val objIdmesa = objs.getJSONObject(i).getString("IDMesa")
-                            if (objIdmesa == idMesaAbierta) {
-                                h.sendEmptyMessage(0)
-                                break
-                            }
-                        }
-                    } else {
-                        h.sendEmptyMessage(0)
-                    }
-                }
+                // ... (manejo del handler) ...
+
+            } catch (e: Exception) {
+                Log.e("SERVICE_COM", "Error en procesarRespose: $e")
             }
-        } catch (e: Exception) {
-            Log.e("SERVICE_COM", "Error en procesarRespose: $e")
         }
     }
 
