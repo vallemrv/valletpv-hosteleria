@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.valleapp.vallecash.R
 import com.valleapp.vallecash.ValleCASH
-import com.valleapp.valletpvlib.Interfaces.IControllerWS
+import com.valleapp.valletpvlib.interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.WSClient
 import org.json.JSONObject
 

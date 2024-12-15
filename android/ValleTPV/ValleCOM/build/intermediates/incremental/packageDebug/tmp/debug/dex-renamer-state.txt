@@ -1,4 +1,0 @@
-#Tue Sep 17 16:40:03 CEST 2024
-base.0=/Users/valle/proyectos/github/valletpv-hosteleria/android/ValleTPV/ValleCOM/build/intermediates/dex/debug/mergeDexDebug/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex

@@ -1,6 +1,6 @@
 package com.valleapp.valletpvlib.comunicacion
 
-import com.valleapp.valletpvlib.Interfaces.IControllerWS
+import com.valleapp.valletpvlib.interfaces.IControllerWS
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.json.JSONObject
