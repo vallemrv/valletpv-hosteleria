@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="ValleTPV">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-06T13:56:29.486533Z">
+        <DropdownSelection timestamp="2024-11-09T23:13:00.251900190Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/valle/.android/avd/Tablet.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/valle/.android/avd/Tablet.avd" />
             </handle>
           </Target>
         </DropdownSelection>
