@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.valleapp.valletpvlib.db.entities.Camarero
 
 
+
 @Dao
 interface CamareroDao  {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -31,5 +32,6 @@ interface CamareroDao  {
 
     @Query("SELECT * FROM camareros WHERE activo = 1 AND permisos LIKE '%' || :permiso || '%'")
     suspend fun getConPermiso(permiso: String): List<Camarero>
+
 }
 
