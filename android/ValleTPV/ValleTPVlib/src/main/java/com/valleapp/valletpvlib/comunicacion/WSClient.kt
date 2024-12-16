@@ -1,17 +1,17 @@
 package com.valleapp.valletpvlib.comunicacion
 
 import com.valleapp.valletpvlib.interfaces.IControllerWS
+import kotlinx.coroutines.*
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.json.JSONObject
 import java.net.URI
-import java.util.Timer
-import kotlin.concurrent.schedule
 
 class WSClient(
     serverUrl: String, // La URL del servidor (por ejemplo, "api.server.com")
     endpoint: String,  // El endpoint (por ejemplo, "/comunicacion/devices")
-    private val controller: IControllerWS // Interfaz para sincronizar datos perdidos
+    private val controller: IControllerWS, // Interfaz para sincronizar datos perdidos
+    private val viewModelScope: CoroutineScope // Inyectar el viewModelScope
 ) : WebSocketClient(constructUri(serverUrl, endpoint)) {
 
     private var reconnectAttempts = 0
@@ -54,32 +54,26 @@ class WSClient(
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
         println("Connection closed with exit code $code, reason: $reason")
-        if (shouldReconnect) {
-            attemptReconnect() // Intentamos reconectar en caso de desconexión si está permitido
-        }
+        if (shouldReconnect) attemptReconnect()
     }
 
     override fun onError(ex: Exception?) {
         println("An error occurred: ${ex?.message}")
-        if (shouldReconnect) {
-            attemptReconnect() // Intentamos reconectar en caso de error si está permitido
-        }
+        if (shouldReconnect) attemptReconnect()
     }
 
-    private fun attemptReconnect() {
+    private fun attemptReconnect() = viewModelScope.launch { // Usar viewModelScope para controlar el ciclo de vida
         reconnectAttempts++
         val reconnectDelay = calculateReconnectDelay()
         println("Attempting to reconnect in $reconnectDelay ms...")
 
-        // Reintentar la reconexión después del retraso calculado
-        Timer().schedule(reconnectDelay) {
-            if (shouldReconnect) {
-                try {
-                    println("Reconnecting...")
-                    reconnect()
-                } catch (e: Exception) {
-                    println("Reconnection failed: ${e.message}")
-                }
+        delay(reconnectDelay) // Utilizar corrutinas para el retraso
+        if (shouldReconnect) {
+            try {
+                println("Reconnecting...")
+                reconnect()
+            } catch (e: Exception) {
+                println("Reconnection failed: ${e.message}")
             }
         }
     }
@@ -92,9 +86,9 @@ class WSClient(
 
     fun sendMessage(message: String) {
         if (isOpen) {
-            val o =  JSONObject();
-            o.put("content", message);
-            send(o.toString());
+            val o =  JSONObject()
+            o.put("content", message)
+            send(o.toString())
         } else {
             println("WebSocket is not open")
         }
@@ -106,6 +100,4 @@ class WSClient(
         close() // Cierra la conexión WebSocket
         println("Reconnection stopped and WebSocket closed")
     }
-
-
 }

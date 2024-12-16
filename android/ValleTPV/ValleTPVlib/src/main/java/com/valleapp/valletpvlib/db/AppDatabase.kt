@@ -12,13 +12,13 @@ import com.valleapp.valletpvlib.db.entities.Tecla
 import com.valleapp.valletpvlib.db.entities.Seccion
 
 
-import com.valleapp.valletpvlib.db.interfaces.CamareroDao
-import com.valleapp.valletpvlib.db.interfaces.CuentaDao
-import com.valleapp.valletpvlib.db.interfaces.MesaDao
-import com.valleapp.valletpvlib.db.interfaces.SeccionDao
-import com.valleapp.valletpvlib.db.interfaces.SubTeclaDao
-import com.valleapp.valletpvlib.db.interfaces.TeclaDao
-import com.valleapp.valletpvlib.db.interfaces.ZonaDao
+import com.valleapp.valletpvlib.db.dao.CamareroDao
+import com.valleapp.valletpvlib.db.dao.CuentaDao
+import com.valleapp.valletpvlib.db.dao.MesaDao
+import com.valleapp.valletpvlib.db.dao.SeccionDao
+import com.valleapp.valletpvlib.db.dao.SubTeclaDao
+import com.valleapp.valletpvlib.db.dao.TeclaDao
+import com.valleapp.valletpvlib.db.dao.ZonaDao
 
 @Database(entities = [Cuenta::class, Camarero::class, Mesa::class,
     Seccion::class, Subtecla::class, Tecla::class, ZonaDao::class], version = 1, exportSchema = false)

@@ -15,7 +15,7 @@ data class Subtecla(
     val descripcion_r: String?
 ) : IBaseEntity<Subtecla> {
 
-    override fun emtityFromJson(obj: JSONObject): Subtecla {
+    override fun entityFromJson(obj: JSONObject): Subtecla {
         return Subtecla(
             ID = obj.getInt("ID"),
             Nombre = obj.getString("Nombre"),
@@ -26,7 +26,7 @@ data class Subtecla(
         )
     }
 
-    override fun jsonFromEmtity(entity: Subtecla): JSONObject {
+    override fun jsonFromEntity(entity: Subtecla): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Nombre", entity.Nombre)

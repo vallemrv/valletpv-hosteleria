@@ -20,7 +20,7 @@ data class Cuenta(
     val servido: Int?
 ) : IBaseEntity<Cuenta> {
 
-    override fun emtityFromJson(obj: JSONObject): Cuenta {
+    override fun entityFromJson(obj: JSONObject): Cuenta {
         return Cuenta(
             ID = obj.getString("ID"),
             Estado = obj.optString("Estado"),
@@ -36,7 +36,7 @@ data class Cuenta(
         )
     }
 
-    override fun jsonFromEmtity(entity: Cuenta): JSONObject {
+    override fun jsonFromEntity(entity: Cuenta): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Estado", entity.Estado)

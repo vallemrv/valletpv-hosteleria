@@ -13,7 +13,7 @@ data class Seccion(
     val RGB: String
 ) : IBaseEntity<Seccion> {
 
-    override fun emtityFromJson(obj: JSONObject): Seccion {
+    override fun entityFromJson(obj: JSONObject): Seccion {
         return Seccion(
             ID = obj.getInt("ID"),
             Nombre = obj.getString("Nombre"),
@@ -22,7 +22,7 @@ data class Seccion(
         )
     }
 
-    override fun jsonFromEmtity(entity: Seccion): JSONObject {
+    override fun jsonFromEntity(entity: Seccion): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Nombre", entity.Nombre)

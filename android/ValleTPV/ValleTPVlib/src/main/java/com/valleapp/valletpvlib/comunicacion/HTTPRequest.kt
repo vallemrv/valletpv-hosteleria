@@ -1,108 +1,66 @@
-package com.valleapp.valletpvlib.comunicacion;
+package com.valleapp.valletpvlib.comunicacion
 
-import android.content.ContentValues;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
+import android.util.Log
+import kotlinx.coroutines.*
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.io.IOException
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+object HTTPRequest {
 
+private val client = OkHttpClient()
+private val jsonMediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
 
+suspend fun request(strUrl: String, params: JSONObject?): Result<JSONObject> = withContext(Dispatchers.IO) {
+    try {
+        val url = if (!strUrl.startsWith("http://") && !strUrl.startsWith("https://")) {
+            "http://$strUrl"
+        } else {
+            strUrl
+        }
 
-public class HTTPRequest {
+        val requestBody = params?.toString()?.toRequestBody(jsonMediaType)
+                ?: "".toRequestBody(jsonMediaType) // Manejar el caso de params nulos. Enviar body vacío.
 
+        val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build()
 
-    public HTTPRequest(String strUrl, ContentValues params, final String op, final Handler handlerExternal){
-        // Create a new HttpClient and Post Header
-        HttpURLConnection conn = null;
-        try {
-
-            if(!strUrl.contains("http://") && !strUrl.contains("https://")) strUrl = "http://"+ strUrl;
-            URL url = new URL(strUrl);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Accept-Charset", "UTF-8");
-            // Execute HTTP Post Request
-            HttpURLConnection finalConn = conn;
-            new Thread(() -> {
-                int statusCode = -1;
-                try {
-                    DataOutputStream wr = new DataOutputStream(finalConn.getOutputStream());
-                    wr.writeBytes(getParams(params));
-                    wr.flush();
-                    wr.close();
-                    statusCode = finalConn.getResponseCode();
-                    InputStream in = new BufferedInputStream(finalConn.getInputStream());
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder result = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
+        client.newCall(request).execute().use { response ->
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                if (!responseBody.isNullOrEmpty()) {
+                    try {
+                        val jsonResponse = JSONObject(responseBody)
+                        return@withContext Result.success(jsonResponse)
+                    } catch (e: Exception) {
+                        Log.e("HTTPRequest", "Error parsing JSON response: ${e.message}")
+                        return@withContext Result.failure(ParseException("Error parsing JSON")) //Customizar la exception
                     }
-                    if (handlerExternal != null)
-                        sendMessage(handlerExternal, op, result.toString());
-
-                } catch (ConnectException e) {
-                    if (handlerExternal != null) sendMessage(handlerExternal, "no_connexion", null);
-                    Log.e("HTTPRequeest", e.toString());
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    Log.e("HTTPRequeest", e.toString());
-                    if (handlerExternal != null && statusCode == 500)
-                        sendMessage(handlerExternal, "ERROR", null);
-
+                }else{
+                    return@withContext Result.failure(EmptyResponseException("Empty response"))
                 }
-            }).start();
 
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            Log.e("HTTPRequeest", e.toString());
-        }finally {
-            if(conn != null) conn.disconnect();
-        }
-
-    }
-
-    public String getParams(ContentValues params){
-
-        StringBuilder sbParams = new StringBuilder();
-        int i = 0;
-        for (String key : params.keySet()) {
-            try {
-                if (i != 0){
-                    sbParams.append("&");
-                }
-                sbParams.append(key).append("=")
-                        .append(URLEncoder.encode((String) params.get(key), "UTF-8"));
-
-            } catch (UnsupportedEncodingException e) {
-                Log.e("HTTPRequeest", e.toString());
+            } else {
+                val errorMessage = response.body?.string() ?: "HTTP error ${response.code}"
+                Log.e("HTTPRequest", errorMessage)
+                return@withContext Result.failure(HttpException(errorMessage,response.code))
             }
-            i++;
         }
-        return sbParams.toString();
+    } catch (e: IOException) {
+        Log.e("HTTPRequest", "Network error: ${e.message}")
+        return@withContext Result.failure(NetworkException("Network error"))
+    } catch (e: Exception) {
+        Log.e("HTTPRequest", "General error: ${e.message}")
+        return@withContext Result.failure(e) //Devolver la excepcion original.
     }
+}
 
-    public void sendMessage(Handler handler, String op, String res){
-        Message msg = handler.obtainMessage();
-        Bundle bundle = msg.getData();
-        if (bundle == null) bundle = new Bundle();
-        bundle.putString("RESPONSE", res);
-        bundle.putString("op", op);
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
-
-
+class ParseException(message:String): Exception(message)
+class HttpException(message: String,val code:Int) : Exception(message)
+class NetworkException(message:String) : Exception(message)
+class EmptyResponseException(message: String) : Exception(message)
 }
