@@ -1,24 +1,22 @@
 package com.valleapp.valletpvlib.db.entities
 
+
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.valleapp.valletpvlib.interfaces.IBaseEntity
 import org.json.JSONObject
 
 @Entity(tableName = "camareros")
 data class Camarero(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nombre: String,
     val apellidos: String,
     val activo: Boolean,
     val passField: String,
     val autorizado: Boolean,
     val permisos: String
-) : IBaseEntity<Camarero> {
+): BaseEntity(), IBaseEntity<Camarero> {
 
-    override fun emtityFromJson(obj: JSONObject): Camarero {
-        return Camarero(
-            id = obj.getLong("id"),
+    override fun entityFromJson(obj: JSONObject): Camarero {
+         val camarero = Camarero(
             nombre = obj.getString("nombre"),
             apellidos = obj.getString("apellidos"),
             activo = obj.getInt("activo") == 1,
@@ -26,9 +24,11 @@ data class Camarero(
             autorizado = obj.getInt("autorizado") == 1,
             permisos = obj.getString("permisos")
         )
+        camarero.id = obj.getLong("id")
+        return camarero
     }
 
-    override fun jsonFromEmtity(entity: Camarero): JSONObject {
+    override fun jsonFromEntity(entity: Camarero): JSONObject {
         val json = JSONObject()
         json.put("id", entity.id)
         json.put("nombre", entity.nombre)

@@ -22,7 +22,7 @@ data class Tecla(
     val descripcion_r: String?
 ) : IBaseEntity<Tecla> {
 
-    override fun emtityFromJson(obj: JSONObject): Tecla {
+    override fun entityFromJson(obj: JSONObject): Tecla {
         return Tecla(
             ID = obj.getInt("ID"),
             Nombre = obj.getString("Nombre"),
@@ -40,7 +40,7 @@ data class Tecla(
         )
     }
 
-    override fun jsonFromEmtity(entity: Tecla): JSONObject {
+    override fun jsonFromEntity(entity: Tecla): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Nombre", entity.Nombre)

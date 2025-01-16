@@ -1,4 +1,4 @@
-package com.valleapp.valletpvlib.db.interfaces
+package com.valleapp.valletpvlib.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query

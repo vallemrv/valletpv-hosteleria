@@ -8,8 +8,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import com.valleapp.valletpvlib.interfaces.IBaseDatos
-import com.valleapp.valletpvlib.interfaces.IBaseSocket
+import com.valleapp.valletpvlib.db.dao.BaseDao
 import com.valleapp.valletpvlib.interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest
 import com.valleapp.valletpvlib.comunicacion.WSClient
@@ -51,7 +50,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
     private var timerManejarInstrucciones: Timer = Timer()
 
     private var exHandler: MutableMap<String, Handler> = HashMap()
-    private var dbs: MutableMap<String?, IBaseDatos>? = null
+    private var dbs: MutableMap<String?, BaseDao>? = null
 
     val colaInstrucciones: Queue<Instrucciones> = LinkedList()
     var tbNameUpdateLow: Array<String>? = null
@@ -123,7 +122,7 @@ abstract class ServiceComBase : Service(), IControllerWS {
                 val op = o.getString("op")
 
                 // Obtener el DAO correspondiente
-                val dao = when (tb) {
+                val dao: BaseDao = when (tb) {
                     "camareros" -> db.camareroDao()
                     "mesas" -> db.mesaDao()
                     "cuentas" -> db.cuentaDao()
@@ -241,21 +240,21 @@ abstract class ServiceComBase : Service(), IControllerWS {
         if (dbs == null) {
             val dbMesas = DBMesas(applicationContext)
             dbs = HashMap()
-            (dbs as HashMap<String?, IBaseDatos>)["camareros"] = DBCamareros(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["mesas"] = dbMesas
-            (dbs as HashMap<String?, IBaseDatos>)["zonas"] = DBZonas(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["secciones"] = DBSecciones(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["teclas"] = DBTeclas(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["lineaspedido"] = DBCuenta(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["mesasabiertas"] = DBMesasAbiertas(applicationContext)
-            (dbs as HashMap<String?, IBaseDatos>)["subteclas"] = DBSubTeclas(applicationContext)
-            for (db in (dbs as HashMap<String?, IBaseDatos>).values) {
+            (dbs as HashMap<String?, BaseDao>)["camareros"] = DBCamareros(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["mesas"] = dbMesas
+            (dbs as HashMap<String?, BaseDao>)["zonas"] = DBZonas(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["secciones"] = DBSecciones(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["teclas"] = DBTeclas(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["lineaspedido"] = DBCuenta(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["mesasabiertas"] = DBMesasAbiertas(applicationContext)
+            (dbs as HashMap<String?, BaseDao>)["subteclas"] = DBSubTeclas(applicationContext)
+            for (db in (dbs as HashMap<String?, BaseDao>).values) {
                 db.inicializar()
             }
         }
     }
 
-    fun getDb(nombre: String?): IBaseDatos? {
+    fun getDb(nombre: String?): BaseDao? {
         return dbs!![nombre]
     }
 

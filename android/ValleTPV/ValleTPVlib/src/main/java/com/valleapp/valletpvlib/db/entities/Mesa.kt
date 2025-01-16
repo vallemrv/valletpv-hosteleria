@@ -16,7 +16,7 @@ data class Mesa(
     val Orden: Int
 ) : IBaseEntity<Mesa> {
 
-    override fun emtityFromJson(obj: JSONObject): Mesa {
+    override fun entityFromJson(obj: JSONObject): Mesa {
         return Mesa(
             ID = obj.getInt("ID"),
             Nombre = obj.getString("Nombre"),
@@ -28,7 +28,7 @@ data class Mesa(
         )
     }
 
-    override fun jsonFromEmtity(entity: Mesa): JSONObject {
+    override fun jsonFromEntity(entity: Mesa): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Nombre", entity.Nombre)

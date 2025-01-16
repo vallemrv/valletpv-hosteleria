@@ -13,7 +13,7 @@ data class Zona(
     val Tarifa: Int
 ) : IBaseEntity<Zona> {
 
-    override fun emtityFromJson(obj: JSONObject): Zona {
+    override fun entityFromJson(obj: JSONObject): Zona {
         return Zona(
             ID = obj.getInt("ID"),
             Nombre = obj.getString("Nombre"),
@@ -22,7 +22,7 @@ data class Zona(
         )
     }
 
-    override fun jsonFromEmtity(entity: Zona): JSONObject {
+    override fun jsonFromEntity(entity: Zona): JSONObject {
         val json = JSONObject()
         json.put("ID", entity.ID)
         json.put("Nombre", entity.Nombre)

@@ -1,4 +1,4 @@
-package com.valleapp.valletpvlib.db.interfaces
+package com.valleapp.valletpvlib.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -11,15 +11,7 @@ import com.valleapp.valletpvlib.db.entities.Camarero
 
 
 @Dao
-interface CamareroDao  {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(camarero: Camarero)
-
-    @Update
-    suspend fun update(camarero: Camarero)
-
-    @Delete
-    suspend fun delete(camarero: Camarero)
+interface CamareroDao: BaseDao<Camarero>  {
 
     @Query("SELECT * FROM camareros WHERE activo = 1")
     suspend fun getAllActive(): List<Camarero>
