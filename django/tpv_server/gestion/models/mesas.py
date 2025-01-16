@@ -35,7 +35,7 @@ class Mesas(BaseModels):
         mesa_abierta = Mesasabiertas.objects.filter(mesa__pk=self.id).first()
         if mesa_abierta:
             obj["num"] = mesa_abierta.infmesa.numcopias
-            obj["abierta"] = 1;
+            obj["abierta"] = 1
         return obj
 
 

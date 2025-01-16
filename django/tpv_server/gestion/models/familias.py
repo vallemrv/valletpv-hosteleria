@@ -7,6 +7,7 @@ class Receptores(BaseModels):
     nomimp = models.CharField(db_column='nomImp', max_length=40)  # Field name made lowercase.
     activo = models.BooleanField(db_column='Activo', default=True)  # Field name made lowercase.
     descripcion = models.CharField(db_column='Descripcion', max_length=200, default="")  # Field name made lowercase.
+    isTicket = models.BooleanField(default=False)
 
     @staticmethod
     def update_for_devices():
