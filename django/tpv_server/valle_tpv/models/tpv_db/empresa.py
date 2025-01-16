@@ -6,6 +6,7 @@ import random
 
 
 class Dispositivos(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
     nombre = models.CharField(max_length=100, default="")
     UID = models.CharField(max_length=100, default="")
     codigo = models.CharField(max_length=6, default="")
@@ -50,6 +51,7 @@ class Dispositivos(models.Model):
         ordering = ['-id']
 
 class Empresa(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
     nombre = models.CharField(max_length=100, default="")
     razonsocial = models.CharField(max_length=100, default="")
     cif = models.CharField(max_length=20,  default="")

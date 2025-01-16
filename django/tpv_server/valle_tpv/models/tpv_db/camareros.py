@@ -4,16 +4,16 @@ from valle_tpv.tools.ws import comunicar_cambios_devices
 
 
 class Camareros(models.Model):
-    id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    apellidos = models.CharField(max_length=100)
-    activo = models.BooleanField(default=False)
-    autorizado = models.BooleanField(default=False)
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
+    nombre = models.CharField(db_column='Nombre', max_length=100)
+    apellidos = models.CharField(db_column='Apellidos', max_length=100)
+    email = models.CharField(db_column='Email', max_length=50, null=True) 
+    activo = models.IntegerField(db_column='Activo', default=1)
+    autorizado = models.IntegerField(db_column='Autorizado', default=1)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    password = models.CharField(max_length=200, default="")
-    permisos = models.CharField(max_length=200, blank=True)
+    password = models.CharField(db_column='Pass', max_length=200, default="")
+    permisos = models.CharField(db_column='Permisos', max_length=200, blank=True)
     
-
     def __str__(self):  
         return self.nombre + " " + self.apellidos
 

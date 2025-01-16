@@ -14,11 +14,11 @@ class Servidos(models.Model):
 
 
 class Pedidos(models.Model):
-    id = models.AutoField( primary_key=True) 
-    hora = models.CharField( max_length=5) 
-    infmesa = models.ForeignKey('Infmesa',  on_delete=models.CASCADE, db_column='UID') 
-    camarero_id = models.IntegerField() 
-    uid_device = models.CharField(max_length=150, default="")
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    hora = models.CharField(db_column='Hora', max_length=5)  # Field name made lowercase.
+    infmesa = models.ForeignKey('Infmesa',  on_delete=models.CASCADE, db_column='UID')  # Field name made lowercase.
+    camarero_id = models.IntegerField(db_column='IDCam')  # Field name made lowercase.
+    uid_device = models.CharField(max_length=150, default="589274e0-4ae3-4008-a00b-ec7a19d74d01")
     
    
     @staticmethod
@@ -102,13 +102,14 @@ ESTADO_CHOICES=[
 class Lineaspedido(models.Model):
     id = models.AutoField(primary_key=True) 
     pedido = models.ForeignKey('Pedidos',  on_delete=models.CASCADE) 
-    infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID') 
-    estado = models.CharField( choices=ESTADO_CHOICES,  max_length=1, default="P") 
-    precio = models.DecimalField( max_digits=6, decimal_places=2) 
-    descripcion = models.CharField( default=None,  max_length=400, null=True) 
+    infmesa = models.ForeignKey(Infmesa, on_delete=models.CASCADE, db_column='UID')
+    idart = models.IntegerField(db_column='IDArt')  # Field name made lowercase. 
+    estado = models.CharField(db_column='Estado', choices=ESTADO_CHOICES,  max_length=1, default="P") 
+    precio = models.DecimalField(db_column='Precio', max_digits=6, decimal_places=2) 
+    descripcion = models.CharField(db_column='Descripcion', default=None,  max_length=400, null=True) 
     tecla = models.ForeignKey('Teclas', on_delete=models.SET_NULL, null=True) 
     es_compuesta = models.BooleanField("Grupo o simple", default=False)
-    can_composicion = models.IntegerField("Cantidad de articulos que lo compone", default=0)
+    can_composicion = models.IntegerField("Cantidad de articulos que lo compone",db_column='cantidad', default=0)
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
      
     

@@ -2,12 +2,10 @@ from django.db import models
 from django.forms.models import model_to_dict
 
 class Mesas(models.Model):
-    id = models.AutoField( primary_key=True) 
-    nombre = models.CharField( max_length=50) 
-    orden = models.IntegerField( default=0) 
-    zona = models.ForeignKey('Zonas',  on_delete=models.CASCADE) 
-
-
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
+    nombre = models.CharField(db_column='Nombre',  max_length=50)  # Field name made lowercase.
+    orden = models.IntegerField(db_column='Orden', default=0)  # Field name made lowercase. 
+    
     def serialize(self):
         from .mesasabiertas import Mesasabiertas
         obj = {
@@ -37,16 +35,15 @@ class Mesas(models.Model):
 
 
     class Meta:
-        default_permissions = ()
+        db_table = 'mesas'
         ordering = ['-orden']
 
 
 class Zonas(models.Model):
-    id = models.AutoField( primary_key=True) 
-    nombre = models.CharField( unique=True, max_length=50) 
-    tarifa = models.IntegerField() 
-    color = models.CharField("Color", max_length=50) 
-    orden = models.IntegerField( default=0) 
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase 
+    nombre = models.CharField(db_column='Nombre', unique=True, max_length=50)  # Field name made lowercase.
+    tarifa = models.IntegerField(db_column='Tarifa')  # Field name made lowercase.
+    rgb = models.CharField("Color", db_column='RGB', max_length=50)  # Field name made lowercase.
 
         
     def __unicode__(self):
@@ -60,3 +57,13 @@ class Zonas(models.Model):
         db_table = 'zonas'
         ordering = ['orden']
 
+class Mesaszona(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase 
+    zona = models.ForeignKey('Zonas',  on_delete=models.CASCADE, db_column='IDZona')  # Field name made lowercase.
+    mesa = models.ForeignKey('Mesas',  on_delete=models.CASCADE, db_column='IDMesa')  # Field name made lowercase.
+
+    def serialize(self):
+        return self.mesa.serialize()
+
+    class Meta:
+        db_table = 'mesaszona'

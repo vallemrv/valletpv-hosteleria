@@ -6,6 +6,7 @@ from valle_tpv.tools.ws import send_mensaje_impresora
 
 
 class HistorialMensajes(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
     camarero = models.ForeignKey("Camareros", on_delete=models.CASCADE)
     mensaje = models.CharField(max_length=300)
     receptor = models.ForeignKey("Receptores", on_delete=models.CASCADE)
@@ -39,11 +40,11 @@ class HistorialMensajes(models.Model):
 
    
     class Meta:
-        db_table = 'historialmensajes'
+        db_table = 'gestion_historialmensajes'
         ordering = ['-id']
 
 class Historialnulos(models.Model):
-    id = models.AutoField(primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase
     lineapedido = models.ForeignKey('Lineaspedido',  on_delete=models.CASCADE)  # Field name made lowercase.
     camarero = models.ForeignKey('Camareros',  on_delete=models.CASCADE)  # Field name made lowercase.
     hora = models.CharField(max_length=5)  # Field name made lowercase.

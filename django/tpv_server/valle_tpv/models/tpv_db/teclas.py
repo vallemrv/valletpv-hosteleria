@@ -2,11 +2,11 @@ from django.db import models
 from django.forms.models import model_to_dict
 
 class Receptores(models.Model):
-    id = models.AutoField(primary_key=True) 
-    nombre = models.CharField(max_length=40) 
-    nom_impresora = models.CharField(max_length=40, default="", blank=True)
-    activo = models.BooleanField( default=True) 
-    descripcion = models.CharField(max_length=200, default="", blank=True)
+    id = models.AutoField(db_column='ID', primary_key=True) 
+    nombre = models.CharField(db_column='Nombre', max_length=40) 
+    nom_impresora = models.CharField(db_column='nomImp', max_length=40, default="", blank=True)
+    activo = models.BooleanField(db_column='Activo', default=True) 
+    descripcion = models.CharField(db_column='Descripcion', max_length=200, default="", blank=True)
     isTicket = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
@@ -25,10 +25,10 @@ class Receptores(models.Model):
 
 
 class Familias(models.Model):
-    id = models.AutoField(primary_key=True) 
+    id = models.AutoField(db_column='ID', primary_key=True)
     nombre = models.CharField( max_length=40) 
-    compuesto_por = models.CharField(max_length=150) 
-    cantidad = models.IntegerField(default=0) 
+    compuesto_por = models.CharField(db_column='Tipo', max_length=150) 
+    cantidad = models.IntegerField( db_column='NumTapas', default=0) 
     receptor = models.ForeignKey('Receptores',  on_delete=models.SET_NULL, null=True) 
     color = models.CharField( max_length=11, default="#FFC0CB") 
     
@@ -72,7 +72,7 @@ class Familias(models.Model):
 
 
 class Secciones(models.Model):
-    id = models.AutoField(primary_key=True) 
+    id = models.AutoField(db_column="ID", primary_key=True) 
     nombre = models.CharField(max_length=50) 
     orden = models.IntegerField( default=0) 
     icono = models.FileField(upload_to='iconos_secciones/', blank=True, null=True)

@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.valleapp.valletpv"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.valleapp.valletpv"
@@ -42,33 +42,27 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.10.1")
-    implementation("androidx.compose.ui:ui-android:1.6.0-alpha04")
-    implementation("androidx.compose.material3:material3:1.1.1")
-    implementation("androidx.compose.ui:ui-tooling:1.6.0-alpha04")
-    implementation("androidx.activity:activity-compose:1.8.0-alpha07")
-    implementation("androidx.compose.runtime:runtime:1.6.0-alpha04")
-    implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
-    implementation("androidx.navigation:navigation-compose:2.7.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation(project(":ValleTPVLib"))
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.compose.ui:ui-android:1.7.6")
+    implementation("androidx.compose.material3:material3:1.3.1")
+    implementation("androidx.compose.ui:ui-tooling:1.7.6")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.compose.runtime:runtime:1.7.6")
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.6")
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.dagger:hilt-android:2.44")
-
-
-    implementation(project(":ValleTPVLib"))
-    val room_version = "2.5.2"
-
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-
-    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
 }
