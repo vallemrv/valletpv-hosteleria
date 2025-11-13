@@ -29,11 +29,5 @@ def sync_devices(request):
     else:
         logger.debug(f"El modelo {tb_name} no tiene el método 'compare_regs' implementado.")
 
-    if len(result) > 0:
-        print("...................................")
-        print("Tabla:", tb_name)
-        print("===========================================")
-        print("Registros cliente:", reg)
-        print("-------------------------------------------")
-        print("Registros servidor:", result)
+    
     return JsonResponse(result)

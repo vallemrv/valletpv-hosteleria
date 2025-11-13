@@ -233,6 +233,17 @@ class Lineaspedido(BaseModels):
 
             server_record = server_records_dict.get(client_id)
             if server_record:
+                # Si el registro existe en el servidor pero pertenece a otra infmesa
+                # (es decir, a otro ticket/UID) entonces no pertenece a la mesa
+                # abierta actual del cliente y debemos indicarle que lo borre.
+                infmesa_abierta_para_mesa = mesas_abiertas_info.get(id_mesa)
+                if getattr(server_record, 'infmesa_id', None) != infmesa_abierta_para_mesa:
+                    logger.debug(
+                        f"Server record ID: {client_id} belongs to infmesa {getattr(server_record, 'infmesa_id', None)} "
+                        f"not to open infmesa {infmesa_abierta_para_mesa} for mesa {id_mesa}. Marking for removal"
+                    )
+                    result.append({'tb': cls.__name__.lower(), 'op': 'rm', 'obj': {'ID': int(client_id)}})
+                    continue
                 # --- NUEVA CONDICIÓN DE BORRADO AÑADIDA AQUÍ ---
                 # Si el registro en el servidor está Cobrado ('C') o Anulado ('A'),
                 # le decimos al cliente que lo borre y pasamos al siguiente.
