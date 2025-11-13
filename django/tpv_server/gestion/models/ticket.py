@@ -76,6 +76,14 @@ class Ticket(BaseModels):
 
         # Comprobar si la mesa se puede cerrar
         if not Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).exists():
+            # Antes de eliminar la mesa, enviar al cliente que borre
+            # todas las líneas que queden asociadas a esta infmesa,
+            # independientemente de su estado (para mantener sincronía).
+            remaining_ids = list(Lineaspedido.objects.filter(infmesa__pk=uid).values_list('id', flat=True))
+            if remaining_ids:
+                rm_list = [{'ID': int(i)} for i in remaining_ids]
+                comunicar_cambios_devices("rm", "lineaspedido", rm_list)
+
             mesa.delete()
 
         return (total, ticket.id)

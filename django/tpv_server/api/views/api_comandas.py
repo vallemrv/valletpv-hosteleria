@@ -37,7 +37,6 @@ def pedir(request):
     uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
 
-    print("Lineas pedido:", lineas)
     pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, uid_device)
     if pedido:
         imprimir_pedido(pedido.id)

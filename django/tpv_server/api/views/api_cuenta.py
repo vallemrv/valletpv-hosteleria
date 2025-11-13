@@ -54,7 +54,7 @@ def get_cuenta(request):
         'servido': int,
         'descripcion_t': str
     }
-
+    
     # Función para comparar dos diccionarios con conversiones de tipo específicas
     def comparar_lineas(linea_cliente, linea_servidor):
         for campo, tipo in campos_a_comparar.items():
