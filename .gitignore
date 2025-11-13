@@ -188,4 +188,5 @@ server*/
 
 # Backups
 *.bak
-*.backup
+*.backup# Scripts locales de deploy
+deploy_local.sh
