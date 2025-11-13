@@ -80,7 +80,7 @@ ALLOWED_HOSTS=valletpvbot.vallemrv.es,localhostcp .env.example .env
 
 
 
-TELEGRAM_BOT_TOKEN=8480781390:AAEmu5kUZq8cUl6u0B1tm4kdHfFEwCmogxs# Editar .env con tus valores
+TELEGRAM_BOT_TOKEN=TOUR_TELEGRAM_TOKEN # Editar .env con tus valores
 
 TELEGRAM_WEBHOOK_URL=https://valletpvbot.vallemrv.es/webhook/telegram/nano .env
 
