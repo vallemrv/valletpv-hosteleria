@@ -35,6 +35,11 @@ class ServiceTPV: ServiceBase() {
     private var usarTPV: Boolean = false
     private var ipTPV: String? = null
 
+    // Método para compatibilidad con código existente
+    fun getUID(): String? {
+        return getUid()
+    }
+
     override fun startForegroundService() {
 
         // Verifica si el canal ya existe
@@ -106,7 +111,7 @@ class ServiceTPV: ServiceBase() {
     fun getLineasTicket(mostrarLsTicket: Handler?, idTicket: String?) {
         val p = ContentValues()
         p.put("id", idTicket)
-        p.put("uid", myServicio?.getUID())
+        p.put("uid", getUid())
         HTTPRequest(
             "$server/cuenta/lslineas", p,
             "get_lineas_ticket", mostrarLsTicket
@@ -115,7 +120,7 @@ class ServiceTPV: ServiceBase() {
 
     fun getListaTickets(hLsTicket: Handler?) {
             val p = ContentValues()
-            p.put("uid", myServicio?.getUID())
+            p.put("uid", getUid())
         HTTPRequest(
             "$server/cuenta/lsticket", p,
             "get_lista_ticket", hLsTicket
@@ -135,13 +140,13 @@ class ServiceTPV: ServiceBase() {
         p.put("id", idTicket)
         p.put("abrircajon", "False")
         p.put("receptor_activo", "True")
-        p.put("uid", myServicio?.getUID())
+        p.put("uid", getUid())
         HTTPRequest("$server/impresion/imprimir_factura", p, "", controllerHttp)
     }
 
     fun getSettings(controller: Handler?) {
         val p = ContentValues()
-        p.put("uid", myServicio?.getUID())
+        p.put("uid", getUid())
         HTTPRequest(
             "$server/receptores/get_lista", ContentValues(),
             "get_lista_receptores", controller
@@ -183,7 +188,7 @@ class ServiceTPV: ServiceBase() {
         val p = ContentValues()
         p.put("nombre", n)
         p.put("apellido", a)
-        p.put("uid", uid)
+        p.put("uid", getUid())
         HTTPRequest("$server/camareros/camarero_add", p, "add_camarero", controllerHttp) // Usando HTTPRequest directamente
     }
 
@@ -193,7 +198,7 @@ class ServiceTPV: ServiceBase() {
         o.put(obj)
         p.put("rows", o.toString())
         p.put("tb", "camareros")
-        p.put("uid", uid)
+        p.put("uid", getUid())
 
         HTTPRequest("$server/sync/update_from_devices", p, "autorizar_camarero", controllerHttp) // Usando HTTPRequest directamente
     }

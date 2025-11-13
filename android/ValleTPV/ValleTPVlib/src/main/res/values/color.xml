@@ -6,4 +6,9 @@
     <color name="green_light">#a8d8b9</color>
     <color name="green_light_pressed">#8ec6a0</color>
     <color name="green_dark">#6fbf8c</color>
+    <color name="black_semi_transparent">#B2000000</color>
+    <color name="red">#FB6664</color>
+    <color name="red_press">#FC1310</color>
+    <color name="gris">#686767</color>
+    <color name="blue_light">#94CCE7</color>
 </resources>

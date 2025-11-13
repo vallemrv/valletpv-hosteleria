@@ -4,10 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.util.Log
@@ -18,12 +21,25 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.tu.paquete.CustomToast
 import com.valleapp.valletpv.cashlogyActivitis.ArqueoCashlogyActivity
+import com.valleapp.valletpv.tools.ServiceTPV
 import com.valleapp.valletpvlib.comunicacion.HTTPRequest
 import com.valleapp.valletpvlib.tools.JSON
 import org.json.JSONException
 import org.json.JSONObject
 
 class Arqueo : Activity() {
+
+    private var myServicio: ServiceTPV? = null
+
+    private val mConexion = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, iBinder: IBinder?) {
+            myServicio = (iBinder as ServiceTPV.MyBinder).service
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            myServicio = null
+        }
+    }
 
     private lateinit var server: String
     private lateinit var pneGastos: LinearLayout
@@ -157,6 +173,11 @@ class Arqueo : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_arqueo)
+
+        // Enlazar con el servicio
+        val intent = Intent(this, ServiceTPV::class.java)
+        bindService(intent, mConexion, BIND_AUTO_CREATE)
+
         cargarPreferencias()
         pneGastos = findViewById(R.id.pneGastos)
         pneEfectivo = findViewById(R.id.pneEfectivo)
@@ -340,5 +361,11 @@ class Arqueo : Activity() {
         // Este método no está implementado en el código Java original,
         // asumo que debería mostrar un Toast o similar
         custuomToast.showCenter(texto)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Desenlazar del servicio
+        myServicio?.let { unbindService(mConexion) }
     }
 }
