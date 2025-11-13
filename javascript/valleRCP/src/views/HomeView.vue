@@ -44,12 +44,33 @@
         <v-row>
           <v-col cols="12">
             <v-text-field 
+              v-model="empresaNombre" 
+              label="Nombre de la Empresa" 
+              placeholder="Mi Empresa"
+              hide-details="auto"
+              required>
+            </v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field 
+              v-model="deviceAlias" 
+              label="Alias del Dispositivo" 
+              placeholder="Receptor-1"
+              hint="Identificador único de este dispositivo"
+              persistent-hint
+              hide-details="auto"
+              required>
+            </v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field 
               v-model="server" 
               label="Dirección del servidor" 
               placeholder="ejemplo: mi-servidor.com:8000"
               hint="Solo la dirección y puerto, sin protocolo"
               persistent-hint
-              hide-details="auto">
+              hide-details="auto"
+              required>
             </v-text-field>
           </v-col>
           <v-col cols="12">
@@ -79,12 +100,17 @@
               Se usará HTTP para API y WS para WebSockets
             </v-alert>
           </v-col>
+          <v-col cols="12" v-if="serverError">
+            <v-alert type="error" variant="tonal">
+              {{ serverError }}
+            </v-alert>
+          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="showDialog = false">Cancelar</v-btn>
-        <v-btn @click="server_change()" color="primary">Conectar</v-btn>
+        <v-btn @click="server_change()" color="primary" :loading="isConnecting">Conectar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>  <v-dialog v-model="showSelDialog" max-width="400" persistent>
@@ -132,6 +158,10 @@ export default {
     const showDialog = ref(false);
     const server = ref("");
     const useHttps = ref(false);
+    const empresaNombre = ref("");
+    const deviceAlias = ref("");
+    const serverError = ref("");
+    const isConnecting = ref(false);
     const ws = ref([]);
     const receptores_sel = ref([]);
     const showPedidos = ref(false);
@@ -220,23 +250,75 @@ export default {
       connect();
     };
 
-    const server_change = () => {
-      showDialog.value = false;
+    const server_change = async () => {
+      serverError.value = "";
+      isConnecting.value = true;
+      
+      // Validar campos requeridos
+      if (!empresaNombre.value || !deviceAlias.value || !server.value) {
+        serverError.value = "Por favor, completa todos los campos";
+        isConnecting.value = false;
+        return;
+      }
       
       // Construir la URL completa con el protocolo seleccionado
       const protocol = useHttps.value ? 'https://' : 'http://';
       const fullServerUrl = `${protocol}${server.value}`;
       
-      // Guardar tanto la dirección del servidor como el protocolo
-      localStorage.server = fullServerUrl;
-      localStorage.useHttps = useHttps.value.toString();
-      
-      if (!receptores.value || receptores.value.length <= 0) {
-        store.getListado();
+      try {
+        // Paso 1: Verificar que el servidor esté disponible llamando a /api/health/
+        console.log('Verificando salud del servidor...');
+        const healthCheck = await store.checkServerHealth(fullServerUrl);
+        
+        if (!healthCheck || !healthCheck.success) {
+          serverError.value = "No se pudo conectar con el servidor. Verifica la dirección.";
+          isConnecting.value = false;
+          return;
+        }
+        
+        console.log('Servidor disponible ✓');
+        
+        // Guardar la configuración del servidor
+        localStorage.server = fullServerUrl;
+        localStorage.useHttps = useHttps.value.toString();
+        localStorage.empresaNombre = empresaNombre.value;
+        localStorage.deviceAlias = deviceAlias.value;
+        
+        // Paso 2: Crear/obtener el UID del dispositivo con el alias
+        console.log('Creando UID del dispositivo con alias:', deviceAlias.value);
+        const uid = await store.createDeviceUID(deviceAlias.value);
+        
+        if (!uid) {
+          serverError.value = "Error al crear el UID del dispositivo";
+          isConnecting.value = false;
+          return;
+        }
+        
+        console.log('UID del dispositivo creado/recuperado:', uid);
+        
+        // Paso 3: Obtener el listado de receptores (ya incluye el UID automáticamente)
+        if (!receptores.value || receptores.value.length <= 0) {
+          await store.getListado();
+        }
+        
+        // Reiniciar receptores seleccionados
+        receptores_sel.value = [];
+        localStorage.receptores = JSON.stringify(receptores_sel.value);
+        
+        console.log('✓ Configuración completada exitosamente');
+        console.log('  - Empresa:', empresaNombre.value);
+        console.log('  - Dispositivo:', deviceAlias.value);
+        console.log('  - UID:', uid);
+        
+        // Cerrar el diálogo
+        showDialog.value = false;
+        isConnecting.value = false;
+        
+      } catch (error) {
+        console.error('Error al configurar el servidor:', error);
+        serverError.value = error.message || "Error al conectar con el servidor";
+        isConnecting.value = false;
       }
-      receptores_sel.value = [];
-      localStorage.receptores = JSON.stringify(receptores_sel.value);
-      store.getDatosEmpresa();
     };
 
     const connect = () => {
@@ -299,7 +381,14 @@ export default {
           useHttps.value = localStorage.useHttps === 'true';
         }
         
-        if (empresa.value == null) store.getDatosEmpresa();
+        // Cargar nombre de empresa y alias si existen
+        if (localStorage.empresaNombre) {
+          empresaNombre.value = localStorage.empresaNombre;
+        }
+        if (localStorage.deviceAlias) {
+          deviceAlias.value = localStorage.deviceAlias;
+        }
+        
         if (localStorage.receptores) {
           try {
             const storedReceptores = JSON.parse(localStorage.receptores);
@@ -325,6 +414,10 @@ export default {
       showDialog,
       server,
       useHttps,
+      empresaNombre,
+      deviceAlias,
+      serverError,
+      isConnecting,
       ws,
       receptores_sel,
       showPedidos,

@@ -3,34 +3,29 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "generate-icons": "node generate-icons.js"
   },
   "dependencies": {
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
     "@mdi/font": "^7.4.47",
-    "core-js": "^3.45.0",
-    "register-service-worker": "^1.7.2",
+    "axios": "^1.13.2",
+    "core-js": "^3.46.0",
+    "pinia": "^3.0.4",
     "roboto-fontface": "^0.10.0",
-    "vue": "^3.5.18",
-    "vue-native-websocket": "^2.0.15",
-    "vue-router": "^4.5.1",
-    "vuetify": "^3.7.6",
-    "pinia": "^2.3.0",
-    "webfontloader": "^1.6.28",
-    "axios": "^1.7.9"
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.3",
+    "vuetify": "^3.10.10",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.8",
-    "@vue/cli-plugin-pwa": "~5.0.8",
-    "@vue/cli-plugin-router": "~5.0.8",
-    "@vue/cli-service": "~5.0.8",
-    "sass": "^1.81.1",
-    "sass-loader": "^13.3.3",
-    "vite-plugin-vuetify": "^2.0.4"
+    "@vitejs/plugin-vue": "^6.0.1",
+    "sass": "^1.94.0",
+    "sharp": "^0.34.5",
+    "vite": "^7.2.2",
+    "vite-plugin-pwa": "^1.1.0",
+    "vite-plugin-vuetify": "^2.1.2"
   },
   "browserslist": [
     "> 1%",

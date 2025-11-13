@@ -13,6 +13,7 @@ export const useMainStore = defineStore('main', {
     lineasPedidos: [],
     receptores: [],
     empresa: null,
+    deviceUID: null,
     // Sistema de reconexión
     reconnectAttempts: 0,
     maxReconnectAttempts: 10,
@@ -28,6 +29,7 @@ export const useMainStore = defineStore('main', {
     getListadoData: (state) => state.listado,
     getReceptoresData: (state) => state.receptores,
     getEmpresaData: (state) => state.empresa,
+    getDeviceUID: (state) => state.deviceUID,
     // Estado de reconexión
     getIsReconnecting: (state) => state.isReconnecting,
     reconnectionStatus: (state) => {
@@ -114,15 +116,7 @@ export const useMainStore = defineStore('main', {
       }
     },
     
-    async getDatosEmpresa() {
-      try {
-        const response = await API.get_datos_empresa()
-        this.empresa = response
-      } catch (error) {
-        this.setError(`Error al obtener datos de empresa: ${error.message}`)
-        console.error('Error al obtener empresa:', error)
-      }
-    },
+
     
     async getReceptores() {
       try {
@@ -134,9 +128,39 @@ export const useMainStore = defineStore('main', {
       }
     },
     
+    // Verificar salud del servidor
+    async checkServerHealth(serverUrl = null) {
+      try {
+        const response = await API.checkHealth(serverUrl)
+        return response
+      } catch (error) {
+        console.error('Error al verificar salud del servidor:', error)
+        return { success: false, error: error.message }
+      }
+    },
+
+    // Crear UID del dispositivo con alias
+    async createDeviceUID(alias) {
+      try {
+        const uid = await API.create_uid(alias)
+        this.deviceUID = uid
+        return uid
+      } catch (error) {
+        this.setError(`Error al crear UID del dispositivo: ${error.message}`)
+        console.error('Error al crear UID:', error)
+        throw error
+      }
+    },
+
     async getListado() {
       try {
         const response = await API.get_listado()
+        
+        // Guardar el UID en el estado si está disponible
+        if (localStorage.deviceUID) {
+          this.deviceUID = localStorage.deviceUID
+        }
+        
         // Actualizar listado con filtro
         this.setListado(response)
         // También actualizar receptores con el mismo filtro aplicado
@@ -232,7 +256,6 @@ export const useMainStore = defineStore('main', {
         // SOLO intentar reconectar HTTP/API, NO WebSocket
         // El WebSocket se reconecta automáticamente desde HomeView
         if (!this.isHttpConnected) {
-          await this.getDatosEmpresa()
           await this.getListado()
         }
 
