@@ -1,0 +1,61 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Botón de la mesa -->
+    <Button
+        android:id="@+id/btnMesa"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/btn_mesa_texto_ejemplo"
+        android:textSize="18sp"
+        android:gravity="center"
+        />
+
+    <!-- Contenedor de botones de acción -->
+    <LinearLayout
+        android:id="@+id/pneBtnMesa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:visibility="visible"
+        android:elevation="10dp"
+        android:layout_gravity="bottom|end">
+
+        <ImageButton
+            android:id="@+id/btnCambiarMesa"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/boton_rounded"
+            android:src="@drawable/cambiarmesa"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+            />
+
+        <ImageButton
+            android:id="@+id/btnListaTicket"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/boton_rounded"
+            android:src="@drawable/factura"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+           />
+
+        <ImageButton
+            android:id="@+id/btnTicket"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/boton_rounded"
+            android:src="@drawable/cobrar"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:layout_marginEnd="5dp"
+           />
+
+    </LinearLayout>
+
+</FrameLayout>

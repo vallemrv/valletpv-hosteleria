@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true">
+
+    <!-- Título de mensajes -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Mensajes"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start" />
+
+    <!-- Lista de receptores con peso flexible -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/white">
+        
+        <ListView
+            android:id="@+id/lista_receptores"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            android:clipToPadding="false" />
+    </FrameLayout>
+
+    <!-- Panel de entrada de mensaje -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:minHeight="64dp">
+
+        <!-- Campo de texto para escribir mensaje -->
+        <EditText
+            android:id="@+id/txt_mensaje"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="@string/mensaje"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:maxLines="3"
+            android:textSize="25sp"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine"
+            android:textColorHint="#757575"
+            android:gravity="start|top"
+            android:autofillHints="" />
+
+    </LinearLayout>
+
+</LinearLayout>

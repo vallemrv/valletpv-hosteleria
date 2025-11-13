@@ -1,0 +1,172 @@
+package com.valleapp.vallecom.activitys
+
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.ContentValues
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.os.Message
+import android.view.View
+import android.widget.ListView
+import android.widget.TextView
+import com.valleapp.vallecom.adaptadores.AdaptadorTicket
+import com.valleapp.vallecom.utilidades.ActivityBase
+import com.valleapp.vallecom.utilidades.ServiceCOM
+import com.valleapp.valletpv.R
+import com.valleapp.valletpvlib.comunicacion.HTTPRequest
+import com.valleapp.valletpvlib.db.DBCuenta
+import com.valleapp.valletpvlib.db.DBMesas
+import com.valleapp.valletpvlib.tools.Instruccion
+import org.json.JSONException
+import org.json.JSONObject
+
+class Cuenta : ActivityBase() {
+
+    private var totalMesa: String = ""
+    private lateinit var mesa: JSONObject
+    private lateinit var dbCuenta: DBCuenta
+    private lateinit var dbMesa: DBMesas
+
+    private val mConexion = object : ServiceConnection {
+        override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
+            try {
+                myServicio = (iBinder as ServiceCOM.MyBinder).getService()
+                myServicio?.setExHandler("lineaspedido", handlerHttp)
+                dbCuenta = myServicio?.getDb("lineaspedido") as DBCuenta
+                dbMesa = myServicio?.getDb("mesas") as DBMesas
+                rellenarTicket()
+                // Actualizar cuenta
+                val p = ContentValues().apply {
+                    put("idm", mesa.getString("ID"))
+                    put("reg", dbCuenta.filter("IDMesa=" + mesa.getString("ID")).toString())
+                    put("uid", myServicio?.getUid())
+                }
+                HTTPRequest("$server/cuenta/get_cuenta", p, "actualizar", handlerHttp)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            myServicio = null
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handlerHttp = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            val op = msg.data.getString("op")
+            val res = msg.data.getString("RESPONSE")
+            if (op == "actualizar") {
+                try {
+                    val datos = JSONObject(res.toString())
+                    val soniguales = datos.getBoolean("soniguales")
+                    if (!soniguales) {
+                        val lineas = datos.getJSONArray("reg")
+                        if (datos.length() > 0) {
+                            dbCuenta.replaceMesa(lineas, mesa.getString("ID"))
+                        } else {
+                            val db = myServicio?.getDb("mesas") as DBMesas
+                            db.cerrarMesa(mesa.getString("ID"))
+                            finish()
+                        }
+                        rellenarTicket()
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun rellenarTicket() {
+        try {
+            val l = findViewById<TextView>(R.id.txtTotal)
+            val lst = findViewById<ListView>(R.id.lstCuenta)
+            val lineasTicket = dbCuenta.getLineasTicket(mesa.getString("ID"))
+            totalMesa = String.format("%.2f", dbCuenta.getTotal(mesa.getString("ID")))
+            l.text = buildString {
+                append(totalMesa)
+                append(" €")
+            }
+            val adaptador = AdaptadorTicket(cx, lineasTicket)
+            lst.adapter = adaptador.toListAdapter() // Convierte AdaptadorTicket a un adaptador compatible con ListView
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_cuenta)
+        val lbl = findViewById<TextView>(R.id.lblMesa)
+        try {
+            server = intent.extras?.getString("url") ?: ""
+            mesa = JSONObject(intent.extras?.getString("mesa") ?: "")
+            lbl.text = "Mesa ${mesa.getString("Nombre")}"
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onResume() {
+        if (myServicio == null) {
+            val intent = Intent(applicationContext, ServiceCOM::class.java).apply {
+                putExtra("url", server)
+            }
+            bindService(intent, mConexion, BIND_AUTO_CREATE)
+        } else {
+            rellenarTicket()
+        }
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        unbindService(mConexion)
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    fun clickImprimir(v: View) {
+        if (totalMesa.replace(",", ".").toDouble() > 0) {
+            try {
+                val p = ContentValues().apply {
+                    put("idm", mesa.getString("ID"))
+                }
+                dbMesa.marcarRojo(mesa.getString("ID"))
+                myServicio?.agregarInstruccion(Instruccion(p, "$server/impresion/preimprimir"))
+                finish()
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun clickMarcarRojo(v: View) {
+        if (totalMesa.replace(",", ".").toDouble() > 0) {
+            try {
+                val p = ContentValues().apply {
+                    put("idm", mesa.getString("ID"))
+                }
+                myServicio?.agregarInstruccion(Instruccion(p, "$server/comandas/marcar_rojo"))
+                dbMesa.marcarRojo(mesa.getString("ID"))
+                finish()
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun clickSalir(v: View) {
+        finish()
+    }
+}

@@ -1,0 +1,1 @@
+# telegram_bot/migrations/__init__.py

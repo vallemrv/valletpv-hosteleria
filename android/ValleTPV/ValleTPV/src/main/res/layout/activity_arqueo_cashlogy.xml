@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Cabecera -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp"
+        android:background="@drawable/bg_pink">
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cierre de caja"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+
+    <!-- Información de salida -->
+    <TextView
+        android:id="@+id/tvInformacionSalida"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Calculado efectivo......."
+        android:textColor="@android:color/black"
+        android:textSize="56sp"
+        android:textStyle="bold" />
+
+    <!-- Botones para arqueo y salir -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <ImageButton
+            android:id="@+id/arquearCaja"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_pink"
+            android:contentDescription="@string/op_mesas_camarero"
+            android:padding="16dp"
+            android:src="@drawable/llave"
+            android:scaleType="centerInside" />
+
+        <ImageButton
+            android:id="@+id/btnSalir"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/bg_pink"
+            android:contentDescription="@string/op_mesas_camarero"
+            android:padding="16dp"
+            android:src="@drawable/salir"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
+
+</LinearLayout>

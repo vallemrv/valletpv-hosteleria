@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5sp"
+    android:background="@android:color/white"
+    android:gravity="center_horizontal">
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="14dp"
+        android:text="Cobro con tarjeta"
+        android:background="@color/pink"
+        android:textColor="@android:color/black"
+        android:textSize="52sp"
+        android:textStyle="bold" />
+
+    <!-- Sección de información de estado del cobro -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp"
+        android:padding="10sp"
+        android:background="@android:color/background_dark"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvEstadoCobro"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Esperando tarjeta, cobrando $totalToCobrar"
+            android:textColor="@android:color/black"
+            android:background="@android:color/white"
+            android:textSize="44sp"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Botón de Cancelar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Botón Cancelar -->
+        <ImageButton
+            android:id="@+id/btnCancelar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/bg_pink"
+            android:contentDescription="@string/salir"
+            android:src="@drawable/salir"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

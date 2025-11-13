@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1976d2">
+    <meta name="description" content="Sistema de punto de venta para hostelería">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Valle TPV">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <title>Valle TPV - Sistema de Punto de Venta</title>
+    <style>
+      /* Fullscreen - Ocupar toda la pantalla */
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height para móviles */
+        overflow: hidden;
+        position: fixed;
+        touch-action: pan-x pan-y;
+        -ms-touch-action: pan-x pan-y;
+        overscroll-behavior: none;
+      }
+      
+      #app {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        overflow: auto;
+        position: relative;
+      }
+      
+      /* Prevenir zoom y selección en toda la app */
+      * {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Permitir selección en inputs y textareas */
+      input, textarea {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+
+  </body>
+</html>

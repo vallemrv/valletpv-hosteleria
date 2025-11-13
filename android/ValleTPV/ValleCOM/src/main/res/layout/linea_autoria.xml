@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5sp">
+
+    <TextView
+        android:id="@+id/txt_mensaje_autoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:padding="10sp"
+        android:textSize="25sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:orientation="horizontal"
+            android:padding="1sp">
+
+            <ImageButton
+                android:id="@+id/btn_denegar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/boton_rounded"
+                android:contentDescription="@android:string/cancel"
+                android:onClick="sendCancelacion"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/cancel" />
+
+            <ImageButton
+                android:id="@+id/btn_autorizar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/boton_rounded"
+                android:contentDescription="@string/autorizar"
+                android:onClick="sendAutorizacion"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/user_key" />
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>

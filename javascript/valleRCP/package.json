@@ -1,0 +1,40 @@
+{
+  "name": "vallercp",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@mdi/font": "^7.4.47",
+    "core-js": "^3.45.0",
+    "register-service-worker": "^1.7.2",
+    "roboto-fontface": "^0.10.0",
+    "vue": "^3.5.18",
+    "vue-native-websocket": "^2.0.15",
+    "vue-router": "^4.5.1",
+    "vuetify": "^3.7.6",
+    "pinia": "^2.3.0",
+    "webfontloader": "^1.6.28",
+    "axios": "^1.7.9"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-plugin-pwa": "~5.0.8",
+    "@vue/cli-plugin-router": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "sass": "^1.81.1",
+    "sass-loader": "^13.3.3",
+    "vite-plugin-vuetify": "^2.0.4"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

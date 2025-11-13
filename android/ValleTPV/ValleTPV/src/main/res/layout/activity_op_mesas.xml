@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.valleapp.valletpv.Mesas"
+    android:padding="5dip">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="55dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/relativeLayout"
+        android:background="@android:color/white"
+        android:padding="5dip"
+        android:textSize="35sp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/op_mesas_camarero"
+
+            android:id="@+id/lblTitulo"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:textSize="35sp"
+            android:layout_marginStart="5dp" />
+
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/relativeLayout"
+        android:background="#fffff1ea">
+
+        <HorizontalScrollView
+            android:id="@+id/scrollView4"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="2dp"
+
+            android:layout_marginTop="5dp"
+            android:layout_weight="0.1"
+            android:background="@android:color/white"
+            android:contentDescription="@string/lista_zonas">
+
+            <LinearLayout
+                android:id="@+id/pneZonas"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="0.9"
+            android:background="@android:color/white"
+            android:contentDescription="@string/lista_zonas">
+
+            <TableLayout
+                android:id="@+id/pneMesas"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*" />
+
+        </ScrollView>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

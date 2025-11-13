@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="2dp">
+
+    <!-- Columna 1: Nombre de la moneda o billete -->
+    <TextView
+        android:id="@+id/text_denomination_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Denominación"
+        android:textSize="20sp"
+        android:padding="15dp"
+        android:gravity="end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.3"/> <!-- 40% del ancho para la primera columna -->
+
+    <!-- Columna 2: Cantidad disponible -->
+    <TextView
+        android:id="@+id/text_quantity_available"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cantidad"
+        android:textSize="20sp"
+        android:padding="15dp"
+        android:gravity="end"
+        app:layout_constraintStart_toEndOf="@id/text_denomination_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/edit_amount"
+        app:layout_constraintWidth_percent="0.3"/> <!-- 30% del ancho para la segunda columna -->
+
+    <!-- Columna 3: EditText para ingresar la cantidad -->
+    <EditText
+        android:id="@+id/edit_amount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="0"
+        android:inputType="number"
+        android:gravity="center"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/text_quantity_available"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.4"/> <!-- 30% del ancho para la tercera columna -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

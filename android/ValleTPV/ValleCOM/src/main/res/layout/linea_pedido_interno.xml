@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:minHeight="60dp">
+
+        <TextView
+            android:id="@+id/lblCantidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="40dp"
+            android:gravity="center"
+            android:text="1x"
+            android:textSize="22sp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/lblNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/texto_prueba"
+            android:textSize="22sp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageButton
+            android:id="@+id/btnCambiar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/fondo_redondeado_btn_xml"
+            android:contentDescription="@string/cambiar_linea"
+            android:onClick="clickCambiar"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/cambiarmesa" />
+
+</LinearLayout>

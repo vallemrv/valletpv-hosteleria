@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50.000004mm"
+   viewBox="0 0 50 50.000004"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter1"
+       x="-0.14198697"
+       y="-0.14198697"
+       width="1.2839739"
+       height="1.2839739">
+      <feGaussianBlur
+         stdDeviation="2.2871581"
+         id="feGaussianBlur1" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter1-2"
+       x="-0.14198697"
+       y="-0.14198697"
+       width="1.2839739"
+       height="1.2839739">
+      <feGaussianBlur
+         stdDeviation="2.2871581"
+         id="feGaussianBlur1-3" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter1-2-8"
+       x="-0.14198697"
+       y="-0.14198697"
+       width="1.2839739"
+       height="1.2839739">
+      <feGaussianBlur
+         stdDeviation="2.2871581"
+         id="feGaussianBlur1-3-4" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter1-2-2"
+       x="-0.14198697"
+       y="-0.14198697"
+       width="1.2839739"
+       height="1.2839739">
+      <feGaussianBlur
+         stdDeviation="2.2871581"
+         id="feGaussianBlur1-3-6" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter1-2-4"
+       x="-0.14198697"
+       y="-0.14198697"
+       width="1.2839739"
+       height="1.2839739">
+      <feGaussianBlur
+         stdDeviation="2.2871581"
+         id="feGaussianBlur1-3-9" />
+    </filter>
+  </defs>
+  <g
+     id="layer1">
+    <g
+       id="g3">
+      <circle
+         style="opacity:0.309582;fill:#999999;stroke:none;stroke-width:0.474001;filter:url(#filter1)"
+         id="path1"
+         cx="103.01684"
+         cy="138.94765"
+         r="19.32987"
+         transform="matrix(0.44416505,0,0,0.44416505,-22.305018,-34.20357)" />
+      <circle
+         style="opacity:0.309582;fill:#999999;stroke:none;stroke-width:0.474001;filter:url(#filter1-2)"
+         id="path1-5"
+         cx="144.14613"
+         cy="131.50522"
+         r="19.32987"
+         transform="matrix(0.12265367,0,0,0.12265367,20.706351,10.400029)" />
+      <circle
+         style="fill:#cfb6d6;stroke:#000000;stroke-width:0.210535"
+         id="path1-3"
+         cx="25"
+         cy="25"
+         r="8.5856533" />
+      <circle
+         style="fill:#cfb6d6;stroke:#000000;stroke-width:0.068616"
+         id="path1-39"
+         cx="39.692749"
+         cy="24.734848"
+         r="2.7981668" />
+      <circle
+         style="opacity:0.309582;fill:#999999;stroke:none;stroke-width:0.474001;filter:url(#filter1-2-4)"
+         id="path1-5-5"
+         cx="144.14613"
+         cy="131.50522"
+         r="19.32987"
+         transform="matrix(0.12265367,0,0,0.12265367,6.0135998,-3.5167107)" />
+      <circle
+         style="fill:#cfb6d6;stroke:#000000;stroke-width:0.068616"
+         id="path1-39-5"
+         cx="25"
+         cy="10.818122"
+         r="2.7981668" />
+      <circle
+         style="opacity:0.309582;fill:#999999;stroke:none;stroke-width:0.474001;filter:url(#filter1-2-8)"
+         id="path1-5-4"
+         cx="144.14613"
+         cy="131.50522"
+         r="19.32987"
+         transform="matrix(0.12265367,0,0,0.12265367,-8.8597512,10.280559)" />
+      <circle
+         style="fill:#cfb6d6;stroke:#000000;stroke-width:0.068616"
+         id="path1-39-6"
+         cx="10.126648"
+         cy="24.615372"
+         r="2.7981668" />
+      <circle
+         style="opacity:0.309582;fill:#999999;stroke:none;stroke-width:0.474001;filter:url(#filter1-2-2)"
+         id="path1-5-1"
+         cx="144.14613"
+         cy="131.50522"
+         r="19.32987"
+         transform="matrix(0.12265367,0,0,0.12265367,6.1126868,23.988469)" />
+      <circle
+         style="fill:#cfb6d6;stroke:#000000;stroke-width:0.068616"
+         id="path1-39-3"
+         cx="25.099091"
+         cy="38.323288"
+         r="2.7981668" />
+      <rect
+         style="opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-width:0.204;stroke-dasharray:none;stroke-opacity:1"
+         id="rect3"
+         width="50"
+         height="50"
+         x="0"
+         y="0"
+         ry="1.5523508" />
+    </g>
+  </g>
+</svg>

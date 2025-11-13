@@ -1,0 +1,25 @@
+// COPIA Y PEGA ESTO EN: valleTPV/tsconfig.app.json
+
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "../valle-tpv-lib/src/**/*",
+    "../valle-tpv-lib/src/**/*.vue"
+  ],
+  "exclude": ["src/**/__tests__/*"],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    // --- ¡AÑADE ESTO DE VUELTA! Este es el mapa para TypeScript ---
+    "paths": {
+      "@/*": ["./src/*"],
+      "valle-tpv-lib": ["../valle-tpv-lib/src/index.ts"],
+      "valle-tpv-lib/*": ["../valle-tpv-lib/src/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  }
+}

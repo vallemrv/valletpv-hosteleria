@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="500"
+   height="500"
+   viewBox="0 0 500.00001 500.00001"
+   id="svg2"
+   version="1.1"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="logo_valleapp_v3.svg"
+   inkscape:export-filename="/home/valle/proyectos/valletpv-hosteleria/assets/logos/logo_valleapp_v3.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.146"
+     inkscape:cx="195.02618"
+     inkscape:cy="215.09599"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-552.36216)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="214.28571"
+       y="980.93365"
+       id="text4186"><tspan
+         sodipodi:role="line"
+         id="tspan4188"
+         x="214.28571"
+         y="980.93365"
+         style="font-size:40px;line-height:1.25"> </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="249.56371"
+       y="719.02881"
+       id="text4450"><tspan
+         sodipodi:role="line"
+         id="tspan4452"
+         x="249.56371"
+         y="719.02881"
+         style="font-size:40px;line-height:1.25"> </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.52188px;line-height:0%;font-family:sans-serif;letter-spacing:4.13474px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:5.01068;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="178.11372"
+       y="779.47131"
+       id="text4355"><tspan
+         sodipodi:role="line"
+         id="tspan4357"
+         x="178.11372"
+         y="779.47131"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:45.463px;line-height:125%;font-family:Phosphate;-inkscape-font-specification:'Phosphate, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:#000000;stroke-width:5.01068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         dy="0 0 0"
+         dx="0 0 0">VALLE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="229.76161"
+       y="822.43616"
+       id="text4363"><tspan
+         sodipodi:role="line"
+         id="tspan4365"
+         x="229.76161"
+         y="822.43616"
+         style="font-size:27.6825px;line-height:1.25">app</tspan></text>
+    <path
+       style="font-style:normal;font-weight:normal;font-size:327.27429199px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 69.183061,593.89677 77.194479,202.18738 28.22089,-73.92053 -48.26517,-128.26685 -57.150199,0 z m 313.644159,0 -48.36116,128.24367 28.18446,73.94371 77.05545,-202.18738 -56.87875,0 z m -180.41176,202.18738 -27.81703,73.92383 48.97028,128.26683 62.02306,0 48.87429,-128.24367 -27.88325,-73.94699 -52.13829,138.27076 -52.02906,-138.27076 z"
+       id="text4454"
+       inkscape:connector-curvature="0"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+</svg>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Solicitudes"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lista_peticiones"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title"
+        android:layout_above="@+id/panelBotonSalir"
+        android:background="@color/white"
+        android:padding="10dp"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/panelBotonSalir"
+        android:padding="20dp"
+        android:background="@color/white">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="107dp"
+            android:layout_height="51dp"
+            android:layout_gravity="center_vertical|end"
+            android:background="@drawable/boton_rounded"
+            android:onClick="salirAutorias"
+            android:text="@string/salir" />
+    </FrameLayout>
+
+</RelativeLayout>

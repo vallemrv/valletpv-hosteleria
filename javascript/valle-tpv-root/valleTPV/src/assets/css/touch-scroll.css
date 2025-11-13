@@ -1,0 +1,98 @@
+/* Mejoras para scroll táctil en toda la aplicación */
+
+/* Scroll suave y táctil global */
+html {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pan-x;
+  scroll-behavior: smooth;
+}
+
+/* Estilos globales para elementos con scroll */
+* {
+  /* Scroll suave */
+  scroll-behavior: smooth;
+  
+  /* Optimizar para táctil en iOS */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevenir scroll en cadena (bounce) */
+  overscroll-behavior: contain;
+}
+
+/* Mejorar scrollbars en toda la app - Webkit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Optimizaciones táctiles para elementos interactivos */
+.v-btn, 
+.v-list-item, 
+.v-card,
+button,
+a {
+  /* Quitar highlight azul en iOS */
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Prevenir selección de texto */
+  user-select: none;
+  -webkit-user-select: none;
+  
+  /* Optimizar gestos táctiles */
+  touch-action: manipulation;
+}
+
+/* Áreas scrolleables específicas */
+.v-list,
+.v-data-table,
+.v-virtual-scroll,
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Mejorar performance en scroll */
+.v-list-item,
+.v-card {
+  /* Activar aceleración por hardware */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Feedback visual al tocar */
+.v-list-item:active,
+.v-btn:active {
+  opacity: 0.7;
+  transition: opacity 0.1s;
+}
+
+/* Scrollbars más delgados en móviles */
+@media (max-width: 768px) {
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}

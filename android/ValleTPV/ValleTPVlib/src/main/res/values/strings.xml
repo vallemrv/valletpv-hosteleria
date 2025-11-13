@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="customtoast">customToast</string>
+    <string name="btn_mesa_texto_ejemplo">Mesa</string>
+</resources>

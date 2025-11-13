@@ -1,0 +1,18 @@
+html, body {
+  background: linear-gradient(145deg, #F3F4FD 0%, #FBFBFF 100%);
+  /* Ocupan el 100% de la altura de la ventana */
+  height: 100%;
+  width: 100%;
+
+  /* Eliminan los márgenes y rellenos por defecto del navegador */
+  margin: 0;
+  padding: 0;
+
+  /* Oculta las barras de scroll */
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}

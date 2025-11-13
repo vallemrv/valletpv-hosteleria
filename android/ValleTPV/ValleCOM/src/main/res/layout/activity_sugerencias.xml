@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="com.valleapp.vallecom.activitys.Mesas"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:gravity="start"
+        android:paddingStart="16dp"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingEnd="0dp"
+        android:paddingBottom="16dp"
+        android:text="Sugerencias"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/lstSugerencias"
+        android:layout_below="@+id/title"
+        android:layout_above="@id/txtSugerencias"
+        android:padding="10dp"
+        android:background="@color/white"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtSugerencias"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:textSize="25sp"
+        android:padding="10dp"
+        android:hint="Crea o busca sugerencias aqui"/>
+
+
+</RelativeLayout>

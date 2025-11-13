@@ -1,0 +1,138 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.valleapp.vallecom.activitys.MostrarPedidos"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Pedidos"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start"
+      />
+
+    <!-- Contenedor para lblMesa y los botones a la derecha -->
+    <RelativeLayout
+        android:id="@+id/mesa_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:padding="10sp"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/lblMesa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/mesa_z1"
+            android:textSize="19sp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:id="@+id/btnsMultipleRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:gravity="center_vertical"
+            >
+
+            <Button
+                android:id="@+id/btnMultiple"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Multiple"
+                android:textSize="18sp"
+                android:minWidth="80dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/boton_rounded"
+                android:padding="5sp"
+                />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:id="@+id/pneSendMultiple">
+
+                <ImageButton
+                    android:id="@+id/btnSendMultiple"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/fondo_redondeado_btn_xml"
+                    android:src="@android:drawable/ic_menu_send"
+                    android:contentDescription="@string/enviar"
+                    android:padding="8dp"
+                    />
+
+
+                <TextView
+                    android:id="@+id/txtSendMultiple"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:id="@+id/frameLayout"
+        android:padding="10dp"
+        >
+            <Button
+                android:id="@+id/btnSalir"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:textSize="18sp"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="20dp"
+                android:padding="5dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/boton_rounded"
+                android:text="@string/salir" />
+    </FrameLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/frameLayout"
+        android:layout_below="@+id/mesa_row"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/lista_pedidos"
+        android:padding="10dp"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:id="@+id/pneListado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+</RelativeLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/linea_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Opción"
+        android:textSize="26sp"
+        android:padding="8dp"
+        android:gravity="center_vertical"/>
+</LinearLayout>

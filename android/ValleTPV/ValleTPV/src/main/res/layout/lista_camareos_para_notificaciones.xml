@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_pink"
+        android:gravity="center"
+        android:padding="14dp"
+        android:text="@string/personal_autorizado"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/lista_camareros_notificables"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8">
+
+    </ListView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp">
+
+        <ImageButton
+            android:id="@+id/btn_salir_notificaciones_camareros"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/fondo_btn_xml"
+            android:contentDescription="@string/borrar_salir"
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/salir"
+            android:text="@string/salir"
+            android:textSize="32sp" />
+    </FrameLayout>
+
+</LinearLayout>

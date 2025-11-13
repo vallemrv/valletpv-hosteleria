@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dip">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/impresoras_activas"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@drawable/bg_pink"
+        android:textColor="@android:color/black" />
+
+    <ListView
+        android:id="@+id/lista_settings"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <ImageButton
+        android:id="@+id/btn_guardar"
+        android:layout_width="match_parent"
+        android:layout_height="100dip"
+        android:background="@drawable/fondo_btn_xml"
+        android:contentDescription="@string/guardar"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/guardar"
+        android:text="@string/guardar"
+        android:textSize="35sp" />
+
+</LinearLayout>

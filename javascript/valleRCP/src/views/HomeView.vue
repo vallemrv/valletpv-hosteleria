@@ -1,0 +1,358 @@
+<template>
+  <v-toolbar color="#cfb6d4">
+    <v-toolbar-title>
+      Receptor <span v-if="empresa">{{ empresa.nombre }}</span>
+    </v-toolbar-title>
+    <v-spacer></v-spacer>
+    <v-btn icon @click="() => (showSelDialog = true)">
+      <v-icon>mdi-list-status</v-icon></v-btn
+    >
+    <v-btn icon @click="() => (showDialog = true)"> <v-icon>mdi-cog</v-icon></v-btn>
+  </v-toolbar>
+  
+  <v-container fluid>
+    <!-- Componente de estado de conexión -->
+    <connection-status 
+      v-if="serverUrl"
+      :is-ws-connected="isWsConnected"
+      :is-http-connected="isHttpConnected"
+      :is-secure="useHttps"
+    />
+    
+    <v-row>
+      <v-col cols="12" sm="6" md="3" v-for="(item, i) in items" :key="i">
+        <valle-comanda :pedido="item"></valle-comanda>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <v-btn
+      @click="reload"
+      icon
+      size="large"
+      color="primary"
+      location="bottom right"
+      position="fixed"
+      class="fab-reload"
+    >
+      <v-icon>mdi-reload</v-icon>
+    </v-btn>
+
+  <v-dialog v-model="showDialog" max-width="500" persistent>
+    <v-card title="Configuración del Servidor">
+      <v-card-text>
+        <v-row>
+          <v-col cols="12">
+            <v-text-field 
+              v-model="server" 
+              label="Dirección del servidor" 
+              placeholder="ejemplo: mi-servidor.com:8000"
+              hint="Solo la dirección y puerto, sin protocolo"
+              persistent-hint
+              hide-details="auto">
+            </v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-radio-group v-model="useHttps" inline>
+              <template v-slot:label>
+                <div><strong>Protocolo de conexión:</strong></div>
+              </template>
+              <v-radio label="HTTP/WS (No seguro)" :value="false"></v-radio>
+              <v-radio label="HTTPS/WSS (Seguro)" :value="true"></v-radio>
+            </v-radio-group>
+          </v-col>
+          <v-col cols="12">
+            <v-alert 
+              v-if="useHttps" 
+              type="info" 
+              variant="tonal"
+              class="mb-3">
+              <strong>Conexión segura habilitada</strong><br>
+              Se usará HTTPS para API y WSS para WebSockets
+            </v-alert>
+            <v-alert 
+              v-else 
+              type="warning" 
+              variant="tonal"
+              class="mb-3">
+              <strong>Conexión no segura</strong><br>
+              Se usará HTTP para API y WS para WebSockets
+            </v-alert>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="showDialog = false">Cancelar</v-btn>
+        <v-btn @click="server_change()" color="primary">Conectar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>  <v-dialog v-model="showSelDialog" max-width="400" persistent>
+    <v-card title="Selecionar receptor">
+      <v-card-text>
+        <v-row class="pa-4">
+          <v-col class="pa-0" cols="12" v-for="(r, i) in receptores_mod" :key="i">
+            {{ r.Nombre }}
+            <v-switch
+              v-model="r.is_sel"
+              @change="on_change(r)"
+              class="float-right"
+              hide-details="auto"
+              color="success"
+            ></v-switch>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="showSelDialog = false">Cancelar</v-btn>
+        <v-btn @click="receptores_change()" color="primary">Aceptar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <valle-pedidos @close="() => (showPedidos = false)" :show="showPedidos"></valle-pedidos>
+</template>
+
+<script>
+import VWebsocket from "@/websocket";
+import { useMainStore } from "@/stores/main";
+import { computed, onMounted, ref, watch } from 'vue';
+import ValleComanda from "@/components/ValleComanda.vue";
+import VallePedidos from "@/components/VallePedidos.vue";
+import ConnectionStatus from "@/components/ConnectionStatus.vue";
+
+export default {
+  components: { ValleComanda, VallePedidos, ConnectionStatus },
+  setup() {
+    const store = useMainStore();
+    
+    // Reactive data
+    const showSelDialog = ref(false);
+    const showDialog = ref(false);
+    const server = ref("");
+    const useHttps = ref(false);
+    const ws = ref([]);
+    const receptores_sel = ref([]);
+    const showPedidos = ref(false);
+
+    // Computed properties
+    const items = computed(() => store.items);
+    const isWsConnected = computed(() => store.isWsConnected);
+    const isHttpConnected = computed(() => store.isHttpConnected);
+    const receptores = computed(() => store.receptores);
+    const empresa = computed(() => store.empresa);
+    
+    // URLs calculadas
+    const serverUrl = computed(() => {
+      if (!server.value) return '';
+      const protocol = useHttps.value ? 'https://' : 'http://';
+      return `${protocol}${server.value}`;
+    });
+    
+    const wsUrl = computed(() => {
+      if (!server.value) return '';
+      const protocol = useHttps.value ? 'wss://' : 'ws://';
+      return `${protocol}${server.value}/ws/impresion/[receptor]/`;
+    });
+    
+    const receptores_mod = computed(() => {
+      receptores.value.forEach((e) => {
+        e.is_sel = is_sel(e.ID);
+      });
+      return receptores.value;
+    });
+
+    // Methods
+    const is_sel = (id) => {
+      return Object.values(receptores_sel.value).includes(id);
+    };
+
+    const getReceptores = () => {
+      if (receptores_sel.value.length > 0) {
+        // Eliminar duplicados de receptores_sel usando Set
+        const uniqueIds = [...new Set(receptores_sel.value)];
+        
+        return Object.values(receptores.value).filter((r) => {
+          return uniqueIds.includes(r.ID);
+        });
+      }
+      return [];
+    };
+
+    const on_change = (r) => {
+      if (r.is_sel) {
+        // Solo agregar si no está ya incluido (evitar duplicados)
+        if (!receptores_sel.value.includes(r.ID)) {
+          receptores_sel.value.push(r.ID);
+          console.log(`Receptor ${r.Nombre} (ID: ${r.ID}) seleccionado`);
+        }
+      } else {
+        // Eliminar de la selección
+        receptores_sel.value = receptores_sel.value.filter((e) => e != r.ID);
+        console.log(`Receptor ${r.Nombre} (ID: ${r.ID}) deseleccionado`);
+
+        // Cerrar inmediatamente la conexión WebSocket de este receptor si existe
+        try {
+          const idx = ws.value.findIndex((w) => w.receptor === r.nomimp);
+          if (idx !== -1) {
+            ws.value[idx].disconnect();
+            ws.value.splice(idx, 1);
+            console.log(`Conexión WebSocket parada para receptor: ${r.Nombre}`);
+          }
+        } catch (err) {
+          console.warn(`No se pudo cerrar la conexión de ${r.Nombre}:`, err);
+        }
+
+        // Persistir el cambio para evitar reconexiones posteriores
+        try {
+          localStorage.receptores = JSON.stringify(receptores_sel.value);
+        } catch (_) {}
+      }
+      
+      // Eliminar duplicados finales
+      receptores_sel.value = [...new Set(receptores_sel.value)];
+    };
+
+    const receptores_change = () => {
+      showSelDialog.value = false;
+      localStorage.receptores = JSON.stringify(receptores_sel.value);
+      connect();
+    };
+
+    const server_change = () => {
+      showDialog.value = false;
+      
+      // Construir la URL completa con el protocolo seleccionado
+      const protocol = useHttps.value ? 'https://' : 'http://';
+      const fullServerUrl = `${protocol}${server.value}`;
+      
+      // Guardar tanto la dirección del servidor como el protocolo
+      localStorage.server = fullServerUrl;
+      localStorage.useHttps = useHttps.value.toString();
+      
+      if (!receptores.value || receptores.value.length <= 0) {
+        store.getListado();
+      }
+      receptores_sel.value = [];
+      localStorage.receptores = JSON.stringify(receptores_sel.value);
+      store.getDatosEmpresa();
+    };
+
+    const connect = () => {
+      // Evitar conectar si no hay receptores seleccionados
+      const receptoresParaConectar = getReceptores();
+      if (receptoresParaConectar.length === 0) {
+        console.log('No hay receptores seleccionados, no se establecen conexiones');
+        return;
+      }
+
+      console.log('Estableciendo conexiones WebSocket para', receptoresParaConectar.length, 'receptores:', 
+                  receptoresParaConectar.map(r => `${r.Nombre} (${r.nomimp})`));
+      
+      // Desconectar TODAS las conexiones existentes y limpiar timers
+      VWebsocket.disconnectAll();
+      ws.value = []; // Limpiar el array completamente
+      
+      // Crear nuevas conexiones solo para receptores seleccionados
+      receptoresParaConectar.forEach((r) => {
+          // Usar la URL almacenada que ya incluye el protocolo
+          const serverUrl = localStorage.server || serverUrl.value;
+          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/impresion/${r.nomimp}/`);
+          
+          var ws_aux = new VWebsocket(serverUrl, r, store);
+          ws.value.push(ws_aux);
+          ws_aux.connect();
+      });
+      
+      console.log(`Total conexiones WebSocket creadas: ${ws.value.length}`);
+    };
+
+    // Watchers
+    watch(receptores, (v) => {
+      // Solo conectar si hay receptores y al menos uno seleccionado
+      if (v && v.length > 0 && receptores_sel.value.length > 0) {
+        console.log('Receptores actualizados, reconectando...');
+        connect();
+      }
+    }, { deep: true });
+
+    const reload = () => {
+      showPedidos.value = true;
+      console.log('Recargando pedidos para los siguientes receptores:', receptores_sel.value);
+      store.getPendientes(JSON.stringify(receptores_sel.value));
+    };
+
+    // Lifecycle
+    onMounted(() => {
+      if (localStorage.server) {
+        // Extraer el servidor y protocolo de la URL guardada
+        const savedServer = localStorage.server;
+        if (savedServer.startsWith('https://')) {
+          server.value = savedServer.replace('https://', '');
+          useHttps.value = true;
+        } else if (savedServer.startsWith('http://')) {
+          server.value = savedServer.replace('http://', '');
+          useHttps.value = false;
+        } else {
+          server.value = savedServer;
+          useHttps.value = localStorage.useHttps === 'true';
+        }
+        
+        if (empresa.value == null) store.getDatosEmpresa();
+        if (localStorage.receptores) {
+          try {
+            const storedReceptores = JSON.parse(localStorage.receptores);
+            // Eliminar duplicados del localStorage
+            receptores_sel.value = [...new Set(storedReceptores)];
+            console.log('Receptores cargados del localStorage:', receptores_sel.value);
+          } catch (e) {
+            console.error('Error parsing localStorage.receptores:', e);
+            receptores_sel.value = [];
+          }
+        }
+        if (!receptores.value || receptores.value.length <= 0) {
+          store.getListado();
+        } else {
+          connect();
+        }
+      }
+    });
+
+    return {
+      // Reactive data
+      showSelDialog,
+      showDialog,
+      server,
+      useHttps,
+      ws,
+      receptores_sel,
+      showPedidos,
+      // Computed
+      items,
+      isWsConnected,
+      isHttpConnected: isHttpConnected,
+      receptores,
+      empresa,
+      serverUrl,
+      wsUrl,
+      receptores_mod,
+      // Methods
+      is_sel,
+      getReceptores,
+      on_change,
+      receptores_change,
+      server_change,
+      connect,
+      reload
+    };
+  }
+};
+</script>
+
+<style>
+.fab-reload {
+  margin-bottom: 1rem;
+  margin-right: 1rem;
+}
+</style>

@@ -1,0 +1,123 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.valleapp.vallecom.activitys.Cuenta"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Cuenta"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start"
+        android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/mesa_z1"
+        android:id="@+id/lblMesa"
+        android:layout_below="@+id/title"
+        android:textSize="17sp"
+        android:padding="10dp"
+        android:background="@color/white"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@color/white"
+        android:id="@+id/relativeLayout"
+        android:layout_below="@+id/lblMesa">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/total"
+            android:id="@+id/textView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/test_precio"
+            android:id="@+id/txtTotal"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/black" />
+    </RelativeLayout>
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lstCuenta"
+        android:layout_below="@+id/relativeLayout"
+        android:layout_above="@id/botones_layout"
+        android:padding="5dp"
+        android:background="@color/white"
+        />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/botones_layout"
+        android:background="@color/white"
+        >
+
+        <Button
+            android:id="@+id/btnSalir"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/boton_rounded"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:onClick="clickSalir"
+            android:text="@string/salir"
+            android:layout_alignParentEnd="true"
+           />
+
+        <Button
+            android:id="@+id/btnImprimir"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/boton_rounded"
+            android:onClick="clickImprimir"
+            android:text="@string/imprimir"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:layout_toStartOf="@+id/btnSalir"/>
+
+        <Button
+            android:id="@+id/btnMarcarRojo"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/boton_rounded"
+            android:onClick="clickMarcarRojo"
+            android:text="@string/marcar"
+            android:padding="10dp"
+            android:layout_toStartOf="@+id/btnImprimir"/>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

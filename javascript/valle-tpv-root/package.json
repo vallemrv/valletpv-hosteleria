@@ -1,0 +1,21 @@
+{
+  "name": "valle-tpv-root",
+  "private": true,
+  "workspaces": [
+    "valle-tpv-lib",
+    "valleTPV"
+  ],
+  "scripts": {
+    "sync": "bash sync-lib.sh",
+    "build:lib": "npm run build -w valle-tpv-lib",
+    "build:app": "npm run build -w valleTPV",
+    "build": "npm run build:lib && npm run build:app",
+    "dev:app": "npm run dev -w valleTPV",
+    "dev": "bash sync-lib.sh && npm run dev:app",
+    "install:all": "npm install",
+    "tauri": "cargo tauri",
+    "tauri:dev": "if [ \"$(uname)\" = \"Linux\" ]; then WEBKIT_DISABLE_DMABUF_RENDERER=1 cargo tauri dev; else cargo tauri dev; fi",
+    "tauri:build": "cargo tauri build",
+    "tauri:build:debug": "cargo tauri build --debug"
+  }
+}

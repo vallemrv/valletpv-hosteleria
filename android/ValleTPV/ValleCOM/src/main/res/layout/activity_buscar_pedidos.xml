@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true"
+    tools:context="com.valleapp.vallecom.activitys.Mesas">
+
+    <!-- Título del buscador de pedidos -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Buscar pedido"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start" />
+
+    <!-- Lista de pedidos con peso flexible -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white">
+        
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lstPedidosPendientes"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
+            />
+    </FrameLayout>
+
+    <!-- Panel de entrada de búsqueda -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:minHeight="64dp">
+
+        <!-- Campo de texto para buscar pedidos -->
+        <EditText
+            android:id="@+id/textBuscador"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="Escribe aqui para buscar pedido"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:maxLines="3"
+            android:textSize="25sp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:selectAllOnFocus="true" />
+
+    </LinearLayout>
+
+</LinearLayout>

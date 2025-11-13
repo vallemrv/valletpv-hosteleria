@@ -1,0 +1,18 @@
+html, body {
+  height: 100dvh; /* Dynamic height: se ajusta a teclado/barras */
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Bloquea scroll global */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; /* Feel nativo */
+}
+
+#app {
+  height: 100%;
+  overflow: hidden; /* Evita leaks de Vuetify */
+  font-size: 2.4rem;
+}
+
+* {
+  touch-action: manipulation; /* Taps rápidos en mobile */
+}
+

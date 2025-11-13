@@ -1,0 +1,89 @@
+<LinearLayout android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true"
+    tools:context="com.valleapp.vallecom.activitys.HacerComandas"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/pink"
+            android:paddingTop="@dimen/padding_top_title"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="Comandas"
+            android:textColor="@android:color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="start" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="16dp">
+
+
+
+        <TextView
+            android:id="@+id/lblNombreCamarero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:text="@string/camarero"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/lblCantidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:text="@string/num_uno"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/lblPedido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="40dp"
+            android:layout_toStartOf="@+id/lblCantidad"
+            android:text="@string/no_hay_pedido"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+    </RelativeLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="scrollable"
+        android:background="@color/white" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:background="@color/white">
+
+
+
+    </androidx.viewpager2.widget.ViewPager2>
+
+
+    </LinearLayout>
+

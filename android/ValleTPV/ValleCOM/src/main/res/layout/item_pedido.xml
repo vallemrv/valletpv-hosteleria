@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="2sp">
+
+    <RelativeLayout
+        android:id="@+id/btnArticuloPedido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.85"
+        android:layout_gravity="center_vertical"
+        android:onClick="clickSugerencia"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/lblDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/text_prueba" />
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/btnAgregar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/fondo_redondeado_btn_xml"
+        android:contentDescription="@string/anadir_linea"
+        android:src="@android:drawable/ic_input_add"
+        tools:ignore="ImageContrastCheck" />
+
+    <ImageButton
+        android:id="@+id/btnBorrar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/fondo_redondeado_btn_xml"
+        android:contentDescription="@string/borrar_linea"
+        android:layout_marginStart="5dp"
+        android:src="@android:drawable/ic_menu_delete"
+        tools:ignore="ImageContrastCheck" />
+
+</LinearLayout>

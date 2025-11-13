@@ -1,0 +1,44 @@
+{
+  "name": "valle-tpv-lib",
+  "version": "1.0.0",
+  "description": "A library of reusable Vue components, stores, and utilities for ValleTPV",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/types/src/index.d.ts",
+  "style": "dist/valle-tpv-lib.css",
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/valle-tpv-lib.css": "./dist/valle-tpv-lib.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build && tsc",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.vue",
+    "copy-sw": "node scripts/copyServiceWorker.js"
+  },
+  "dependencies": {
+    "@vueuse/core": "^13.7.0",
+    "dexie": "^4.0.11"
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.0",
+    "vue": "^3.5.0",
+    "vuetify": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "eslint": "^8.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "pinia": "^2.1.7",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.2"
+  }
+}

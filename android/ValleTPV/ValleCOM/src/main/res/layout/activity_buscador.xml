@@ -1,0 +1,75 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true"
+    tools:context="com.valleapp.vallecom.activitys.BuscadorTeclas">
+
+    <!-- Título del buscador -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Buscar Teclas"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start" />
+
+    <!-- Contenido scrolleable con peso flexible -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/scrollBuscador"
+            android:padding="16dp"
+            android:background="@color/white">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/pneBuscador"
+                android:stretchColumns="*">
+            </TableLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Panel de entrada de búsqueda -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:minHeight="64dp">
+
+        <!-- Campo de texto para buscar -->
+        <EditText
+            android:id="@+id/txtBuscador"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="Escribe aqui para buscar tecla"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:maxLines="3"
+            android:textSize="25sp"
+            android:imeOptions="actionSearch"
+            android:inputType="text" />
+
+    </LinearLayout>
+
+</LinearLayout>

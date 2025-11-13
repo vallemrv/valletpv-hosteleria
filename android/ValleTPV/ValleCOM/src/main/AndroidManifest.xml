@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO"
+        tools:ignore="ProtectedPermissions" />
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        tools:ignore="GoogleAppIndexingWarning"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.ValleCOM"
+        android:configChanges="orientation|screenSize"
+           >
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+
+           <activity
+            android:name="com.valleapp.vallecom.activitys.Camareros"
+            android:configChanges="orientation"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.Preferencias"
+            android:label="PreferenciasTpv"
+            android:configChanges="orientation"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.Mesas"
+            android:label="Elegir Mesa"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.HacerComandas"
+            android:label="@string/title_activity_comanda"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.BuscadorTeclas"
+            android:windowSoftInputMode="adjustResize"
+            android:label="@string/title_activity_buscador"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.OpMesas"
+            android:label="@string/title_activity_op_mesas"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.BuscarPedidos"
+            android:windowSoftInputMode="adjustResize"
+            android:label="Buscar pedidos"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.Cuenta"
+            android:label="@string/title_activity_cuenta"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.MostrarPedidos"
+            android:label="@string/title_activity_mostrar_pedidos"
+            android:configChanges="orientation">
+        </activity>
+        <activity
+            android:name="com.valleapp.vallecom.activitys.Sugerencias"
+            android:windowSoftInputMode="adjustResize"
+            android:label="@string/title_activity_sugerencias"
+            android:configChanges="orientation">
+        </activity>
+           <activity
+               android:name="com.valleapp.vallecom.activitys.Autorias"
+               android:label="@string/title_activity_autorias"
+               android:configChanges="orientation">
+           </activity>
+           <activity
+               android:name="com.valleapp.vallecom.activitys.Refill"
+               android:label="@string/title_activity_refill"
+               android:configChanges="orientation">
+           </activity>
+           <activity
+               android:name="com.valleapp.vallecom.activitys.SendMensajes"
+               android:windowSoftInputMode="adjustResize"
+               android:label="@string/title_activity_sendmensajes"
+               android:configChanges="orientation">
+           </activity>
+           <activity android:name="com.valleapp.vallecom.activitys.ChatBotActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"
+            android:label="@string/title_activity_chatbot"
+            android:configChanges="orientation">
+              </activity>
+       <service
+           android:name="com.valleapp.vallecom.utilidades.ServiceCOM"
+           android:enabled="true"
+           android:exported="false"
+           android:foregroundServiceType="dataSync" />
+
+       </application>
+
+</manifest>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:background="@drawable/bg_pink"
+        android:gravity="center_vertical">
+
+        <!-- Título alineado a la izquierda -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textSize="45sp"
+            android:gravity="start" />
+
+        <!-- Botón 1 alineado a la derecha -->
+        <ImageButton
+            android:id="@+id/btn_arqueo_caja"
+            android:layout_marginEnd="5dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/fondo_btn_press"
+            android:contentDescription="@string/settings"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/llave" />
+
+        <!-- Botón 2 alineado a la derecha -->
+        <ImageButton
+            android:id="@+id/btn_aceptar_preferencias"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@drawable/fondo_btn_press"
+            android:contentDescription="@string/arqueo_de_caja"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/settings" />
+
+    </LinearLayout>
+
+
+    <!-- Incluir el layout seleccionar_camarero.xml -->
+    <include
+        layout="@layout/seleccionar_camareros" />
+
+
+
+</LinearLayout>

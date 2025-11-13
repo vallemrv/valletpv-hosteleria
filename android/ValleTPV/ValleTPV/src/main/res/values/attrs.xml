@@ -1,0 +1,6 @@
+<!-- res/values/attrs.xml -->
+<resources>
+    <declare-styleable name="MyCustomStyle">
+        <attr name="marginHorizontal" format="dimension" />
+    </declare-styleable>
+</resources>

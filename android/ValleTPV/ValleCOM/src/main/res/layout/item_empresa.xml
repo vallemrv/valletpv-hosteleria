@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_empresa"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/nombre_empresa_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="32sp"
+        android:textColor="@android:color/black"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <ImageView
+        android:id="@+id/icon_empresa_activa"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        android:src="@drawable/check"
+        android:contentDescription="@string/empresa_activa" />
+
+    <ImageButton
+        android:id="@+id/boton_editar_empresa"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:scaleType="fitCenter"
+        android:padding="10dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="Editar empresa"
+        android:background="@drawable/boton_rounded" />
+
+    <ImageButton
+        android:id="@+id/boton_borrar_empresa"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/papelera"
+        android:scaleType="fitCenter"
+        android:padding="10dp"
+        android:contentDescription="@string/borrar_empresa"
+        android:background="@drawable/boton_rounded" />
+
+</LinearLayout>

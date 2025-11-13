@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/pink"
+    android:fitsSystemWindows="true">
+
+    <!-- Título del chatbot -->
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink"
+        android:paddingTop="@dimen/padding_top_title"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="0dp"
+        android:text="Asistente Virtual"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="start" />
+
+    <!-- Lista de mensajes con ScrollView para mejor control -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
+            android:background="@color/white"/>
+    </FrameLayout>
+
+    <!-- Panel de entrada de mensajes -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:minHeight="64dp">
+
+        <!-- Campo de texto para escribir mensajes -->
+        <EditText
+            android:id="@+id/editTextMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="Escribe tu mensaje..."
+            android:padding="12dp"
+            android:background="@drawable/edit_text_background"
+            android:maxLines="3"
+            android:textSize="16sp"
+            android:imeOptions="actionSend"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <!-- Botón de grabación de audio -->
+        <ImageButton
+            android:id="@+id/buttonRecord"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_btn_speak_now"
+            android:background="@drawable/button_circular_background"
+            android:contentDescription="Grabar audio"
+            android:scaleType="centerInside" />
+
+        <!-- Botón de enviar -->
+        <ImageButton
+            android:id="@+id/buttonSend"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_menu_send"
+            android:background="@drawable/button_circular_background"
+            android:contentDescription="Enviar mensaje"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
+
+</LinearLayout>

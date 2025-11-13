@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.valleapp.vallecash.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" >
+        <argument
+            android:name="server"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_fondo_caja"
+        android:name="com.valleapp.vallecash.ui.fondocaja.FondoCajaFragment"
+        android:label="Modificar cambio"
+        tools:layout="@layout/fragment_home" >
+        <argument
+            android:name="server"
+            app:argType="string" />
+    </fragment>
+
+
+    <!-- Añadir el SettingsFragment -->
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.valleapp.vallecash.ui.settings.SettingsFragment"
+        android:label="Configuraciones"
+        tools:layout="@layout/fragment_settings" >
+        <argument
+            android:name="server"
+            app:argType="string" />
+
+    </fragment>
+
+    <!-- Añadir DispenseCoinsFragment -->
+    <fragment
+        android:id="@+id/nav_modificar_cambio"
+        android:name="com.valleapp.vallecash.ui.modificarcambio.ModificarCambioFragment"
+        android:label="Dispensar cambio"
+        tools:layout="@layout/fragment_modificar_cambio" />
+
+    <!-- Añadir DispenseCoinsFragment -->
+    <fragment
+        android:id="@+id/nav_mantenimiento"
+        android:name="com.valleapp.vallecash.ui.mantenimiento.MantenimientoFragment"
+        android:label="Mantenimiento"
+        tools:layout="@layout/fragment_mantenimiento" />
+
+
+</navigation>
