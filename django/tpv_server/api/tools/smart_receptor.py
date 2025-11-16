@@ -43,6 +43,7 @@ def enviar_pedido_smart_receptor(pedido):
         if receptor_nombre not in receptores:
             receptores[receptor_nombre] = {
                 "op": "pedido",
+                "pedido_id": pedido.id,
                 "hora": pedido.hora,
                 "receptor": receptor.nomimp,
                 "nom_receptor": receptor_nombre,
@@ -58,7 +59,7 @@ def enviar_pedido_smart_receptor(pedido):
             "idart": linea.idart,
             "descripcion": linea.descripcion,
             "estado": linea.estado,
-            "pedido_id": linea.pedido_id
+            "pedido_id": pedido.id
         })
     
     # Enviar a cada receptor usando send_mensaje_devices (necesita for)
@@ -127,16 +128,16 @@ def _notificar_lineas(op, lineas):
         receptor = tecla.familia.receptor.nomimp
         
         if receptor not in receptores_ids:
-            receptores_ids[receptor] = []
+            receptores_ids[receptor] = set()
         
-        receptores_ids[receptor].append(linea.id)
+        receptores_ids[receptor].add(linea.id)
     
-    # Enviar notificación a cada receptor
-    for receptor, linea_ids in receptores_ids.items():
+    # Enviar UNA SOLA notificación por receptor con todas sus líneas
+    for receptor, linea_ids_set in receptores_ids.items():
         send_mensaje_devices({
             "op": op,
             "receptor": receptor,
-            "ids": linea_ids
+            "ids": list(linea_ids_set)
         })
 
 
