@@ -75,7 +75,6 @@ def get_pedidos_by_receptor(request):
     # Obtener UIDs de mesas abiertas
     mesas_abiertas = Mesasabiertas.objects.select_related('infmesa')
     mesas_abiertas_uids = set(ma.infmesa.id for ma in mesas_abiertas)
-    print(f"Mesas abiertas UIDs: {mesas_abiertas_uids}")
     
     # Obtener todas las líneas del servidor para este receptor en mesas abiertas
     lineas_servidor = Lineaspedido.objects.filter(
@@ -90,9 +89,6 @@ def get_pedidos_by_receptor(request):
         'servidos_set'
     )
     
-    print(f"Líneas encontradas en servidor: {lineas_servidor.count()}")
-    if lineas_servidor.count() > 0:
-        print(f"Primera línea - Receptor nomimp: {lineas_servidor.first().tecla.familia.receptor.nomimp if lineas_servidor.first().tecla else 'Sin tecla'}")
     
     # IDs de líneas y pedidos que el cliente tiene (ignorar duplicados)
     lineas_cliente_ids = set()
@@ -101,8 +97,6 @@ def get_pedidos_by_receptor(request):
         pedidos_cliente_ids.add(p["pedido_id"])
         lineas_cliente_ids.update(p["lineas"])
     
-    print(f"Pedidos únicos del cliente: {pedidos_cliente_ids}")
-    print(f"Total líneas únicas del cliente: {len(lineas_cliente_ids)}")
     
     # Lista de IDs a eliminar en el cliente
     rm_ids = []
@@ -205,8 +199,6 @@ def get_pedidos_by_receptor(request):
         "rm": rm_ids
     }
     
-    print(f"Respuesta: {len(resultado['pedidos'])} pedidos, {len(resultado['rm'])} líneas a eliminar")
-    print(f"=== Fin get_pedidos_by_receptor ===\n")
     
     return JsonResponse(resultado)
 
