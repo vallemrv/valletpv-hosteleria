@@ -10,7 +10,7 @@
     <v-btn icon @click="() => (showDialog = true)"> <v-icon>mdi-cog</v-icon></v-btn>
   </v-toolbar>
   
-  <v-container fluid>
+  <v-container fluid class="pb-16">
     <!-- Componente de estado de conexión -->
     <connection-status 
       v-if="serverUrl"
@@ -19,23 +19,20 @@
       :is-secure="useHttps"
     />
     
-    <v-row>
-      <v-col cols="12" sm="6" md="3" v-for="(item, i) in items" :key="i">
-        <valle-comanda :pedido="item"></valle-comanda>
-      </v-col>
-    </v-row>
+    <!-- Vista principal agrupada -->
+    <vista-principal :receptor="receptorActual" />
   </v-container>
 
   <v-btn
-      @click="reload"
+      @click="abrirServidos"
       icon
       size="large"
-      color="primary"
+      color="success"
       location="bottom right"
       position="fixed"
-      class="fab-reload"
+      class="fab-servidos"
     >
-      <v-icon>mdi-reload</v-icon>
+      <v-icon>mdi-check-all</v-icon>
     </v-btn>
 
   <v-dialog v-model="showDialog" max-width="500" persistent>
@@ -44,12 +41,33 @@
         <v-row>
           <v-col cols="12">
             <v-text-field 
+              v-model="empresaNombre" 
+              label="Nombre de la Empresa" 
+              placeholder="Mi Empresa"
+              hide-details="auto"
+              required>
+            </v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field 
+              v-model="deviceAlias" 
+              label="Alias del Dispositivo" 
+              placeholder="Receptor-1"
+              hint="Identificador único de este dispositivo"
+              persistent-hint
+              hide-details="auto"
+              required>
+            </v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field 
               v-model="server" 
               label="Dirección del servidor" 
               placeholder="ejemplo: mi-servidor.com:8000"
               hint="Solo la dirección y puerto, sin protocolo"
               persistent-hint
-              hide-details="auto">
+              hide-details="auto"
+              required>
             </v-text-field>
           </v-col>
           <v-col cols="12">
@@ -79,12 +97,17 @@
               Se usará HTTP para API y WS para WebSockets
             </v-alert>
           </v-col>
+          <v-col cols="12" v-if="serverError">
+            <v-alert type="error" variant="tonal">
+              {{ serverError }}
+            </v-alert>
+          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="showDialog = false">Cancelar</v-btn>
-        <v-btn @click="server_change()" color="primary">Conectar</v-btn>
+        <v-btn @click="server_change()" color="primary" :loading="isConnecting">Conectar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>  <v-dialog v-model="showSelDialog" max-width="400" persistent>
@@ -111,19 +134,23 @@
     </v-card>
   </v-dialog>
 
-  <valle-pedidos @close="() => (showPedidos = false)" :show="showPedidos"></valle-pedidos>
+  <valle-pedidos 
+    @close="() => (showPedidos = false)" 
+    :show="showPedidos"
+    :receptor="receptorActual"
+  ></valle-pedidos>
 </template>
 
 <script>
 import VWebsocket from "@/websocket";
 import { useMainStore } from "@/stores/main";
 import { computed, onMounted, ref, watch } from 'vue';
-import ValleComanda from "@/components/ValleComanda.vue";
+import VistaPrincipal from "@/components/VistaPrincipal.vue";
 import VallePedidos from "@/components/VallePedidos.vue";
 import ConnectionStatus from "@/components/ConnectionStatus.vue";
 
 export default {
-  components: { ValleComanda, VallePedidos, ConnectionStatus },
+  components: { VistaPrincipal, VallePedidos, ConnectionStatus },
   setup() {
     const store = useMainStore();
     
@@ -132,6 +159,10 @@ export default {
     const showDialog = ref(false);
     const server = ref("");
     const useHttps = ref(false);
+    const empresaNombre = ref("");
+    const deviceAlias = ref("");
+    const serverError = ref("");
+    const isConnecting = ref(false);
     const ws = ref([]);
     const receptores_sel = ref([]);
     const showPedidos = ref(false);
@@ -143,6 +174,12 @@ export default {
     const receptores = computed(() => store.receptores);
     const empresa = computed(() => store.empresa);
     
+    // Receptor actual (primer receptor seleccionado o null para ver todos)
+    const receptorActual = computed(() => {
+      const recs = getReceptores();
+      return recs.length > 0 ? recs[0].nomimp : null;
+    });
+    
     // URLs calculadas
     const serverUrl = computed(() => {
       if (!server.value) return '';
@@ -153,7 +190,7 @@ export default {
     const wsUrl = computed(() => {
       if (!server.value) return '';
       const protocol = useHttps.value ? 'wss://' : 'ws://';
-      return `${protocol}${server.value}/ws/impresion/[receptor]/`;
+      return `${protocol}${server.value}/ws/comunicacion/[receptor]`;
     });
     
     const receptores_mod = computed(() => {
@@ -220,23 +257,75 @@ export default {
       connect();
     };
 
-    const server_change = () => {
-      showDialog.value = false;
+    const server_change = async () => {
+      serverError.value = "";
+      isConnecting.value = true;
+      
+      // Validar campos requeridos
+      if (!empresaNombre.value || !deviceAlias.value || !server.value) {
+        serverError.value = "Por favor, completa todos los campos";
+        isConnecting.value = false;
+        return;
+      }
       
       // Construir la URL completa con el protocolo seleccionado
       const protocol = useHttps.value ? 'https://' : 'http://';
       const fullServerUrl = `${protocol}${server.value}`;
       
-      // Guardar tanto la dirección del servidor como el protocolo
-      localStorage.server = fullServerUrl;
-      localStorage.useHttps = useHttps.value.toString();
-      
-      if (!receptores.value || receptores.value.length <= 0) {
-        store.getListado();
+      try {
+        // Paso 1: Verificar que el servidor esté disponible llamando a /api/health/
+        console.log('Verificando salud del servidor...');
+        const healthCheck = await store.checkServerHealth(fullServerUrl);
+        
+        if (!healthCheck || !healthCheck.success) {
+          serverError.value = "No se pudo conectar con el servidor. Verifica la dirección.";
+          isConnecting.value = false;
+          return;
+        }
+        
+        console.log('Servidor disponible ✓');
+        
+        // Guardar la configuración del servidor
+        localStorage.server = fullServerUrl;
+        localStorage.useHttps = useHttps.value.toString();
+        localStorage.empresaNombre = empresaNombre.value;
+        localStorage.deviceAlias = deviceAlias.value;
+        
+        // Paso 2: Crear/obtener el UID del dispositivo con el alias
+        console.log('Creando UID del dispositivo con alias:', deviceAlias.value);
+        const uid = await store.createDeviceUID(deviceAlias.value);
+        
+        if (!uid) {
+          serverError.value = "Error al crear el UID del dispositivo";
+          isConnecting.value = false;
+          return;
+        }
+        
+        console.log('UID del dispositivo creado/recuperado:', uid);
+        
+        // Paso 3: Obtener el listado de receptores (ya incluye el UID automáticamente)
+        if (!receptores.value || receptores.value.length <= 0) {
+          await store.getListado();
+        }
+        
+        // Reiniciar receptores seleccionados
+        receptores_sel.value = [];
+        localStorage.receptores = JSON.stringify(receptores_sel.value);
+        
+        console.log('✓ Configuración completada exitosamente');
+        console.log('  - Empresa:', empresaNombre.value);
+        console.log('  - Dispositivo:', deviceAlias.value);
+        console.log('  - UID:', uid);
+        
+        // Cerrar el diálogo
+        showDialog.value = false;
+        isConnecting.value = false;
+        
+      } catch (error) {
+        console.error('Error al configurar el servidor:', error);
+        serverError.value = error.message || "Error al conectar con el servidor";
+        isConnecting.value = false;
       }
-      receptores_sel.value = [];
-      localStorage.receptores = JSON.stringify(receptores_sel.value);
-      store.getDatosEmpresa();
     };
 
     const connect = () => {
@@ -258,7 +347,7 @@ export default {
       receptoresParaConectar.forEach((r) => {
           // Usar la URL almacenada que ya incluye el protocolo
           const serverUrl = localStorage.server || serverUrl.value;
-          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/impresion/${r.nomimp}/`);
+          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/comunicacion/${r.nomimp}`);
           
           var ws_aux = new VWebsocket(serverUrl, r, store);
           ws.value.push(ws_aux);
@@ -266,6 +355,10 @@ export default {
       });
       
       console.log(`Total conexiones WebSocket creadas: ${ws.value.length}`);
+    };
+    
+    const abrirServidos = () => {
+      showPedidos.value = true;
     };
 
     // Watchers
@@ -277,14 +370,36 @@ export default {
       }
     }, { deep: true });
 
-    const reload = () => {
-      showPedidos.value = true;
-      console.log('Recargando pedidos para los siguientes receptores:', receptores_sel.value);
-      store.getPendientes(JSON.stringify(receptores_sel.value));
-    };
-
     // Lifecycle
-    onMounted(() => {
+    onMounted(async () => {
+      // Inicializar IndexedDB y cargar todo en memoria
+      try {
+        await store.inicializarDB();
+        console.log('Base de datos lista');
+      } catch (error) {
+        console.error('Error al inicializar base de datos:', error);
+      }
+      
+      // Solicitar permiso para notificaciones
+      if ('Notification' in window && Notification.permission === 'default') {
+        try {
+          await Notification.requestPermission();
+        } catch (error) {
+          console.log('No se pudieron habilitar las notificaciones:', error);
+        }
+      }
+      
+      // Limpiar service workers antiguos si existen
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        for (let registration of registrations) {
+          if (registration.scope.includes('/app/')) {
+            console.log('Desregistrando service worker antiguo:', registration.scope)
+            await registration.unregister()
+          }
+        }
+      }
+      
       if (localStorage.server) {
         // Extraer el servidor y protocolo de la URL guardada
         const savedServer = localStorage.server;
@@ -299,7 +414,14 @@ export default {
           useHttps.value = localStorage.useHttps === 'true';
         }
         
-        if (empresa.value == null) store.getDatosEmpresa();
+        // Cargar nombre de empresa y alias si existen
+        if (localStorage.empresaNombre) {
+          empresaNombre.value = localStorage.empresaNombre;
+        }
+        if (localStorage.deviceAlias) {
+          deviceAlias.value = localStorage.deviceAlias;
+        }
+        
         if (localStorage.receptores) {
           try {
             const storedReceptores = JSON.parse(localStorage.receptores);
@@ -325,6 +447,10 @@ export default {
       showDialog,
       server,
       useHttps,
+      empresaNombre,
+      deviceAlias,
+      serverError,
+      isConnecting,
       ws,
       receptores_sel,
       showPedidos,
@@ -337,6 +463,7 @@ export default {
       serverUrl,
       wsUrl,
       receptores_mod,
+      receptorActual,
       // Methods
       is_sel,
       getReceptores,
@@ -344,15 +471,22 @@ export default {
       receptores_change,
       server_change,
       connect,
-      reload
+      abrirServidos
     };
   }
 };
 </script>
 
 <style>
-.fab-reload {
-  margin-bottom: 1rem;
-  margin-right: 1rem;
+.fab-servidos {
+  margin-bottom: 2rem;
+  margin-right: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Asegurar que el contenedor tenga espacio suficiente */
+.pb-16 {
+  padding-bottom: 6rem !important;
 }
 </style>
