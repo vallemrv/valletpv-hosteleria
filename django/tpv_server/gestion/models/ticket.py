@@ -64,7 +64,12 @@ class Ticket(BaseModels):
             # Marcamos la línea de pedido original como pagada
             linea.estado = 'C'
 
+        # Notificar a devices y smart receptors
         comunicar_cambios_devices("rm", "lineaspedido", lineas_a_borrar)
+        
+        # Import aquí para evitar circular import
+        from api.tools.smart_receptor import notificar_lineas_borradas
+        notificar_lineas_borradas(lineas_a_procesar)
 
          # --- MEJORA 3: OPERACIONES BULK PARA MEJORAR RENDIMIENTO ---
 
@@ -79,10 +84,14 @@ class Ticket(BaseModels):
             # Antes de eliminar la mesa, enviar al cliente que borre
             # todas las líneas que queden asociadas a esta infmesa,
             # independientemente de su estado (para mantener sincronía).
-            remaining_ids = list(Lineaspedido.objects.filter(infmesa__pk=uid).values_list('id', flat=True))
-            if remaining_ids:
-                rm_list = [{'ID': int(i)} for i in remaining_ids]
+            remaining_lineas = Lineaspedido.objects.filter(infmesa__pk=uid)
+            if remaining_lineas.exists():
+                rm_list = [{'ID': int(i)} for i in remaining_lineas.values_list('id', flat=True)]
                 comunicar_cambios_devices("rm", "lineaspedido", rm_list)
+                
+                # Import aquí para evitar circular import
+                from api.tools.smart_receptor import notificar_lineas_borradas
+                notificar_lineas_borradas(remaining_lineas)
 
             mesa.delete()
 

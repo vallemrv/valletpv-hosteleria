@@ -10,21 +10,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
-def get_datos_empresa(request):
-    return JsonResponse({'nombre':settings.BRAND, "email": settings.MAIL})
-
-
-@csrf_exempt
 def health_check(request):
     """Endpoint simple para verificar conectividad con el servidor"""
     return JsonResponse({'success': True, 'status': 'ok'})
 
-
-@csrf_exempt
-def get_uuid_factura(request, num):
-    from gestion.models.ticket import Ticket
-    ticket = Ticket.objects.filter(id=num).first()
-    if ticket:
-        return JsonResponse({'id':ticket.id,'uid':ticket.uid})
-    else:
-        return JsonError("Ticket no valido")

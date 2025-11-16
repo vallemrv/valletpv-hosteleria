@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura {{ ticket.id }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .ticket-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+        .ticket-info strong {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .required {
+            color: #e74c3c;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-data {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .modal-data p {
+            margin: 8px 0;
+            color: #555;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-confirm {
+            flex: 1;
+            background: #27ae60;
+            color: white;
+        }
+        .btn-cancel {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-confirm:hover {
+            background: #229954;
+        }
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📄 Datos para Factura</h1>
+        
+        <div class="ticket-info">
+            <p><strong>Ticket:</strong> #{{ ticket.id }}</p>
+            <p><strong>Fecha:</strong> {{ ticket.fecha }} {{ ticket.hora }}</p>
+            <p><strong>Mesa:</strong> {{ ticket.mesa }}</p>
+            <p><strong>Total:</strong> {{ total }}€</p>
+        </div>
+
+        <form id="facturaForm">
+            <div class="form-group">
+                <label for="nombre">Nombre completo <span class="required">*</span></label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nif">NIF/CIF <span class="required">*</span></label>
+                <input type="text" id="nif" name="nif" required>
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">Dirección <span class="required">*</span></label>
+                <input type="text" id="direccion" name="direccion" required>
+            </div>
+
+            <div class="form-group">
+                <label for="cp">Código Postal <span class="required">*</span></label>
+                <input type="text" id="cp" name="cp" required>
+            </div>
+
+            <div class="form-group">
+                <label for="poblacion">Población <span class="required">*</span></label>
+                <input type="text" id="poblacion" name="poblacion" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Generar Factura</button>
+        </form>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h2>✓ Confirmar Datos</h2>
+            <div class="modal-data" id="confirmData"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn btn-confirm" onclick="confirmarFactura()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('facturaForm');
+        const modal = document.getElementById('confirmModal');
+        const confirmData = document.getElementById('confirmData');
+        let datosFormulario = {};
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            datosFormulario = {
+                nombre: document.getElementById('nombre').value,
+                nif: document.getElementById('nif').value,
+                direccion: document.getElementById('direccion').value,
+                cp: document.getElementById('cp').value,
+                poblacion: document.getElementById('poblacion').value,
+                email: document.getElementById('email').value
+            };
+
+            confirmData.innerHTML = `
+                <p><strong>Nombre:</strong> ${datosFormulario.nombre}</p>
+                <p><strong>NIF/CIF:</strong> ${datosFormulario.nif}</p>
+                <p><strong>Dirección:</strong> ${datosFormulario.direccion}</p>
+                <p><strong>CP:</strong> ${datosFormulario.cp}</p>
+                <p><strong>Población:</strong> ${datosFormulario.poblacion}</p>
+                ${datosFormulario.email ? `<p><strong>Email:</strong> ${datosFormulario.email}</p>` : ''}
+            `;
+
+            modal.classList.add('active');
+        });
+
+        function cerrarModal() {
+            modal.classList.remove('active');
+        }
+
+        async function confirmarFactura() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Generando...';
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(datosFormulario)
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error al generar la factura');
+                    btn.disabled = false;
+                    btn.textContent = 'Confirmar';
+                }
+            } catch (error) {
+                alert('Error de conexión');
+                btn.disabled = false;
+                btn.textContent = 'Confirmar';
+            }
+        }
+    </script>
+</body>
+</html>

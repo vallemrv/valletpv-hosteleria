@@ -9,6 +9,7 @@ from django.db.models.functions import Concat
 from langchain_core.tools import tool
 
 from api.tools.impresion import imprimir_pedido
+from api.tools.smart_receptor import enviar_pedido_smart_receptor
 from chatbot.decorators.db_connection_manager import db_connection_handler
 
 
@@ -147,7 +148,8 @@ def crear_pedido_cliente(
         if pedido_creado:
             mensajes_proceso.append(f"✅ ¡Pedido #{pedido_creado.id} creado exitosamente!")
             mensajes_proceso.append(f"🆔 UID del pedido: {uid_pedido}")
-            imprimir_pedido(pedido_creado.id)
+            imprimir_pedido(pedido_creado)
+            enviar_pedido_smart_receptor(pedido_creado)
             
             # Enviar todos los mensajes concatenados
             send_tool_message("\n".join(mensajes_proceso))

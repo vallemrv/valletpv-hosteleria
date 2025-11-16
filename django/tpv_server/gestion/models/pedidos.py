@@ -377,8 +377,9 @@ class Lineaspedido(BaseModels):
 
         uid = mesa_abierta.infmesa.pk
         ids_borrados = []
+        lineas_lista = list(lineas_a_borrar)  # Convertir a lista para reutilizar
         
-        for linea in lineas_a_borrar:
+        for linea in lineas_lista:
             ids_borrados.append(linea.id)
             
             if motivo != 'null' and motivo.strip() != '':
@@ -394,6 +395,11 @@ class Lineaspedido(BaseModels):
                 linea.delete()  # Esto también dispara la señal post-delete
 
             linea.modifiar_composicion()
+        
+        # Notificar a smart receptors
+        if lineas_lista:
+            from api.tools.smart_receptor import notificar_lineas_borradas
+            notificar_lineas_borradas(lineas_lista)
         
         # Componer artículos una sola vez al final
         mesa_abierta.infmesa.componer_articulos()
@@ -415,9 +421,9 @@ class Lineaspedido(BaseModels):
         
         uid = mesa_abierta.infmesa.pk
         # Usamos select_for_update() para bloquear las filas hasta que la transacción termine
-        lineas_a_borrar = Lineaspedido.objects.select_for_update().filter(
+        lineas_a_borrar = list(Lineaspedido.objects.select_for_update().filter(
             infmesa__pk=uid, idart=idArt, estado=s, precio=p, descripcion=n
-        )[:can]
+        )[:can])
 
         ids_borrados = []
         precios_borrados = []
@@ -440,6 +446,10 @@ class Lineaspedido(BaseModels):
 
             linea.modifiar_composicion()
         
+        # Notificar a smart receptors
+        if lineas_a_borrar:
+            from api.tools.smart_receptor import notificar_lineas_borradas
+            notificar_lineas_borradas(lineas_a_borrar)
        
         # Componer artículos una sola vez al final
         mesa_abierta.infmesa.componer_articulos()

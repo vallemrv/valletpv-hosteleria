@@ -7,17 +7,18 @@
 
 from uuid import uuid4
 from api.tools import imprimir_pedido
+from api.tools.smart_receptor import enviar_pedido_smart_receptor
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from api.decorators.uid_activo import verificar_uid_activo
 from gestion.models.mesasabiertas import Mesasabiertas 
 from gestion.models.pedidos import Pedidos
 
 import json
 
 
-@csrf_exempt
+@verificar_uid_activo
 def marcar_rojo(request):
     idm = request.POST["idm"]
     mesa_abierta = Mesasabiertas.objects.get(mesa_id=idm)
@@ -30,7 +31,7 @@ def marcar_rojo(request):
 
 
 
-@csrf_exempt
+@verificar_uid_activo
 def pedir(request):
     idm = int(request.POST["idm"])
     idc = int(request.POST["idc"])
@@ -39,7 +40,9 @@ def pedir(request):
 
     pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, uid_device)
     if pedido:
-        imprimir_pedido(pedido.id)
+        imprimir_pedido(pedido)
+        enviar_pedido_smart_receptor(pedido)
+        
     return HttpResponse("success")
 
 

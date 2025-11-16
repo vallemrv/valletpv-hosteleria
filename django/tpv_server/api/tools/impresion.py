@@ -15,37 +15,65 @@ from gestion.models.camareros import Camareros
 import json
                           
 
-def imprimir_pedido(id):
-    pedido = Pedidos.objects.get(pk=id)
-    camareo = Camareros.objects.get(pk=pedido.camarero_id)
-    mesa = pedido.infmesa.mesasabiertas_set.get().mesa
-    lineas = pedido.lineaspedido_set.values("idart",
-                                           "descripcion",
-                                           "estado",
-                                           "pedido_id").annotate(can=Count('idart'))
+def imprimir_pedido(pedido):
+    from django.db.models import Prefetch
     
+    # Si recibimos un ID en lugar del objeto, lo buscamos (retrocompatibilidad)
+    if isinstance(pedido, int):
+        lineas_prefetch = Prefetch(
+            'lineaspedido_set',
+            queryset=Lineaspedido.objects.select_related('tecla__familia__receptor')
+        )
+        pedido = Pedidos.objects.select_related('infmesa').prefetch_related(
+            lineas_prefetch,
+            'infmesa__mesasabiertas_set__mesa'
+        ).get(pk=pedido)
+    
+    camareo = Camareros.objects.get(pk=pedido.camarero_id)
+    mesa = pedido.infmesa.mesasabiertas_set.all()[0].mesa
+    
+    # Agrupar líneas por idart para contar (equivalente a annotate(can=Count('idart')))
+    from collections import defaultdict
+    lineas_agrupadas = defaultdict(lambda: {'linea': None, 'can': 0})
+    
+    for linea in pedido.lineaspedido_set.all():
+        key = linea.idart
+        if lineas_agrupadas[key]['linea'] is None:
+            lineas_agrupadas[key]['linea'] = linea
+        lineas_agrupadas[key]['can'] += 1
     
     receptores = {}
-    for l in lineas:
-        tecla = Teclas.objects.filter(id=int(l['idart'])).first()
-        if not tecla:
-            print("Tecla no encontrada para idart:", l['idart'])
+    for data in lineas_agrupadas.values():
+        linea = data['linea']
+        can = data['can']
+        
+        if not linea.tecla or not linea.tecla.familia or not linea.tecla.familia.receptor:
+            print("Tecla no encontrada para idart:", linea.idart)
             continue
-        receptor = tecla.familia.receptor
-        if receptor.nombre not in receptores:
-            receptores[receptor.nombre] = {
+        
+        receptor = linea.tecla.familia.receptor
+        receptor_nombre = receptor.nombre
+            
+        if receptor_nombre not in receptores:
+            receptores[receptor_nombre] = {
                 "op": "pedido",
                 "hora": pedido.hora,
                 "receptor": receptor.nomimp,
-                "nom_receptor": receptor.nombre,
+                "nom_receptor": receptor_nombre,
                 "receptor_activo": receptor.activo,
                 "camarero": camareo.nombre + " " + camareo.apellidos,
                 "mesa": mesa.nombre,
                 "lineas": []
             }
+        
+        receptores[receptor_nombre]['lineas'].append({
+            "idart": linea.idart,
+            "descripcion": linea.descripcion,
+            "estado": linea.estado,
+            "pedido_id": linea.pedido_id,
+            "can": can
+        })
     
-        receptores[receptor.nombre]['lineas'].append(l)
-
     send_mensaje_impresora(receptores)
 
 def send_imprimir_ticket(request, id, es_factura=False):

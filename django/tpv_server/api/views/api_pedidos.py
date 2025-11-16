@@ -8,71 +8,21 @@
 from django.db.models import Count, Q
 from comunicacion.tools import comunicar_cambios_devices
 from tokenapi.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from api.decorators.uid_activo import verificar_uid_activo
 
 from gestion.models.mesasabiertas import Mesasabiertas
 from gestion.models.camareros import Camareros
 from gestion.models.familias import Receptores
 from gestion.models.pedidos import Pedidos, Lineaspedido, Servidos
 
-
+from api.tools.smart_receptor import notificar_lineas_servidas
 from api.tools import is_float
 import json
 
 
-def find(id, lineas):
-    for l in lineas:
-        if is_float(l["ID"]) and int(l["ID"]) == int(id):
-            lineas.remove(l)
-            return l
-        
-    return None
-
-@csrf_exempt
-def  get_pendientes(request):
-    if "idz" in request.POST:
-        idz = request.POST["idz"]
-        mesas = Mesasabiertas.objects.filter(mesa__mesaszona__zona__pk=idz).distinct()
-    else:
-        mesas = Mesasabiertas.objects.filter()
-
-        
-    lineas = json.loads(request.POST["lineas"]) if "lineas" in request.POST else json.loads(request.POST["reg"])
-    
-    result = []
-    lineas_server = []
-    
-    for m in mesas:
-        lineas_server = [*lineas_server, *m.get_lineaspedido()]
-
-    
-    for l in lineas_server:
-        linea = find(l["ID"], lineas)
-        if linea:
-            if not Lineaspedido.is_equals(l, linea):
-                result.append({'op':'md', 'tb':"lineaspedido", 'obj': l})
-        else:
-            result.append({'op':'insert', 'tb':"lineaspedido", 'obj': l})
-
-
-   
-    #Las linesa que no esten en el servidor o esten cobradas se borran.      
-    for l in lineas:
-        result.append({'op':'rm', 'tb':"lineaspedido", 'obj': {"ID":l["ID"]}})  
-
-   
-    return JsonResponse(result)
-
-
-
-@csrf_exempt
-def  comparar_lineaspedido(request):
-    return get_pendientes(request)
-
-
-@csrf_exempt # CUIDADO: Revisa si realmente necesitas desactivar la protección CSRF.
+@verificar_uid_activo
 def servido(request):
-    # --- 1. Preparación de datos (Igual que antes) ---
+    # --- 1. Preparación de datos ---
     try:
         articles_data = json.loads(request.POST["art"])
         if not isinstance(articles_data, list):
@@ -80,7 +30,7 @@ def servido(request):
     except (json.JSONDecodeError, KeyError):
         return JsonResponse({"error": "Datos de artículo inválidos o faltantes."}, status=400)
 
-    # --- 2. Consulta Única y Eficiente a la BD (Mantenemos esta gran mejora) ---
+    # --- 2. Consulta Única y Eficiente a la BD ---
     query = Q()
     for art in articles_data:
         if "IDArt" in art and "IDPedido" in art:
@@ -89,89 +39,175 @@ def servido(request):
     if not query:
         return JsonResponse({})
         
-    # Usamos prefetch_related para cargar los datos que 'serialize' pueda necesitar
     lineas_a_servir = Lineaspedido.objects.filter(query)
 
     # --- 3. Procesamiento y Guardado ---
-    # La comunicación "md" se delega completamente al método .save() del modelo.
-    # La vista solo se preocupa de la comunicación "rm".
-    
-    result_rm = [] # Solo necesitamos esta lista
+    result_rm = []
 
-    # Este bucle es AHORA NECESARIO para que se ejecute el .save() de cada objeto Servidos
     for linea in lineas_a_servir:
-        # Al crear y guardar, el método .save() del modelo Servidos se ejecuta automáticamente
-        # y se encarga de la comunicación "md". No necesitamos hacer nada más para eso.
+        # Crear registro de servido (el modelo se encarga de comunicación "md")
         Servidos.objects.create(linea=linea)
         
-        # Ahora, gestionamos el único caso que el modelo no cubre: la comunicación "rm"
-        obj = linea.serialize()
-        if not obj:
-            result_rm.append({"ID": linea.pk})
+        # Gestionar comunicación "rm" si es necesario
+        result_rm.append({"ID": linea.pk})
 
-    # --- 4. Comunicación Final (Solo lo que no hace el modelo) ---
-    # Comunicamos los cambios 'rm' al final, en un solo lote.
+    # --- 4. Comunicación Final ---
+    # Notificar a smart receptors (pasamos las líneas directamente, sin consultar BD de nuevo)
+    if lineas_a_servir:
+        notificar_lineas_servidas(lineas_a_servir)
+    
+    # Comunicar cambios 'rm' a devices
     if result_rm:
         comunicar_cambios_devices("rm", "lineaspedido", result_rm)
     
     return JsonResponse({"status": "ok", "message": "Operación completada."})
 
-@csrf_exempt
+@verificar_uid_activo
 def get_pedidos_by_receptor(request):
-    rec = json.loads(request.POST["receptores"])
-    result = []
-    for r in rec:
-        partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=int(r)) & (Q(estado='P') | 
-                                              Q(estado="R") | Q(estado="M"))).order_by("-pedido_id")
-        lineas = partial.values("pedido").distinct()
-        for l in lineas:
-            p = Pedidos.objects.get(pk=l["pedido"])
-            infmesa = p.infmesa
-            camarero = Camareros.objects.get(pk=p.camarero_id)
-            mesa_abierta = infmesa.mesasabiertas_set.first()
-            if mesa_abierta:
-                mesa = mesa_abierta.mesa
-                result.append({
-                "hora": infmesa.hora,
-                "camarero": camarero.nombre+" "+camarero.apellidos,
-                "mesa": mesa.nombre,
-                "id": p.pk,
-                "idReceptor": r
-                })
-
-
-    return JsonResponse(result)
-
-
-@csrf_exempt
-def recuperar_pedido(request):
-    p = json.loads(request.POST["pedido"])
-    partial = Lineaspedido.objects.filter(Q(tecla__familia__receptor_id=p["idReceptor"])  &
-                                          Q(pedido_id=p["id"]) &
-                                          (Q(estado='P') | Q(estado="R") | Q(estado="M")))
-    lineas = partial.values("idart",
-                            "descripcion",
-                            "estado",
-                            "pedido_id").annotate(can=Count('idart'))
-    receptor = Receptores.objects.get(pk=p["idReceptor"])
+    """
+    Recibe lista de pedidos con sus líneas del cliente y sincroniza con el servidor.
+    Formato: {"receptor": "nombre_receptor", "pedidos": [{"pedido_id": 789, "lineas": [1234, 1235]}]}
+    """
+    receptor_nombre = request.POST.get("receptor")
+    pedidos_cliente = json.loads(request.POST.get("pedidos_locales", "[]"))
+   
     
-    pedido = Pedidos.objects.get(pk=p["id"])
-    mesa = pedido.infmesa.mesasabiertas_set.first().mesa
-
-    camarero = Camareros.objects.get(pk=pedido.camarero_id)
-    result = {
-        "op": "pedido",
-        "hora": pedido.hora,
-        "receptor": receptor.nomimp,
-        "nom_receptor": receptor.nombre,
-        "receptor_activo": receptor.activo,
-        "camarero": camarero.nombre + " " + camarero.apellidos,
-        "mesa": mesa.nombre,
-        "lineas": []
+    # Obtener UIDs de mesas abiertas
+    mesas_abiertas = Mesasabiertas.objects.select_related('infmesa')
+    mesas_abiertas_uids = set(ma.infmesa.id for ma in mesas_abiertas)
+    print(f"Mesas abiertas UIDs: {mesas_abiertas_uids}")
+    
+    # Obtener todas las líneas del servidor para este receptor en mesas abiertas
+    lineas_servidor = Lineaspedido.objects.filter(
+        Q(tecla__familia__receptor__nomimp=receptor_nombre) & 
+        Q(infmesa__id__in=mesas_abiertas_uids) &
+        (Q(estado='P') | Q(estado='R') | Q(estado='M'))
+    ).select_related(
+        'pedido__infmesa',
+        'tecla__familia__receptor'
+    ).prefetch_related(
+        'pedido__infmesa__mesasabiertas_set__mesa',
+        'servidos_set'
+    )
+    
+    print(f"Líneas encontradas en servidor: {lineas_servidor.count()}")
+    if lineas_servidor.count() > 0:
+        print(f"Primera línea - Receptor nomimp: {lineas_servidor.first().tecla.familia.receptor.nomimp if lineas_servidor.first().tecla else 'Sin tecla'}")
+    
+    # IDs de líneas y pedidos que el cliente tiene (ignorar duplicados)
+    lineas_cliente_ids = set()
+    pedidos_cliente_ids = set()
+    for p in pedidos_cliente:
+        pedidos_cliente_ids.add(p["pedido_id"])
+        lineas_cliente_ids.update(p["lineas"])
+    
+    print(f"Pedidos únicos del cliente: {pedidos_cliente_ids}")
+    print(f"Total líneas únicas del cliente: {len(lineas_cliente_ids)}")
+    
+    # Lista de IDs a eliminar en el cliente
+    rm_ids = []
+    
+    # Si el cliente tiene líneas, verificarlas
+    if lineas_cliente_ids:
+        lineas_a_verificar = Lineaspedido.objects.filter(
+            id__in=lineas_cliente_ids
+        ).select_related('pedido__infmesa')
+        
+        for linea in lineas_a_verificar:
+            # Eliminar si está cobrada o anulada
+            if linea.estado in ['C', 'A']:
+                rm_ids.append(linea.id)
+                continue
+            
+            # Eliminar si es regalo pero la mesa no está abierta
+            if linea.estado == 'R':
+                if linea.pedido.infmesa.id not in mesas_abiertas_uids:
+                    rm_ids.append(linea.id)
+    
+    # Organizar líneas del servidor por pedido
+    pedidos_servidor = {}
+    for linea in lineas_servidor:
+        pedido_id = linea.pedido_id
+        
+        # Verificar si está servido
+        servido = linea.servidos_set.exists()
+        
+        # Si el cliente ya tiene este pedido, solo enviar líneas nuevas
+        if pedido_id in pedidos_cliente_ids:
+            # Solo agregar líneas que el cliente NO tiene
+            if linea.id not in lineas_cliente_ids:
+                if pedido_id not in pedidos_servidor:
+                    pedido = linea.pedido
+                    camarero = Camareros.objects.get(pk=pedido.camarero_id)
+                    mesa_abierta = pedido.infmesa.mesasabiertas_set.first()
+                    
+                    if not mesa_abierta:
+                        continue
+                    
+                    receptor = linea.tecla.familia.receptor
+                    
+                    pedidos_servidor[pedido_id] = {
+                        "op": "pedido",
+                        "hora": pedido.hora,
+                        "receptor": receptor.nomimp,
+                        "nom_receptor": receptor.nombre,
+                        "receptor_activo": receptor.activo,
+                        "camarero": camarero.nombre + " " + camarero.apellidos,
+                        "mesa": mesa_abierta.mesa.nombre,
+                        "pedido_id": pedido_id,
+                        "lineas": []
+                    }
+                
+                pedidos_servidor[pedido_id]["lineas"].append({
+                    "id": linea.id,
+                    "idart": linea.idart,
+                    "descripcion": linea.descripcion,
+                    "estado": linea.estado,
+                    "pedido_id": linea.pedido_id,
+                    "servido": servido
+                })
+        else:
+            # Pedido completo nuevo para el cliente
+            if pedido_id not in pedidos_servidor:
+                pedido = linea.pedido
+                camarero = Camareros.objects.get(pk=pedido.camarero_id)
+                mesa_abierta = pedido.infmesa.mesasabiertas_set.first()
+                
+                if not mesa_abierta:
+                    continue
+                
+                receptor = linea.tecla.familia.receptor
+                
+                pedidos_servidor[pedido_id] = {
+                    "op": "pedido",
+                    "hora": pedido.hora,
+                    "receptor": receptor.nomimp,
+                    "nom_receptor": receptor.nombre,
+                    "receptor_activo": receptor.activo,
+                    "camarero": camarero.nombre + " " + camarero.apellidos,
+                    "mesa": mesa_abierta.mesa.nombre,
+                    "pedido_id": pedido_id,
+                    "lineas": []
+                }
+            
+            # Agregar línea al pedido
+            pedidos_servidor[pedido_id]["lineas"].append({
+                "id": linea.id,
+                "idart": linea.idart,
+                "descripcion": linea.descripcion,
+                "estado": linea.estado,
+                "pedido_id": linea.pedido_id,
+                "servido": servido
+            })
+    
+    resultado = {
+        "pedidos": list(pedidos_servidor.values()),
+        "rm": rm_ids
     }
+    
+    print(f"Respuesta: {len(resultado['pedidos'])} pedidos, {len(resultado['rm'])} líneas a eliminar")
+    print(f"=== Fin get_pedidos_by_receptor ===\n")
+    
+    return JsonResponse(resultado)
 
-    for l in lineas:
-        result["lineas"].append(l)
-
-    return JsonResponse(result)
 

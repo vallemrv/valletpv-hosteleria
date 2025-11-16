@@ -23,11 +23,13 @@ Including another URLconf
 """
 from django.urls import  include, path, re_path
 from django.views.generic.base import RedirectView
+from gestion import views as gestion_views
 
 
 
 urlpatterns = [
     path('api/', include('api.urls'), name="api"),
     path('token/', include('tokenapi.urls')),
+    path('app/facturas/<int:ticket_id>/<str:uid>', gestion_views.factura_view, name='factura_view'),
     re_path(r'^.*$', RedirectView.as_view(url="https://www.valletpv.es"))
 ]

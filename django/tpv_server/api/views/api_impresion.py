@@ -6,6 +6,7 @@
 # @License: Apache License v2.0
 
 from api.tools import send_imprimir_ticket
+from api.tools.smart_receptor import enviar_urgente_smart_receptor
 from tokenapi.http import  JsonResponse
 from comunicacion.tools import (comunicar_cambios_devices, 
                                 send_mensaje_impresora)
@@ -79,7 +80,12 @@ def reenviarpedido(request):
                                             "descripcion",
                                             "estado",
                                             "pedido_id").annotate(can=Count('idart'))
-    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
+    
+    # Notificar a impresoras tradicionales y smart receptors
+    send_urgente(lineas, pedido.hora, camarero, mesa_a)
+    enviar_urgente_smart_receptor(pedido_id=idp)
+    
+    return HttpResponse("success")
 
 @verificar_uid_activo
 def reenviarlinea(request):
@@ -93,7 +99,15 @@ def reenviarlinea(request):
                                             "descripcion",
                                             "estado",
                                             "pedido_id").annotate(can=Count('idart'))
-    return send_urgente(lineas, pedido.hora, camarero, mesa_a)
+    
+    # Obtener IDs de las líneas para smart receptors
+    linea_ids = list(pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values_list('id', flat=True))
+    
+    # Notificar a impresoras tradicionales y smart receptors
+    send_urgente(lineas, pedido.hora, camarero, mesa_a)
+    enviar_urgente_smart_receptor(linea_ids=linea_ids)
+    
+    return HttpResponse("success")
 
 @verificar_uid_activo
 def abrircajon(request):
