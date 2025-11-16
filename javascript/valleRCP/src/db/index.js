@@ -51,7 +51,6 @@ class PedidosDB {
           console.error('Error en conexión IndexedDB:', event.target.error)
         }
         
-        console.log('IndexedDB inicializada correctamente')
         resolve(this.db)
       }
 
@@ -70,8 +69,6 @@ class PedidosDB {
           pedidosStore.createIndex('pedido_id', 'pedido_id', { unique: false })
           pedidosStore.createIndex('timestamp', 'timestamp', { unique: false })
           pedidosStore.createIndex('estado', 'estado', { unique: false })
-
-          console.log('Object store "pedidos" creado con índices')
         }
       }
       
@@ -88,7 +85,6 @@ class PedidosDB {
     if (this.db) {
       this.db.close()
       this.db = null
-      console.log('Conexión IndexedDB cerrada')
     }
   }
 
@@ -119,7 +115,6 @@ class PedidosDB {
       const request = store.add(pedidoConTimestamp)
 
       request.onsuccess = () => {
-        console.log('Pedido guardado en IndexedDB:', request.result)
         resolve(request.result)
       }
 
@@ -211,7 +206,6 @@ class PedidosDB {
           const updateRequest = store.put(pedido)
 
           updateRequest.onsuccess = () => {
-            console.log('Estado del pedido actualizado:', id, nuevoEstado)
             resolve(updateRequest.result)
           }
 
@@ -250,7 +244,6 @@ class PedidosDB {
       const updateRequest = store.put(pedidoConId)
 
       updateRequest.onsuccess = () => {
-        console.log('Pedido actualizado completamente:', id)
         resolve(updateRequest.result)
       }
 
@@ -281,7 +274,6 @@ class PedidosDB {
             const updateRequest = store.put(pedido)
 
             updateRequest.onsuccess = () => {
-              console.log('Estado de línea actualizado:', lineaId, nuevoEstado)
               resolve(updateRequest.result)
             }
 
@@ -312,7 +304,6 @@ class PedidosDB {
       const request = store.delete(id)
 
       request.onsuccess = () => {
-        console.log('Pedido eliminado:', id)
         resolve()
       }
 
@@ -343,7 +334,6 @@ class PedidosDB {
           eliminados++
           cursor.continue()
         } else {
-          console.log(`Pedidos antiguos eliminados: ${eliminados}`)
           resolve(eliminados)
         }
       }

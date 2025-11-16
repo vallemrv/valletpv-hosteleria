@@ -151,7 +151,6 @@ const recuperarPedido = async (pedido) => {
   
   if (idsLineas.length > 0) {
     await store.desmarcarServido(idsLineas)
-    console.log('Pedido recuperado:', pedido.mesa || pedido.pedido_id)
   }
 }
 

@@ -78,25 +78,21 @@ export default class VWebsocket {
         
         if (this.customSocket) this.disconnect();
         
-        console.log(`Conectando WebSocket: ${this.socketUrl}`);
         this.customSocket = new WebSocket(this.socketUrl);
 
         this.customSocket.onopen = async (event) => {
-            console.log(`WebSocket conectado exitosamente: ${this.receptor.nomimp}`);
             this.reconnectTimer.reset();
             this.store.onConnect();
             
             // Sincronizar pedidos al conectar
             try {
                 const result = await this.store.sincronizarPedidos(this.receptor.nomimp);
-                console.log(`Sincronización completada para ${this.receptor.nomimp}:`, result);
             } catch (error) {
                 console.error('Error en sincronización inicial:', error);
             }
         };
 
         this.customSocket.onclose = (event) => {
-            console.log(`WebSocket cerrado para receptor: ${this.receptor.nomimp}, código: ${event.code}`);
             this.store.onDisconnect();
             if (event.code !== 1000) {
                 this.reconnectTimer.scheduleTimeout();
@@ -119,7 +115,7 @@ export default class VWebsocket {
                     ? JSON.parse(data.message) 
                     : data.message || data;
                 
-                console.log('Mensaje WebSocket recibido:', mensaje);
+                console.log('📨 WebSocket mensaje recibido:', mensaje);
                 
                 // Verificar que el mensaje sea para este receptor
                 const esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp || 
@@ -170,14 +166,12 @@ export default class VWebsocket {
         if (this.customSocket) {
             this.customSocket.onclose = function(){};
             this.customSocket.close();
-            console.log(`WebSocket desconectado para receptor: ${this.receptor.nomimp}`);
         }
         // Eliminar del registro al desconectar
         delete VWebsocket.activeSockets[this.receptor.nomimp];
     }
 
     static disconnectAll() {
-        console.log("Desconectando todos los WebSockets...");
         for (const receptor in VWebsocket.activeSockets) {
             VWebsocket.activeSockets[receptor].disconnect();
         }

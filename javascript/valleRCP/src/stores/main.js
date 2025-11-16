@@ -203,8 +203,6 @@ export const useMainStore = defineStore('main', {
     // Vista principal: Agrupar por pedido > artículos (ordenados por pedido_id)
     // Muestra: pedidos urgentes (aunque estén servidos) + pedidos con líneas pendientes
     vistaPrincipal: (state) => (receptor = null) => {
-      console.log('Vista Principal - Total pedidos en memoria:', state.pedidosEnMemoria.length)
-      
       let pedidosActivos = state.pedidosEnMemoria.filter(p => {
         if (p.estado !== 'activo') return false
         
@@ -220,8 +218,6 @@ export const useMainStore = defineStore('main', {
         
         return false
       })
-      
-      console.log('Vista Principal - Pedidos filtrados (activos/urgentes/pendientes):', pedidosActivos.length)
       
       // Filtrar por receptor si se especifica
       if (receptor) {
@@ -301,16 +297,6 @@ export const useMainStore = defineStore('main', {
         )
       }
       
-      console.log('📊 Pedidos servidos filtrados:', pedidosServidos.length)
-      if (pedidosServidos.length > 0) {
-        console.log('Ejemplo de pedido servido:', {
-          pedido_id: pedidosServidos[0].pedido_id,
-          mesa: pedidosServidos[0].mesa,
-          camarero: pedidosServidos[0].camarero,
-          lineas: pedidosServidos[0].lineas?.length
-        })
-      }
-      
       // Primero, agrupar líneas por pedido_id (en caso de que haya múltiples registros)
       const pedidosConsolidados = {}
       
@@ -340,16 +326,12 @@ export const useMainStore = defineStore('main', {
         }
       })
       
-      console.log('📦 Pedidos consolidados:', Object.keys(pedidosConsolidados).length)
-      
       // Ahora agrupar por camarero
       const camareros = {}
       
       Object.values(pedidosConsolidados).forEach(pedido => {
         // Buscar el nombre del camarero en diferentes campos posibles
         const nombreCamarero = pedido.camarero || pedido.nom_camarero || pedido.usuario || pedido.vendedor || pedido.camarero_nombre || 'Sin camarero'
-        
-        // console.log('🧑‍💼 Camarero detectado:', nombreCamarero)
         
         if (!camareros[nombreCamarero]) {
           camareros[nombreCamarero] = {
@@ -405,8 +387,6 @@ export const useMainStore = defineStore('main', {
           return idA - idB
         })
       })
-      
-      console.log('👥 Camareros agrupados:', result.map(c => `${c.camarero} (${c.pedidosArray.length} pedidos)`))
       
       return result
     },
@@ -589,14 +569,12 @@ export const useMainStore = defineStore('main', {
 
     // Métodos para WebSocket
     onConnect() {
-      console.log('WebSocket conectado')
       this.setWsConnected(true)
       // Resetear reconexión cuando se conecta exitosamente
       this.resetReconnection()
     },
 
     onDisconnect() {
-      console.log('WebSocket desconectado')
       this.setWsConnected(false)
       // NO activar reconexión automática para WebSocket
       // Los WebSockets tienen su propio sistema de reconexión
@@ -610,7 +588,6 @@ export const useMainStore = defineStore('main', {
         await pedidosDB.init()
         await this.cargarTodosLosPedidos()
         this.dbInitialized = true
-        console.log('Base de datos inicializada y pedidos cargados en memoria')
       } catch (error) {
         console.error('Error al inicializar DB:', error)
         throw error
@@ -622,7 +599,6 @@ export const useMainStore = defineStore('main', {
       try {
         const pedidos = await pedidosDB.obtenerTodos()
         this.pedidosEnMemoria = pedidos
-        console.log(`${pedidos.length} pedidos cargados en memoria`)
         
         // Actualizar items con pedidos activos para compatibilidad
         this.items = pedidos.filter(p => p.estado === 'activo')
@@ -633,121 +609,85 @@ export const useMainStore = defineStore('main', {
     },
 
     async recepcionPedido(pedido) {
-      console.log('📥 recepcionPedido - Pedido recibido:', {
+      console.log('📥 STORE: Procesando pedido recibido:', {
         pedido_id: pedido.pedido_id,
         mesa: pedido.mesa,
-        receptor: pedido.receptor,
-        nom_receptor: pedido.nom_receptor,
-        camarero: pedido.camarero,
-        nom_camarero: pedido.nom_camarero,
-        usuario: pedido.usuario,
-        vendedor: pedido.vendedor,
-        lineas: pedido.lineas?.length,
-        op: pedido.op
-      })
-      
-      if (!pedido) return
-      
-      try {
-        // Verificar si el pedido ya existe por pedido_id
-        const pedidoExistente = this.pedidosEnMemoria.find(p => 
-          p.pedido_id === pedido.pedido_id
-        )
-        
-        console.log('🔍 Pedido existente:', pedidoExistente ? `ID ${pedidoExistente.id}` : 'NO')
-        
-        if (pedidoExistente) {
-          console.log('Pedido duplicado detectado, actualizando:', pedido.pedido_id)
+        receptor: pedido.receptor || pedido.nom_receptor,
+        lineas: pedido.lineas?.length
+      });
+
+      // LOG COMPLETO DEL PEDIDO RECIBIDO
+      console.log('🔍 DATOS COMPLETOS DEL PEDIDO:', JSON.stringify(pedido, null, 2));
+
+      // NORMALIZAR EL PEDIDO ANTES DE PROCESARLO
+      const pedidoNormalizado = {
+        ...pedido,
+        estado: 'activo', // Asegurar que el pedido tenga estado activo
+        timestamp: Date.now(), // Añadir timestamp
+        lineas: pedido.lineas.map(linea => ({
+          ...linea,
+          servido: linea.servido || false,
+          urgente: linea.urgente || false,
+        }))
+      }
+
+      console.log('🔧 PEDIDO DESPUÉS DE NORMALIZAR:', JSON.stringify(pedidoNormalizado, null, 2));
+
+      // Comprobar si el pedido ya existe en memoria
+      const pedidoExistente = this.pedidosEnMemoria.find(p => p.pedido_id === pedidoNormalizado.pedido_id)
+
+      if (!pedidoExistente) {
+        try {
+          const idGuardado = await pedidosDB.guardarPedido(toRaw(pedidoNormalizado))
+          const pedidoConId = { ...pedidoNormalizado, id: idGuardado }
           
-          // Verificar líneas nuevas (que no existan ya)
-          const lineasExistentesIds = new Set(pedidoExistente.lineas?.map(l => l.id) || [])
-          const lineasNuevas = pedido.lineas?.filter(l => !lineasExistentesIds.has(l.id)) || []
+          this.pedidosEnMemoria.push(pedidoConId)
           
-          if (lineasNuevas.length > 0) {
-            console.log(`${lineasNuevas.length} líneas nuevas encontradas`)
-            
-            // Inicializar estado de las líneas nuevas
-            lineasNuevas.forEach(linea => {
-              if (linea.servido === undefined) {
-                linea.servido = false
-              }
-              if (linea.urgente === undefined) {
-                linea.urgente = false
-              }
+          // Actualizar items para UI (pedidos activos)
+          this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
+          
+          // LOG DEL FILTRO
+          console.log('🔍 FILTRO DE ESTADOS:', this.pedidosEnMemoria.map(p => ({
+            id: p.id,
+            estado: p.estado,
+            mesa: p.mesa,
+            activo: p.estado === 'activo'
+          })));
+          
+          // Forzar reactividad recreando el array
+          this.pedidosEnMemoria = [...this.pedidosEnMemoria]
+          
+          console.log('✅ STORE: Pedido guardado y UI actualizada:', {
+            id: idGuardado,
+            pedido_id: pedidoConId.pedido_id,
+            total_pedidos: this.pedidosEnMemoria.length,
+            items_activos: this.items.length
+          });
+
+          // LOG DETALLADO DEL PEDIDO GUARDADO
+          console.log('💾 PEDIDO FINAL GUARDADO:', JSON.stringify(pedidoConId, null, 2));
+          
+          // LOG DE ITEMS ACTIVOS
+          console.log('📋 ITEMS ACTIVOS DESPUÉS DEL FILTRO:', this.items.map(p => ({
+            id: p.id,
+            pedido_id: p.pedido_id,
+            estado: p.estado,
+            mesa: p.mesa
+          })));
+          
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`Nuevo pedido: Mesa ${pedidoConId.mesa}`, {
+              body: `${pedidoConId.lineas?.length || 0} línea(s) - ${pedidoConId.nom_receptor || pedidoConId.receptor}`,
+              icon: '/img/icons/android-chrome-192x192.png',
+              tag: `pedido-${pedidoConId.pedido_id || Date.now()}`
             })
-            
-            // Agregar solo las líneas nuevas
-            pedidoExistente.lineas = [...(pedidoExistente.lineas || []), ...lineasNuevas]
-            
-            // Actualizar en IndexedDB
-            await pedidosDB.actualizarPedido(pedidoExistente.id, toRaw(pedidoExistente))
-            
-            // Mostrar notificación solo de líneas nuevas
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification(`Pedido actualizado: ${pedido.mesa || 'Sin mesa'}`, {
-                body: `${lineasNuevas.length} línea(s) nueva(s) - ${pedido.nom_receptor || pedido.receptor}`,
-                icon: '/img/icons/android-chrome-192x192.png',
-                tag: `pedido-update-${pedido.pedido_id}`
-              })
-            }
-          } else {
-            console.log('No hay líneas nuevas, pedido ya está actualizado')
           }
-          
-          return // Salir, no crear pedido duplicado
+        } catch (error) {
+          console.error('Error al guardar el pedido:', error)
         }
-        
-        // Es un pedido nuevo, inicializar estado de líneas
-        if (pedido.lineas) {
-          pedido.lineas.forEach(linea => {
-            // Inicializar servido y urgente si no están definidos
-            if (linea.servido === undefined) {
-              linea.servido = false
-            }
-            if (linea.urgente === undefined) {
-              linea.urgente = false
-            }
-          })
-        }
-        
-        // Inicializar urgente del pedido si no está definido
-        if (pedido.urgente === undefined) {
-          pedido.urgente = false
-        }
-        
-        // Guardarlo
-        const idGuardado = await pedidosDB.guardarPedido(toRaw(pedido))
-        
-        // Agregar a memoria con el ID generado - forzar reactividad con reasignación
-        const pedidoConId = { ...pedido, id: idGuardado }
-        this.pedidosEnMemoria = [...this.pedidosEnMemoria, pedidoConId]
-        
-        // Actualizar items (pedidos activos) - forzar reactividad con reasignación
-        if (pedidoConId.estado === 'activo') {
-          this.items = [...this.items, pedidoConId]
-        }
-        
-        console.log('✅ Pedido nuevo guardado en IndexedDB y memoria:', {
-          id_guardado: idGuardado,
-          pedido_id: pedido.pedido_id,
-          receptor: pedido.receptor,
-          nom_receptor: pedido.nom_receptor,
-          lineas: pedido.lineas?.length,
-          todasPendientes: pedido.lineas?.every(l => !l.servido),
-          totalEnMemoria: this.pedidosEnMemoria.length,
-          totalItems: this.items.length
-        })
-        
-        // Mostrar notificación
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification(`Nuevo pedido: ${pedido.mesa || 'Sin mesa'}`, {
-            body: `${pedido.lineas?.length || 0} línea(s) - ${pedido.nom_receptor || pedido.receptor}`,
-            icon: '/img/icons/android-chrome-192x192.png',
-            tag: `pedido-${pedido.pedido_id || Date.now()}`
-          })
-        }
-      } catch (error) {
-        console.error('Error al procesar pedido recibido:', error)
+      } else {
+        // Lógica para actualizar pedidos existentes
+        // (Aquí se podría implementar la lógica de actualización si fuera necesario)
       }
     },
 
@@ -766,8 +706,6 @@ export const useMainStore = defineStore('main', {
         
         // Remover de items (solo pedidos activos)
         this.items = this.items.filter(p => p.id !== pedidoId)
-        
-        console.log('Pedido completado:', pedidoId)
       } catch (error) {
         console.error('Error al completar pedido:', error)
         throw error
@@ -786,8 +724,6 @@ export const useMainStore = defineStore('main', {
         }
         
         this.items = this.items.filter(p => p.id !== pedidoId)
-        
-        console.log('Pedido cancelado:', pedidoId)
       } catch (error) {
         console.error('Error al cancelar pedido:', error)
         throw error
@@ -808,8 +744,6 @@ export const useMainStore = defineStore('main', {
             linea.estado = nuevoEstado
           }
         }
-        
-        console.log(`Línea ${lineaId} actualizada a estado: ${nuevoEstado}`)
       } catch (error) {
         console.error('Error al actualizar estado de línea:', error)
         throw error
@@ -819,7 +753,6 @@ export const useMainStore = defineStore('main', {
     // Marcar líneas como servidas
     async servirLineas(idsLineas) {
       try {
-        console.log('Marcando líneas como servidas:', idsLineas)
         
         let lineasActualizadas = 0
         
@@ -853,7 +786,6 @@ export const useMainStore = defineStore('main', {
         // Forzar reactividad recreando el array
         this.pedidosEnMemoria = [...this.pedidosEnMemoria]
         
-        console.log(`${lineasActualizadas} líneas marcadas como servidas`)
         return lineasActualizadas
       } catch (error) {
         console.error('Error al marcar líneas como servidas:', error)
@@ -864,7 +796,6 @@ export const useMainStore = defineStore('main', {
     // Desmarcar líneas como servidas (para recuperar de la vista de servidos)
     async desmarcarServido(idsLineas) {
       try {
-        console.log('Desmarcando líneas como servidas:', idsLineas)
         
         let lineasDesmarcadas = 0
         
@@ -891,7 +822,6 @@ export const useMainStore = defineStore('main', {
         // Forzar reactividad recreando el array
         this.pedidosEnMemoria = [...this.pedidosEnMemoria]
         
-        console.log(`${lineasDesmarcadas} líneas desmarcadas como servidas`)
         return lineasDesmarcadas
       } catch (error) {
         console.error('Error al desmarcar servido:', error)
@@ -902,7 +832,7 @@ export const useMainStore = defineStore('main', {
     // Borrar líneas específicas (cobradas/borradas)
     async borrarLineas(idsLineas) {
       try {
-        console.log('Borrando líneas:', idsLineas)
+        console.log('🗑️ Borrando líneas:', idsLineas);
         
         let lineasBorradas = 0
         const pedidosVacios = []
@@ -931,20 +861,21 @@ export const useMainStore = defineStore('main', {
           }
         }
         
-        // Completar pedidos que se quedaron sin líneas
+        // Eliminar completamente pedidos que se quedaron sin líneas
         for (const pedidoId of pedidosVacios) {
-          await this.completarPedido(pedidoId)
-          console.log(`Pedido ${pedidoId} completado automáticamente (sin líneas)`)
+          await pedidosDB.eliminar(pedidoId)
+          console.log(`🗑️ Pedido ${pedidoId} eliminado completamente (sin líneas)`);
         }
         
-        // Forzar reactividad recreando el array
-        this.pedidosEnMemoria = [...this.pedidosEnMemoria]
+        // Eliminar pedidos vacíos de memoria
+        this.pedidosEnMemoria = this.pedidosEnMemoria.filter(p => !pedidosVacios.includes(p.id))
         
         // Actualizar items (pedidos activos para la UI)
         this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
         
-        console.log(`${lineasBorradas} líneas borradas, ${pedidosVacios.length} pedidos completados`)
-        return { lineasBorradas, pedidosCompletados: pedidosVacios.length }
+        console.log(`🗑️ ${lineasBorradas} líneas borradas, ${pedidosVacios.length} pedidos eliminados completamente`);
+        
+        return { lineasBorradas, pedidosEliminados: pedidosVacios.length }
       } catch (error) {
         console.error('Error al borrar líneas:', error)
         throw error
@@ -954,7 +885,6 @@ export const useMainStore = defineStore('main', {
     // Marcar líneas o pedido completo como urgente
     async marcarUrgente(idsLineas, pedidoId = null) {
       try {
-        console.log('Marcando como urgente - IDs:', idsLineas, 'Pedido:', pedidoId)
         
         let lineasMarcadas = 0
         let pedidosMarcados = 0
@@ -1004,8 +934,6 @@ export const useMainStore = defineStore('main', {
         // Actualizar items (pedidos activos para la UI)
         this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
         
-        console.log(`${lineasMarcadas} líneas marcadas como urgentes, ${pedidosMarcados} pedidos completos`)
-        
         // Mostrar notificación de urgencia
         if ('Notification' in window && Notification.permission === 'granted') {
           const pedidoUrgente = this.pedidosEnMemoria.find(p => 
@@ -1037,8 +965,6 @@ export const useMainStore = defineStore('main', {
         // Eliminar de memoria
         this.pedidosEnMemoria = this.pedidosEnMemoria.filter(p => p.id !== pedidoId)
         this.items = this.items.filter(p => p.id !== pedidoId)
-        
-        console.log('Pedido eliminado:', pedidoId)
       } catch (error) {
         console.error('Error al eliminar pedido:', error)
         throw error
@@ -1053,7 +979,6 @@ export const useMainStore = defineStore('main', {
         // Recargar todo en memoria
         await this.cargarTodosLosPedidos()
         
-        console.log(`${eliminados} pedidos antiguos eliminados`)
         return eliminados
       } catch (error) {
         console.error('Error al limpiar pedidos antiguos:', error)
@@ -1064,7 +989,12 @@ export const useMainStore = defineStore('main', {
     // Sincronizar pedidos con el servidor al conectar WebSocket
     async sincronizarPedidos(receptor) {
       try {
-        console.log('Sincronizando pedidos para receptor:', receptor)
+        
+        // Verificar que el receptor esté definido
+        if (!receptor) {
+          console.error('Error: receptor es undefined o null')
+          return { pedidos: 0, lineasEliminadas: 0 }
+        }
         
         // Obtener pedidos locales de este receptor
         const pedidosLocales = this.pedidosEnMemoria.filter(p => 
@@ -1079,15 +1009,13 @@ export const useMainStore = defineStore('main', {
           lineas: p.lineas?.map(l => l.id) || []
         }))
         
-        console.log('Pedidos locales encontrados:', pedidosLocales.length)
-        console.log('Pedidos a enviar al servidor:', pedidosParaEnviar)
+
         
         const response = await API.sincronizar_pedidos(receptor, pedidosParaEnviar)
         
         if (response) {
           // Procesar pedidos recibidos
           if (response.pedidos && Array.isArray(response.pedidos)) {
-            console.log(`${response.pedidos.length} pedidos recibidos del servidor`)
             
             for (const pedido of response.pedidos) {
               // Eliminar líneas duplicadas dentro del mismo pedido
@@ -1110,7 +1038,6 @@ export const useMainStore = defineStore('main', {
               // Asegurarse de que el pedido tenga el receptor correcto
               if (!pedido.receptor && !pedido.nom_receptor) {
                 pedido.receptor = receptor
-                console.log(`⚠️ Pedido sin receptor, asignado: ${receptor}`)
               }
               
               // Agregar el pedido (op: "pedido" indica que es nuevo o actualizado)
@@ -1122,16 +1049,11 @@ export const useMainStore = defineStore('main', {
           
           // Procesar líneas a eliminar (rm = IDs de líneas cobradas/borradas)
           if (response.rm && Array.isArray(response.rm)) {
-            console.log(`${response.rm.length} líneas marcadas para eliminar`)
             await this.borrarLineas(response.rm)
           }
           
           // Forzar actualización de items para que Vue reactive los cambios
           this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
-          
-          console.log('Sincronización completada')
-          console.log('Pedidos en memoria después de sincronizar:', this.pedidosEnMemoria.length)
-          console.log('Items activos después de sincronizar:', this.items.length)
           
           return { 
             pedidos: response.pedidos?.length || 0, 
@@ -1154,7 +1076,6 @@ export const useMainStore = defineStore('main', {
       const delays = [1000, 2000, 5000, 10000, 15000, 30000, 60000, 120000, 300000]
       const delay = delays[Math.min(this.reconnectAttempts, delays.length - 1)]
       
-      console.log(`Reintentando conexión en ${delay/1000}s (intento ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`)
       this.setReconnecting(true)
       
       this.reconnectTimer = setTimeout(() => {
@@ -1164,13 +1085,11 @@ export const useMainStore = defineStore('main', {
 
     async attemptReconnection() {
       if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-        console.log('Máximo número de intentos de reconexión alcanzado')
         this.setReconnecting(false)
         return
       }
 
       this.setReconnectAttempts(this.reconnectAttempts + 1)
-      console.log(`Intento de reconexión ${this.reconnectAttempts}/${this.maxReconnectAttempts}`)
 
       try {
         // SOLO intentar reconectar HTTP/API, NO WebSocket
@@ -1181,14 +1100,12 @@ export const useMainStore = defineStore('main', {
 
         // Si HTTP funciona, resetear contador y parar timer
         if (this.isHttpConnected) {
-          console.log('Reconexión HTTP exitosa')
           this.resetReconnection()
         } else {
           // Si falla, programar siguiente intento
           this.startReconnectionTimer()
         }
       } catch (error) {
-        console.log('Fallo en intento de reconexión:', error.message)
         this.startReconnectionTimer()
       }
     },
@@ -1200,13 +1117,11 @@ export const useMainStore = defineStore('main', {
       }
       this.setReconnectAttempts(0)
       this.setReconnecting(false)
-      console.log('Sistema de reconexión reseteado')
     },
 
     // Iniciar reconexión cuando se detecte pérdida de conexión
     handleConnectionLoss() {
       if (!this.isReconnecting && this.reconnectAttempts < this.maxReconnectAttempts) {
-        console.log('Pérdida de conexión detectada, iniciando reconexión automática')
         this.startReconnectionTimer()
       }
     }

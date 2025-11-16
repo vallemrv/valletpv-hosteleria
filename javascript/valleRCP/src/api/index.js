@@ -71,7 +71,6 @@ export default {
         if (response && response.uid) {
             // Guardar el UID en localStorage
             localStorage.deviceUID = response.uid
-            console.log('UID del dispositivo creado/recuperado:', response.uid)
             return response.uid
         }
         throw new Error('No se pudo obtener el UID del dispositivo')

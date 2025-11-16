@@ -222,12 +222,10 @@ export default {
         // Solo agregar si no está ya incluido (evitar duplicados)
         if (!receptores_sel.value.includes(r.ID)) {
           receptores_sel.value.push(r.ID);
-          console.log(`Receptor ${r.Nombre} (ID: ${r.ID}) seleccionado`);
         }
       } else {
         // Eliminar de la selección
         receptores_sel.value = receptores_sel.value.filter((e) => e != r.ID);
-        console.log(`Receptor ${r.Nombre} (ID: ${r.ID}) deseleccionado`);
 
         // Cerrar inmediatamente la conexión WebSocket de este receptor si existe
         try {
@@ -235,7 +233,6 @@ export default {
           if (idx !== -1) {
             ws.value[idx].disconnect();
             ws.value.splice(idx, 1);
-            console.log(`Conexión WebSocket parada para receptor: ${r.Nombre}`);
           }
         } catch (err) {
           console.warn(`No se pudo cerrar la conexión de ${r.Nombre}:`, err);
@@ -274,7 +271,6 @@ export default {
       
       try {
         // Paso 1: Verificar que el servidor esté disponible llamando a /api/health/
-        console.log('Verificando salud del servidor...');
         const healthCheck = await store.checkServerHealth(fullServerUrl);
         
         if (!healthCheck || !healthCheck.success) {
@@ -283,8 +279,6 @@ export default {
           return;
         }
         
-        console.log('Servidor disponible ✓');
-        
         // Guardar la configuración del servidor
         localStorage.server = fullServerUrl;
         localStorage.useHttps = useHttps.value.toString();
@@ -292,7 +286,6 @@ export default {
         localStorage.deviceAlias = deviceAlias.value;
         
         // Paso 2: Crear/obtener el UID del dispositivo con el alias
-        console.log('Creando UID del dispositivo con alias:', deviceAlias.value);
         const uid = await store.createDeviceUID(deviceAlias.value);
         
         if (!uid) {
@@ -300,8 +293,6 @@ export default {
           isConnecting.value = false;
           return;
         }
-        
-        console.log('UID del dispositivo creado/recuperado:', uid);
         
         // Paso 3: Obtener el listado de receptores (ya incluye el UID automáticamente)
         if (!receptores.value || receptores.value.length <= 0) {
@@ -312,10 +303,7 @@ export default {
         receptores_sel.value = [];
         localStorage.receptores = JSON.stringify(receptores_sel.value);
         
-        console.log('✓ Configuración completada exitosamente');
-        console.log('  - Empresa:', empresaNombre.value);
-        console.log('  - Dispositivo:', deviceAlias.value);
-        console.log('  - UID:', uid);
+
         
         // Cerrar el diálogo
         showDialog.value = false;
@@ -332,12 +320,8 @@ export default {
       // Evitar conectar si no hay receptores seleccionados
       const receptoresParaConectar = getReceptores();
       if (receptoresParaConectar.length === 0) {
-        console.log('No hay receptores seleccionados, no se establecen conexiones');
         return;
       }
-
-      console.log('Estableciendo conexiones WebSocket para', receptoresParaConectar.length, 'receptores:', 
-                  receptoresParaConectar.map(r => `${r.Nombre} (${r.nomimp})`));
       
       // Desconectar TODAS las conexiones existentes y limpiar timers
       VWebsocket.disconnectAll();
@@ -347,14 +331,11 @@ export default {
       receptoresParaConectar.forEach((r) => {
           // Usar la URL almacenada que ya incluye el protocolo
           const serverUrl = localStorage.server || serverUrl.value;
-          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/comunicacion/${r.nomimp}`);
           
           var ws_aux = new VWebsocket(serverUrl, r, store);
           ws.value.push(ws_aux);
           ws_aux.connect();
       });
-      
-      console.log(`Total conexiones WebSocket creadas: ${ws.value.length}`);
     };
     
     const abrirServidos = () => {
@@ -365,7 +346,6 @@ export default {
     watch(receptores, (v) => {
       // Solo conectar si hay receptores y al menos uno seleccionado
       if (v && v.length > 0 && receptores_sel.value.length > 0) {
-        console.log('Receptores actualizados, reconectando...');
         connect();
       }
     }, { deep: true });
@@ -375,7 +355,6 @@ export default {
       // Inicializar IndexedDB y cargar todo en memoria
       try {
         await store.inicializarDB();
-        console.log('Base de datos lista');
       } catch (error) {
         console.error('Error al inicializar base de datos:', error);
       }
@@ -385,7 +364,7 @@ export default {
         try {
           await Notification.requestPermission();
         } catch (error) {
-          console.log('No se pudieron habilitar las notificaciones:', error);
+          // Notificaciones no disponibles
         }
       }
       
@@ -394,7 +373,6 @@ export default {
         const registrations = await navigator.serviceWorker.getRegistrations()
         for (let registration of registrations) {
           if (registration.scope.includes('/app/')) {
-            console.log('Desregistrando service worker antiguo:', registration.scope)
             await registration.unregister()
           }
         }
@@ -427,7 +405,6 @@ export default {
             const storedReceptores = JSON.parse(localStorage.receptores);
             // Eliminar duplicados del localStorage
             receptores_sel.value = [...new Set(storedReceptores)];
-            console.log('Receptores cargados del localStorage:', receptores_sel.value);
           } catch (e) {
             console.error('Error parsing localStorage.receptores:', e);
             receptores_sel.value = [];
