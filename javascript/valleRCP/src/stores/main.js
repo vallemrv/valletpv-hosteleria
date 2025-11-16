@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { toRaw } from 'vue'
 import API from "@/api"
 import pedidosDB from "@/db"
+import audioMario from "@/assets/mario.mp3"
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -674,6 +675,9 @@ export const useMainStore = defineStore('main', {
             estado: p.estado,
             mesa: p.mesa
           })));
+
+          // Reproducir sonido para nuevo pedido
+          this.playNotificationSound();
           
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(`Nuevo pedido: Mesa ${pedidoConId.mesa}`, {
@@ -934,6 +938,11 @@ export const useMainStore = defineStore('main', {
         // Actualizar items (pedidos activos para la UI)
         this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
         
+        // Reproducir sonido para pedido urgente
+        if (lineasMarcadas > 0 || pedidosMarcados > 0) {
+          this.playNotificationSound();
+        }
+        
         // Mostrar notificación de urgencia
         if ('Notification' in window && Notification.permission === 'granted') {
           const pedidoUrgente = this.pedidosEnMemoria.find(p => 
@@ -1123,6 +1132,39 @@ export const useMainStore = defineStore('main', {
     handleConnectionLoss() {
       if (!this.isReconnecting && this.reconnectAttempts < this.maxReconnectAttempts) {
         this.startReconnectionTimer()
+      }
+    },
+
+    // Reproducir sonido de notificación
+    playNotificationSound() {
+      try {
+        // Buscar elemento de audio existente o crearlo
+        let audioElement = document.getElementById('notificationAudio');
+        
+        if (!audioElement) {
+          audioElement = document.createElement('audio');
+          audioElement.id = 'notificationAudio';
+          audioElement.preload = 'auto';
+          document.body.appendChild(audioElement);
+        }
+
+        // Establecer la fuente del audio (mario.mp3)
+        if (audioElement.src !== audioMario) {
+          audioElement.src = audioMario;
+        }
+
+        // Reproducir el audio
+        const playPromise = audioElement.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error('Error al reproducir sonido de notificación:', error);
+          });
+        }
+
+        console.log('🔊 Reproduciendo sonido de notificación');
+      } catch (error) {
+        console.error('Error en playNotificationSound:', error);
       }
     }
   }

@@ -51,9 +51,12 @@ export default class VWebsocket {
     static activeSockets = {}; // Registro de sockets activos
 
     constructor(server, receptor, store){
-        if (VWebsocket.activeSockets[receptor.nomimp]) {
-            console.warn(`Ya existe una conexión para el receptor: ${receptor.nomimp}. No se creará una nueva.`);
-            return VWebsocket.activeSockets[receptor.nomimp]; // Opcional: devolver la instancia existente
+        // Verificar si ya existe una conexión para este receptor
+        const existingSocket = VWebsocket.activeSockets[receptor.nomimp];
+        if (existingSocket) {
+            console.warn(`⚠️ Ya existe una conexión para el receptor: ${receptor.nomimp}. Cerrando la anterior.`);
+            existingSocket.disconnect();
+            delete VWebsocket.activeSockets[receptor.nomimp];
         }
 
         const wsProtocol = getWebSocketProtocol(server);
@@ -66,7 +69,8 @@ export default class VWebsocket {
             this.connect();
         }, this.reconnectAfterMs);
 
-        VWebsocket.activeSockets[receptor.nomimp] = this; // Registrar la nueva instancia
+        // Registrar la nueva instancia
+        VWebsocket.activeSockets[receptor.nomimp] = this;
     }
 
     reconnectAfterMs(tries){
@@ -114,8 +118,6 @@ export default class VWebsocket {
                 const mensaje = typeof data.message === 'string' 
                     ? JSON.parse(data.message) 
                     : data.message || data;
-                
-                console.log('📨 WebSocket mensaje recibido:', mensaje);
                 
                 // Verificar que el mensaje sea para este receptor
                 const esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp || 
@@ -172,8 +174,14 @@ export default class VWebsocket {
     }
 
     static disconnectAll() {
-        for (const receptor in VWebsocket.activeSockets) {
-            VWebsocket.activeSockets[receptor].disconnect();
+        const socketCount = Object.keys(VWebsocket.activeSockets).length;
+        if (socketCount > 0) {
+            console.log(`🔌 Desconectando ${socketCount} WebSockets activos`);
+            for (const receptor in VWebsocket.activeSockets) {
+                VWebsocket.activeSockets[receptor].disconnect();
+            }
         }
+        // Limpiar completamente el registro de sockets activos
+        VWebsocket.activeSockets = {};
     }
 }

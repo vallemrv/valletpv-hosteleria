@@ -60,21 +60,58 @@ class Cuenta : ActivityBase() {
     private val handlerHttp = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             val op = msg.data.getString("op")
-            val res = msg.data.getString("RESPONSE")
+            val res = msg.data.getString("RESPONSE") ?: return
+
             if (op == "actualizar") {
                 try {
-                    val datos = JSONObject(res.toString())
-                    val soniguales = datos.getBoolean("soniguales")
+                    val raw = res.trim()
+
+                    // Normalizar la respuesta: puede venir como array o como objeto
+                    val datos: JSONObject = when {
+                        raw.startsWith("[") -> {
+                            // Si viene un array JSON directamente, lo envolvemos en un objeto con "reg"
+                            JSONObject().apply {
+                                put("soniguales", false)
+                                put("reg", org.json.JSONArray(raw))
+                            }
+                        }
+                        raw.contains("'") && !raw.contains("\"") -> {
+                            // Si usa comillas simples, las convertimos a dobles
+                            val fixed = raw.replace("'", "\"")
+                            JSONObject(fixed)
+                        }
+                        else -> {
+                            // Respuesta normal como JSONObject
+                            JSONObject(raw)
+                        }
+                    }
+
+                    val soniguales = datos.optBoolean("soniguales", false)
                     if (!soniguales) {
-                        val lineas = datos.getJSONArray("reg")
-                        if (datos.length() > 0) {
+                        val lineas = if (datos.has("reg")) {
+                            datos.getJSONArray("reg")
+                        } else {
+                            // Buscar el primer array en el objeto
+                            val keys = datos.keys()
+                            var found: org.json.JSONArray? = null
+                            while (keys.hasNext()) {
+                                val k = keys.next()
+                                if (datos.opt(k) is org.json.JSONArray) {
+                                    found = datos.getJSONArray(k)
+                                    break
+                                }
+                            }
+                            found ?: org.json.JSONArray()
+                        }
+
+                        if (lineas.length() > 0) {
                             dbCuenta.replaceMesa(lineas, mesa.getString("ID"))
+                            rellenarTicket()
                         } else {
                             val db = myServicio?.getDb("mesas") as DBMesas
                             db.cerrarMesa(mesa.getString("ID"))
                             finish()
                         }
-                        rellenarTicket()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
