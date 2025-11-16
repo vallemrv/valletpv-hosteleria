@@ -105,12 +105,16 @@ export default {
         return formData
     },
     
-    recuperar_pedido(params){
-        return post("/api/recuperar_pedido", this.addUIDToParams(params))
-    },
-    
-    get_pedidos(params){
-        return post("/api/get_pedidos_by_receptor", this.addUIDToParams(params))
+    // Sincronizar pedidos con el servidor
+    // Envía todos los pedidos que tiene en local y recibe los actualizados
+    async sincronizar_pedidos(receptor, pedidosLocales){
+        const formData = this.addUIDToParams()
+        formData.append('receptor', receptor)
+        
+        // Enviar array de pedidos locales (solo IDs o pedidos completos según necesites)
+        formData.append('pedidos_locales', JSON.stringify(pedidosLocales))
+        
+        return post("/api/sincronizar_pedidos", formData)
     },
     
     // Obtener lista de receptores (requiere UID)

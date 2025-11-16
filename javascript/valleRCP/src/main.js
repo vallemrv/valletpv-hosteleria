@@ -1,4 +1,3 @@
-import './registerServiceWorker'
 import notification from "@/plugins/notificacion"
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

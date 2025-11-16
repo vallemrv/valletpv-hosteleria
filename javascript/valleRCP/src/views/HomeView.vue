@@ -10,7 +10,7 @@
     <v-btn icon @click="() => (showDialog = true)"> <v-icon>mdi-cog</v-icon></v-btn>
   </v-toolbar>
   
-  <v-container fluid>
+  <v-container fluid class="pb-16">
     <!-- Componente de estado de conexión -->
     <connection-status 
       v-if="serverUrl"
@@ -19,23 +19,20 @@
       :is-secure="useHttps"
     />
     
-    <v-row>
-      <v-col cols="12" sm="6" md="3" v-for="(item, i) in items" :key="i">
-        <valle-comanda :pedido="item"></valle-comanda>
-      </v-col>
-    </v-row>
+    <!-- Vista principal agrupada -->
+    <vista-principal :receptor="receptorActual" />
   </v-container>
 
   <v-btn
-      @click="reload"
+      @click="abrirServidos"
       icon
       size="large"
-      color="primary"
+      color="success"
       location="bottom right"
       position="fixed"
-      class="fab-reload"
+      class="fab-servidos"
     >
-      <v-icon>mdi-reload</v-icon>
+      <v-icon>mdi-check-all</v-icon>
     </v-btn>
 
   <v-dialog v-model="showDialog" max-width="500" persistent>
@@ -137,19 +134,23 @@
     </v-card>
   </v-dialog>
 
-  <valle-pedidos @close="() => (showPedidos = false)" :show="showPedidos"></valle-pedidos>
+  <valle-pedidos 
+    @close="() => (showPedidos = false)" 
+    :show="showPedidos"
+    :receptor="receptorActual"
+  ></valle-pedidos>
 </template>
 
 <script>
 import VWebsocket from "@/websocket";
 import { useMainStore } from "@/stores/main";
 import { computed, onMounted, ref, watch } from 'vue';
-import ValleComanda from "@/components/ValleComanda.vue";
+import VistaPrincipal from "@/components/VistaPrincipal.vue";
 import VallePedidos from "@/components/VallePedidos.vue";
 import ConnectionStatus from "@/components/ConnectionStatus.vue";
 
 export default {
-  components: { ValleComanda, VallePedidos, ConnectionStatus },
+  components: { VistaPrincipal, VallePedidos, ConnectionStatus },
   setup() {
     const store = useMainStore();
     
@@ -173,6 +174,12 @@ export default {
     const receptores = computed(() => store.receptores);
     const empresa = computed(() => store.empresa);
     
+    // Receptor actual (primer receptor seleccionado o null para ver todos)
+    const receptorActual = computed(() => {
+      const recs = getReceptores();
+      return recs.length > 0 ? recs[0].nomimp : null;
+    });
+    
     // URLs calculadas
     const serverUrl = computed(() => {
       if (!server.value) return '';
@@ -183,7 +190,7 @@ export default {
     const wsUrl = computed(() => {
       if (!server.value) return '';
       const protocol = useHttps.value ? 'wss://' : 'ws://';
-      return `${protocol}${server.value}/ws/impresion/[receptor]/`;
+      return `${protocol}${server.value}/ws/comunicacion/[receptor]`;
     });
     
     const receptores_mod = computed(() => {
@@ -340,7 +347,7 @@ export default {
       receptoresParaConectar.forEach((r) => {
           // Usar la URL almacenada que ya incluye el protocolo
           const serverUrl = localStorage.server || serverUrl.value;
-          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/impresion/${r.nomimp}/`);
+          console.log(`Conectando WebSocket para receptor: ${r.Nombre} -> ${serverUrl}/ws/comunicacion/${r.nomimp}`);
           
           var ws_aux = new VWebsocket(serverUrl, r, store);
           ws.value.push(ws_aux);
@@ -348,6 +355,10 @@ export default {
       });
       
       console.log(`Total conexiones WebSocket creadas: ${ws.value.length}`);
+    };
+    
+    const abrirServidos = () => {
+      showPedidos.value = true;
     };
 
     // Watchers
@@ -359,14 +370,36 @@ export default {
       }
     }, { deep: true });
 
-    const reload = () => {
-      showPedidos.value = true;
-      console.log('Recargando pedidos para los siguientes receptores:', receptores_sel.value);
-      store.getPendientes(JSON.stringify(receptores_sel.value));
-    };
-
     // Lifecycle
-    onMounted(() => {
+    onMounted(async () => {
+      // Inicializar IndexedDB y cargar todo en memoria
+      try {
+        await store.inicializarDB();
+        console.log('Base de datos lista');
+      } catch (error) {
+        console.error('Error al inicializar base de datos:', error);
+      }
+      
+      // Solicitar permiso para notificaciones
+      if ('Notification' in window && Notification.permission === 'default') {
+        try {
+          await Notification.requestPermission();
+        } catch (error) {
+          console.log('No se pudieron habilitar las notificaciones:', error);
+        }
+      }
+      
+      // Limpiar service workers antiguos si existen
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        for (let registration of registrations) {
+          if (registration.scope.includes('/app/')) {
+            console.log('Desregistrando service worker antiguo:', registration.scope)
+            await registration.unregister()
+          }
+        }
+      }
+      
       if (localStorage.server) {
         // Extraer el servidor y protocolo de la URL guardada
         const savedServer = localStorage.server;
@@ -430,6 +463,7 @@ export default {
       serverUrl,
       wsUrl,
       receptores_mod,
+      receptorActual,
       // Methods
       is_sel,
       getReceptores,
@@ -437,15 +471,22 @@ export default {
       receptores_change,
       server_change,
       connect,
-      reload
+      abrirServidos
     };
   }
 };
 </script>
 
 <style>
-.fab-reload {
-  margin-bottom: 1rem;
-  margin-right: 1rem;
+.fab-servidos {
+  margin-bottom: 2rem;
+  margin-right: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Asegurar que el contenedor tenga espacio suficiente */
+.pb-16 {
+  padding-bottom: 6rem !important;
 }
 </style>

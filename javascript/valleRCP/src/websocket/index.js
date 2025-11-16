@@ -57,7 +57,7 @@ export default class VWebsocket {
         }
 
         const wsProtocol = getWebSocketProtocol(server);
-        this.socketUrl = `${wsProtocol}/ws/impresion/${receptor.nomimp}/`;
+        this.socketUrl = `${wsProtocol}/ws/comunicacion/${receptor.nomimp}`;
         this.customSocket = null;
         this.store = store;
         this.receptor = receptor;
@@ -81,10 +81,18 @@ export default class VWebsocket {
         console.log(`Conectando WebSocket: ${this.socketUrl}`);
         this.customSocket = new WebSocket(this.socketUrl);
 
-        this.customSocket.onopen = (event) => {
+        this.customSocket.onopen = async (event) => {
             console.log(`WebSocket conectado exitosamente: ${this.receptor.nomimp}`);
             this.reconnectTimer.reset();
             this.store.onConnect();
+            
+            // Sincronizar pedidos al conectar
+            try {
+                const result = await this.store.sincronizarPedidos(this.receptor.nomimp);
+                console.log(`Sincronización completada para ${this.receptor.nomimp}:`, result);
+            } catch (error) {
+                console.error('Error en sincronización inicial:', error);
+            }
         };
 
         this.customSocket.onclose = (event) => {
@@ -103,9 +111,56 @@ export default class VWebsocket {
         };
 
         this.customSocket.onmessage = (event) => {
-            var pedido = JSON.parse(JSON.parse(event.data).message);
-            if (pedido.nom_receptor == this.receptor.Nombre)
-              this.store.recepcionPedido(pedido);
+            try {
+                const data = JSON.parse(event.data);
+                
+                // Extraer el mensaje (puede estar anidado)
+                const mensaje = typeof data.message === 'string' 
+                    ? JSON.parse(data.message) 
+                    : data.message || data;
+                
+                console.log('Mensaje WebSocket recibido:', mensaje);
+                
+                // Verificar que el mensaje sea para este receptor
+                const esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp || 
+                                          mensaje.nom_receptor === this.receptor.Nombre;
+                
+                // Manejar diferentes tipos de operaciones
+                switch (mensaje.op) {
+                    case 'pedido':
+                        // Nuevo pedido recibido
+                        if (esParaEsteReceptor) {
+                            this.store.recepcionPedido(mensaje);
+                        }
+                        break;
+                        
+                    case 'servir_lineas':
+                        // Marcar líneas como servidas
+                        if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
+                            this.store.servirLineas(mensaje.ids);
+                        }
+                        break;
+                        
+                    case 'borrar_lineas':
+                        // Borrar líneas (cobradas/borradas)
+                        if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
+                            this.store.borrarLineas(mensaje.ids);
+                        }
+                        break;
+                        
+                    case 'marcar_urgente':
+                        // Marcar líneas o pedido completo como urgente
+                        if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
+                            this.store.marcarUrgente(mensaje.ids, mensaje.pedido_id || null);
+                        }
+                        break;
+                        
+                    default:
+                        console.warn('Operación desconocida recibida:', mensaje.op);
+                }
+            } catch (error) {
+                console.error('Error al procesar mensaje WebSocket:', error, event.data);
+            }
         };
     }
 
