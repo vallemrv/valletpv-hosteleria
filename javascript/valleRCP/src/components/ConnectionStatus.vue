@@ -1,33 +1,20 @@
 <template>
-  <v-card class="mb-3" variant="outlined">
-    <v-card-text>
-      <v-row align="center">
-        <v-col cols="auto">
-          <v-icon 
-            :color="connectionStatus.color" 
-            size="large">
-            {{ connectionStatus.icon }}
-          </v-icon>
-        </v-col>
-        <v-col>
-          <div class="text-subtitle-1 font-weight-bold">
-            {{ connectionStatus.title }}
-          </div>
-          <div class="text-body-2 text-medium-emphasis">
-            {{ connectionStatus.subtitle }}
-          </div>
-        </v-col>
-        <v-col cols="auto">
-          <v-chip 
-            :color="connectionStatus.color"
-            variant="outlined"
-            size="small">
-            {{ connectionStatus.status }}
-          </v-chip>
-        </v-col>
-      </v-row>
-    </v-card-text>
-  </v-card>
+  <div class="status-bar" :class="`status-bar--${connectionStatus.color}`">
+    <div class="status-bar__content">
+      <v-icon 
+        :color="connectionStatus.color" 
+        size="small"
+        class="status-bar__icon">
+        {{ connectionStatus.icon }}
+      </v-icon>
+      <span class="status-bar__text">
+        {{ connectionStatus.title }}
+      </span>
+      <span class="status-bar__chip">
+        {{ connectionStatus.status }}
+      </span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -88,3 +75,98 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.status-bar--success {
+  background-color: rgba(76, 175, 80, 0.08);
+  border-top-color: rgba(76, 175, 80, 0.2);
+}
+
+.status-bar--warning {
+  background-color: rgba(255, 152, 0, 0.08);
+  border-top-color: rgba(255, 152, 0, 0.2);
+}
+
+.status-bar--error {
+  background-color: rgba(244, 67, 54, 0.08);
+  border-top-color: rgba(244, 67, 54, 0.2);
+}
+
+.status-bar--info {
+  background-color: rgba(33, 150, 243, 0.08);
+  border-top-color: rgba(33, 150, 243, 0.2);
+}
+
+.status-bar__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.status-bar__icon {
+  opacity: 0.9;
+}
+
+.status-bar__text {
+  font-size: 0.813rem;
+  font-weight: 500;
+  opacity: 0.87;
+}
+
+.status-bar__chip {
+  font-size: 0.688rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  opacity: 0.75;
+  letter-spacing: 0.5px;
+}
+
+.status-bar--success .status-bar__chip {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: rgb(46, 125, 50);
+}
+
+.status-bar--warning .status-bar__chip {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: rgb(230, 81, 0);
+}
+
+.status-bar--error .status-bar__chip {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: rgb(198, 40, 40);
+}
+
+.status-bar--info .status-bar__chip {
+  background-color: rgba(33, 150, 243, 0.15);
+  color: rgb(13, 71, 161);
+}
+
+/* Animación sutil para el ícono cuando está reconectando */
+.status-bar--info .status-bar__icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+</style>

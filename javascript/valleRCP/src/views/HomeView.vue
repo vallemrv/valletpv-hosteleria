@@ -4,24 +4,27 @@
       Receptor <span v-if="empresa">{{ empresa.nombre }}</span>
     </v-toolbar-title>
     <v-spacer></v-spacer>
+    <v-btn icon @click="servirTodos" title="Servir todos los pedidos">
+      <v-icon>mdi-check-all</v-icon>
+    </v-btn>
     <v-btn icon @click="() => (showSelDialog = true)">
       <v-icon>mdi-list-status</v-icon></v-btn
     >
     <v-btn icon @click="() => (showDialog = true)"> <v-icon>mdi-cog</v-icon></v-btn>
   </v-toolbar>
   
-  <v-container fluid class="pb-16">
-    <!-- Componente de estado de conexión -->
-    <connection-status 
-      v-if="serverUrl"
-      :is-ws-connected="isWsConnected"
-      :is-http-connected="isHttpConnected"
-      :is-secure="useHttps"
-    />
-    
+  <v-container fluid class="main-content">
     <!-- Vista principal agrupada -->
     <vista-principal :receptor="receptorActual" />
   </v-container>
+
+  <!-- Barra de estado de conexión fija en la parte inferior -->
+  <connection-status 
+    v-if="serverUrl"
+    :is-ws-connected="isWsConnected"
+    :is-http-connected="isHttpConnected"
+    :is-secure="useHttps"
+  />
 
   <v-btn
       @click="abrirServidos"
@@ -350,6 +353,33 @@ export default {
       showPedidos.value = false;
     };
 
+    const servirTodos = async () => {
+      // Obtener todos los pedidos actuales
+      const pedidos = store.vistaPrincipal(receptorActual.value);
+      
+      if (!pedidos || pedidos.length === 0) {
+        return;
+      }
+      
+      // Recopilar todos los IDs de líneas pendientes
+      const idsLineas = [];
+      
+      pedidos.forEach(pedido => {
+        pedido.articulosArray?.forEach(articulo => {
+          articulo.lineas.forEach(linea => {
+            if (!linea.servido) {
+              idsLineas.push(linea.id);
+            }
+          });
+        });
+      });
+      
+      // Servir todas las líneas
+      if (idsLineas.length > 0) {
+        await store.servirLineas(idsLineas);
+      }
+    };
+
     // Watchers
     watch(receptores, (v) => {
       // Solo conectar si hay receptores y al menos uno seleccionado
@@ -463,13 +493,14 @@ export default {
       server_change,
       connect,
       abrirServidos,
-      cerrarServidos
+      cerrarServidos,
+      servirTodos
     };
   }
 };
 </script>
 
-<style>
+<style scoped>
 .fab-servidos {
   margin-bottom: 2rem;
   margin-right: 1.5rem;
@@ -477,8 +508,8 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Asegurar que el contenedor tenga espacio suficiente */
-.pb-16 {
-  padding-bottom: 6rem !important;
+/* Ajuste del contenido principal para la barra de estado */
+.main-content {
+  padding-bottom: 52px !important;
 }
 </style>
