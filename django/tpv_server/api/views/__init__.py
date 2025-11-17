@@ -5,8 +5,7 @@
 # @Last modified time: 2019-02-01T14:33:04+01:00
 # @License: Apache License v2.0
 
-from tokenapi.http import JsonResponse, JsonError
-from django.conf import settings
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt

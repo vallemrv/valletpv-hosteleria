@@ -15,17 +15,17 @@
                 :class="{'border-urgent': esUrgente(pedido)}"
                 class="h-100"
               >
-                <v-card-title class="pa-2" :class="esUrgente(pedido) ? 'bg-error text-white' : 'bg-grey-lighten-3'">
+                <v-card-title class="pa-4" :class="esUrgente(pedido) ? 'bg-error text-white' : 'bg-grey-lighten-3'">
                   <div class="d-flex flex-column w-100">
                     <div class="d-flex justify-space-between align-center">
-                      <span>
-                        <v-icon v-if="esUrgente(pedido)" start>mdi-alert</v-icon>
+                      <span class="text-h4 font-weight-bold">
+                        <v-icon v-if="esUrgente(pedido)" start size="x-large">mdi-alert</v-icon>
                         Mesa {{ pedido.mesa || pedido.pedido_id }}
                       </span>
-                      <span class="text-caption">{{ pedido.hora }}</span>
+                      <span class="text-h6">{{ pedido.hora }}</span>
                     </div>
-                    <div class="text-caption mt-1">
-                      <v-icon size="x-small">mdi-account</v-icon>
+                    <div class="text-h6 mt-2">
+                      <v-icon size="large">mdi-account</v-icon>
                       {{ pedido.camarero || 'Sin camarero' }}
                     </div>
                   </div>
@@ -34,38 +34,38 @@
                 <v-divider></v-divider>
                 
                 <!-- Artículos agrupados -->
-                <v-card-text class="pa-2">
-                  <v-list dense class="pa-0">
+                <v-card-text class="pa-4">
+                  <v-list class="pa-0">
                     <v-list-item 
                       v-for="articulo in pedido.articulosArray" 
                       :key="`${pedido.pedido_id}-${articulo.idart}-${articulo.descripcion}`"
-                      class="pa-1"
+                      class="pa-3 mb-2"
                       @click="toggleLineasArticulo(articulo)"
                     >
                       <template v-slot:prepend>
                         <v-chip 
                           :color="articulo.pendientes > 0 ? 'warning' : 'success'" 
-                          size="small"
-                          class="mr-2"
+                          size="x-large"
+                          class="mr-3 font-weight-bold"
                         >
-                          {{ articulo.cantidad }}
+                          <span class="text-h5">{{ articulo.cantidad }}</span>
                         </v-chip>
                       </template>
                       
-                      <v-list-item-title>
+                      <v-list-item-title class="text-h5 mb-2">
                         <span :class="{'text-decoration-line-through': articulo.pendientes === 0}">
                           {{ articulo.descripcion }}
                         </span>
                         <v-icon 
                           v-if="articulo.lineas.some(l => l.urgente)" 
                           color="error" 
-                          size="small"
+                          size="large"
                         >
                           mdi-alert-circle
                         </v-icon>
                       </v-list-item-title>
                       
-                      <v-list-item-subtitle class="text-caption">
+                      <v-list-item-subtitle class="text-h6">
                         <span v-if="articulo.servidas > 0" class="text-success">
                           {{ articulo.servidas }} servidas
                         </span>
@@ -80,15 +80,16 @@
                 <v-divider></v-divider>
                 
                 <!-- Acciones del pedido -->
-                <v-card-actions class="pa-2">
+                <v-card-actions class="pa-4">
                   <v-btn 
                     @click="servirPedido(pedido)" 
                     color="success" 
                     variant="tonal"
-                    size="small"
+                    size="x-large"
                     block
+                    class="text-h6"
                   >
-                    <v-icon start>mdi-check</v-icon>
+                    <v-icon start size="large">mdi-check</v-icon>
                     Servir todo
                   </v-btn>
                 </v-card-actions>
@@ -97,9 +98,9 @@
     </v-row>
     
     <!-- Mensaje si no hay pedidos -->
-    <v-card v-if="!vistaDatos || vistaDatos.length === 0" class="text-center pa-8">
-      <v-icon size="64" color="grey">mdi-food-off</v-icon>
-      <p class="text-h6 mt-4">No hay pedidos pendientes</p>
+    <v-card v-if="!vistaDatos || vistaDatos.length === 0" class="text-center pa-16">
+      <v-icon size="128" color="grey">mdi-food-off</v-icon>
+      <p class="text-h3 mt-8">No hay pedidos pendientes</p>
     </v-card>
   </v-container>
 </template>
