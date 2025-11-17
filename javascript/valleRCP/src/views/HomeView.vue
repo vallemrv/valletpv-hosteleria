@@ -63,39 +63,12 @@
             <v-text-field 
               v-model="server" 
               label="Dirección del servidor" 
-              placeholder="ejemplo: mi-servidor.com:8000"
-              hint="Solo la dirección y puerto, sin protocolo"
+              placeholder="ejemplo.com:8000 o https://ejemplo.com:8000"
+              hint="Puedes incluir http:// o https://, si no se especifica se usará http://"
               persistent-hint
               hide-details="auto"
               required>
             </v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-radio-group v-model="useHttps" inline>
-              <template v-slot:label>
-                <div><strong>Protocolo de conexión:</strong></div>
-              </template>
-              <v-radio label="HTTP/WS (No seguro)" :value="false"></v-radio>
-              <v-radio label="HTTPS/WSS (Seguro)" :value="true"></v-radio>
-            </v-radio-group>
-          </v-col>
-          <v-col cols="12">
-            <v-alert 
-              v-if="useHttps" 
-              type="info" 
-              variant="tonal"
-              class="mb-3">
-              <strong>Conexión segura habilitada</strong><br>
-              Se usará HTTPS para API y WSS para WebSockets
-            </v-alert>
-            <v-alert 
-              v-else 
-              type="warning" 
-              variant="tonal"
-              class="mb-3">
-              <strong>Conexión no segura</strong><br>
-              Se usará HTTP para API y WS para WebSockets
-            </v-alert>
           </v-col>
           <v-col cols="12" v-if="serverError">
             <v-alert type="error" variant="tonal">
@@ -183,14 +156,32 @@ export default {
     // URLs calculadas
     const serverUrl = computed(() => {
       if (!server.value) return '';
+      
+      // Si la URL ya tiene protocolo, usarla tal cual
+      if (server.value.startsWith('http://') || server.value.startsWith('https://')) {
+        return server.value;
+      }
+      
+      // Si no, agregar el protocolo correspondiente
       const protocol = useHttps.value ? 'https://' : 'http://';
       return `${protocol}${server.value}`;
     });
     
     const wsUrl = computed(() => {
       if (!server.value) return '';
+      
+      let baseUrl = server.value;
+      
+      // Si la URL tiene protocolo HTTP/HTTPS, reemplazarlo por WS/WSS
+      if (baseUrl.startsWith('https://')) {
+        return baseUrl.replace('https://', 'wss://') + '/ws/comunicacion/[receptor]';
+      } else if (baseUrl.startsWith('http://')) {
+        return baseUrl.replace('http://', 'ws://') + '/ws/comunicacion/[receptor]';
+      }
+      
+      // Si no tiene protocolo, usar el protocolo correspondiente
       const protocol = useHttps.value ? 'wss://' : 'ws://';
-      return `${protocol}${server.value}/ws/comunicacion/[receptor]`;
+      return `${protocol}${baseUrl}/ws/comunicacion/[receptor]`;
     });
     
     const receptores_mod = computed(() => {
@@ -265,9 +256,22 @@ export default {
         return;
       }
       
-      // Construir la URL completa con el protocolo seleccionado
-      const protocol = useHttps.value ? 'https://' : 'http://';
-      const fullServerUrl = `${protocol}${server.value}`;
+      // Detectar automáticamente el protocolo de la URL
+      let fullServerUrl = server.value.trim();
+      let detectedHttps = false;
+      
+      if (fullServerUrl.startsWith('https://')) {
+        detectedHttps = true;
+      } else if (fullServerUrl.startsWith('http://')) {
+        detectedHttps = false;
+      } else {
+        // Si no hay protocolo, agregar http:// por defecto
+        fullServerUrl = `http://${fullServerUrl}`;
+        detectedHttps = false;
+      }
+      
+      // Actualizar el valor de useHttps basándose en la detección
+      useHttps.value = detectedHttps;
       
       try {
         // Paso 1: Verificar que el servidor esté disponible llamando a /api/health/
@@ -389,17 +393,17 @@ export default {
       }
       
       if (localStorage.server) {
-        // Extraer el servidor y protocolo de la URL guardada
+        // Mantener la URL completa con el protocolo para que el usuario la vea
         const savedServer = localStorage.server;
+        server.value = savedServer;
+        
+        // Detectar el protocolo para uso interno
         if (savedServer.startsWith('https://')) {
-          server.value = savedServer.replace('https://', '');
           useHttps.value = true;
         } else if (savedServer.startsWith('http://')) {
-          server.value = savedServer.replace('http://', '');
           useHttps.value = false;
         } else {
-          server.value = savedServer;
-          useHttps.value = localStorage.useHttps === 'true';
+          useHttps.value = false; // Por defecto HTTP
         }
         
         // Cargar nombre de empresa y alias si existen
