@@ -22,5 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "ValleTPV"
 include(":ValleCOM")
 include(":ValleTPVlib")
-include(":ValleTPV")
 include(":ValleCASH")

@@ -11,8 +11,8 @@ android {
         applicationId = "com.valleapp.valletpv.vallecom"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "5.0.5"
+        versionCode = 6
+        versionName = "6.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
