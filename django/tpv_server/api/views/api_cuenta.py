@@ -27,11 +27,10 @@ def get_cuenta(request):
     id = request.POST['idm'] if 'idm' in request.POST else request.POST["mesa_id"]  # ID de la mesa
     reg = json.loads(request.POST['reg'])  # Datos recibidos del cliente
     
-   
     # Obtener las líneas de pedido del servidor
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
-
+    
    
     if m_abierta:
         lstArt = m_abierta.get_lineaspedido()

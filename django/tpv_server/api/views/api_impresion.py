@@ -84,6 +84,8 @@ def reenviarpedido(request):
     from gestion.models.pedidos import Servidos
     for linea in lineas_receptor:
         Servidos.objects.filter(linea=linea).delete()
+        # Notificar cambio a devices
+        comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
     
     lineas = lineas_receptor.values("idart",
                                      "descripcion",
@@ -104,13 +106,24 @@ def reenviarlinea(request):
     pedido = Pedidos.objects.get(pk=idp)
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
-    lineas = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values("idart",
-                                            "descripcion",
-                                            "estado",
-                                            "pedido_id").annotate(can=Count('idart'))
+    
+    # Obtener líneas que coincidan
+    lineas_reenviar = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre)
+    
+    # Borrar todos los registros de servido para estas líneas
+    from gestion.models.pedidos import Servidos
+    for linea in lineas_reenviar:
+        Servidos.objects.filter(linea=linea).delete()
+        # Notificar cambio a devices
+        comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
+    
+    lineas = lineas_reenviar.values("idart",
+                                     "descripcion",
+                                     "estado",
+                                     "pedido_id").annotate(can=Count('idart'))
     
     # Obtener IDs de las líneas para smart receptors
-    linea_ids = list(pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).values_list('id', flat=True))
+    linea_ids = list(lineas_reenviar.values_list('id', flat=True))
     
     # Notificar a impresoras tradicionales y smart receptors
     send_urgente(lineas, pedido.hora, camarero, mesa_a)
