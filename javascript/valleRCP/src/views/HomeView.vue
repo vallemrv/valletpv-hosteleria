@@ -342,6 +342,10 @@ export default {
       showPedidos.value = true;
     };
 
+    const cerrarServidos = () => {
+      showPedidos.value = false;
+    };
+
     // Watchers
     watch(receptores, (v) => {
       // Solo conectar si hay receptores y al menos uno seleccionado
@@ -359,7 +363,7 @@ export default {
         console.error('Error al inicializar base de datos:', error);
       }
       
-      // Solicitar permiso para notificaciones
+      // Solicitar permisos para notificaciones y audio
       if ('Notification' in window && Notification.permission === 'default') {
         try {
           await Notification.requestPermission();
@@ -367,6 +371,12 @@ export default {
           // Notificaciones no disponibles
         }
       }
+
+      // Solicitar autorización de audio siempre al iniciar la aplicación
+      await store.requestAudioPermission();
+
+      // Registrar callback para cerrar vista de servidos
+      store.registrarCerrarServidos(cerrarServidos);
       
       // Limpiar service workers antiguos si existen
       if ('serviceWorker' in navigator) {
@@ -448,7 +458,8 @@ export default {
       receptores_change,
       server_change,
       connect,
-      abrirServidos
+      abrirServidos,
+      cerrarServidos
     };
   }
 };
