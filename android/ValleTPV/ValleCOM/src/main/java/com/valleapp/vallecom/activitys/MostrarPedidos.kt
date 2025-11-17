@@ -34,9 +34,13 @@ class MostrarPedidos : ActivityBase() {
                 myServicio = (iBinder as ServiceCOM.MyBinder).getService()
                 myServicio?.setExHandler("lineaspedido", handlerHttp)
                 dbCuenta = myServicio?.getDb("lineaspedido") as DBCuenta
+
+                // Obtener datos actuales de la mesa para enviar al servidor
+                val datosActuales = dbCuenta.filter("IDMesa=" + mesa.getString("ID"))
+
                 val p = ContentValues().apply {
-                    put("mesa_id", mesa.getString("ID"))
-                    put("reg", dbCuenta.filter("IDMesa=" + mesa.getString("ID")).toString())
+                    put("idm", mesa.getString("ID"))
+                    put("reg", datosActuales.toString())
                     put("uid", myServicio?.getUid())
                 }
                 HTTPRequest("$server/cuenta/get_cuenta", p, "actualizar", handlerHttp)
@@ -84,26 +88,63 @@ class MostrarPedidos : ActivityBase() {
                     val soniguales = datos.optBoolean("soniguales", false)
 
                     if (!soniguales) {
-                        val lineas = if (datos.has("reg")) {
-                            datos.getJSONArray("reg")
-                        } else {
-                            // Buscar el primer array en el objeto
-                            val keys = datos.keys()
-                            var found: org.json.JSONArray? = null
-                            while (keys.hasNext()) {
-                                val k = keys.next()
-                                if (datos.opt(k) is org.json.JSONArray) {
-                                    found = datos.getJSONArray(k)
-                                    break
+                        // Procesar delta del servidor
+                        if (datos.has("delta")) {
+                            val delta = datos.getJSONObject("delta")
+
+                            // Procesar inserts
+                            if (delta.has("inserts")) {
+                                val inserts = delta.getJSONArray("inserts")
+                                for (i in 0 until inserts.length()) {
+                                    val registro = inserts.getJSONObject(i)
+                                    dbCuenta.insert(registro)
                                 }
                             }
-                            found ?: org.json.JSONArray()
-                        }
 
-                        dbCuenta.replaceMesa(lineas, mesa.getString("ID"))
+                            // Procesar updates
+                            if (delta.has("updates")) {
+                                val updates = delta.getJSONArray("updates")
+                                for (i in 0 until updates.length()) {
+                                    val registro = updates.getJSONObject(i)
+                                    dbCuenta.update(registro)
+                                }
+                            }
+
+                            // Procesar deletes
+                            if (delta.has("deletes")) {
+                                val deletes = delta.getJSONArray("deletes")
+                                for (i in 0 until deletes.length()) {
+                                    val registro = deletes.getJSONObject(i)
+                                    dbCuenta.rm(registro)
+                                }
+                            }
+
+                        } else {
+                            // Fallback al método anterior si no viene delta
+                            val lineas = if (datos.has("reg")) {
+                                datos.getJSONArray("reg")
+                            } else {
+                                // Buscar el primer array en el objeto
+                                val keys = datos.keys()
+                                var found: org.json.JSONArray? = null
+                                while (keys.hasNext()) {
+                                    val k = keys.next()
+                                    if (datos.opt(k) is org.json.JSONArray) {
+                                        found = datos.getJSONArray(k)
+                                        break
+                                    }
+                                }
+                                found ?: org.json.JSONArray()
+                            }
+
+                            if (lineas.length() > 0) {
+                                dbCuenta.replaceMesa(lineas, mesa.getString("ID"))
+                            }
+                        }
                     }
                     rellenarPedido()
                 } catch (e: JSONException) {
+                    android.util.Log.e("MOSTRAR_PEDIDOS", "Error procesando respuesta: ${e.message}")
                     e.printStackTrace()
                 }
             } else if (op != null) {

@@ -24,7 +24,9 @@ export const useMainStore = defineStore('main', {
     isReconnecting: false,
     // Pedidos en memoria
     pedidosEnMemoria: [],
-    dbInitialized: false
+    dbInitialized: false,
+    // Callback para cerrar vista de servidos
+    cerrarServidosCallback: null
   }),
   
   getters: {
@@ -589,9 +591,132 @@ export const useMainStore = defineStore('main', {
         await pedidosDB.init()
         await this.cargarTodosLosPedidos()
         this.dbInitialized = true
+        
+        // Configurar el sistema de audio para notificaciones
+        this.setupAudioUnlock()
       } catch (error) {
         console.error('Error al inicializar DB:', error)
         throw error
+      }
+    },
+
+    // Método auxiliar para asegurar que el elemento de audio existe
+    ensureAudioElement() {
+      let audioElement = document.getElementById('notificationAudio');
+      
+      if (!audioElement) {
+        audioElement = document.createElement('audio');
+        audioElement.id = 'notificationAudio';
+        audioElement.preload = 'auto';
+        audioElement.volume = 0.7;
+        audioElement.src = audioMario;
+        document.body.appendChild(audioElement);
+      }
+      
+      return audioElement;
+    },
+
+    // Solicitar autorización de audio de forma proactiva
+    async requestAudioPermission() {
+      try {
+        // Asegurar que el elemento de audio existe
+        const audioElement = this.ensureAudioElement();
+
+        // Mostrar diálogo personalizado para solicitar permisos de audio
+        return new Promise((resolve) => {
+          // Crear modal de solicitud de audio
+          const modal = document.createElement('div');
+          modal.id = 'audio-permission-modal';
+          modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          `;
+
+          const dialog = document.createElement('div');
+          dialog.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          `;
+
+          dialog.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 20px;">🔊</div>
+            <h2 style="margin: 0 0 15px 0; color: #333;">Habilitar Sonido de Notificaciones</h2>
+            <p style="color: #666; margin-bottom: 25px; line-height: 1.4;">
+              Para recibir alertas sonoras cuando lleguen nuevos pedidos, necesitamos tu autorización para reproducir audio.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+              <button id="enable-audio" style="
+                background: #4CAF50;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 500;
+              ">Habilitar Sonido</button>
+              <button id="skip-audio" style="
+                background: #f5f5f5;
+                color: #333;
+                border: 1px solid #ddd;
+                padding: 12px 24px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+              ">Omitir</button>
+            </div>
+          `;
+
+          modal.appendChild(dialog);
+          document.body.appendChild(modal);
+
+          // Manejar clic en "Habilitar Sonido"
+          document.getElementById('enable-audio').onclick = async () => {
+            try {
+              // Intentar reproducir audio para obtener permisos
+              const playPromise = audioElement.play();
+              
+              if (playPromise !== undefined) {
+                await playPromise;
+                audioElement.pause();
+                audioElement.currentTime = 0;
+                console.log('🔊 Audio habilitado correctamente');
+                
+                // Marcar como habilitado en localStorage
+                localStorage.audioEnabled = 'true';
+              }
+            } catch (error) {
+              console.warn('No se pudo habilitar el audio:', error);
+            }
+            
+            document.body.removeChild(modal);
+            resolve(true);
+          };
+
+          // Manejar clic en "Omitir"
+          document.getElementById('skip-audio').onclick = () => {
+            localStorage.audioEnabled = 'false';
+            document.body.removeChild(modal);
+            resolve(false);
+          };
+        });
+
+      } catch (error) {
+        console.error('Error al solicitar permisos de audio:', error);
+        return false;
       }
     },
 
@@ -610,15 +735,6 @@ export const useMainStore = defineStore('main', {
     },
 
     async recepcionPedido(pedido) {
-      console.log('📥 STORE: Procesando pedido recibido:', {
-        pedido_id: pedido.pedido_id,
-        mesa: pedido.mesa,
-        receptor: pedido.receptor || pedido.nom_receptor,
-        lineas: pedido.lineas?.length
-      });
-
-      // LOG COMPLETO DEL PEDIDO RECIBIDO
-      console.log('🔍 DATOS COMPLETOS DEL PEDIDO:', JSON.stringify(pedido, null, 2));
 
       // NORMALIZAR EL PEDIDO ANTES DE PROCESARLO
       const pedidoNormalizado = {
@@ -631,8 +747,6 @@ export const useMainStore = defineStore('main', {
           urgente: linea.urgente || false,
         }))
       }
-
-      console.log('🔧 PEDIDO DESPUÉS DE NORMALIZAR:', JSON.stringify(pedidoNormalizado, null, 2));
 
       // Comprobar si el pedido ya existe en memoria
       const pedidoExistente = this.pedidosEnMemoria.find(p => p.pedido_id === pedidoNormalizado.pedido_id)
@@ -647,37 +761,14 @@ export const useMainStore = defineStore('main', {
           // Actualizar items para UI (pedidos activos)
           this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
           
-          // LOG DEL FILTRO
-          console.log('🔍 FILTRO DE ESTADOS:', this.pedidosEnMemoria.map(p => ({
-            id: p.id,
-            estado: p.estado,
-            mesa: p.mesa,
-            activo: p.estado === 'activo'
-          })));
-          
           // Forzar reactividad recreando el array
           this.pedidosEnMemoria = [...this.pedidosEnMemoria]
           
-          console.log('✅ STORE: Pedido guardado y UI actualizada:', {
-            id: idGuardado,
-            pedido_id: pedidoConId.pedido_id,
-            total_pedidos: this.pedidosEnMemoria.length,
-            items_activos: this.items.length
-          });
-
-          // LOG DETALLADO DEL PEDIDO GUARDADO
-          console.log('💾 PEDIDO FINAL GUARDADO:', JSON.stringify(pedidoConId, null, 2));
-          
-          // LOG DE ITEMS ACTIVOS
-          console.log('📋 ITEMS ACTIVOS DESPUÉS DEL FILTRO:', this.items.map(p => ({
-            id: p.id,
-            pedido_id: p.pedido_id,
-            estado: p.estado,
-            mesa: p.mesa
-          })));
-
           // Reproducir sonido para nuevo pedido
           this.playNotificationSound();
+          
+          // Cerrar vista de servidos automáticamente para mostrar el nuevo pedido
+          this.cerrarServidosAutomatico();
           
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(`Nuevo pedido: Mesa ${pedidoConId.mesa}`, {
@@ -836,8 +927,6 @@ export const useMainStore = defineStore('main', {
     // Borrar líneas específicas (cobradas/borradas)
     async borrarLineas(idsLineas) {
       try {
-        console.log('🗑️ Borrando líneas:', idsLineas);
-        
         let lineasBorradas = 0
         const pedidosVacios = []
         
@@ -868,7 +957,6 @@ export const useMainStore = defineStore('main', {
         // Eliminar completamente pedidos que se quedaron sin líneas
         for (const pedidoId of pedidosVacios) {
           await pedidosDB.eliminar(pedidoId)
-          console.log(`🗑️ Pedido ${pedidoId} eliminado completamente (sin líneas)`);
         }
         
         // Eliminar pedidos vacíos de memoria
@@ -876,8 +964,6 @@ export const useMainStore = defineStore('main', {
         
         // Actualizar items (pedidos activos para la UI)
         this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
-        
-        console.log(`🗑️ ${lineasBorradas} líneas borradas, ${pedidosVacios.length} pedidos eliminados completamente`);
         
         return { lineasBorradas, pedidosEliminados: pedidosVacios.length }
       } catch (error) {
@@ -1137,34 +1223,78 @@ export const useMainStore = defineStore('main', {
 
     // Reproducir sonido de notificación
     playNotificationSound() {
+      // Verificar si el usuario ha habilitado el audio
+      if (localStorage.audioEnabled !== 'true') {
+        return; // Audio deshabilitado por el usuario
+      }
+
       try {
-        // Buscar elemento de audio existente o crearlo
-        let audioElement = document.getElementById('notificationAudio');
-        
-        if (!audioElement) {
-          audioElement = document.createElement('audio');
-          audioElement.id = 'notificationAudio';
-          audioElement.preload = 'auto';
-          document.body.appendChild(audioElement);
-        }
+        // Asegurar que el elemento de audio existe
+        const audioElement = this.ensureAudioElement();
 
-        // Establecer la fuente del audio (mario.mp3)
-        if (audioElement.src !== audioMario) {
-          audioElement.src = audioMario;
-        }
-
-        // Reproducir el audio
+        // Intentar reproducir el audio
         const playPromise = audioElement.play();
         
         if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.error('Error al reproducir sonido de notificación:', error);
+          playPromise.then(() => {
+            // Audio reproducido correctamente
+          }).catch(error => {
+            if (error.name === 'NotAllowedError') {
+              console.warn('⚠️ Audio bloqueado. Solicitar permisos de nuevo.');
+              // Resetear permisos para que vuelva a preguntar
+              localStorage.audioEnabled = 'false';
+            } else {
+              console.error('Error al reproducir sonido:', error);
+            }
           });
         }
-
-        console.log('🔊 Reproduciendo sonido de notificación');
       } catch (error) {
         console.error('Error en playNotificationSound:', error);
+      }
+    },
+
+    // Habilitar audio después de la primera interacción del usuario (respaldo)
+    setupAudioUnlock() {
+      // Solo configurar si el audio está habilitado pero falló la reproducción
+      if (localStorage.audioEnabled === 'true') {
+        const self = this; // Capturar el contexto
+        const unlockAudio = () => {
+          // Asegurar que el elemento de audio existe
+          const audioElement = self.ensureAudioElement();
+          
+          if (audioElement) {
+            const playPromise = audioElement.play();
+            
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                audioElement.pause();
+                audioElement.currentTime = 0;
+              }).catch(() => {
+                // Falló, seguir intentando
+              });
+            }
+          }
+          
+          // Remover los event listeners después del primer uso
+          document.removeEventListener('click', unlockAudio, true);
+          document.removeEventListener('touchstart', unlockAudio, true);
+        };
+
+        // Escuchar cualquier interacción del usuario
+        document.addEventListener('click', unlockAudio, true);
+        document.addEventListener('touchstart', unlockAudio, true);
+      }
+    },
+
+    // Registrar callback para cerrar vista de servidos
+    registrarCerrarServidos(callback) {
+      this.cerrarServidosCallback = callback;
+    },
+
+    // Cerrar vista de servidos si está abierta
+    cerrarServidosAutomatico() {
+      if (this.cerrarServidosCallback) {
+        this.cerrarServidosCallback();
       }
     }
   }
