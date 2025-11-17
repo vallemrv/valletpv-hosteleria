@@ -56,9 +56,6 @@ def servido(request):
     if lineas_a_servir:
         notificar_lineas_servidas(lineas_a_servir)
     
-    # Comunicar cambios 'rm' a devices
-    if result_rm:
-        comunicar_cambios_devices("rm", "lineaspedido", result_rm)
     
     return JsonResponse({"status": "ok", "message": "Operación completada."})
 

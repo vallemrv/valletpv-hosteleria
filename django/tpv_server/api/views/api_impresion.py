@@ -76,10 +76,19 @@ def reenviarpedido(request):
     pedido = Pedidos.objects.get(pk=idp);
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
-    lineas = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).values("idart",
-                                            "descripcion",
-                                            "estado",
-                                            "pedido_id").annotate(can=Count('idart'))
+    
+    # Obtener líneas del receptor
+    lineas_receptor = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr)
+    
+    # Borrar todos los registros de servido para estas líneas
+    from gestion.models.pedidos import Servidos
+    for linea in lineas_receptor:
+        Servidos.objects.filter(linea=linea).delete()
+    
+    lineas = lineas_receptor.values("idart",
+                                     "descripcion",
+                                     "estado",
+                                     "pedido_id").annotate(can=Count('idart'))
     
     # Notificar a impresoras tradicionales y smart receptors
     send_urgente(lineas, pedido.hora, camarero, mesa_a)

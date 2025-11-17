@@ -27,7 +27,7 @@ def get_cuenta(request):
     id = request.POST['idm'] if 'idm' in request.POST else request.POST["mesa_id"]  # ID de la mesa
     reg = json.loads(request.POST['reg'])  # Datos recibidos del cliente
     
-
+   
     # Obtener las líneas de pedido del servidor
     m_abierta = Mesasabiertas.objects.filter(mesa__pk=id).first()
     lstArt = []
@@ -134,8 +134,6 @@ def get_cuenta(request):
         logger_sync.debug(f"GET_CUENTA ___ Diferencias encontradas. Delta: {delta}")
         return JsonResponse({'soniguales': False, 'delta': delta})
 
-    # Si todas las líneas son iguales
-    logger_sync.debug("GET_CUENTA ___ Todas las líneas son iguales.")
     return JsonResponse({'soniguales': True, 'delta': {'inserts': [], 'updates': [], 'deletes': []}})
 
 
