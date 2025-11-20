@@ -13,7 +13,7 @@
               <v-card 
                 elevation="2" 
                 :class="{'border-urgent': esUrgente(pedido)}"
-                class="h-100"
+                class="h-100 d-flex flex-column"
               >
                 <v-card-title class="pa-4" :class="esUrgente(pedido) ? 'bg-error text-white' : 'bg-grey-lighten-3'">
                   <div class="d-flex flex-column w-100">
@@ -34,47 +34,35 @@
                 <v-divider></v-divider>
                 
                 <!-- Artículos agrupados -->
-                <v-card-text class="pa-4">
-                  <v-list class="pa-0">
-                    <v-list-item 
-                      v-for="articulo in pedido.articulosArray" 
-                      :key="`${pedido.pedido_id}-${articulo.idart}-${articulo.descripcion}`"
-                      class="pa-3 mb-2"
-                      @click="toggleLineasArticulo(articulo)"
-                    >
-                      <template v-slot:prepend>
-                        <v-chip 
-                          :color="articulo.pendientes > 0 ? 'warning' : 'success'" 
-                          size="x-large"
-                          class="mr-3 font-weight-bold"
-                        >
-                          <span class="text-h5">{{ articulo.cantidad }}</span>
-                        </v-chip>
-                      </template>
-                      
-                      <v-list-item-title class="text-h5 mb-2">
-                        <span :class="{'text-decoration-line-through': articulo.pendientes === 0}">
-                          {{ articulo.descripcion }}
-                        </span>
-                        <v-icon 
-                          v-if="articulo.lineas.some(l => l.urgente)" 
-                          color="error" 
-                          size="large"
-                        >
+                <v-card-text class="pa-4 flex-grow-1">
+                  <v-row 
+                    v-for="articulo in pedido.articulosArray" 
+                    :key="`${pedido.pedido_id}-${articulo.idart}-${articulo.descripcion}`"
+                    class="mb-3 articulo-row"
+                    @click="toggleLineasArticulo(articulo)"
+                  >
+                    <v-col cols="auto" class="pr-0">
+                      <div class="cantidad-box">
+                        {{ articulo.cantidad }}
+                      </div>
+                    </v-col>
+                    <v-col>
+                      <div class="text-h5 font-weight-bold mb-1" :class="{'text-decoration-line-through': articulo.pendientes === 0}">
+                        {{ articulo.descripcion }}
+                        <v-icon v-if="articulo.lineas.some(l => l.urgente)" color="error" size="large">
                           mdi-alert-circle
                         </v-icon>
-                      </v-list-item-title>
-                      
-                      <v-list-item-subtitle class="text-h6">
+                      </div>
+                      <div class="text-h6">
                         <span v-if="articulo.servidas > 0" class="text-success">
                           {{ articulo.servidas }} servidas
                         </span>
                         <span v-if="articulo.pendientes > 0" class="text-warning ml-2">
                           {{ articulo.pendientes }} pendientes
                         </span>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
+                      </div>
+                    </v-col>
+                  </v-row>
                 </v-card-text>
                 
                 <v-divider></v-divider>
@@ -180,5 +168,29 @@ const servirPedido = async (pedido) => {
 
 .h-100 {
   height: 100%;
+}
+
+.cantidad-box {
+  background-color: black;
+  color: white;
+  font-size: 2rem;
+  font-weight: 900;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.articulo-row {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.articulo-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 </style>

@@ -30,6 +30,21 @@
             android:hint="@string/label_direccion_servidor"
             android:inputType="textUri" />
 
+        <TextView
+            android:id="@+id/alias_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alias del dispositivo"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp" />
+
+        <EditText
+            android:id="@+id/alias_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del dispositivo"
+            android:inputType="text" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
