@@ -42,16 +42,16 @@ def send_tool_message(message: str):
             logger.error(f"❌ Error llamando a la función sender desde send_tool_message: {e}", exc_info=True)
             pass
     else:
-        logger.warning("⚠️ send_tool_message llamado pero no hay sender en contexto.")
+        pass
  
 
 
 class CallbackHandler(BaseCallbackHandler):
     def on_chain_start(self, serialized: dict, inputs: dict, **kwargs) -> None:
         """Llamado cuando la cadena comienza a ejecutarse"""
-        logger.info("⚡ Cadena iniciada con entradas: %s", inputs)
+        pass
 
     def on_chain_end(self, outputs: dict, **kwargs) -> None:
         """Llamado cuando la cadena termina su ejecución"""
-        logger.info("✅ Cadena finalizada con salidas: %s", outputs)
+        pass
 

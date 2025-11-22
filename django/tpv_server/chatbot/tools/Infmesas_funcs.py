@@ -801,7 +801,6 @@ def obtener_historial_nulos(
                                 mesa_nombre = mesa_fisica.nombre
                         except (ValueError, IndexError):
                             # Si hay error en la conversión o el formato del UID
-                            logger.warning(f"No se pudo extraer ID de mesa del UID: {nulo.lineapedido.infmesa.pk}")
                             mesa_id = 0
                 
                 # Obtener fecha desde el infmesa o usar fecha del pedido
@@ -888,7 +887,7 @@ def obtener_desglose_nulo_por_id(
                     if mesa_fisica:
                         mesa_nombre = mesa_fisica.nombre
                 except (ValueError, IndexError):
-                    logger.warning(f"No se pudo extraer ID de mesa del UID: {infmesa.pk}")
+                    pass
         
         # Calcular totales del infmesa
         

@@ -11,7 +11,6 @@ from gestion.models.dispositivos import Dispositivo
 
 class PedidosConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        logger.info("Iniciando conexión WebSocket de dispositivo de pedidos...")
         try:
             query_params = self.scope['query_string'].decode('utf-8').split('&')
             # Manejo más robusto por si falta '=' en algún parámetro
@@ -25,10 +24,8 @@ class PedidosConsumer(AsyncWebsocketConsumer):
 
             self.device_uid = params.get('uid', '')
             self.camarero_id = params.get('camarero_id', '')
-            logger.info(f"Intento de conexión de dispositivo - UID: {self.device_uid}, Camarero ID: {self.camarero_id}")
 
             if not self.device_uid:
-                logger.warning("Falta parámetro 'uid' en la conexión del dispositivo.")
                 # Aceptamos para poder enviar el mensaje de error
                 await self.accept()
                 await self.send(text_data=json.dumps({
@@ -42,7 +39,6 @@ class PedidosConsumer(AsyncWebsocketConsumer):
             # --- Validación del Dispositivo ---
             device_info = await self.validate_device(self.device_uid)
             if not device_info:
-                logger.warning(f"Dispositivo con UID {self.device_uid} no encontrado o inactivo. Rechazando conexión.")
                 # Aceptamos para poder enviar el mensaje de error
                 await self.accept()
                 await self.send(text_data=json.dumps({
@@ -53,21 +49,18 @@ class PedidosConsumer(AsyncWebsocketConsumer):
                 await self.close(code=4003)  # Código personalizado para dispositivo no autorizado
                 return
 
-            logger.info(f"Validación de dispositivo exitosa: {device_info['nombre']}")
             self.device_info = device_info
 
             # --- Continuar con la conexión normal si el dispositivo es válido ---
             room = self.scope['url_route']['kwargs']['room']
             empresa = settings.EMPRESA  # Asegúrate que settings.EMPRESA esté disponible
             self.group_name = f"{room}-{empresa}-device-{self.device_uid}"
-            logger.info(f"Nombre de grupo asignado para dispositivo: {self.group_name}")
 
             # Añadir al grupo ANTES de aceptar completamente
             await self.channel_layer.group_add(self.group_name, self.channel_name)
 
             # Aceptar la conexión de forma definitiva
             await self.accept()
-            logger.info(f"Dispositivo WebSocket conectado y aceptado en el grupo: {self.group_name}")
 
             # Inicializar MessageProcessor como dispositivo de pedidos (no administrador)
             self.message_processor = PedidosProcessor(
@@ -90,13 +83,9 @@ class PedidosConsumer(AsyncWebsocketConsumer):
             await self.close(code=4005)  # Código para error genérico del servidor
 
     async def disconnect(self, close_code):
-        logger.info(f"Dispositivo WebSocket desconectando con código: {close_code}")
         # Es buena práctica verificar si group_name fue asignado antes de usarlo
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
-            logger.info(f"Dispositivo WebSocket desconectado del grupo: {self.group_name}")
-        else:
-            logger.info("Dispositivo WebSocket desconectado (nunca se unió a un grupo).")
 
     async def receive(self, text_data):
         """
@@ -109,8 +98,6 @@ class PedidosConsumer(AsyncWebsocketConsumer):
             sender = data.get('sender', '')
             type_message = data.get('type', 'message')
             message_id = str(uuid.uuid4())
-
-            logger.info(f"Mensaje recibido del dispositivo {self.device_uid}, tipo: {type_message}")
 
             if type_message == "message" and sender == 'user' and message.strip():
                 # Crear mensaje de texto para el agente de pedidos
@@ -138,8 +125,6 @@ class PedidosConsumer(AsyncWebsocketConsumer):
                     }))
                     return
                 
-                logger.info(f"Procesando audio del dispositivo {self.device_uid}")
-                
                 # Crear mensaje de audio para transcripción INCLUYENDO información del camarero
                 user_input = HumanMessage(
                     content=[
@@ -157,8 +142,6 @@ class PedidosConsumer(AsyncWebsocketConsumer):
                 
                 # Procesar el audio como pedido
                 await self.message_processor.generate_response(user_input, message_id)
-            else:
-                logger.warning(f"Mensaje vacío o tipo inválido del dispositivo {self.device_uid}")
                 await self.send(text_data=json.dumps({
                     'type': 'error',
                     'message': 'Mensaje vacío o formato inválido.'
@@ -200,7 +183,6 @@ class PedidosConsumer(AsyncWebsocketConsumer):
         """
         try:
             dispositivo = Dispositivo.objects.get(uid=device_uid, activo=True)
-            logger.info(f"Dispositivo encontrado: {dispositivo.descripcion} (ID: {dispositivo.id})")
             
             return {
                 'id': dispositivo.id,

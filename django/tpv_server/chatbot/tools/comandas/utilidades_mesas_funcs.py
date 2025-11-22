@@ -289,7 +289,7 @@ def mover_lineas_entre_mesas(
                 mesa_destino.infmesa.componer_articulos()
                 mesa_destino.infmesa.unir_en_grupos()
             except Exception as e:
-                logger.warning(f"Error actualizando composición de artículos: {e}")
+                pass
             
             # Verificar si la mesa origen se quedó vacía
             lineas_restantes_origen = mesa_origen.infmesa.lineaspedido_set.filter(

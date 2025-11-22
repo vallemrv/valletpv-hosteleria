@@ -19,7 +19,6 @@ def listar_receptores() -> List[Dict[str, Union[int, str, bool]]]:
         (id, nombre, nomimp, activo, descripcion).
     """
     send_tool_message("Listando receptores desde la base de datos...")
-    logger.debug("Listando receptores desde la base de datos...")
     
     receptores = Receptores.objects.exclude(nombre__iexact="Nulo")
     return [
@@ -56,7 +55,6 @@ def crear_receptor(
         (id, nombre, nomimp, activo, descripcion).
     """
     send_tool_message(f"Creando receptor con nombre '{nombre}'...")
-    logger.debug(f"Creando receptor con nombre '{nombre}'...")
     
     receptor = Receptores(
         nombre=nombre,
@@ -101,7 +99,6 @@ def editar_receptor(
     try:
         receptor = Receptores.objects.get(id=receptor_id)
         send_tool_message(f"Editando receptor '{receptor.nombre}'...")
-        logger.debug(f"Editando receptor '{receptor.nombre}'...")
         
         if nombre is not None:
             receptor.nombre = nombre
@@ -141,7 +138,6 @@ def borrar_receptor(receptor_id: int) -> Dict[str, str]:
     try:
         receptor = Receptores.objects.get(id=receptor_id)
         send_tool_message(f"Eliminando receptor '{receptor.nombre}'...")
-        logger.debug(f"Eliminando receptor '{receptor.nombre}'...")
         
         receptor.delete()
         return {"success": f"Receptor '{receptor.nombre}' eliminado correctamente"}
@@ -163,7 +159,6 @@ def find_receptor_by_name(query: str) -> Union[List[Dict[str, Union[int, str, bo
         Union[List[Dict[str, Union[int, str, bool]]], Dict[str, str]]: Lista de receptores encontrados o mensaje de error.
     """
     send_tool_message(f"Buscando receptores que coincidan con la expresión '{query}' (icontains)...")
-    logger.debug(f"Buscando receptores que coincidan con la expresión '{query}' (icontains)...")
     receptores = Receptores.objects.filter(
         Q(nombre__icontains=query) | Q(nomimp__icontains=query) | Q(descripcion__icontains=query)
     ).exclude(nombre__iexact="Nulo")

@@ -46,13 +46,10 @@ def get_sales_by_waiters(date_start: str, date_end: str, start_time: str, end_ti
             datetime.strptime(start_time, "%H:%M")
             datetime.strptime(end_time, "%H:%M")
             if date_start > date_end:
-                logger.warning(f"date_start ({date_start}) posterior a date_end ({date_end})")
                 return {"error": "La fecha de inicio debe ser anterior o igual a la fecha de fin."}
             if date_start == date_end and start_time > end_time:
-                logger.warning(f"start_time ({start_time}) posterior a end_time ({end_time})")
                 return {"error": "La hora de inicio debe ser anterior o igual a la hora de fin en la misma fecha."}
         except ValueError:
-            logger.warning(f"Formato de fecha/hora inválido: {date_start}, {date_end}, {start_time}, {end_time}")
             return {"error": "Formato debe ser 'YYYY/MM/DD' para fechas y 'HH:MM' para horas."}
 
         # 2. Consulta SQL
@@ -80,10 +77,8 @@ def get_sales_by_waiters(date_start: str, date_end: str, start_time: str, end_ti
         # 3. Ejecutar consulta
         with connection.cursor() as cursor:
             params = [date_start, date_end, start_time, end_time]
-            logger.debug(f"Ejecutando SQL con params: {params}")
             cursor.execute(sql, params)
             rows = cursor.fetchall()
-            logger.debug(f"SQL devolvió {len(rows)} filas.")
 
         # 4. Procesar resultados
         camareros_data = {}
@@ -106,10 +101,8 @@ def get_sales_by_waiters(date_start: str, date_end: str, start_time: str, end_ti
             elif estado == 'P':
                 camareros_data[camarero_id]["cantidad_p"] += total_sales
             else:
-                logger.warning(f"Estado desconocido '{estado}' para camarero {camarero_id}")
 
         if not camareros_data:
-            logger.info(f"No se encontraron ventas para {date_start} a {date_end}, {start_time}-{end_time}.")
             return []
 
         # 5. Obtener nombres de camareros
@@ -173,7 +166,6 @@ def get_sales_by_waiter_id(waiter_id: int, date_start: str, date_end: str, start
     try:
         # 1. Validar waiter_id
         if not isinstance(waiter_id, int) or waiter_id <= 0:
-            logger.warning(f"ID de camarero inválido: {waiter_id}")
             return {"error": "El ID del camarero debe ser un entero positivo."}
 
         # 2. Validar formato de entrada
@@ -183,13 +175,10 @@ def get_sales_by_waiter_id(waiter_id: int, date_start: str, date_end: str, start
             datetime.strptime(start_time, "%H:%M")
             datetime.strptime(end_time, "%H:%M")
             if date_start > date_end:
-                logger.warning(f"date_start ({date_start}) posterior a date_end ({date_end})")
                 return {"error": "La fecha de inicio debe ser anterior o igual a la fecha de fin."}
             if date_start == date_end and start_time > end_time:
-                logger.warning(f"start_time ({start_time}) posterior a end_time ({end_time})")
                 return {"error": "La hora de inicio debe ser anterior o igual a la hora de fin en la misma fecha."}
         except ValueError:
-            logger.warning(f"Formato de fecha/hora inválido: {date_start}, {date_end}, {start_time}, {end_time}")
             return {"error": "Formato debe ser 'YYYY/MM/DD' para fechas y 'HH:MM' para horas."}
 
         # 3. Consulta SQL
@@ -215,10 +204,8 @@ def get_sales_by_waiter_id(waiter_id: int, date_start: str, date_end: str, start
 
         # 4. Ejecutar consulta
         with connection.cursor() as cursor:
-            logger.debug(f"Ejecutando SQL con params: {params}")
             cursor.execute(sql, params)
             rows = cursor.fetchall()
-            logger.debug(f"SQL devolvió {len(rows)} filas.")
 
         # 5. Procesar resultados
         sales_data = {
@@ -236,7 +223,6 @@ def get_sales_by_waiter_id(waiter_id: int, date_start: str, date_end: str, start
             elif status == 'P':
                 sales_data["cantidad_p"] += total_sales
             else:
-                logger.warning(f"Estado desconocido '{status}' para camarero {waiter_id}")
 
         # 6. Obtener nombre y apellido
         nombre_camarero = f"Camarero ID {waiter_id}"
@@ -295,21 +281,17 @@ def get_top_selling_items(date_start: str, date_end: str, start_time: str, end_t
             
             # Validar que date_start <= date_end
             if date_start > date_end:
-                logger.warning(f"date_start ({date_start}) es posterior a date_end ({date_end})")
                 return {"error": "La fecha de inicio debe ser anterior o igual a la fecha de fin."}
                 
             # Validar que si las fechas son iguales, start_time <= end_time
             if date_start == date_end and start_time > end_time:
-                logger.warning(f"start_time ({start_time}) es posterior a end_time ({end_time}) en la misma fecha")
                 return {"error": "La hora de inicio debe ser anterior o igual a la hora de fin en la misma fecha."}
                 
         except ValueError as ve:
-            logger.warning(f"Error de formato detectado: {ve}")
             return {"error": "El formato debe ser 'YYYY/MM/DD' para fechas y 'HH:MM' para horas."}
 
         # 2. Validar y asegurar límite
         if not isinstance(limit, int) or limit <= 0:
-            logger.debug(f"Límite inválido ({limit}), usando valor por defecto 10.")
             limit = 10
 
         # 3. LÓGICA INTERNA CON SQL RAW
@@ -343,10 +325,8 @@ def get_top_selling_items(date_start: str, date_end: str, start_time: str, end_t
 
         with connection.cursor() as cursor:
             params = [date_start, date_end, start_time, end_time, limit]
-            logger.debug(f"Ejecutando SQL raw con params: {params}")
             cursor.execute(raw_query, params)
             rows = cursor.fetchall()
-            logger.debug(f"SQL raw devolvió {len(rows)} filas.")
 
         # 4. Formatear resultados CON REDONDEO A 2 DECIMALES
         formatted_results = []
@@ -1260,7 +1240,6 @@ def create_ticket_print_object(ticket_id: int):
                 # Añadir la línea con el código de autorización
                 lineas_recibo.append(f"Código autorización: {recibo['codigo_autorizacion']}")
             except (json.JSONDecodeError, KeyError) as e:
-                logger.warning(f"Error al procesar recibo_tarjeta para ticket {ticket_id}: {e}")
 
         # Calcular total del ticket
         total_ticket = ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']
@@ -1407,10 +1386,8 @@ def search_order_lines_by_description(descripcion: str, fecha: str = None, start
         
         # 7. Ejecutar consulta
         with connection.cursor() as cursor:
-            logger.debug(f"Ejecutando consulta con params: {params}")
             cursor.execute(base_query, params)
             rows = cursor.fetchall()
-            logger.debug(f"Consulta devolvió {len(rows)} resultados")
         
         # 8. Formatear resultados (información básica)
         results = []

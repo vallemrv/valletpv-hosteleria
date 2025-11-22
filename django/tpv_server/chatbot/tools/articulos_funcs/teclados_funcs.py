@@ -196,7 +196,6 @@ def buscar_teclas(
                 continue
         
         send_tool_message(f"Encontradas {len(results)} teclas")
-        logger.debug(f"Búsqueda completada: {len(results)} teclas encontradas")
         return results
         
     except Exception as e:
@@ -287,9 +286,7 @@ def _crear_tecla(data: Dict) -> Dict:
                     "coleccion": "teclas",
                     "id_elemento": tecla.id
                 }])
-                logger.info(f"ChromaDB actualizado para nueva tecla ID {tecla.id}")
             except Exception as e:
-                logger.warning(f"Error actualizando ChromaDB para tecla ID {tecla.id}: {e}")
         
         send_tool_message(f"Tecla '{nombre}' creada exitosamente")
         return _format_success({"id": tecla.id, "nombre": tecla.nombre}, f"Tecla '{nombre}' creada")
@@ -327,9 +324,7 @@ def _modificar_tecla(data: Dict) -> Dict:
                     "coleccion": "teclas",
                     "id_elemento": tecla.id
                 }])
-                logger.info(f"ChromaDB actualizado para tecla modificada ID {tecla.id}")
             except Exception as e:
-                logger.warning(f"Error actualizando ChromaDB para tecla ID {tecla.id}: {e}")
         
         send_tool_message(f"Tecla '{nombre_original}' modificada exitosamente")
         return _format_success({"id": tecla.id, "nombre": tecla.nombre}, f"Tecla modificada")
@@ -360,9 +355,7 @@ def _eliminar_tecla(data: Dict) -> Dict:
                     "coleccion": "teclas",
                     "id_elemento": tecla_id
                 }])
-                logger.info(f"Tecla ID {tecla_id} eliminada de ChromaDB")
             except Exception as e:
-                logger.warning(f"Error eliminando de ChromaDB tecla ID {tecla_id}: {e}")
         
         tecla.delete()
         send_tool_message(f"Tecla '{nombre}' eliminada exitosamente")
@@ -1503,7 +1496,6 @@ def limpiar_espacios_sugerencias() -> Dict[str, Union[str, int]]:
                         })
                 
             except Exception as e:
-                logger.warning(f"Error procesando sugerencia ID {sugerencia.id}: {e}")
                 continue
         
         # Mensaje de resultado

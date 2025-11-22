@@ -25,7 +25,6 @@ def crear_seccion_global(
         (id, nombre, rgb).
     """
     send_tool_message(f"Creando sección '{nombre}' con color RGB '{rgb}'...")
-    logger.debug(f"Creando sección '{nombre}' con color RGB '{rgb}'...")
     
     seccion = Secciones(nombre=nombre, rgb=rgb)
     seccion.save()
@@ -52,7 +51,6 @@ def borrar_seccion(seccion_id: int) -> Dict[str, str]:
     try:
         seccion = Secciones.objects.get(id=seccion_id)
         send_tool_message(f"Eliminando sección '{seccion.nombre}'...")
-        logger.debug(f"Eliminando sección '{seccion.nombre}'...")
         
         seccion.delete()
         return {"success": f"Sección '{seccion.nombre}' eliminada correctamente"}
@@ -83,7 +81,6 @@ def modificar_seccion(
     try:
         seccion = Secciones.objects.get(id=seccion_id)
         send_tool_message(f"Modificando sección '{seccion.nombre}'...")
-        logger.debug(f"Modificando sección '{seccion.nombre}'...")
         
         if nombre is not None:
             seccion.nombre = nombre
@@ -115,7 +112,6 @@ def listar_secciones_globales() -> List[Dict[str, Union[int, str]]]:
         (id, nombre, rgb).
     """
     send_tool_message("Listando todas las secciones disponibles...")
-    logger.debug("Listando todas las secciones disponibles...")
     
     secciones = Secciones.objects.all()
     return [
@@ -139,7 +135,6 @@ def listar_iconos_secciones_comanda() -> List[Dict[str, str]]:
         List[Dict[str, str]]: Lista de diccionarios con la clave y el nombre de cada icono disponible.
     """
     send_tool_message("Listando iconos disponibles para las secciones de comandas...")
-    logger.debug("Listando iconos disponibles para las secciones de comandas...")
     
     return [name for  name in dict(ICON_CHOICES).values()]
 
@@ -164,7 +159,6 @@ def modificar_icono_seccion(
     try:
         seccion = SeccionesCom.objects.get(id=seccion_id)
         send_tool_message(f"Modificando icono de la sección '{seccion.nombre}' a '{nuevo_icono}'...")
-        logger.debug(f"Modificando icono de la sección '{seccion.nombre}' a '{nuevo_icono}'...")
         
         # Buscar la key correspondiente al value en ICON_CHOICES
         icon_dict = dict(ICON_CHOICES)
@@ -202,7 +196,6 @@ def listar_secciones_comanda() -> List[Dict[str, Union[int, str]]]:
         (id, nombre, icono).
     """
     send_tool_message("Listando nombres e iconos de las secciones de comandas...")
-    logger.debug("Listando nombres e iconos de las secciones de comandas...")
     
     secciones = SeccionesCom.objects.all()
     return [
@@ -272,7 +265,6 @@ def asociar_tecla_a_seccion_comanda(
     try:
         seccion_com = SeccionesCom.objects.get(id=seccion_com_id)
         send_tool_message(f"Asociando teclas a la sección de comanda '{seccion_com.nombre}'...")
-        logger.debug(f"Asociando teclas a la sección de comanda '{seccion_com.nombre}'...")
         
         # Verificar si la sección ya tiene 18 teclas
         if seccion_com.teclascom_set.count() + len(tecla_ids) > 18:
@@ -311,7 +303,6 @@ def quitar_asociacion_tecla_a_seccion(tecla_id: int) -> Dict[str, str]:
     try:
         tecla = Teclas.objects.get(id=tecla_id)
         send_tool_message(f"Quitando asociación de la tecla '{tecla.nombre}' con su sección...")
-        logger.debug(f"Quitando asociación de la tecla '{tecla.nombre}' con su sección...")
         
         deleted_count = Teclaseccion.objects.filter(tecla=tecla).delete()[0]
         if deleted_count > 0:
@@ -339,7 +330,6 @@ def quitar_asociacion_tecla_a_seccion_comanda(tecla_id: int) -> Dict[str, str]:
     try:
         tecla = Teclas.objects.get(id=tecla_id)
         send_tool_message(f"Quitando asociación de la tecla '{tecla.nombre}' con su sección de comanda...")
-        logger.debug(f"Quitando asociación de la tecla '{tecla.nombre}' con su sección de comanda...")
         
         deleted_count = Teclascom.objects.filter(tecla=tecla).delete()[0]
         if deleted_count > 0:
@@ -366,7 +356,6 @@ def find_seccion_by_name(query: str) -> Union[List[Dict[str, Union[int, str]]], 
         o mensaje de error si no hay coincidencias.
     """
     send_tool_message(f"Buscando secciones que coincidan con la expresión '{query}' (icontains)...")
-    logger.debug(f"Buscando secciones que coincidan con la expresión '{query}' (icontains)...")
 
     while len(query) >= 3:
         secciones = Secciones.objects.filter(nombre__icontains=query)
@@ -380,7 +369,6 @@ def find_seccion_by_name(query: str) -> Union[List[Dict[str, Union[int, str]]], 
                 for seccion in secciones
             ]
         query = query[:-3]  # Reducir el filtro en 3 caracteres
-        logger.debug(f"No se encontraron resultados. Reduciendo filtro a '{query}'...")
     
     return {"error": "No se encontraron secciones que coincidan con el filtro proporcionado, incluso después de reducirlo."}
 
@@ -400,7 +388,6 @@ def find_seccion_comanda_by_name(query: str) -> Union[List[Dict[str, Union[int, 
         o mensaje de error si no hay coincidencias.
     """
     send_tool_message(f"Buscando secciones de comanda que coincidan con la expresión '{query}' (icontains)...")
-    logger.debug(f"Buscando secciones de comanda que coincidan con la expresión '{query}' (icontains)...")
 
     while len(query) >= 3:
         secciones = SeccionesCom.objects.filter(nombre__icontains=query)
@@ -414,7 +401,6 @@ def find_seccion_comanda_by_name(query: str) -> Union[List[Dict[str, Union[int, 
                 for seccion in secciones
             ]
         query = query[:-3]  # Reducir el filtro en 3 caracteres
-        logger.debug(f"No se encontraron resultados. Reduciendo filtro a '{query}'...")
     
     return {"error": "No se encontraron secciones de comanda que coincidan con el filtro proporcionado, incluso después de reducirlo."}
 

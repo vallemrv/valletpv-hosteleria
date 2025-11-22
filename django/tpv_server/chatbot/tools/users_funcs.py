@@ -50,7 +50,6 @@ def crear_usuarios(usuarios: List[Dict[str, Union[str, bool]]]) -> List[Dict[str
                 results.append({"error": error_msg})
                 continue
             send_tool_message(f"Creando usuario '{username}'...")
-            logger.debug(f"Creando usuario '{username}'...")
             
             # Validar la contraseña
             validate_password(password)
@@ -103,7 +102,6 @@ def listar_usuarios(ids: List[int] = None, solo_superusuarios: bool = False, sol
         
         if ids is not None:
             send_tool_message(f"Listando usuarios con IDs: {ids}...")
-            logger.debug(f"Listando usuarios con IDs: {ids}...")
             queryset = queryset.filter(id__in=ids)
         else:
             filters = []
@@ -119,7 +117,6 @@ def listar_usuarios(ids: List[int] = None, solo_superusuarios: bool = False, sol
             
             filter_text = ", ".join(filters) if filters else "todos los usuarios"
             send_tool_message(f"Listando {filter_text}...")
-            logger.debug(f"Listando {filter_text}...")
         
         users = []
         for user in queryset:
@@ -179,7 +176,6 @@ def modificar_usuarios(modificaciones: List[Dict[str, Union[int, str, bool]]]) -
         try:
             user = User.objects.get(id=user_id)
             send_tool_message(f"Modificando usuario '{user.username}'...")
-            logger.debug(f"Modificando usuario '{user.username}'...")
             
             # Verificar si se intenta cambiar username y ya existe
             new_username = mod_data.get("username")
@@ -251,7 +247,6 @@ def eliminar_usuarios(user_ids: List[int]) -> List[Dict[str, str]]:
             username = user.username
             
             send_tool_message(f"Eliminando usuario '{username}'...")
-            logger.debug(f"Eliminando usuario '{username}'...")
             
             user.delete()
             results.append({"success": f"Usuario '{username}' eliminado correctamente"})
@@ -287,7 +282,6 @@ def promover_a_superusuario(user_ids: List[int]) -> List[Dict[str, Union[int, st
         try:
             user = User.objects.get(id=user_id)
             send_tool_message(f"Promoviendo usuario '{user.username}' a superusuario...")
-            logger.debug(f"Promoviendo usuario '{user.username}' a superusuario...")
             
             user.is_superuser = True
             user.is_staff = True
@@ -326,7 +320,6 @@ def quitar_permisos_superusuario(user_ids: List[int]) -> List[Dict[str, Union[in
         try:
             user = User.objects.get(id=user_id)
             send_tool_message(f"Quitando permisos de superusuario a '{user.username}'...")
-            logger.debug(f"Quitando permisos de superusuario a '{user.username}'...")
             
             user.is_superuser = False
             user.is_staff = False
@@ -360,7 +353,6 @@ def buscar_usuarios_por_nombre(filtro: str) -> List[Dict[str, Union[int, str, bo
     """
     try:
         send_tool_message(f"Buscando usuarios con filtro '{filtro}'...")
-        logger.debug(f"Buscando usuarios con filtro '{filtro}'...")
         
         users = User.objects.filter(
             Q(username__icontains=filtro) |
@@ -419,12 +411,10 @@ def _enviar_email_destinatarios_logic(destinatarios: List[str], asunto: str, men
         try:
             if "@" not in email_destino or "." not in email_destino:
                 error_msg = f"Dirección de correo inválida: {email_destino}"
-                logger.warning(error_msg)
                 results.append({"email": email_destino, "error": error_msg})
                 continue
             
             send_tool_message(f"Enviando correo a '{email_destino}'...")
-            logger.debug(f"Enviando correo a '{email_destino}'...")
             
             if es_html:
                 from django.core.mail import EmailMessage
@@ -466,7 +456,6 @@ def enviar_email_usuarios(user_ids: List[int], asunto: str, mensaje: str, es_htm
             user = User.objects.get(id=user_id)
             if not user.email:
                 error_msg = f"Usuario '{user.username}' no tiene dirección de correo configurada"
-                logger.warning(error_msg)
                 results.append({"id": user.id, "username": user.username, "email": "", "error": error_msg})
                 continue
             emails_validos.append(user.email)

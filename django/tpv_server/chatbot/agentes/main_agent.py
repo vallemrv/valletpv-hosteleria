@@ -112,15 +112,12 @@ class MainAgent:
                 audio_bytes = audio_part.get("data")
                 mime_type = audio_part.get("mime_type")
                 if self.transcriptor and audio_bytes:
-                    logger.info(f"[{self.agent_name}] Audio detectado. Transcribiendo...")
                     return await self.transcriptor.transcribir(audio_bytes, mime_type)
                 else:
-                    logger.warning(f"[{self.agent_name}] Se encontró audio pero no hay transcriptor.")
                     return "Error: No se pudo procesar el audio."
 
             final_text = " ".join(text_parts)
             if image_part:
-                logger.info(f"[{self.agent_name}] Imagen detectada. Obteniendo descripción...")
                 image_message = HumanMessage(content=[image_part])
                 response = await self.llm.ainvoke([image_message])
                 image_description = response.content.strip()
@@ -128,7 +125,6 @@ class MainAgent:
 
             return final_text.strip() if final_text else None
 
-        logger.warning(f"Formato de contenido no soportado: {query.content}")
         return None
 
     def _load_dinamic_instructions(self, file_name: str) -> str:

@@ -25,7 +25,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.token = params.get('token', '')
 
             if not self.user or not self.token:
-                 logger.warning(f"❌ Conexión rechazada - Faltan parámetros (user={self.user})")
                  await self.accept()
                  await self.send(text_data=json.dumps({
                      'type': 'error',
@@ -36,7 +35,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             # Validación del Token
             if not await self.validate_token(self.token, self.user):
-                logger.warning(f"❌ Token inválido - Usuario: {self.user}")
                 await self.accept()
                 await self.send(text_data=json.dumps({
                     'type': 'error',
@@ -52,8 +50,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             await self.channel_layer.group_add(self.group_name, self.channel_name)
             await self.accept()
-            
-            logger.info(f"✅ Chatbot conectado - Usuario: {self.user}, Grupo: {self.group_name}")
 
             self.message_processor = MessageProcessor(self)
 
@@ -67,9 +63,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
-            logger.info(f"🔌 Desconectado - Usuario: {self.user}, Código: {close_code}")
-        else:
-            logger.info(f"🔌 Desconectado sin grupo - Código: {close_code}")
         # Puedes añadir limpieza adicional si es necesario (ej: self.audio_processor.cleanup())
 
     # --- Tus otros métodos (receive, validate_token, etc.) irían aquí ---
@@ -125,7 +118,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def validate_token(self, token, user_id):
         user = await sync_to_async(authenticate)(pk=user_id, token=token)
         if user:
-            logger.info(f"Token válido para el usuario {user_id}.")
             return True
         else:
             logger.error(f"Token inválido para el usuario {user_id}.")

@@ -83,7 +83,6 @@ class MessageProcessor:
         if not isinstance(message, str) or not message.strip():
             message = "No he podido procesar tu solicitud. Inténtalo de nuevo."
             sender = "bot"
-            logger.warning(f"Intento de enviar mensaje vacío o no-string. ID: {message_id}")
 
         if not self.consumer.group_name:
             logger.error(f"consumer.group_name no definido. No se puede enviar mensaje ID: {message_id}")

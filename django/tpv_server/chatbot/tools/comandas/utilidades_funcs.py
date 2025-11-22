@@ -237,7 +237,6 @@ def gestionar_memoria_camarero(
                 with open(archivo_memoria, 'r', encoding='utf-8') as f:
                     memoria_actual = f.read()
             except Exception as e:
-                logger.warning(f"Error leyendo archivo de memoria {archivo_memoria}: {str(e)}")
                 memoria_actual = ""
         
         # Ejecutar acción

@@ -33,7 +33,6 @@ def crear_familia(
     try:
         receptor = Receptores.objects.get(id=receptor_id)
         send_tool_message(f"Creando familia '{nombre}' asociada al receptor '{receptor.nombre}'...")
-        logger.debug(f"Creando familia '{nombre}' asociada al receptor '{receptor.nombre}'...")
         
         # Convertir la lista de strings a JSON para almacenamiento
         composicion_str = json.dumps(composicion) if composicion else json.dumps([])
@@ -115,7 +114,6 @@ def modificar_familia(
         familia = Familias.objects.get(id=familia_id)
         nombre_anterior = familia.nombre
         send_tool_message(f"Modificando familia '{familia.nombre}'...")
-        logger.debug(f"Modifying familia '{familia.nombre}'...")
         
         # Validar composición si se está modificando
         if composicion is not None:
@@ -134,7 +132,6 @@ def modificar_familia(
         actualizar_composiciones = False
         
         if nombre is not None and nombre != nombre_anterior:
-            logger.debug(f"Cambiando nombre de familia de '{nombre_anterior}' a '{nombre}'")
             familia.nombre = nombre
             actualizar_composiciones = True
             
@@ -157,7 +154,6 @@ def modificar_familia(
         
         # Actualizar composiciones de otras familias si se cambió el nombre
         if actualizar_composiciones:
-            logger.debug(f"Buscando familias con '{nombre_anterior}' en su composición para actualizar")
             familias_con_composicion = Familias.objects.filter(
                 Q(composicion__icontains=nombre_anterior) & ~Q(id=familia_id)
             )
@@ -178,14 +174,12 @@ def modificar_familia(
                             fam.composicion = json.dumps(elementos_actualizados)
                             fam.save()
                             familias_actualizadas += 1
-                            logger.debug(f"Actualizada composición de familia '{fam.nombre}': {fam.composicion}")
                     except json.JSONDecodeError as e:
                         logger.error(f"Error decodificando JSON en composición de familia '{fam.nombre}': {str(e)}")
                         continue
             
             if familias_actualizadas > 0:
                 send_tool_message(f"Actualizadas {familias_actualizadas} familias que tenían '{nombre_anterior}' en su composición")
-                logger.info(f"Actualizadas {familias_actualizadas} familias que tenían '{nombre_anterior}' en su composición")
         
         return {
             "id": familia.id,
@@ -210,7 +204,6 @@ def listar_todas_familias() -> List[Dict[str, Union[int, str]]]:
         (id, nombre, composicion, cantidad, receptor_id).
     """
     send_tool_message("Listando todas las familias disponibles...")
-    logger.debug("Listando todas las familias disponibles...")
     
     familias = Familias.objects.all()
     return [
@@ -241,7 +234,6 @@ def listar_teclas_por_familia(familia_id: int) -> Union[List[Dict[str, Union[int
     try:
         familia = Familias.objects.get(id=familia_id)
         send_tool_message(f"Listando teclas asociadas a la familia '{familia.nombre}'...")
-        logger.debug(f"Listando teclas asociadas a la familia '{familia.nombre}'...")
         
         teclas = familia.teclas_set.all()
         return [
@@ -273,7 +265,6 @@ def find_familia_by_name(query: str) -> Union[List[Dict[str, Union[int, str]]], 
         Union[List[Dict[str, Union[int, str]]], Dict[str, str]]: Lista de familias encontradas o mensaje de error.
     """
     send_tool_message(f"Buscando familias que coincidan con la expresión '{query}' (icontains)...")
-    logger.debug(f"Buscando familias que coincidan con la expresión '{query}' (icontains)...")
 
     while len(query) >= 3:
         familias = Familias.objects.filter(nombre__icontains=query)
@@ -309,7 +300,6 @@ def listar_familias_por_receptor(receptor_id: int) -> Union[List[Dict[str, Union
     try:
         receptor = Receptores.objects.get(id=receptor_id)
         send_tool_message(f"Listando familias asociadas al receptor '{receptor.nombre}'...")
-        logger.debug(f"Listando familias asociadas al receptor '{receptor.nombre}'...")
         familias = Familias.objects.filter(receptor=receptor)
         return [
             {
@@ -346,11 +336,9 @@ def agregar_familia_a_composicion(
     try:
         familia = Familias.objects.get(id=familia_id)
         send_tool_message(f"Agregando familia '{nombre_familia_agregar}' a la composición de '{familia.nombre}'...")
-        logger.debug(f"Agregando familia '{nombre_familia_agregar}' a la composición de '{familia.nombre}'...")
         
         # Verificar que la familia a agregar existe
         if not Familias.objects.filter(nombre=nombre_familia_agregar).exists():
-            logger.warning(f"La familia '{nombre_familia_agregar}' no existe en la base de datos")
             return {"error": f"La familia '{nombre_familia_agregar}' no existe"}
         
         # Convertir la composición actual a lista
@@ -367,7 +355,6 @@ def agregar_familia_a_composicion(
         
         # Verificar si la familia ya está en la composición
         if nombre_familia_agregar in composicion_actual:
-            logger.info(f"La familia '{nombre_familia_agregar}' ya está en la composición")
             return {"info": f"La familia '{nombre_familia_agregar}' ya está en la composición de '{familia.nombre}'"}
         
         # Agregar la nueva familia a la composición
@@ -377,7 +364,6 @@ def agregar_familia_a_composicion(
         familia.composicion = json.dumps(composicion_actual)
         familia.save()
         
-        logger.info(f"Familia '{nombre_familia_agregar}' agregada exitosamente a la composición")
         
         return {
             "id": familia.id,
@@ -416,7 +402,6 @@ def quitar_familia_de_composicion(
     try:
         familia = Familias.objects.get(id=familia_id)
         send_tool_message(f"Quitando familia '{nombre_familia_quitar}' de la composición de '{familia.nombre}'...")
-        logger.debug(f"Quitando familia '{nombre_familia_quitar}' de la composición de '{familia.nombre}'...")
         
         # Convertir la composición actual a lista
         composicion_actual = []
@@ -432,7 +417,6 @@ def quitar_familia_de_composicion(
         
         # Verificar si la familia está en la composición
         if nombre_familia_quitar not in composicion_actual:
-            logger.info(f"La familia '{nombre_familia_quitar}' no está en la composición")
             return {"info": f"La familia '{nombre_familia_quitar}' no está en la composición de '{familia.nombre}'"}
         
         # Quitar la familia de la composición
@@ -442,7 +426,6 @@ def quitar_familia_de_composicion(
         familia.composicion = json.dumps(composicion_actual)
         familia.save()
         
-        logger.info(f"Familia '{nombre_familia_quitar}' quitada exitosamente de la composición")
         
         return {
             "id": familia.id,

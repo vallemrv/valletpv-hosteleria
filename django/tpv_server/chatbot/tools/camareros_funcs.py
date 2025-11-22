@@ -248,21 +248,17 @@ def delete_inactive_waiters() -> str:
         send_tool_message("Eliminando camareros inactivos")
         camareros_inactivos = Camareros.objects.filter(activo=0)
         total = camareros_inactivos.count()
-        logger.info(f"Encontrados {total} camareros inactivos para procesar")
         eliminados = 0
         no_eliminados = 0
 
         for camarero in camareros_inactivos:
-            logger.info(f"Procesando camarero ID {camarero.id}: {camarero.nombre} {camarero.apellidos}")
             if Pedidos.objects.filter(camarero_id=camarero.id).exists():
-                logger.info(f"No se puede eliminar el camarero ID {camarero.id} porque tiene ventas asociadas.")
                 no_eliminados += 1
                 continue
             else:
                 try:
                     camarero.delete()
                     eliminados += 1
-                    logger.info(f"Camarero ID {camarero.id} eliminado correctamente.")
                 except ProtectedError:
                     logger.error(f"Error al eliminar el camarero ID {camarero.id}: Tiene ventas asociadas.")
                     no_eliminados += 1
@@ -270,7 +266,6 @@ def delete_inactive_waiters() -> str:
                     logger.error(f"Error inesperado al eliminar el camarero ID {camarero.id}: {str(e)}")
                     no_eliminados += 1
 
-        logger.info(f"Proceso completado. Eliminados: {eliminados}, No eliminados: {no_eliminados}")
         if total == 0:
             return "No se encontraron camareros inactivos para eliminar."
         if eliminados == 0 and no_eliminados == total:

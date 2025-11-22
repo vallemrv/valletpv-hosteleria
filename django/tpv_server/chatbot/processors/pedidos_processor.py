@@ -97,7 +97,6 @@ class PedidosProcessor:
         if not message or not isinstance(message, str):
             message = "No he podido procesar tu pedido. Inténtalo de nuevo. Disculpa las molestias."
             sender = "bot"
-            logger.warning(f"Intento de enviar mensaje vacío o no string a cliente. ID: {message_id}, Sender: {sender}")
             
 
         if not self.consumer.group_name:

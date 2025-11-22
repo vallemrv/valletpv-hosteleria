@@ -47,9 +47,7 @@ def close_db_connections():
         for conn in connections.all():
             if conn.connection and not conn.connection.closed:
                 conn.close()
-                logger.debug(f"Conexión DB cerrada: {conn.alias}")
     except (InterfaceError, OperationalError) as e:
         # Estas excepciones son normales cuando las conexiones ya están cerradas
-        logger.debug(f"Conexión DB ya cerrada o error normal: {e}")
     except Exception as e:
         logger.error(f"Error al cerrar conexiones DB: {e}", exc_info=True)

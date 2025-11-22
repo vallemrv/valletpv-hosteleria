@@ -56,8 +56,6 @@ class ExpertAgent:
             if not isinstance(query, str):
                 raise ValueError("La entrada para TextAgent debe ser una cadena de texto.")
 
-            logger.info(f"[{self.agent_name}] Procesando texto: '{query[:50]}...'")
-            
             # Versión simplificada: usar el LLM directamente
             try:
                 response = await self.llm.ainvoke(self.prompt.format(input=query, agent_scratchpad=""))

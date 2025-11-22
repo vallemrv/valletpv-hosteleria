@@ -16,14 +16,11 @@ class TranscriptorGeminiLangChain(TranscriptorDeAudio):
             llm: Instancia de ChatGoogleGenerativeAI.
         """
         self.llm = llm
-        logger.info(f"TranscriptorGeminiLangChain inicializado.")
 
     async def transcribir(self, audio_bytes: bytes, mime_type: str) -> str:
         """
         Transcribe audio usando el modelo Gemini a través de LangChain.
         """
-        logger.info(f"Enviando audio a Gemini (vía LangChain) para transcripción...")
-
         # 1. En LangChain, el contenido multimodal se pasa en una lista dentro de HumanMessage
         mensaje_multimodal = HumanMessage(
             content=[
@@ -34,8 +31,6 @@ class TranscriptorGeminiLangChain(TranscriptorDeAudio):
         
         # 2. Invocamos el LLM de LangChain
         response = await self.llm.ainvoke([mensaje_multimodal])
-
-        logger.info("Transcripción con Gemini (vía LangChain) completada.")
         
         # 3. Devolvemos el texto extraído
         return response.content.strip()
