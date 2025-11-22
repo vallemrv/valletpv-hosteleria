@@ -14,13 +14,15 @@ import com.valleapp.vallecash.ValleCASH
 import com.valleapp.valletpv.R
 import com.valleapp.valletpvlib.interfaces.IControllerWS
 import com.valleapp.valletpvlib.comunicacion.WSClient
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONException
 import org.json.JSONObject
 
 class WebSocketService : Service(), IControllerWS {
 
     private var wsClient: WSClient? = null
     private var serverUrl = "" // La URL de tu servidor
-    private val endpoint = "/comunicacion/cashlogy" // El endpoint de tu WebSocket
+    private var endpoint = "/comunicacion/cashlogy" // El endpoint de tu WebSocket
     private val channelId = "WebSocketServiceChannel" // ID del canal de notificación
 
     private fun startForegroundService() {
@@ -56,10 +58,12 @@ class WebSocketService : Service(), IControllerWS {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         serverUrl = intent?.getStringExtra("SERVER_URL") ?: ""
         if (wsClient == null && serverUrl.isNotEmpty()) {
-            println("Intentando conectar al WebSocket... $serverUrl")
+            val uid = cargarUid()
+            endpoint = if (uid.isNotEmpty()) "/comunicacion/cashlogy?uid=$uid" else "/comunicacion/cashlogy"
+            println("Intentando conectar al WebSocket... $serverUrl$endpoint")
             wsClient = WSClient(serverUrl, endpoint, this)
             wsClient?.connect()
-            Log.d("WebSocketService", "WebSocket conectado a $serverUrl")
+            Log.d("WebSocketService", "WebSocket conectado a $serverUrl$endpoint")
             startForegroundService()
         }
 
@@ -141,5 +145,16 @@ class WebSocketService : Service(), IControllerWS {
             putExtra("message", o.getString("respuesta"))
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    private fun cargarUid(): String {
+        val json = JSON()
+        return try {
+            val obj = json.deserializar("settings.dat", this)
+            obj?.optString("uid", "") ?: ""
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            ""
+        }
     }
 }

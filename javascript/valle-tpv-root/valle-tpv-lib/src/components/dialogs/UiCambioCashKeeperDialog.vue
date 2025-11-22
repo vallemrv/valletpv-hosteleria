@@ -1,10 +1,5 @@
 <template>
-  <v-dialog 
-    v-model="isOpen" 
-    persistent 
-    max-width="1000px"
-    class="cambio-dialog"
-  >
+  <v-dialog v-model="isOpen" persistent max-width="1000px" class="cambio-dialog">
     <v-card class="dialog-card elevation-12 rounded-xl">
       <!-- Cabecera negra como en UiVariosDialog -->
       <v-card-title class="dialog-title bg-black text-white text-center pa-4">
@@ -25,29 +20,34 @@
                 <div class="importe-value success--text">{{ formatCurrency(cambioADar) }}</div>
               </div>
             </div>
-            
+
             <!-- Fila inferior - Explicaciones -->
             <div class="explicaciones-section">
               <div class="explicacion-item" :class="{ 'intermittent-blink': isCanceling }">
                 <v-icon color="primary" class="mr-2">{{ statusIcon }}</v-icon>
                 <span class="status-text">{{ statusText }}</span>
               </div>
-            </div>          </div>
+            </div>
+          </div>
 
           <!-- Columna derecha - Cuadrícula de denominaciones -->
           <div class="denominaciones-column">
             <div class="denominaciones-grid">
-               <!-- 20 EUR -->
+              <!-- 20 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(20) || isDispensing" @click="dispensarDenominacionDirecta(20)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(20) || isDispensing"
+                  @click="dispensarDenominacionDirecta(20)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/veinteeuros.png" alt="20€" width="40" height="25" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">20€</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">20€</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">20€</div>
-                    <v-chip v-if="getCantidadDenominacion(20) > 0" :color="getDenominacionStatus(20).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(20) > 0" :color="getDenominacionStatus(20).color"
+                      size="x-small" class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(20).showAmount">{{ getDenominacionStatus(20).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -56,15 +56,19 @@
               </div>
               <!-- 10 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(10) || isDispensing" @click="dispensarDenominacionDirecta(10)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(10) || isDispensing"
+                  @click="dispensarDenominacionDirecta(10)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/diezeuros.png" alt="10€" width="40" height="25" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">10€</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">10€</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">10€</div>
-                    <v-chip v-if="getCantidadDenominacion(10) > 0" :color="getDenominacionStatus(10).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(10) > 0" :color="getDenominacionStatus(10).color"
+                      size="x-small" class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(10).showAmount">{{ getDenominacionStatus(10).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -73,15 +77,19 @@
               </div>
               <!-- 5 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(5) || isDispensing" @click="dispensarDenominacionDirecta(5)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn billete-btn" :disabled="!estaDenominacionDisponible(5) || isDispensing"
+                  @click="dispensarDenominacionDirecta(5)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/cincoeuros.png" alt="5€" width="40" height="25" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">5€</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">5€</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">5€</div>
-                    <v-chip v-if="getCantidadDenominacion(5) > 0" :color="getDenominacionStatus(5).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(5) > 0" :color="getDenominacionStatus(5).color" size="x-small"
+                      class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(5).showAmount">{{ getDenominacionStatus(5).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -91,23 +99,21 @@
               <!-- 2 EUR -->
               <div class="denominacion-item">
                 <!-- Si es <= 10€, botón normal. Si es > 10€, botón con menú -->
-                <v-menu v-if="cashKeeperStore.totalAdmitido > 10" offset-y max-height="400">
+                <v-menu v-if="cashKeeperStore.totalAdmitido > 2" offset-y max-height="400">
                   <template v-slot:activator="{ props }">
-                    <v-btn 
-                      v-bind="props"
-                      class="denominacion-btn moneda-btn" 
-                      :disabled="!estaDenominacionDisponible(2) || isDispensing" 
-                      size="large" 
-                      variant="elevated"
-                    >
+                    <v-btn v-bind="props" class="denominacion-btn moneda-btn"
+                      :disabled="!estaDenominacionDisponible(2) || isDispensing" size="large" variant="elevated">
                       <div class="btn-content">
                         <div class="denominacion-image">
                           <v-img src="/ic_euros/doseuros.png" alt="2€" width="35" height="35" contain>
-                            <template v-slot:placeholder><div class="image-placeholder">2€</div></template>
+                            <template v-slot:placeholder>
+                              <div class="image-placeholder">2€</div>
+                            </template>
                           </v-img>
                         </div>
                         <div class="denominacion-valor">2€</div>
-                        <v-chip v-if="getCantidadDenominacion(2) > 0" :color="getDenominacionStatus(2).color" size="x-small" class="mt-1" variant="elevated">
+                        <v-chip v-if="getCantidadDenominacion(2) > 0" :color="getDenominacionStatus(2).color"
+                          size="x-small" class="mt-1" variant="elevated">
                           <span v-if="getDenominacionStatus(2).showAmount">{{ getDenominacionStatus(2).amount }}</span>
                           <v-icon v-else>mdi-check</v-icon>
                         </v-chip>
@@ -115,37 +121,31 @@
                     </v-btn>
                   </template>
                   <v-list class="euro-menu-list">
-                    <!-- Generar opciones para monedas de 2€: 5, luego de 10 en 10 -->
-                    <v-list-item 
-                      v-for="opcion in opcionesMenu2Euros" 
-                      :key="opcion.cantidad"
-                      @click="dispensarMonedas2Euros(opcion.cantidad)" 
-                      class="menu-item-large"
-                    >
+                    <!-- Generar opciones para monedas de 2€: 5, luego de 5 en 5 -->
+                    <v-list-item v-for="opcion in opcionesMenu2Euros" :key="opcion.cantidad"
+                      @click="dispensarMonedas2Euros(opcion.cantidad)" class="menu-item-large">
                       <v-list-item-title class="menu-item-text">
                         {{ opcion.texto }}
                       </v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                
+
                 <!-- Botón normal cuando totalAdmitido <= 10 -->
-                <v-btn 
-                  v-else
-                  class="denominacion-btn moneda-btn" 
-                  :disabled="!estaDenominacionDisponible(2) || isDispensing" 
-                  @click="dispensarDenominacionDirecta(2)" 
-                  size="large" 
-                  variant="elevated"
-                >
+                <v-btn v-else class="denominacion-btn moneda-btn"
+                  :disabled="!estaDenominacionDisponible(2) || isDispensing" @click="dispensarDenominacionDirecta(2)"
+                  size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/doseuros.png" alt="2€" width="35" height="35" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">2€</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">2€</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">2€</div>
-                    <v-chip v-if="getCantidadDenominacion(2) > 0" :color="getDenominacionStatus(2).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(2) > 0" :color="getDenominacionStatus(2).color" size="x-small"
+                      class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(2).showAmount">{{ getDenominacionStatus(2).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -155,23 +155,21 @@
               <!-- 1 EUR -->
               <div class="denominacion-item">
                 <!-- Si es <= 5€, botón normal. Si es > 5€, botón con menú -->
-                <v-menu v-if="cashKeeperStore.totalAdmitido > 5" offset-y max-height="400">
+                <v-menu v-if="cashKeeperStore.totalAdmitido > 1" offset-y max-height="400">
                   <template v-slot:activator="{ props }">
-                    <v-btn 
-                      v-bind="props"
-                      class="denominacion-btn moneda-btn" 
-                      :disabled="!estaDenominacionDisponible(1) || isDispensing" 
-                      size="large" 
-                      variant="elevated"
-                    >
+                    <v-btn v-bind="props" class="denominacion-btn moneda-btn"
+                      :disabled="!estaDenominacionDisponible(1) || isDispensing" size="large" variant="elevated">
                       <div class="btn-content">
                         <div class="denominacion-image">
                           <v-img src="/ic_euros/uneuro.png" alt="1€" width="35" height="35" contain>
-                            <template v-slot:placeholder><div class="image-placeholder">1€</div></template>
+                            <template v-slot:placeholder>
+                              <div class="image-placeholder">1€</div>
+                            </template>
                           </v-img>
                         </div>
                         <div class="denominacion-valor">1€</div>
-                        <v-chip v-if="getCantidadDenominacion(1) > 0" :color="getDenominacionStatus(1).color" size="x-small" class="mt-1" variant="elevated">
+                        <v-chip v-if="getCantidadDenominacion(1) > 0" :color="getDenominacionStatus(1).color"
+                          size="x-small" class="mt-1" variant="elevated">
                           <span v-if="getDenominacionStatus(1).showAmount">{{ getDenominacionStatus(1).amount }}</span>
                           <v-icon v-else>mdi-check</v-icon>
                         </v-chip>
@@ -180,36 +178,30 @@
                   </template>
                   <v-list class="euro-menu-list">
                     <!-- Generar opciones de 10 en 10 hasta el total -->
-                    <v-list-item 
-                      v-for="opcion in opcionesMenu" 
-                      :key="opcion.cantidad"
-                      @click="dispensarMonedas(opcion.cantidad)" 
-                      class="menu-item-large"
-                    >
+                    <v-list-item v-for="opcion in opcionesMenu" :key="opcion.cantidad"
+                      @click="dispensarMonedas(opcion.cantidad)" class="menu-item-large">
                       <v-list-item-title class="menu-item-text">
                         {{ opcion.texto }}
                       </v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                
+
                 <!-- Botón normal cuando totalAdmitido <= 5 -->
-                <v-btn 
-                  v-else
-                  class="denominacion-btn moneda-btn" 
-                  :disabled="!estaDenominacionDisponible(1) || isDispensing" 
-                  @click="dispensarDenominacionDirecta(1)" 
-                  size="large" 
-                  variant="elevated"
-                >
+                <v-btn v-else class="denominacion-btn moneda-btn"
+                  :disabled="!estaDenominacionDisponible(1) || isDispensing" @click="dispensarDenominacionDirecta(1)"
+                  size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/uneuro.png" alt="1€" width="35" height="35" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">1€</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">1€</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">1€</div>
-                    <v-chip v-if="getCantidadDenominacion(1) > 0" :color="getDenominacionStatus(1).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(1) > 0" :color="getDenominacionStatus(1).color" size="x-small"
+                      class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(1).showAmount">{{ getDenominacionStatus(1).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -218,15 +210,19 @@
               </div>
               <!-- 0.50 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.5) || isDispensing" @click="dispensarDenominacionDirecta(0.5)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.5) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.5)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/cincuentacentimos.png" alt="0.50€" width="32" height="32" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">50c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">50c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.50€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.5) > 0" :color="getDenominacionStatus(0.5).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(0.5) > 0" :color="getDenominacionStatus(0.5).color"
+                      size="x-small" class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(0.5).showAmount">{{ getDenominacionStatus(0.5).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -235,15 +231,19 @@
               </div>
               <!-- 0.20 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.2) || isDispensing" @click="dispensarDenominacionDirecta(0.2)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.2) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.2)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/veintecentimos.png" alt="0.20€" width="30" height="30" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">20c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">20c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.20€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.2) > 0" :color="getDenominacionStatus(0.2).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(0.2) > 0" :color="getDenominacionStatus(0.2).color"
+                      size="x-small" class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(0.2).showAmount">{{ getDenominacionStatus(0.2).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -252,15 +252,19 @@
               </div>
               <!-- 0.10 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.1) || isDispensing" @click="dispensarDenominacionDirecta(0.1)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.1) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.1)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/diezcentimos.png" alt="0.10€" width="28" height="28" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">10c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">10c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.10€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.1) > 0" :color="getDenominacionStatus(0.1).color" size="x-small" class="mt-1" variant="elevated">
+                    <v-chip v-if="getCantidadDenominacion(0.1) > 0" :color="getDenominacionStatus(0.1).color"
+                      size="x-small" class="mt-1" variant="elevated">
                       <span v-if="getDenominacionStatus(0.1).showAmount">{{ getDenominacionStatus(0.1).amount }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
@@ -269,16 +273,21 @@
               </div>
               <!-- 0.05 EUR -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.05) || isDispensing" @click="dispensarDenominacionDirecta(0.05)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.05) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.05)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/cincocentimos.png" alt="0.05€" width="26" height="26" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">5c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">5c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.05€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.05) > 0" :color="getDenominacionStatus(0.05).color" size="x-small" class="mt-1" variant="elevated">
-                      <span v-if="getDenominacionStatus(0.05).showAmount">{{ getDenominacionStatus(0.05).amount }}</span>
+                    <v-chip v-if="getCantidadDenominacion(0.05) > 0" :color="getDenominacionStatus(0.05).color"
+                      size="x-small" class="mt-1" variant="elevated">
+                      <span v-if="getDenominacionStatus(0.05).showAmount">{{ getDenominacionStatus(0.05).amount
+                        }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
                   </div>
@@ -287,33 +296,43 @@
 
               <!-- Fila 4: 0.02€, 0.01€ -->
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.02) || isDispensing" @click="dispensarDenominacionDirecta(0.02)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.02) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.02)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/doscentimos.png" alt="0.02€" width="24" height="24" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">2c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">2c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.02€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.02) > 0" :color="getDenominacionStatus(0.02).color" size="x-small" class="mt-1" variant="elevated">
-                      <span v-if="getDenominacionStatus(0.02).showAmount">{{ getDenominacionStatus(0.02).amount }}</span>
+                    <v-chip v-if="getCantidadDenominacion(0.02) > 0" :color="getDenominacionStatus(0.02).color"
+                      size="x-small" class="mt-1" variant="elevated">
+                      <span v-if="getDenominacionStatus(0.02).showAmount">{{ getDenominacionStatus(0.02).amount
+                        }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
                   </div>
                 </v-btn>
               </div>
-              
+
               <div class="denominacion-item">
-                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.01) || isDispensing" @click="dispensarDenominacionDirecta(0.01)" size="large" variant="elevated">
+                <v-btn class="denominacion-btn moneda-btn" :disabled="!estaDenominacionDisponible(0.01) || isDispensing"
+                  @click="dispensarDenominacionDirecta(0.01)" size="large" variant="elevated">
                   <div class="btn-content">
                     <div class="denominacion-image">
                       <v-img src="/ic_euros/uncentimo.png" alt="0.01€" width="22" height="22" contain>
-                        <template v-slot:placeholder><div class="image-placeholder">1c</div></template>
+                        <template v-slot:placeholder>
+                          <div class="image-placeholder">1c</div>
+                        </template>
                       </v-img>
                     </div>
                     <div class="denominacion-valor">0.01€</div>
-                    <v-chip v-if="getCantidadDenominacion(0.01) > 0" :color="getDenominacionStatus(0.01).color" size="x-small" class="mt-1" variant="elevated">
-                      <span v-if="getDenominacionStatus(0.01).showAmount">{{ getDenominacionStatus(0.01).amount }}</span>
+                    <v-chip v-if="getCantidadDenominacion(0.01) > 0" :color="getDenominacionStatus(0.01).color"
+                      size="x-small" class="mt-1" variant="elevated">
+                      <span v-if="getDenominacionStatus(0.01).showAmount">{{ getDenominacionStatus(0.01).amount
+                        }}</span>
                       <v-icon v-else>mdi-check</v-icon>
                     </v-chip>
                   </div>
@@ -327,15 +346,8 @@
       <!-- Acciones del diálogo -->
       <v-card-actions class="dialog-actions pa-4">
         <v-spacer></v-spacer>
-        <v-btn
-          color="error"
-          variant="elevated"
-          @click="onDialogAction('cancelar')"
-          size="x-large"
-          rounded="lg"
-          style="height: 80px;"
-          :disabled="isCanceling || isDispensing"
-        >
+        <v-btn color="error" variant="elevated" @click="onDialogAction('cancelar')" size="x-large" rounded="lg"
+          style="height: 80px;" :disabled="isCanceling || isDispensing">
           <v-icon size="24" class="mr-2">mdi-close</v-icon>
           Cancelar
         </v-btn>
@@ -346,7 +358,7 @@
 </template>
 
 <script setup lang="ts">
-import {  computed, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useCashKeeperStore } from '../../store/cashKeeperStore';
 
 // Props
@@ -404,7 +416,7 @@ const cambioADar = computed(() => cashKeeperStore.totalAdmitido);
 const opcionesMenu = computed(() => {
   const total = Math.floor(cashKeeperStore.totalAdmitido);
   const opciones: Array<{ cantidad: number; texto: string }> = [];
-  
+
   // Si el total es 5 o menos, solo mostrar TODO
   if (total <= 5) {
     opciones.push({
@@ -413,7 +425,7 @@ const opcionesMenu = computed(() => {
     });
     return opciones;
   }
-  
+
   // Agregar opción de 5 monedas si el total es mayor a 5
   if (total > 5) {
     opciones.push({
@@ -421,7 +433,7 @@ const opcionesMenu = computed(() => {
       texto: `5 MONEDAS (${formatCurrency(5)})`
     });
   }
-  
+
   // Generar opciones de 10 en 10 hasta llegar al total
   for (let i = 10; i < total; i += 10) {
     opciones.push({
@@ -429,21 +441,21 @@ const opcionesMenu = computed(() => {
       texto: `${i} MONEDAS (${formatCurrency(i)})`
     });
   }
-  
+
   // Agregar opción TODO al final
   opciones.push({
     cantidad: total,
     texto: `TODO (${formatCurrency(total)})`
   });
-  
+
   return opciones;
 });
 
-// Generar opciones del menú para monedas de 2€: 5, luego de 10 en 10
+// Generar opciones del menú para monedas de 2€: 5, luego de 5 en 5
 const opcionesMenu2Euros = computed(() => {
   const totalDisponible = Math.floor(cashKeeperStore.totalAdmitido / 2); // Máximo de monedas de 2€ que podemos dispensar
   const opciones: Array<{ cantidad: number; texto: string }> = [];
-  
+
   // Si el total disponible es 5 o menos, solo mostrar TODO
   if (totalDisponible <= 5) {
     opciones.push({
@@ -452,7 +464,7 @@ const opcionesMenu2Euros = computed(() => {
     });
     return opciones;
   }
-  
+
   // Agregar opción de 5 monedas si el total disponible es mayor a 5
   if (totalDisponible > 5) {
     opciones.push({
@@ -460,21 +472,21 @@ const opcionesMenu2Euros = computed(() => {
       texto: `5 MONEDAS (${formatCurrency(5 * 2)})`
     });
   }
-  
+
   // Generar opciones de 10 en 10 hasta llegar al total disponible
-  for (let i = 10; i < totalDisponible; i += 10) {
+  for (let i = 10; i < totalDisponible; i += 5) {
     opciones.push({
       cantidad: i,
       texto: `${i} MONEDAS (${formatCurrency(i * 2)})`
     });
   }
-  
+
   // Agregar opción TODO al final
   opciones.push({
     cantidad: totalDisponible,
     texto: `TODO (${totalDisponible} monedas = ${formatCurrency(totalDisponible * 2)})`
   });
-  
+
   return opciones;
 });
 
@@ -692,9 +704,17 @@ function dispensarMonedas2Euros(cantidad: number) {
 }
 
 @keyframes blink-animation {
-  0% { opacity: 1; }
-  50% { opacity: 0.4; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .denominaciones-column {
@@ -730,7 +750,7 @@ function dispensarMonedas2Euros(cantidad: number) {
 
 .denominacion-btn:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .denominacion-btn:active {
@@ -797,7 +817,7 @@ function dispensarMonedas2Euros(cantidad: number) {
   min-width: 240px !important;
   border-radius: 12px !important;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
 }
 
 .menu-item-large {

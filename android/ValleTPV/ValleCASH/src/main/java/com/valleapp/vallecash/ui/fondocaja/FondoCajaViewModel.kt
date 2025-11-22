@@ -22,8 +22,8 @@ class FondoCajaViewModel : ViewModel() {
     private val ocupado = MutableLiveData(false)
     val message = MutableLiveData("")
 
-    fun getTotales(server: String) {
-        val url = "$server/arqueos/getcambio"
+    fun getTotales(server: String, uid: String) {
+        val url = "$server/arqueo/getcambio"
         val handler = Handler(Looper.getMainLooper()) {
             val res = it.data.getString("RESPONSE")
             if (res != null) {
@@ -38,10 +38,12 @@ class FondoCajaViewModel : ViewModel() {
         }
         ocupado.postValue(true)
         // Realizar la solicitud HTTP
-        HTTPRequest(url, ContentValues(), "cambio", handler)
+        val p = ContentValues()
+        p.put("uid", uid)
+        HTTPRequest(url, p, "cambio", handler)
     }
 
-    fun updateTotales(server: String) {
+    fun updateTotales(server: String, uid: String) {
         val ultimoStacker = totalUltimoStacker.value ?: 0.0
         val totalAlmacenesValor = totalAlmacenes.value ?: 0.0
         val cambioRealValor = cambioReal.value ?: 0.0
@@ -54,8 +56,9 @@ class FondoCajaViewModel : ViewModel() {
         p.put("cambio", String.format(Locale.UK, "%.2f", fondoDeCaja.value))
         p.put("stacke", String.format(Locale.UK, "%.2f", nuevoStacker))
         p.put("cambio_real", String.format(Locale.UK, "%.2f", nuevoCambioReal))
+        p.put("uid", uid)
 
-        val url = "$server/arqueos/setcambio"
+        val url = "$server/arqueo/setcambio"
         val handler = Handler(Looper.getMainLooper()) {
             ocupado.postValue(false)
             val nuevo = getTotalRecicladores()

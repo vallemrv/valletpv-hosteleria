@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar color="#cfb6d4">
+  <v-toolbar color="#cfb6d4" class="toolbar-fixed">
     <v-toolbar-title>
       Receptor <span v-if="empresa">{{ empresa.nombre }}</span>
     </v-toolbar-title>
@@ -501,6 +501,14 @@ export default {
 </script>
 
 <style scoped>
+.toolbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
 .fab-servidos {
   margin-bottom: 2rem;
   margin-right: 1.5rem;
@@ -508,8 +516,9 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Ajuste del contenido principal para la barra de estado */
+/* Ajuste del contenido principal para la barra de estado y toolbar */
 .main-content {
+  padding-top: 64px !important;
   padding-bottom: 52px !important;
 }
 </style>

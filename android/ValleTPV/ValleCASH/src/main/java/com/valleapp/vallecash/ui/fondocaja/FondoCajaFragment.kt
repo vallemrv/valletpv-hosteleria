@@ -23,6 +23,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.valleapp.vallecash.tools.WebSocketService
 import com.valleapp.valletpv.R
 import com.valleapp.valletpv.databinding.FragmentFondoCajaBinding
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.Locale
 
 
@@ -31,6 +34,7 @@ class FondoCajaFragment : Fragment() {
     private var _binding: FragmentFondoCajaBinding? = null
     private val binding get() = _binding!!
     private var serverURL = ""
+    private var uid = ""
 
     private lateinit var viewModel: FondoCajaViewModel
     private var isAcceptingChange = false
@@ -48,6 +52,10 @@ class FondoCajaFragment : Fragment() {
         _binding = FragmentFondoCajaBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this)[FondoCajaViewModel::class.java]
         serverURL = arguments?.getString("server").toString()
+
+        // Cargar uid desde preferencias
+        val preferencias = cargarPreferencias()
+        uid = preferencias?.optString("uid", "") ?: ""
 
         // Configuración del callback para manejar el botón "Atrás"
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -86,7 +94,7 @@ class FondoCajaFragment : Fragment() {
             isReceiverRegistered = true
         }
 
-        viewModel.getTotales(serverURL)
+        viewModel.getTotales(serverURL, uid)
 
         // Enviar instrucción #T# después de 1 segundo
         Handler(Looper.getMainLooper()).postDelayed({
@@ -161,7 +169,7 @@ class FondoCajaFragment : Fragment() {
                 val newCambio = binding.edittextCambio.text.toString().replace(",",".").toDoubleOrNull()
                 if (newCambio != null && newCambio != viewModel.cambioReal.value) {
                     viewModel.fondoDeCaja.value = newCambio
-                    viewModel.updateTotales(serverURL)
+                    viewModel.updateTotales(serverURL, uid)
                 } else {
                     // Mostrar mensaje de error
                     viewModel.message.postValue("No se ha producido ningún cambio. Accion cancelada.")
@@ -224,7 +232,7 @@ class FondoCajaFragment : Fragment() {
                     }
                     instruction?.contains("#J#") == true -> {
                         procesarJCadena(it)
-                        viewModel.updateTotales(serverURL)
+                        viewModel.updateTotales(serverURL, uid)
                     }
                     instruction?.contains("#S#") == true -> {
                         procesarSCadena(it)
@@ -279,8 +287,8 @@ class FondoCajaFragment : Fragment() {
             var retirado = b.toDoubleOrNull() ?: 0.0
             if (retirado > 0) retirado /= 100
             viewModel.totalRetiradoStacker.value = retirado
-            viewModel.updateTotales(serverURL)
-            viewModel.getTotales(serverURL)
+            viewModel.updateTotales(serverURL, uid)
+            viewModel.getTotales(serverURL, uid)
         }
         sendInstructionToWebSocket("#T#")
         disableButtons(binding.butttonRetirarStacker, false)
@@ -320,7 +328,7 @@ class FondoCajaFragment : Fragment() {
             val admitido = viewModel.totalAdmitido.value ?: 0.0
             if (nuevoAdmitido != admitido) {
                 viewModel.totalAdmitido.postValue(nuevoAdmitido)
-                viewModel.updateTotales(serverURL)
+                viewModel.updateTotales(serverURL, uid)
                 isProcesando = false
             }
         }
@@ -334,6 +342,16 @@ class FondoCajaFragment : Fragment() {
             LocalBroadcastManager.getInstance(requireContext())
                 .unregisterReceiver(webSocketReceiver)
             isReceiverRegistered = false
+        }
+    }
+
+    private fun cargarPreferencias(): JSONObject? {
+        val json = JSON()
+        return try {
+            json.deserializar("settings.dat", requireContext())
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            null
         }
     }
 }

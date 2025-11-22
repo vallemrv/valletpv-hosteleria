@@ -42,8 +42,8 @@ class DenominationViewModel : ViewModel() {
         _amounts.value = mutableMapOf()
     }
 
-    fun getTotales(server: String) {
-        val url = "$server/arqueos/getcambio"
+    fun getTotales(server: String, uid: String) {
+        val url = "$server/arqueo/getcambio"
          val handler = Handler(Looper.getMainLooper()) {
             val res = it.data.getString("RESPONSE")
             if (res != null) {
@@ -58,11 +58,14 @@ class DenominationViewModel : ViewModel() {
         }
         _ocupado.postValue(true)
         // Realizar la solicitud HTTP
-        HTTPRequest(url, ContentValues(), "cambio", handler)
+        val p = ContentValues()
+        p.put("uid", uid)
+
+        HTTPRequest(url, p, "cambio", handler)
 
     }
 
-    fun updateTotales(server: String){
+    fun updateTotales(server: String, uid: String){
 
         val almacenes = _totalAlmacenes
         val cambioReal = _cambioReal
@@ -75,8 +78,9 @@ class DenominationViewModel : ViewModel() {
         p.put("cambio",String.format(Locale.US,"%.2f", _cambio) )
         p.put("stacke", String.format(Locale.US,"%.2f", almacenes))
         p.put("cambio_real", String.format(Locale.US,"%.2f", nuevoCambioReal))
+        p.put("uid", uid)
 
-        val url = "$server/arqueos/setcambio"
+        val url = "$server/arqueo/setcambio"
         val handler = Handler(Looper.getMainLooper()) {
             val res = it.data.getString("RESPONSE")
             if (res != null) {

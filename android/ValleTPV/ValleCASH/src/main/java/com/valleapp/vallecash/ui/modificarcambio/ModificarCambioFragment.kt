@@ -25,6 +25,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.valleapp.vallecash.tools.WebSocketService
 import com.valleapp.valletpv.R
 import com.valleapp.valletpv.databinding.FragmentModificarCambioBinding
+import com.valleapp.valletpvlib.tools.JSON
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.Locale
 
 
@@ -35,6 +38,7 @@ class ModificarCambioFragment : Fragment() {
     private var _binding: FragmentModificarCambioBinding? = null
     private val binding get() = _binding!!
     private var serverURL = ""
+    private var uid = ""
     private var isAceptar = false
 
     private val webSocketReceiver = object : BroadcastReceiver() {
@@ -54,12 +58,12 @@ class ModificarCambioFragment : Fragment() {
 
                     }else if (instruction.contains("#U#")){
                         viewModel.processResponseU(it)
-                        viewModel.updateTotales(serverURL)
+                        viewModel.updateTotales(serverURL, uid)
                     }else if (instruction.contains("#A#")){
                         sendInstructionToWebSocket("#Y#")
                     }else if (instruction.contains("#J#")){
                         procesarJCadena(it)
-                        viewModel.updateTotales(serverURL)
+                        viewModel.updateTotales(serverURL, uid)
                     }
                 }
             }
@@ -105,7 +109,7 @@ class ModificarCambioFragment : Fragment() {
         intent.putExtra("action", "SEND_INSTRUCTION") // Acción que el servicio va a manejar
         intent.putExtra("instruction", instruction) // Instrucción que se va a enviar
         requireContext().startService(intent) // Enviar la instrucción al servicio
-        viewModel.getTotales(serverURL)
+        viewModel.getTotales(serverURL, uid)
     }
 
 
@@ -128,6 +132,10 @@ class ModificarCambioFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         serverURL = arguments?.getString("server").toString()
+
+        // Cargar uid desde preferencias
+        val preferencias = cargarPreferencias()
+        uid = preferencias?.optString("uid", "") ?: ""
 
         // Registrar el BroadcastReceiver
         LocalBroadcastManager.getInstance(requireContext())
@@ -233,4 +241,13 @@ class ModificarCambioFragment : Fragment() {
             .unregisterReceiver(webSocketReceiver)
     }
 
+    private fun cargarPreferencias(): JSONObject? {
+        val json = JSON()
+        return try {
+            json.deserializar("settings.dat", requireContext())
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            null
+        }
+    }
 }
