@@ -2,6 +2,43 @@
 # Sistema de Push Notifications para Telegram
 
 from django.db import models
+from django.utils import timezone
+
+
+class TelegramUser(models.Model):
+    """
+    Usuarios de Telegram registrados en el sistema.
+    Permite buscar por nombre en lugar de recordar IDs numéricos.
+    """
+    nombre = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="Nombre del usuario (ej: Valle, Admin, Camarero1)"
+    )
+    telegram_user_id = models.BigIntegerField(
+        unique=True,
+        help_text="ID de usuario de Telegram (número)"
+    )
+    descripcion = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Descripción o rol del usuario (opcional)"
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text="¿Está activo este usuario?"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'telegram_users'
+        verbose_name = "Usuario de Telegram"
+        verbose_name_plural = "Usuarios de Telegram"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.telegram_user_id})"
 
 
 class TelegramEventType(models.Model):
@@ -39,16 +76,13 @@ class TelegramEventType(models.Model):
 
 class TelegramSubscription(models.Model):
     """
-    Suscripciones: qué ID de Telegram recibe qué eventos
-    Se gestiona manualmente desde el admin de Django (por ahora)
+    Suscripciones: qué usuario de Telegram recibe qué eventos
     """
-    telegram_user_id = models.BigIntegerField(
-        help_text="ID de usuario de Telegram (número)"
-    )
-    nombre_usuario = models.CharField(
-        max_length=100,
-        blank=True,
-        help_text="Nombre del usuario (para referencia)"
+    usuario = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        help_text="Usuario de Telegram suscrito"
     )
     event_type = models.ForeignKey(
         TelegramEventType,
@@ -60,6 +94,11 @@ class TelegramSubscription(models.Model):
         default=True,
         help_text="¿Está activa esta suscripción?"
     )
+    filtros = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Filtros adicionales para la suscripción (ej: {'zonas': [1, 2, 3]}, {'camareros': [1, 5]}, etc.)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,10 +106,29 @@ class TelegramSubscription(models.Model):
         db_table = 'telegram_subscriptions'
         verbose_name = "Suscripción Push"
         verbose_name_plural = "Suscripciones Push"
-        unique_together = ['telegram_user_id', 'event_type']
+        unique_together = ['usuario', 'event_type']
 
     def __str__(self):
-        return f"{self.telegram_user_id} -> {self.event_type.code}"
+        filtros_str = f" (filtros: {self.filtros})" if self.filtros else ""
+        return f"{self.usuario.nombre} -> {self.event_type.code}{filtros_str}"
+    
+    def match_filtros(self, **kwargs):
+        """
+        Verifica si los datos del evento coinciden con los filtros de la suscripción.
+        Ejemplo: match_filtros(zona_id=5) devuelve True si 5 está en filtros['zonas']
+        """
+        if not self.filtros:
+            return True  # Sin filtros = recibe todos los eventos de este tipo
+        
+        # Filtro por zonas
+        if 'zonas' in self.filtros and 'zona_id' in kwargs:
+            zonas_vigiladas = self.filtros['zonas']
+            if isinstance(zonas_vigiladas, list):
+                return kwargs['zona_id'] in zonas_vigiladas
+            elif isinstance(zonas_vigiladas, int):
+                return kwargs['zona_id'] == zonas_vigiladas
+        
+        return True  # Si no hay filtros aplicables, permitir
 
 
 class TelegramNotificationLog(models.Model):
@@ -117,7 +175,8 @@ class TelegramNotificationLog(models.Model):
 
 class TelegramAutorizacion(models.Model):
     """
-    Autorizaciones temporales para acceder a APIs protegidas
+    Autorizaciones temporales para validar callbacks de Telegram.
+    Cada botón tiene un token único que expira en 10 minutos.
     """
     token = models.CharField(
         max_length=100,
@@ -137,7 +196,7 @@ class TelegramAutorizacion(models.Model):
     accion = models.CharField(
         max_length=50,
         default='activate_device',
-        help_text="Acción autorizada (ej: activate_device, delete_device)"
+        help_text="Acción autorizada (ej: activate_device, delete_device, dispositivo_action para acciones genéricas)"
     )
     empresa = models.CharField(
         max_length=100,
@@ -174,7 +233,6 @@ class TelegramAutorizacion(models.Model):
 
     def is_valida(self):
         """Verificar si la autorización es válida"""
-        from django.utils import timezone
         if self.usada:
             return False
         if self.expirada:

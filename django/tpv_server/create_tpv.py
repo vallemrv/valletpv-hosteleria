@@ -40,14 +40,17 @@ if __name__ == '__main__':
     local_config_vars['email_port'] = globals().get('EMAIL_PORT', 587)
     local_config_vars['email_host'] = globals().get('EMAIL_HOST', '')
     
-    # Telegram Push - solo necesita el token
+    # Telegram Push - token, webhook URL y API Key
     local_config_vars['telegram_bot_token'] = globals().get('TELEGRAM_BOT_TOKEN', '')
+    local_config_vars['telegram_webhook_url'] = globals().get('TELEGRAM_WEBHOOK_URL', '')
+    local_config_vars['telegram_api_key'] = globals().get('TELEGRAM_API_KEY', '')
     
     print("🔑 Variables sensibles cargadas desde local_config.py:")
     print(f"   - APIs configuradas: OpenAI, Gemini, Groq, Grok")
     print(f"   - Email: {local_config_vars['email_host_user']}")
     if local_config_vars['telegram_bot_token']:
-        print(f"   - Telegram Push: ✅ Token configurado")
+        print(f"   - Telegram Push: ✅ Token, Webhook y API Key configurados")
+        print(f"     └─ Webhook: {local_config_vars['telegram_webhook_url']}")
     else:
         print(f"   - Telegram Push: ⚠️  Token no configurado")
     print()

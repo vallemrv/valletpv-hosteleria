@@ -1,5 +1,6 @@
 """
-Vistas para el webhook de Telegram.
+Webhook Router - Proxy simple para Telegram
+Recibe mensajes del TPV → Envía a Telegram → Devuelve callbacks al TPV
 """
 
 import logging
@@ -7,13 +8,34 @@ import requests
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.utils import timezone
+from django.conf import settings
 import json
 
-from .models import TelegramAutorizacion
+from .models import TokenCallbackMapping
 from .telegram_service import TelegramService
 
 logger = logging.getLogger(__name__)
+
+
+def validate_api_key(request):
+    """
+    Valida que la petición incluya el API Key correcto.
+    
+    El TPV debe enviar: Authorization: Bearer <API_KEY>
+    """
+    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    
+    if not auth_header.startswith('Bearer '):
+        return False
+    
+    provided_key = auth_header.replace('Bearer ', '').strip()
+    expected_key = settings.TPV_API_KEY
+    
+    if not expected_key:
+        logger.warning('TPV_API_KEY no configurado en settings')
+        return False
+    
+    return provided_key == expected_key
 
 
 @csrf_exempt
@@ -92,83 +114,67 @@ def process_message(message_data):
 
 def process_callback_query(callback_data):
     """
-    Procesa callbacks de botones inline (activar/desactivar dispositivos).
-    El callback_data contiene: accion|token
-    Busca el token en BD para obtener la empresa y construir la URL.
+    PASO 2: Telegram → Webhook → TPV
+    Usuario pulsa botón → Busca callback_url → Llama al TPV
+    Formato callback_data: "accion|token"
     """
-    from_user = callback_data.get('from', {})
-    telegram_id = from_user.get('id')
+    telegram_id = callback_data.get('from', {}).get('id')
     callback_id = callback_data.get('id')
     data = callback_data.get('data', '')
     
-    if not telegram_id:
-        logger.warning("Callback query sin telegram_id")
-        return
-    
-    logger.info(f"Callback de {telegram_id}: {data}")
-    
-    # El callback_data tiene formato: accion|token
-    if '|' not in data:
-        logger.warning(f"Callback data inválido: {data}")
+    if not telegram_id or '|' not in data:
+        logger.warning(f"Callback inválido: {data}")
         answer_callback_query(callback_id, "❌ Datos inválidos")
         return
+    
+    logger.info(f"← Callback: {data} (user: {telegram_id})")
     
     try:
         accion, token = data.split('|', 1)
         
-        # El token contiene el servidor TPV implícito
-        # Intentamos con los servidores conocidos en orden
-        tpv_urls = [
-            'https://tpvtest.valletpv.es',
-            'https://v6.valletpv.es',
-        ]
+        # Buscar mapeo
+        try:
+            mapping = TokenCallbackMapping.objects.get(token=token)
+        except TokenCallbackMapping.DoesNotExist:
+            logger.error(f"✗ Token no encontrado: {token[:8]}...")
+            answer_callback_query(callback_id, "❌ Token no válido")
+            return
         
-        endpoint = 'activate' if accion == 'activate' else 'deactivate'
-        success = False
+        # Validar
+        if not mapping.is_valida():
+            logger.warning(f"✗ Token expirado: {token[:8]}...")
+            answer_callback_query(callback_id, "❌ Token expirado")
+            return
         
-        # Intentar con cada TPV hasta encontrar el token
-        for base_url in tpv_urls:
-            url = f"{base_url}/api/dispositivo/{endpoint}?token={token}"
+        # Llamar al TPV
+        logger.info(f"→ Llamando TPV: {mapping.callback_url}")
+        response = requests.post(
+            mapping.callback_url,
+            data={'token': token, 'accion': accion},
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            if result.get('success'):
+                mapping.marcar_usada()
+                mensaje = result.get('mensaje', '✅ Hecho')
+                answer_callback_query(callback_id, mensaje)
+                logger.info(f"✓ OK: {accion}")
+            else:
+                error = result.get('error', 'Error')
+                logger.error(f"✗ TPV error: {error}")
+                answer_callback_query(callback_id, f"❌ {error}")
+        else:
+            logger.error(f"✗ HTTP {response.status_code}")
+            answer_callback_query(callback_id, "❌ Error en TPV")
             
-            try:
-                logger.info(f"Intentando callback en: {url}")
-                response = requests.post(url, timeout=5)
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    if result.get('success'):
-                        accion_texto = 'activado' if accion == 'activate' else 'desactivado'
-                        mensaje = f"✅ Dispositivo {accion_texto}"
-                        answer_callback_query(callback_id, mensaje)
-                        logger.info(f"Dispositivo {accion_texto} correctamente en {base_url}")
-                        success = True
-                        break
-                    elif result.get('message'):
-                        # El TPV respondió pero hubo un error (token inválido, etc)
-                        answer_callback_query(callback_id, f"⚠️ {result.get('message')}")
-                        success = True
-                        break
-                        
-            except requests.exceptions.Timeout:
-                logger.warning(f"Timeout en {base_url}")
-                continue
-            except requests.exceptions.RequestException as e:
-                logger.warning(f"Error conectando con {base_url}: {e}")
-                continue
-        
-        if not success:
-            logger.error(f"Token no encontrado en ningún TPV: {token}")
-            answer_callback_query(callback_id, "❌ Autorización no válida o expirada")
-            
-    except ValueError:
-        logger.error(f"Error parseando callback data: {data}")
-        answer_callback_query(callback_id, "❌ Formato inválido")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error conectando con TPV: {e}")
-        answer_callback_query(callback_id, "❌ Error de conexión")
+    except requests.exceptions.Timeout:
+        logger.error(f"✗ Timeout: {mapping.callback_url}")
+        answer_callback_query(callback_id, "❌ Timeout")
     except Exception as e:
-        logger.error(f"Error procesando callback: {e}", exc_info=True)
-        answer_callback_query(callback_id, "❌ Error interno")
+        logger.error(f"✗ Error: {e}", exc_info=True)
+        answer_callback_query(callback_id, "❌ Error")
 
 
 def answer_callback_query(callback_id, text):
@@ -200,6 +206,183 @@ def webhook_info(request):
         'status': 'active',
         'webhook_info': info
     })
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def register_notification(request):
+    """
+    PASO 1: TPV → Webhook
+    Recibe mensaje del TPV y lo envía a Telegram.
+    Guarda mapeo token→callback_url para devolver la respuesta después.
+    
+    POST /api/register_notification/
+    Headers: Authorization: Bearer <API_KEY>
+    {
+        "token": "uuid-unico",
+        "callback_url": "https://tpvtest.valletpv.es/api/dispositivo/action",
+        "telegram_user_id": 123456789,
+        "mensaje": "Texto del mensaje (HTML)",
+        "botones": [[{"text": "✅ Activar", "callback_data": "activate|token"}]],
+        "expira_en": "2024-01-01T12:00:00Z"
+    }
+    """
+    # Validar API Key
+    if not validate_api_key(request):
+        logger.warning(f"✗ Intento no autorizado desde {request.META.get('REMOTE_ADDR')}")
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        
+        # Validar campos
+        required = ['token', 'callback_url', 'telegram_user_id', 'mensaje', 'botones', 'expira_en']
+        if missing := [f for f in required if f not in data]:
+            return JsonResponse({'error': f'Faltan: {", ".join(missing)}'}, status=400)
+        
+        # Parsear fecha
+        from django.utils.dateparse import parse_datetime
+        expira_en = parse_datetime(data['expira_en']) if isinstance(data['expira_en'], str) else data['expira_en']
+        if not expira_en:
+            return JsonResponse({'error': 'expira_en inválido'}, status=400)
+        
+        # Guardar mapeo
+        mapping = TokenCallbackMapping.objects.create(
+            token=data['token'],
+            callback_url=data['callback_url'],
+            telegram_user_id=data['telegram_user_id'],
+            expira_en=expira_en,
+            empresa=data.get('empresa', ''),
+            uid_dispositivo=data.get('uid_dispositivo', ''),
+            metadata=data.get('metadata', {})
+        )
+        
+        logger.info(f"✓ Registrado: {data['token'][:8]}... → {data['callback_url']}")
+        
+        # Enviar a Telegram
+        telegram_service = TelegramService()
+        result = telegram_service.send_message(
+            chat_id=data['telegram_user_id'],
+            text=data['mensaje'],
+            reply_markup={'inline_keyboard': data['botones']}
+        )
+        
+        # Guardar message_id
+        message_id = result.get('message_id') if result else None
+        if message_id:
+            mapping.telegram_message_id = message_id
+            mapping.save(update_fields=['telegram_message_id'])
+            logger.info(f"✓ Telegram message_id: {message_id}")
+        
+        return JsonResponse({'success': True, 'message_id': message_id})
+        
+    except Exception as e:
+        logger.error(f"✗ Error: {e}", exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def delete_message(request):
+    """
+    Permite al TPV borrar un mensaje enviado a Telegram.
+    
+    POST /api/delete_message/
+    Headers: Authorization: Bearer <API_KEY>
+    {
+        "telegram_user_id": 123456789,
+        "message_id": 12345
+    }
+    """
+    # Validar API Key
+    if not validate_api_key(request):
+        logger.warning(f"✗ Intento no autorizado desde {request.META.get('REMOTE_ADDR')}")
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        
+        # Validar campos
+        if 'telegram_user_id' not in data or 'message_id' not in data:
+            return JsonResponse({'error': 'Faltan campos: telegram_user_id, message_id'}, status=400)
+        
+        telegram_user_id = data['telegram_user_id']
+        message_id = data['message_id']
+        
+        # Borrar mensaje
+        telegram_service = TelegramService()
+        success = telegram_service.delete_message(telegram_user_id, message_id)
+        
+        if success:
+            logger.info(f"✓ Mensaje {message_id} borrado")
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'error': 'No se pudo borrar el mensaje'}, status=500)
+        
+    except Exception as e:
+        logger.error(f"✗ Error borrando mensaje: {e}", exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def edit_message(request):
+    """
+    Permite al TPV editar un mensaje enviado a Telegram.
+    
+    POST /api/edit_message/
+    Headers: Authorization: Bearer <API_KEY>
+    {
+        "telegram_user_id": 123456789,
+        "message_id": 12345,
+        "nuevo_texto": "✅ <b>Dispositivo Activado</b>",
+        "botones": []  // Opcional, [] para quitar botones, null para mantener
+    }
+    """
+    # Validar API Key
+    if not validate_api_key(request):
+        logger.warning(f"✗ Intento no autorizado desde {request.META.get('REMOTE_ADDR')}")
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        
+        # Validar campos
+        required = ['telegram_user_id', 'message_id', 'nuevo_texto']
+        if missing := [f for f in required if f not in data]:
+            return JsonResponse({'error': f'Faltan: {", ".join(missing)}'}, status=400)
+        
+        telegram_user_id = data['telegram_user_id']
+        message_id = data['message_id']
+        nuevo_texto = data['nuevo_texto']
+        botones = data.get('botones')  # None = mantener, [] = quitar, [[...]] = reemplazar
+        
+        # Preparar reply_markup
+        reply_markup = None
+        if botones is not None:
+            reply_markup = {'inline_keyboard': botones}
+        
+        # Editar mensaje
+        telegram_service = TelegramService()
+        success = telegram_service.edit_message(
+            chat_id=telegram_user_id,
+            message_id=message_id,
+            text=nuevo_texto,
+            reply_markup=reply_markup
+        )
+        
+        if success:
+            logger.info(f"✓ Mensaje {message_id} editado")
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'error': 'No se pudo editar el mensaje'}, status=500)
+        
+    except Exception as e:
+        logger.error(f"✗ Error editando mensaje: {e}", exc_info=True)
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @require_http_methods(["GET"])

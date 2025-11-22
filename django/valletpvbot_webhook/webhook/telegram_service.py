@@ -202,3 +202,84 @@ class TelegramService:
         except requests.exceptions.RequestException as e:
             logger.error(f"Error de conexión al obtener info del webhook: {str(e)}")
             return None
+    
+    def delete_message(self, chat_id: int, message_id: int) -> bool:
+        """
+        Borra un mensaje de Telegram.
+        
+        Args:
+            chat_id: ID del chat de Telegram
+            message_id: ID del mensaje a borrar
+            
+        Returns:
+            True si se borró correctamente, False en caso contrario
+        """
+        url = f"{self.base_url}/deleteMessage"
+        payload = {
+            'chat_id': chat_id,
+            'message_id': message_id
+        }
+        
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+            
+            if result.get('ok'):
+                logger.info(f"Mensaje {message_id} borrado del chat {chat_id}")
+                return True
+            else:
+                logger.error(f"Error al borrar mensaje: {result.get('description')}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error de conexión al borrar mensaje: {str(e)}")
+            return False
+    
+    def edit_message(
+        self, 
+        chat_id: int, 
+        message_id: int,
+        text: str,
+        parse_mode: str = 'HTML',
+        reply_markup: Optional[Dict] = None
+    ) -> bool:
+        """
+        Edita un mensaje existente de Telegram.
+        
+        Args:
+            chat_id: ID del chat de Telegram
+            message_id: ID del mensaje a editar
+            text: Nuevo texto del mensaje
+            parse_mode: Modo de parseo (HTML, Markdown)
+            reply_markup: Teclado personalizado (None para quitar botones)
+            
+        Returns:
+            True si se editó correctamente, False en caso contrario
+        """
+        url = f"{self.base_url}/editMessageText"
+        payload = {
+            'chat_id': chat_id,
+            'message_id': message_id,
+            'text': text,
+            'parse_mode': parse_mode
+        }
+        
+        if reply_markup is not None:
+            payload['reply_markup'] = reply_markup
+        
+        try:
+            response = requests.post(url, json=payload, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+            
+            if result.get('ok'):
+                logger.info(f"Mensaje {message_id} editado en chat {chat_id}")
+                return True
+            else:
+                logger.error(f"Error al editar mensaje: {result.get('description')}")
+                return False
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error de conexión al editar mensaje: {str(e)}")
+            return False

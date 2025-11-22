@@ -28,18 +28,19 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-# Verificar que existe el archivo .service
-if [ ! -f "$PROJECT_DIR/$SERVICE_FILE" ]; then
-    print_error "Archivo $SERVICE_FILE no encontrado en $PROJECT_DIR"
-    exit 1
-fi
-
 # Crear directorio de logs si no existe
 mkdir -p "$LOG_DIR"
 
 case "$1" in
     install)
         print_info "Instalando servicio $SERVICE_NAME..."
+        
+        # Verificar que existe el archivo .service
+        if [ ! -f "$PROJECT_DIR/$SERVICE_FILE" ]; then
+            print_error "Archivo $SERVICE_FILE no encontrado en $PROJECT_DIR"
+            print_error "No se puede instalar el servicio sin el archivo de configuración"
+            exit 1
+        fi
         
         # Copiar archivo de servicio
         sudo cp "$PROJECT_DIR/$SERVICE_FILE" "$SYSTEMD_PATH"
