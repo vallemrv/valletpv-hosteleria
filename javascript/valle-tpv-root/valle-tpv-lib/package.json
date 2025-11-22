@@ -34,8 +34,8 @@
     "vuetify": "^3.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
     "@typescript-eslint/parser": "^8.19.1",
+    "@vitejs/plugin-vue": "^6.0.1",
     "eslint": "^9.18.0",
     "eslint-plugin-vue": "^9.31.0",
     "pinia": "^2.1.7",

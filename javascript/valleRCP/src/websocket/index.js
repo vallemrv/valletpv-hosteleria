@@ -1,24 +1,24 @@
 class Timer {
-    constructor(callback, timerCalc){
-      this.callback  = callback;
-      this.timerCalc = timerCalc;
-      this.timer     = null;
-      this.tries     = 0;
-    }
-  
-    reset(){
-      this.tries = 0
-      clearTimeout(this.timer)
+    constructor(callback, timerCalc) {
+        this.callback = callback;
+        this.timerCalc = timerCalc;
+        this.timer = null;
+        this.tries = 0;
     }
 
-    scheduleTimeout(){
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.tries = this.tries + 1
-        this.callback()
-      }, this.timerCalc(this.tries + 1))
+    reset() {
+        this.tries = 0
+        clearTimeout(this.timer)
     }
-  }
+
+    scheduleTimeout() {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+            this.tries = this.tries + 1
+            this.callback()
+        }, this.timerCalc(this.tries + 1))
+    }
+}
 
 // Función para determinar el protocolo WebSocket correcto
 const getWebSocketProtocol = (server) => {
@@ -32,17 +32,17 @@ const getWebSocketProtocol = (server) => {
     if (server.startsWith('wss://') || server.startsWith('ws://')) {
         return server;
     }
-    
+
     // Si estamos en un entorno HTTPS, usamos WSS por defecto
     if (window.location.protocol === 'https:') {
         return `wss://${server}`;
     }
-    
+
     // Si el servidor contiene el puerto 443 o palabras clave de HTTPS, usamos WSS
     if (server.includes(':443') || server.includes('ssl') || server.includes('secure')) {
         return `wss://${server}`;
     }
-    
+
     // Por defecto, usamos WS
     return `ws://${server}`;
 };
@@ -50,7 +50,7 @@ const getWebSocketProtocol = (server) => {
 export default class VWebsocket {
     static activeSockets = {}; // Registro de sockets activos
 
-    constructor(server, receptor, store){
+    constructor(server, receptor, store) {
         // Verificar si ya existe una conexión para este receptor
         const existingSocket = VWebsocket.activeSockets[receptor.nomimp];
         if (existingSocket) {
@@ -73,24 +73,24 @@ export default class VWebsocket {
         VWebsocket.activeSockets[receptor.nomimp] = this;
     }
 
-    reconnectAfterMs(tries){
+    reconnectAfterMs(tries) {
         return [1000, 2000, 5000, 10000][tries - 1] || 10000;
     }
 
-    connect(){
+    connect() {
         this.reconnectTimer.reset();
-        
+
         if (this.customSocket) this.disconnect();
-        
+
         this.customSocket = new WebSocket(this.socketUrl);
 
         this.customSocket.onopen = async (event) => {
             this.reconnectTimer.reset();
             this.store.onConnect();
-            
+
             // Sincronizar pedidos al conectar
             try {
-                const result = await this.store.sincronizarPedidos(this.receptor.nomimp);
+                const result = await this.store.sincronizarPedidos(this.receptor);
             } catch (error) {
                 console.error('Error en sincronización inicial:', error);
             }
@@ -113,16 +113,30 @@ export default class VWebsocket {
         this.customSocket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                
+
                 // Extraer el mensaje (puede estar anidado)
-                const mensaje = typeof data.message === 'string' 
-                    ? JSON.parse(data.message) 
+                const mensaje = typeof data.message === 'string'
+                    ? JSON.parse(data.message)
                     : data.message || data;
-                
+
                 // Verificar que el mensaje sea para este receptor
-                const esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp || 
-                                          mensaje.nom_receptor === this.receptor.Nombre;
+                // PRIORIZAR coincidencia por nombre de receptor para evitar duplicados
+                let esParaEsteReceptor = false;
                 
+                // Si el mensaje tiene nom_receptor y nosotros tenemos Nombre, comparar por nombre
+                if (mensaje.nom_receptor && this.receptor.Nombre) {
+                    esParaEsteReceptor = mensaje.nom_receptor === this.receptor.Nombre;
+                } 
+                // Si el mensaje no tiene nom_receptor pero nosotros sí tenemos Nombre,
+                // no es para este receptor (evita duplicados)
+                else if (!mensaje.nom_receptor && this.receptor.Nombre) {
+                    esParaEsteReceptor = false;
+                } 
+                // Solo usar nomimp si ninguno tiene información del nombre
+                else {
+                    esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp;
+                }
+
                 // Manejar diferentes tipos de operaciones
                 switch (mensaje.op) {
                     case 'pedido':
@@ -131,28 +145,28 @@ export default class VWebsocket {
                             this.store.recepcionPedido(mensaje);
                         }
                         break;
-                        
+
                     case 'servir_lineas':
                         // Marcar líneas como servidas
                         if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
                             this.store.servirLineas(mensaje.ids);
                         }
                         break;
-                        
+
                     case 'borrar_lineas':
                         // Borrar líneas (cobradas/borradas)
                         if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
                             this.store.borrarLineas(mensaje.ids);
                         }
                         break;
-                        
+
                     case 'marcar_urgente':
                         // Marcar líneas o pedido completo como urgente
                         if (esParaEsteReceptor && mensaje.ids && Array.isArray(mensaje.ids)) {
                             this.store.marcarUrgente(mensaje.ids, mensaje.pedido_id || null);
                         }
                         break;
-                        
+
                     default:
                         console.warn('Operación desconocida recibida:', mensaje.op);
                 }
@@ -162,11 +176,11 @@ export default class VWebsocket {
         };
     }
 
-    disconnect(){
+    disconnect() {
         this.reconnectTimer.reset();
-        
+
         if (this.customSocket) {
-            this.customSocket.onclose = function(){};
+            this.customSocket.onclose = function () { };
             this.customSocket.close();
         }
         // Eliminar del registro al desconectar

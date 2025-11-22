@@ -106,9 +106,14 @@ export default {
     
     // Sincronizar pedidos con el servidor
     // Envía todos los pedidos que tiene en local y recibe los actualizados
-    async sincronizar_pedidos(receptor, pedidosLocales){
+    async sincronizar_pedidos(receptor, pedidosLocales, nom_receptor = null){
         const formData = this.addUIDToParams()
         formData.append('receptor', receptor)
+        
+        // Enviar también el nombre del receptor si está disponible
+        if (nom_receptor) {
+            formData.append('nom_receptor', nom_receptor)
+        }
         
         // Enviar array de pedidos locales (solo IDs o pedidos completos según necesites)
         formData.append('pedidos_locales', JSON.stringify(pedidosLocales))
