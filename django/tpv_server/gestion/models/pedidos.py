@@ -193,7 +193,10 @@ class Lineaspedido(BaseModels):
         
         for r in regs:
             client_id = int(r.get('id') or r.get('ID'))
-            id_mesa = int(r.get('IDMesa'))
+            id_mesa_raw = r.get('IDMesa')
+            if not id_mesa_raw:
+                continue
+            id_mesa = int(id_mesa_raw)
             if id_mesa not in mesas_abiertas_info:
                 print(f"Lineaspedido ID: {client_id} - Mesa ID: {id_mesa} not found in open tables. Marking for removal."   )
                 result.append({'tb': cls.__name__.lower(), 'op': 'rm', 'obj': {'ID': int(client_id)}})

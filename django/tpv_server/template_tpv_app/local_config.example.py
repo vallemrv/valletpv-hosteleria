@@ -31,33 +31,3 @@ EMAIL_HOST = 'smtp.tuproveedor.com'
 
 TELEGRAM_BOT_TOKEN = "123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh"
 
-# Para obtener tu ID de Telegram:
-# Envía /start al bot @userinfobot en Telegram
-
-# IDs de Telegram para suscripciones automáticas a eventos
-# Estos usuarios recibirán notificaciones push cuando se ejecute init_telegram_events
-TELEGRAM_ADMIN_IDS = [
-    123456789,  # Reemplaza con tu ID de Telegram
-    # 987654321,  # Puedes agregar más IDs
-]
-
-# Hooks (eventos) de Telegram a crear automáticamente
-# Estos eventos se crearán al ejecutar: python manage_testTPV.py init_telegram_events
-TELEGRAM_HOOKS = [
-    {
-        'code': 'nuevo_dispositivo',
-        'name': 'Nuevo Dispositivo',
-        'description': 'Se detecta un nuevo dispositivo intentando conectarse al sistema'
-    },
-    # Ejemplos de otros eventos que puedes crear:
-    # {
-    #     'code': 'venta_completada',
-    #     'name': 'Venta Completada',
-    #     'description': 'Se ha completado una venta en el TPV'
-    # },
-    # {
-    #     'code': 'error_critico',
-    #     'name': 'Error Crítico',
-    #     'description': 'Se ha producido un error crítico en el sistema'
-    # },
-]

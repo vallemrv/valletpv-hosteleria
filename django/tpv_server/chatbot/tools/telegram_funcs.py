@@ -1,6 +1,9 @@
 """
-Tools de LangChain para gestionar notificaciones push de Telegram
-Permite al chatbot gestionar eventos, suscripciones y enviar notificaciones
+Tools de LangChain para gestionar suscripciones de notificaciones push de Telegram.
+Permite al chatbot gestionar suscripciones de usuarios a eventos.
+
+NOTA: Los eventos se gestionan mediante TELEGRAM_HOOKS en local_config.py
+      y el comando: python manage_testTPV.py init_telegram_events
 """
 
 from langchain_core.tools import tool
@@ -10,16 +13,161 @@ from push_telegram.models import (
     TelegramEventType, 
     TelegramSubscription, 
     TelegramNotificationLog,
-    TelegramAutorizacion
+    TelegramUser
 )
 from push_telegram.push_sender import enviar_push_telegram
+
+
+@tool
+def listar_usuarios_telegram() -> str:
+    """
+    Lista todos los usuarios de Telegram registrados en el sistema.
+    Útil para ver qué usuarios están disponibles antes de suscribirlos.
+    
+    Returns:
+        str: Lista de usuarios con sus IDs de Telegram
+    """
+    usuarios = TelegramUser.objects.filter(activo=True)
+    
+    if not usuarios.exists():
+        return "No hay usuarios de Telegram registrados.\nRegistra usuarios en el admin de Django."
+    
+    resultado = ["👥 Usuarios de Telegram registrados:\n"]
+    for usuario in usuarios:
+        subs_count = usuario.subscriptions.filter(activo=True).count()
+        desc = f" - {usuario.descripcion}" if usuario.descripcion else ""
+        resultado.append(
+            f"• {usuario.nombre} (ID: {usuario.telegram_user_id}){desc}\n"
+            f"  Suscripciones activas: {subs_count}"
+        )
+    
+    return "\n".join(resultado)
+
+
+@tool
+def registrar_usuario_telegram(nombre: str, telegram_user_id: int, descripcion: str = "") -> str:
+    """
+    Registra un nuevo usuario de Telegram en el sistema.
+    
+    Args:
+        nombre: Nombre del usuario (ej: Valle, Admin)
+        telegram_user_id: ID numérico de Telegram
+        descripcion: Descripción opcional del usuario
+        
+    Returns:
+        str: Confirmación de registro
+    """
+    try:
+        usuario, created = TelegramUser.objects.update_or_create(
+            nombre=nombre,
+            defaults={
+                'telegram_user_id': telegram_user_id,
+                'descripcion': descripcion,
+                'activo': True
+            }
+        )
+        
+        if created:
+            return f"✅ Usuario '{nombre}' registrado con ID {telegram_user_id}"
+        else:
+            return f"✅ Usuario '{nombre}' actualizado con ID {telegram_user_id}"
+            
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
+def modificar_usuario_telegram(
+    nombre_actual: str,
+    nuevo_nombre: Optional[str] = None,
+    nuevo_telegram_id: Optional[int] = None,
+    nueva_descripcion: Optional[str] = None,
+    activo: Optional[bool] = None
+) -> str:
+    """
+    Modifica los datos de un usuario de Telegram existente.
+    
+    Args:
+        nombre_actual: Nombre actual del usuario a modificar
+        nuevo_nombre: Nuevo nombre (opcional)
+        nuevo_telegram_id: Nuevo ID de Telegram (opcional)
+        nueva_descripcion: Nueva descripción (opcional)
+        activo: Activar/desactivar usuario (opcional)
+        
+    Returns:
+        str: Confirmación de modificación
+    """
+    try:
+        usuario = TelegramUser.objects.get(nombre__iexact=nombre_actual)
+        
+        cambios = []
+        if nuevo_nombre:
+            usuario.nombre = nuevo_nombre
+            cambios.append(f"nombre → '{nuevo_nombre}'")
+        
+        if nuevo_telegram_id:
+            usuario.telegram_user_id = nuevo_telegram_id
+            cambios.append(f"ID → {nuevo_telegram_id}")
+        
+        if nueva_descripcion is not None:
+            usuario.descripcion = nueva_descripcion
+            cambios.append(f"descripción → '{nueva_descripcion}'")
+        
+        if activo is not None:
+            usuario.activo = activo
+            estado = "activado" if activo else "desactivado"
+            cambios.append(f"estado → {estado}")
+        
+        if not cambios:
+            return "⚠️ No se especificaron cambios"
+        
+        usuario.save()
+        return f"✅ Usuario '{nombre_actual}' modificado:\n• " + "\n• ".join(cambios)
+        
+    except TelegramUser.DoesNotExist:
+        return f"❌ Usuario '{nombre_actual}' no encontrado"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
+def eliminar_usuario_telegram(nombre: str) -> str:
+    """
+    Elimina un usuario de Telegram del sistema.
+    También elimina todas sus suscripciones.
+    
+    Args:
+        nombre: Nombre del usuario a eliminar
+        
+    Returns:
+        str: Confirmación de eliminación
+    """
+    try:
+        usuario = TelegramUser.objects.get(nombre__iexact=nombre)
+        telegram_id = usuario.telegram_user_id
+        
+        # Contar suscripciones antes de eliminar (se borrarán automáticamente por CASCADE)
+        subs_count = usuario.subscriptions.count()
+        
+        # Eliminar usuario (borra suscripciones automáticamente)
+        usuario.delete()
+        
+        return f"✅ Usuario '{nombre}' eliminado (ID: {telegram_id})\n• {subs_count} suscripciones eliminadas"
+        
+    except TelegramUser.DoesNotExist:
+        return f"❌ Usuario '{nombre}' no encontrado"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 
 @tool
 def listar_eventos_telegram() -> str:
     """
     Lista todos los tipos de eventos de Telegram disponibles y su estado.
-    Útil para ver qué eventos existen y cuáles están activos.
+    Útil para ver qué eventos existen antes de crear suscripciones.
+    
+    NOTA: Los eventos se crean mediante TELEGRAM_HOOKS en local_config.py
+          y ejecutando: python manage_testTPV.py init_telegram_events
     
     Returns:
         str: Lista formateada de eventos con su estado
@@ -27,7 +175,7 @@ def listar_eventos_telegram() -> str:
     eventos = TelegramEventType.objects.all()
     
     if not eventos.exists():
-        return "No hay eventos de Telegram configurados."
+        return "No hay eventos de Telegram configurados.\nEjecuta: python manage_testTPV.py init_telegram_events"
     
     resultado = ["📋 Eventos de Telegram disponibles:\n"]
     for evento in eventos:
@@ -44,59 +192,28 @@ def listar_eventos_telegram() -> str:
 
 
 @tool
-def crear_evento_telegram(code: str, nombre: str, descripcion: str = "") -> str:
+def listar_zonas_disponibles() -> str:
     """
-    Crea un nuevo tipo de evento de Telegram para notificaciones push.
+    Lista todas las zonas disponibles en el sistema.
+    Útil para saber qué IDs de zona usar en los filtros de suscripciones.
     
-    Args:
-        code: Código único del evento (ej: 'pedido_completado', 'error_critico')
-        nombre: Nombre descriptivo del evento
-        descripcion: Descripción opcional del evento
-        
     Returns:
-        str: Confirmación de creación o mensaje de error
+        str: Lista de zonas con sus IDs
     """
     try:
-        # Verificar si ya existe
-        if TelegramEventType.objects.filter(code=code).exists():
-            return f"❌ Ya existe un evento con el código '{code}'"
+        from gestion.models import Zonas
+        zonas = Zonas.objects.all().order_by('id')
         
-        evento = TelegramEventType.objects.create(
-            code=code,
-            nombre=nombre,
-            descripcion=descripcion,
-            activo=True
-        )
+        if not zonas.exists():
+            return "No hay zonas configuradas en el sistema."
         
-        return f"✅ Evento creado exitosamente:\n• Código: {evento.code}\n• Nombre: {evento.nombre}"
+        resultado = ["🎯 Zonas disponibles:\n"]
+        for zona in zonas:
+            resultado.append(f"• ID: {zona.id} - {zona.nombre}")
         
-    except Exception as e:
-        return f"❌ Error creando evento: {str(e)}"
-
-
-@tool
-def activar_desactivar_evento_telegram(code: str, activar: bool = True) -> str:
-    """
-    Activa o desactiva un tipo de evento de Telegram.
-    Los eventos desactivados no envían notificaciones.
-    
-    Args:
-        code: Código del evento
-        activar: True para activar, False para desactivar
+        resultado.append("\n💡 Usa estos IDs para configurar filtros en suscripciones.")
+        return "\n".join(resultado)
         
-    Returns:
-        str: Confirmación de cambio
-    """
-    try:
-        evento = TelegramEventType.objects.get(code=code)
-        evento.activo = activar
-        evento.save(update_fields=['activo'])
-        
-        accion = "activado" if activar else "desactivado"
-        return f"✅ Evento '{evento.nombre}' {accion} correctamente"
-        
-    except TelegramEventType.DoesNotExist:
-        return f"❌ No existe un evento con código '{code}'"
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
@@ -104,23 +221,23 @@ def activar_desactivar_evento_telegram(code: str, activar: bool = True) -> str:
 @tool
 def listar_suscripciones_telegram(telegram_user_id: Optional[int] = None) -> str:
     """
-    Lista las suscripciones de Telegram.
+    Lista las suscripciones de Telegram con sus filtros aplicados.
     Puede filtrar por usuario específico o mostrar todas.
     
     Args:
         telegram_user_id: ID del usuario de Telegram (opcional)
         
     Returns:
-        str: Lista de suscripciones
+        str: Lista de suscripciones con filtros
     """
     try:
         if telegram_user_id:
             suscripciones = TelegramSubscription.objects.filter(
-                telegram_user_id=telegram_user_id
-            ).select_related('event_type')
+                usuario__telegram_user_id=telegram_user_id
+            ).select_related('event_type', 'usuario')
             titulo = f"📱 Suscripciones del usuario {telegram_user_id}:\n"
         else:
-            suscripciones = TelegramSubscription.objects.all().select_related('event_type')
+            suscripciones = TelegramSubscription.objects.all().select_related('event_type', 'usuario')
             titulo = "📱 Todas las suscripciones:\n"
         
         if not suscripciones.exists():
@@ -129,8 +246,28 @@ def listar_suscripciones_telegram(telegram_user_id: Optional[int] = None) -> str
         resultado = [titulo]
         for sub in suscripciones:
             estado = "✅" if sub.activo else "❌"
+            nombre = sub.usuario.nombre
+            
+            # Mostrar filtros si existen
+            filtro_info = ""
+            if sub.filtros:
+                if 'zonas' in sub.filtros:
+                    zonas_ids = sub.filtros['zonas']
+                    if isinstance(zonas_ids, list):
+                        from gestion.models import Zonas
+                        zonas = Zonas.objects.filter(pk__in=zonas_ids).values_list('nombre', flat=True)
+                        filtro_info = f" [Zonas: {', '.join(zonas)}]"
+                    else:
+                        filtro_info = f" [Zona ID: {zonas_ids}]"
+                else:
+                    # Otros filtros genéricos
+                    filtros_str = ', '.join([f"{k}: {v}" for k, v in sub.filtros.items()])
+                    filtro_info = f" [{filtros_str}]"
+            else:
+                filtro_info = " [Sin filtros]"
+            
             resultado.append(
-                f"{estado} {sub.nombre_usuario or sub.telegram_user_id} → {sub.event_type.nombre} ({sub.event_type.code})"
+                f"{estado} {nombre} → {sub.event_type.nombre} ({sub.event_type.code}){filtro_info}"
             )
         
         return "\n".join(resultado)
@@ -141,77 +278,208 @@ def listar_suscripciones_telegram(telegram_user_id: Optional[int] = None) -> str
 
 @tool
 def suscribir_usuario_telegram(
-    telegram_user_id: int,
+    nombre_o_id: str,
     event_code: str,
-    nombre_usuario: str = ""
+    zonas: Optional[List[int]] = None
 ) -> str:
     """
-    Suscribe un usuario de Telegram a un tipo de evento.
+    Suscribe un usuario de Telegram a un tipo de evento con filtros opcionales.
     El usuario recibirá notificaciones cuando ocurra ese evento.
     
     Args:
-        telegram_user_id: ID del usuario de Telegram (número)
-        event_code: Código del evento al que suscribir
-        nombre_usuario: Nombre descriptivo del usuario (opcional)
+        nombre_o_id: Nombre del usuario (ej: 'Valle') o ID numérico de Telegram
+        event_code: Código del evento al que suscribir (ej: 'cambio_zona', 'nuevo_dispositivo')
+        zonas: Lista de IDs de zonas a vigilar. Si es None o vacío, vigila todas las zonas.
+               Ejemplo: [5, 8] para vigilar solo zonas 5 y 8
         
     Returns:
         str: Confirmación de suscripción
+        
+    Ejemplos:
+        - suscribir_usuario_telegram("Valle", "cambio_zona", [5])
+          → Vigila solo cambios a zona ID 5
+        - suscribir_usuario_telegram("Valle", "cambio_zona", [5, 8])
+          → Vigila cambios a zonas 5 y 8
+        - suscribir_usuario_telegram("Valle", "cambio_zona")
+          → Vigila cambios a todas las zonas
     """
     try:
+        # Buscar usuario por nombre o ID
+        usuario = None
+        
+        # Intentar buscar por nombre primero
+        try:
+            usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
+        except TelegramUser.DoesNotExist:
+            # Intentar convertir a ID numérico
+            try:
+                telegram_user_id = int(nombre_o_id)
+                usuario = TelegramUser.objects.get(telegram_user_id=telegram_user_id, activo=True)
+            except (ValueError, TelegramUser.DoesNotExist):
+                return f"❌ Usuario '{nombre_o_id}' no encontrado. Usa listar_usuarios_telegram() o registra el usuario primero."
+        
         # Buscar el evento
         try:
             evento = TelegramEventType.objects.get(code=event_code)
         except TelegramEventType.DoesNotExist:
             return f"❌ No existe el evento '{event_code}'. Usa listar_eventos_telegram() para ver eventos disponibles."
         
+        # Preparar filtros
+        filtros = {}
+        if zonas:
+            # Validar que las zonas existen
+            from gestion.models import Zonas
+            zonas_validas = Zonas.objects.filter(pk__in=zonas).values_list('id', flat=True)
+            if len(zonas_validas) != len(zonas):
+                zonas_invalidas = set(zonas) - set(zonas_validas)
+                return f"⚠️ Las siguientes zonas no existen: {zonas_invalidas}. Usa listar_zonas_disponibles()"
+            
+            filtros['zonas'] = list(zonas_validas)
+        
         # Crear o actualizar suscripción
         suscripcion, created = TelegramSubscription.objects.update_or_create(
-            telegram_user_id=telegram_user_id,
+            usuario=usuario,
             event_type=evento,
             defaults={
-                'nombre_usuario': nombre_usuario,
-                'activo': True
+                'activo': True,
+                'filtros': filtros
             }
         )
         
-        if created:
-            return f"✅ Usuario {telegram_user_id} suscrito a '{evento.nombre}'"
+        # Mensaje informativo sobre filtros
+        filtro_msg = ""
+        if filtros and 'zonas' in filtros:
+            from gestion.models import Zonas
+            zonas_nombres = Zonas.objects.filter(pk__in=filtros['zonas']).values_list('nombre', flat=True)
+            filtro_msg = f"\n🎯 Vigilando zonas: {', '.join(zonas_nombres)}"
         else:
-            return f"✅ Suscripción actualizada para usuario {telegram_user_id} → '{evento.nombre}'"
+            filtro_msg = "\n🎯 Vigilando todas las zonas"
+        
+        if created:
+            return f"✅ Usuario {usuario.nombre} suscrito a '{evento.nombre}'{filtro_msg}"
+        else:
+            return f"✅ Suscripción actualizada para {usuario.nombre} → '{evento.nombre}'{filtro_msg}"
         
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
 
 @tool
-def desuscribir_usuario_telegram(telegram_user_id: int, event_code: str) -> str:
+def configurar_filtro_zonas(
+    nombre_o_id: str,
+    event_code: str,
+    zonas: Optional[List[int]] = None
+) -> str:
+    """
+    Configura o actualiza los filtros por zonas para una suscripción existente.
+    
+    Args:
+        nombre_o_id: Nombre del usuario (ej: 'Valle') o ID numérico de Telegram
+        event_code: Código del evento
+        zonas: Lista de IDs de zonas a vigilar. Si es None o vacío, vigilará todas las zonas.
+        
+    Returns:
+        str: Confirmación de actualización
+        
+    Ejemplos:
+        - configurar_filtro_zonas("Valle", "cambio_zona", [5])
+          → Solo vigila zona 5 (Barra)
+        - configurar_filtro_zonas("Valle", "cambio_zona", [5, 8])
+          → Vigila zonas 5 y 8
+        - configurar_filtro_zonas("Valle", "cambio_zona", None)
+          → Vigila todas las zonas (elimina filtro)
+    """
+    try:
+        # Buscar usuario por nombre o ID
+        usuario = None
+        try:
+            usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
+        except TelegramUser.DoesNotExist:
+            try:
+                telegram_user_id = int(nombre_o_id)
+                usuario = TelegramUser.objects.get(telegram_user_id=telegram_user_id, activo=True)
+            except (ValueError, TelegramUser.DoesNotExist):
+                return f"❌ Usuario '{nombre_o_id}' no encontrado."
+        
+        # Buscar suscripción existente
+        evento = TelegramEventType.objects.get(code=event_code)
+        suscripcion = TelegramSubscription.objects.get(
+            usuario=usuario,
+            event_type=evento
+        )
+        
+        # Preparar nuevos filtros
+        nuevos_filtros = {}
+        if zonas:
+            # Validar zonas
+            from gestion.models import Zonas
+            zonas_validas = Zonas.objects.filter(pk__in=zonas).values_list('id', flat=True)
+            if len(zonas_validas) != len(zonas):
+                zonas_invalidas = set(zonas) - set(zonas_validas)
+                return f"⚠️ Las siguientes zonas no existen: {zonas_invalidas}"
+            
+            nuevos_filtros['zonas'] = list(zonas_validas)
+        
+        # Actualizar filtros
+        suscripcion.filtros = nuevos_filtros
+        suscripcion.save(update_fields=['filtros'])
+        
+        # Mensaje informativo
+        if nuevos_filtros and 'zonas' in nuevos_filtros:
+            from gestion.models import Zonas
+            zonas_nombres = Zonas.objects.filter(pk__in=nuevos_filtros['zonas']).values_list('nombre', flat=True)
+            return f"✅ Filtros actualizados. Ahora vigila zonas: {', '.join(zonas_nombres)}"
+        else:
+            return f"✅ Filtros eliminados. Ahora vigila todas las zonas"
+        
+    except TelegramEventType.DoesNotExist:
+        return f"❌ No existe el evento '{event_code}'"
+    except TelegramSubscription.DoesNotExist:
+        return f"❌ El usuario '{nombre_o_id}' no está suscrito a '{event_code}'. Usa suscribir_usuario_telegram() primero."
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
+def desuscribir_usuario_telegram(nombre_o_id: str, event_code: str) -> str:
     """
     Desuscribe un usuario de Telegram de un tipo de evento.
     El usuario dejará de recibir notificaciones de ese evento.
     
     Args:
-        telegram_user_id: ID del usuario de Telegram
+        nombre_o_id: Nombre del usuario (ej: 'Valle') o ID numérico de Telegram
         event_code: Código del evento del que desuscribir
         
     Returns:
         str: Confirmación de desuscripción
     """
     try:
+        # Buscar usuario por nombre o ID
+        usuario = None
+        try:
+            usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
+        except TelegramUser.DoesNotExist:
+            try:
+                telegram_user_id = int(nombre_o_id)
+                usuario = TelegramUser.objects.get(telegram_user_id=telegram_user_id, activo=True)
+            except (ValueError, TelegramUser.DoesNotExist):
+                return f"❌ Usuario '{nombre_o_id}' no encontrado."
+        
         evento = TelegramEventType.objects.get(code=event_code)
         suscripcion = TelegramSubscription.objects.get(
-            telegram_user_id=telegram_user_id,
+            usuario=usuario,
             event_type=evento
         )
         
         suscripcion.activo = False
         suscripcion.save(update_fields=['activo'])
         
-        return f"✅ Usuario {telegram_user_id} desuscrito de '{evento.nombre}'"
+        return f"✅ Usuario {usuario.nombre} desuscrito de '{evento.nombre}'"
         
     except TelegramEventType.DoesNotExist:
         return f"❌ No existe el evento '{event_code}'"
     except TelegramSubscription.DoesNotExist:
-        return f"❌ El usuario {telegram_user_id} no estaba suscrito a '{event_code}'"
+        return f"❌ El usuario '{nombre_o_id}' no estaba suscrito a '{event_code}'"
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
@@ -285,78 +553,18 @@ def ver_logs_telegram(limit: int = 10) -> str:
         return f"❌ Error: {str(e)}"
 
 
-@tool
-def ver_autorizaciones_pendientes() -> str:
-    """
-    Muestra las autorizaciones de Telegram pendientes (no usadas y no expiradas).
-    Útil para ver qué acciones están esperando confirmación.
-    
-    Returns:
-        str: Lista de autorizaciones pendientes
-    """
-    try:
-        ahora = timezone.now()
-        autorizaciones = TelegramAutorizacion.objects.filter(
-            usada=False,
-            expirada=False,
-            expira_en__gt=ahora
-        ).order_by('-created_at')[:20]
-        
-        if not autorizaciones.exists():
-            return "✅ No hay autorizaciones pendientes"
-        
-        resultado = [f"🔓 Autorizaciones pendientes ({len(autorizaciones)}):\n"]
-        
-        for auth in autorizaciones:
-            tiempo_restante = (auth.expira_en - ahora).seconds // 60
-            resultado.append(
-                f"• {auth.accion} - Dispositivo: {auth.uid_dispositivo[:16]}...\n"
-                f"  Usuario: {auth.telegram_user_id} | Empresa: {auth.empresa}\n"
-                f"  Expira en: {tiempo_restante} minutos\n"
-            )
-        
-        return "\n".join(resultado)
-        
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
-
-
-@tool
-def limpiar_autorizaciones_expiradas() -> str:
-    """
-    Marca como expiradas todas las autorizaciones que han pasado su fecha de expiración.
-    Esto es útil para mantener limpia la base de datos.
-    
-    Returns:
-        str: Número de autorizaciones marcadas como expiradas
-    """
-    try:
-        ahora = timezone.now()
-        autorizaciones = TelegramAutorizacion.objects.filter(
-            usada=False,
-            expirada=False,
-            expira_en__lte=ahora
-        )
-        
-        count = autorizaciones.count()
-        autorizaciones.update(expirada=True)
-        
-        return f"✅ Se marcaron {count} autorización(es) como expiradas"
-        
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
-
-
 # Lista de todas las herramientas para exportar
 telegram_tools = [
+    listar_usuarios_telegram,
+    registrar_usuario_telegram,
+    modificar_usuario_telegram,
+    eliminar_usuario_telegram,
     listar_eventos_telegram,
-    crear_evento_telegram,
-    activar_desactivar_evento_telegram,
+    listar_zonas_disponibles,
     listar_suscripciones_telegram,
     suscribir_usuario_telegram,
+    configurar_filtro_zonas,
     desuscribir_usuario_telegram,
     enviar_notificacion_telegram,
     ver_logs_telegram,
-    ver_autorizaciones_pendientes,
-    limpiar_autorizaciones_expiradas,
 ]

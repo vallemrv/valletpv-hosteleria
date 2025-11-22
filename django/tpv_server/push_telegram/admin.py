@@ -1,7 +1,15 @@
 # push_telegram/admin.py
 
 from django.contrib import admin
-from .models import TelegramEventType, TelegramSubscription, TelegramNotificationLog, TelegramAutorizacion
+from .models import TelegramEventType, TelegramSubscription, TelegramNotificationLog, TelegramUser
+
+
+@admin.register(TelegramUser)
+class TelegramUserAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'telegram_user_id', 'descripcion', 'activo', 'created_at')
+    list_filter = ('activo',)
+    search_fields = ('nombre', 'telegram_user_id', 'descripcion')
+    readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(TelegramEventType)
@@ -14,23 +22,44 @@ class TelegramEventTypeAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramSubscription)
 class TelegramSubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('telegram_user_id', 'nombre_usuario', 'event_type', 'activo', 'created_at')
-    list_filter = ('activo', 'event_type')
-    search_fields = ('telegram_user_id', 'nombre_usuario')
+    list_display = ('usuario', 'event_type', 'filtros_display', 'activo', 'created_at')
+    list_filter = ('activo', 'event_type', 'usuario')
+    search_fields = ('usuario__nombre', 'usuario__telegram_user_id')
     readonly_fields = ('created_at', 'updated_at')
     
     fieldsets = (
         ('Información del Usuario', {
-            'fields': ('telegram_user_id', 'nombre_usuario')
+            'fields': ('usuario',)
         }),
         ('Suscripción', {
             'fields': ('event_type', 'activo')
+        }),
+        ('Filtros de Vigilancia', {
+            'fields': ('filtros',),
+            'description': 'Configure qué zonas vigilar. Ejemplo: {"zonas": [1, 2, 3]} para vigilar zonas con ID 1, 2 y 3. Dejar vacío para vigilar todas.'
         }),
         ('Metadatos', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
+    
+    def filtros_display(self, obj):
+        """Muestra los filtros de forma legible"""
+        if not obj.filtros:
+            return "Todas las zonas"
+        if 'zonas' in obj.filtros:
+            zonas_ids = obj.filtros['zonas']
+            if isinstance(zonas_ids, list):
+                from gestion.models import Zonas
+                zonas = Zonas.objects.filter(pk__in=zonas_ids).values_list('nombre', flat=True)
+                return f"Zonas: {', '.join(zonas)}"
+            else:
+                from gestion.models import Zonas
+                zona = Zonas.objects.filter(pk=zonas_ids).first()
+                return f"Zona: {zona.nombre if zona else zonas_ids}"
+        return str(obj.filtros)
+    filtros_display.short_description = 'Vigilando'
 
 
 @admin.register(TelegramNotificationLog)
@@ -39,37 +68,6 @@ class TelegramNotificationLogAdmin(admin.ModelAdmin):
     list_filter = ('enviado', 'event_type', 'created_at')
     search_fields = ('telegram_user_id', 'mensaje')
     readonly_fields = ('event_type', 'telegram_user_id', 'mensaje', 'enviado', 'error', 'metadata', 'created_at')
-    
-    def has_add_permission(self, request):
-        return False
-    
-    def has_change_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(TelegramAutorizacion)
-class TelegramAutorizacionAdmin(admin.ModelAdmin):
-    list_display = ('token_corto', 'accion', 'uid_corto', 'telegram_user_id', 'estado', 'expira_en', 'created_at')
-    list_filter = ('usada', 'expirada', 'accion', 'created_at')
-    search_fields = ('token', 'uid_dispositivo', 'telegram_user_id')
-    readonly_fields = ('token', 'uid_dispositivo', 'telegram_message_id', 'telegram_user_id', 
-                      'accion', 'usada', 'expirada', 'usada_en', 'created_at')
-    
-    def token_corto(self, obj):
-        return f"{obj.token[:8]}..."
-    token_corto.short_description = 'Token'
-    
-    def uid_corto(self, obj):
-        return f"{obj.uid_dispositivo[:16]}..."
-    uid_corto.short_description = 'UID Dispositivo'
-    
-    def estado(self, obj):
-        if obj.usada:
-            return "✅ Usada"
-        if obj.expirada or not obj.is_valida():
-            return "⏰ Expirada"
-        return "🔓 Activa"
-    estado.short_description = 'Estado'
     
     def has_add_permission(self, request):
         return False

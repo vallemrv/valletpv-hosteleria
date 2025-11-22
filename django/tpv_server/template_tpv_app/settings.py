@@ -66,7 +66,7 @@ INSTALLED_APPS = [
 	'gestion',
     'tokenapi',
     'chatbot',
-    'telegram_bot',
+    'push_telegram',
     'api',
     'corsheaders',
 ]
@@ -100,7 +100,7 @@ STATICFILES_DIRS = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'gestion', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -205,62 +205,9 @@ STATIC_URL  = '/static/'
 STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT  =  os.path.join(STATIC_ROOT, 'media_{{name_tpv}}')
 
-# Configuración del Bot de Telegram para ValleTPV
+# Configuración de Push Telegram
 TELEGRAM_BOT = {
     'TOKEN': '{{telegram_bot_token}}',
-    'BOT_NAME': '{{telegram_bot_name}}',
-    'BOT_USERNAME': '{{bot_username}}',
     'WEBHOOK_URL': '{{telegram_webhook_url}}',
-    'ADMIN_USER_IDS': {{telegram_admin_user_ids}},
-    'ENABLED': {{telegram_enabled}},
-    'ALLOWED_UPDATES': ['message', 'callback_query'],
-    'MAX_RETRIES': 3,
-    'RETRY_DELAY': 1,  # segundos
-}
-
-# URL base del servidor para callbacks
-BASE_URL = '{{base_url}}'
-
-# Configuración de Base de Datos Externa (Redis, etc.)
-DATABASE_URL = '{{database_url}}'
-REDIS_URL = '{{redis_url}}'
-
-# Configuración de archivos y uploads
-MAX_FILE_SIZE = '{{max_file_size}}'
-UPLOAD_PATH = '{{upload_path}}'
-
-# Configuración de logging para Telegram Bot
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'telegram_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'telegram_bot_{{name_tpv}}.log'),
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        'telegram_bot': {
-            'handlers': ['telegram_file', 'console'],
-            'level': 'DEBUG' if {{is_debug}} else 'INFO',
-            'propagate': True,
-        },
-    },
+    'TPV_API_KEY': '{{telegram_api_key}}',
 }
