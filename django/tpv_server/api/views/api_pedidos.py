@@ -65,17 +65,16 @@ def get_pedidos_by_receptor(request):
     Recibe lista de pedidos con sus líneas del cliente y sincroniza con el servidor.
     Formato: {"receptor": "nombre_receptor", "pedidos": [{"pedido_id": 789, "lineas": [1234, 1235]}]}
     """
-    receptor_nombre = request.POST.get("receptor")
+    receptor_nombre = request.POST.get("nom_receptor", "")
     pedidos_cliente = json.loads(request.POST.get("pedidos_locales", "[]"))
    
-    
     # Obtener UIDs de mesas abiertas
     mesas_abiertas = Mesasabiertas.objects.select_related('infmesa')
     mesas_abiertas_uids = set(ma.infmesa.id for ma in mesas_abiertas)
-    
+
     # Obtener todas las líneas del servidor para este receptor en mesas abiertas
     lineas_servidor = Lineaspedido.objects.filter(
-        Q(tecla__familia__receptor__nomimp=receptor_nombre) & 
+        Q(tecla__familia__receptor__nombre=receptor_nombre) & 
         Q(infmesa__id__in=mesas_abiertas_uids) &
         (Q(estado='P') | Q(estado='R') | Q(estado='M'))
     ).select_related(

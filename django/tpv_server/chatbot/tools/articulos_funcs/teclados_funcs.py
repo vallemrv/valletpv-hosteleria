@@ -287,6 +287,7 @@ def _crear_tecla(data: Dict) -> Dict:
                     "id_elemento": tecla.id
                 }])
             except Exception as e:
+                logger.error(f"Error al actualizar ChromaDB para tecla ID {tecla.id}: {str(e)}", exc_info=True)
         
         send_tool_message(f"Tecla '{nombre}' creada exitosamente")
         return _format_success({"id": tecla.id, "nombre": tecla.nombre}, f"Tecla '{nombre}' creada")
@@ -325,6 +326,7 @@ def _modificar_tecla(data: Dict) -> Dict:
                     "id_elemento": tecla.id
                 }])
             except Exception as e:
+                logger.error(f"Error al actualizar ChromaDB para tecla ID {tecla.id}: {str(e)}", exc_info=True)
         
         send_tool_message(f"Tecla '{nombre_original}' modificada exitosamente")
         return _format_success({"id": tecla.id, "nombre": tecla.nombre}, f"Tecla modificada")
@@ -356,6 +358,7 @@ def _eliminar_tecla(data: Dict) -> Dict:
                     "id_elemento": tecla_id
                 }])
             except Exception as e:
+                logger.error(f"Error al eliminar de ChromaDB para tecla ID {tecla_id}: {str(e)}", exc_info=True)
         
         tecla.delete()
         send_tool_message(f"Tecla '{nombre}' eliminada exitosamente")

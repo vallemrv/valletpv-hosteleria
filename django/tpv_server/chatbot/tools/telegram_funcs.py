@@ -13,7 +13,8 @@ from push_telegram.models import (
     TelegramEventType, 
     TelegramSubscription, 
     TelegramNotificationLog,
-    TelegramUser
+    TelegramUser,
+    TelegramAutorizacion
 )
 from push_telegram.push_sender import enviar_push_telegram
 
@@ -36,9 +37,17 @@ def listar_usuarios_telegram() -> str:
     for usuario in usuarios:
         subs_count = usuario.subscriptions.filter(activo=True).count()
         desc = f" - {usuario.descripcion}" if usuario.descripcion else ""
+        
+        # Contar autorizaciones activas
+        auth_count = TelegramAutorizacion.objects.filter(
+            telegram_user_id=usuario.telegram_user_id,
+            usada=False,
+            expirada=False
+        ).count()
+        
         resultado.append(
             f"• {usuario.nombre} (ID: {usuario.telegram_user_id}){desc}\n"
-            f"  Suscripciones activas: {subs_count}"
+            f"  📋 Suscripciones: {subs_count} | 🔐 Autorizaciones: {auth_count}"
         )
     
     return "\n".join(resultado)
@@ -166,9 +175,8 @@ def listar_eventos_telegram() -> str:
     Lista todos los tipos de eventos de Telegram disponibles y su estado.
     Útil para ver qué eventos existen antes de crear suscripciones.
     
-    NOTA: Los eventos se crean mediante TELEGRAM_HOOKS en local_config.py
-          y ejecutando: python manage_testTPV.py init_telegram_events
-    
+    NOTA: Los eventos se crean mediante internamente
+          
     Returns:
         str: Lista formateada de eventos con su estado
     """
@@ -201,7 +209,7 @@ def listar_zonas_disponibles() -> str:
         str: Lista de zonas con sus IDs
     """
     try:
-        from gestion.models import Zonas
+        from gestion.models.mesas import Zonas
         zonas = Zonas.objects.all().order_by('id')
         
         if not zonas.exists():
@@ -254,7 +262,7 @@ def listar_suscripciones_telegram(telegram_user_id: Optional[int] = None) -> str
                 if 'zonas' in sub.filtros:
                     zonas_ids = sub.filtros['zonas']
                     if isinstance(zonas_ids, list):
-                        from gestion.models import Zonas
+                        from gestion.models.mesas import Zonas
                         zonas = Zonas.objects.filter(pk__in=zonas_ids).values_list('nombre', flat=True)
                         filtro_info = f" [Zonas: {', '.join(zonas)}]"
                     else:
@@ -328,7 +336,7 @@ def suscribir_usuario_telegram(
         filtros = {}
         if zonas:
             # Validar que las zonas existen
-            from gestion.models import Zonas
+            from gestion.models.mesas import Zonas
             zonas_validas = Zonas.objects.filter(pk__in=zonas).values_list('id', flat=True)
             if len(zonas_validas) != len(zonas):
                 zonas_invalidas = set(zonas) - set(zonas_validas)
@@ -349,7 +357,7 @@ def suscribir_usuario_telegram(
         # Mensaje informativo sobre filtros
         filtro_msg = ""
         if filtros and 'zonas' in filtros:
-            from gestion.models import Zonas
+            from gestion.models.mesas import Zonas
             zonas_nombres = Zonas.objects.filter(pk__in=filtros['zonas']).values_list('nombre', flat=True)
             filtro_msg = f"\n🎯 Vigilando zonas: {', '.join(zonas_nombres)}"
         else:
@@ -412,13 +420,16 @@ def configurar_filtro_zonas(
         nuevos_filtros = {}
         if zonas:
             # Validar zonas
-            from gestion.models import Zonas
-            zonas_validas = Zonas.objects.filter(pk__in=zonas).values_list('id', flat=True)
-            if len(zonas_validas) != len(zonas):
-                zonas_invalidas = set(zonas) - set(zonas_validas)
-                return f"⚠️ Las siguientes zonas no existen: {zonas_invalidas}"
-            
-            nuevos_filtros['zonas'] = list(zonas_validas)
+            try:
+                from gestion.models.mesas import Zonas
+                zonas_validas = Zonas.objects.filter(pk__in=zonas).values_list('id', flat=True)
+                if len(zonas_validas) != len(zonas):
+                    zonas_invalidas = set(zonas) - set(zonas_validas)
+                    return f"⚠️ Las siguientes zonas no existen: {zonas_invalidas}. Usa listar_zonas_disponibles()"
+                
+                nuevos_filtros['zonas'] = list(zonas_validas)
+            except Exception as e:
+                return f"❌ Error validando zonas: {str(e)}"
         
         # Actualizar filtros
         suscripcion.filtros = nuevos_filtros
@@ -426,7 +437,7 @@ def configurar_filtro_zonas(
         
         # Mensaje informativo
         if nuevos_filtros and 'zonas' in nuevos_filtros:
-            from gestion.models import Zonas
+            from gestion.models.mesas import Zonas
             zonas_nombres = Zonas.objects.filter(pk__in=nuevos_filtros['zonas']).values_list('nombre', flat=True)
             return f"✅ Filtros actualizados. Ahora vigila zonas: {', '.join(zonas_nombres)}"
         else:
@@ -518,6 +529,199 @@ def enviar_notificacion_telegram(event_code: str, mensaje: str, metadata: Option
 
 
 @tool
+def enviar_notificacion_prueba(nombre_o_id: str, mensaje: str = "🧪 Mensaje de prueba del sistema TPV") -> str:
+    """
+    Envía una notificación de prueba directamente a un usuario específico.
+    No requiere suscripciones ni eventos, útil para verificar conectividad.
+    
+    Args:
+        nombre_o_id: Nombre del usuario (ej: 'Valle') o ID numérico de Telegram
+        mensaje: Mensaje de prueba a enviar (opcional)
+        
+    Returns:
+        str: Resultado del envío
+    """
+    try:
+        # Buscar usuario
+        usuario = None
+        try:
+            usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
+        except TelegramUser.DoesNotExist:
+            try:
+                telegram_user_id = int(nombre_o_id)
+                usuario = TelegramUser.objects.get(telegram_user_id=telegram_user_id, activo=True)
+            except (ValueError, TelegramUser.DoesNotExist):
+                return f"❌ Usuario '{nombre_o_id}' no encontrado"
+        
+        # Obtener configuración
+        from django.conf import settings
+        import requests
+        
+        telegram_config = getattr(settings, 'TELEGRAM_BOT', {})
+        bot_token = telegram_config.get('TOKEN', '')
+        
+        if not bot_token or bot_token == 'TU_BOT_TOKEN_AQUI':
+            return "❌ Token de Telegram no configurado en settings"
+        
+        # Enviar mensaje de prueba
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        data = {
+            'chat_id': usuario.telegram_user_id,
+            'text': f"{mensaje}\n\n⏰ Enviado: {timezone.now().strftime('%d/%m/%Y %H:%M:%S')}",
+            'parse_mode': 'HTML'
+        }
+        
+        response = requests.post(url, json=data, timeout=10)
+        
+        if response.status_code == 200:
+            return f"✅ Mensaje de prueba enviado a {usuario.nombre} (ID: {usuario.telegram_user_id})"
+        else:
+            error_msg = response.json().get('description', 'Error desconocido')
+            return f"❌ Error enviando mensaje: {error_msg}"
+            
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
+def simular_evento_dispositivo(uid: str, descripcion: str = "Dispositivo de prueba") -> str:
+    """
+    Simula la detección de un nuevo dispositivo para probar las notificaciones.
+    Útil para verificar que el sistema de notificaciones funciona correctamente.
+    
+    Args:
+        uid: UID del dispositivo simulado
+        descripcion: Descripción del dispositivo (opcional)
+        
+    Returns:
+        str: Resultado de la simulación
+    """
+    try:
+        from push_telegram.push_sender import notificar_nuevo_dispositivo
+        
+        enviados = notificar_nuevo_dispositivo(
+            uid=uid,
+            descripcion=descripcion
+        )
+        
+        if enviados > 0:
+            return f"✅ Simulación enviada a {enviados} usuario(s) suscrito(s) a 'nuevo_dispositivo'\n📱 UID simulado: {uid}"
+        else:
+            return "⚠️ No se enviaron notificaciones. Verifica que:\n• Existe el evento 'nuevo_dispositivo'\n• Hay usuarios suscritos a ese evento\n• La configuración de Telegram es correcta"
+            
+    except Exception as e:
+        return f"❌ Error en simulación: {str(e)}"
+
+
+@tool
+def listar_autorizaciones_telegram(nombre_o_id: Optional[str] = None, solo_activas: bool = True) -> str:
+    """
+    Lista las autorizaciones temporales de Telegram (tokens para botones).
+    Útil para verificar qué autorizaciones están pendientes o han expirado.
+    
+    Args:
+        nombre_o_id: Nombre del usuario o ID de Telegram (opcional, muestra todas si no se especifica)
+        solo_activas: Si True, solo muestra autorizaciones no usadas y no expiradas
+        
+    Returns:
+        str: Lista de autorizaciones con su estado
+    """
+    try:
+        # Filtrar por usuario si se especifica
+        queryset = TelegramAutorizacion.objects.all()
+        
+        if nombre_o_id:
+            # Intentar buscar por nombre primero
+            try:
+                usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
+                queryset = queryset.filter(telegram_user_id=usuario.telegram_user_id)
+                titulo = f"🔐 Autorizaciones para {usuario.nombre}:\n"
+            except TelegramUser.DoesNotExist:
+                # Intentar como ID numérico
+                try:
+                    telegram_user_id = int(nombre_o_id)
+                    queryset = queryset.filter(telegram_user_id=telegram_user_id)
+                    titulo = f"🔐 Autorizaciones para ID {telegram_user_id}:\n"
+                except ValueError:
+                    return f"❌ Usuario '{nombre_o_id}' no encontrado"
+        else:
+            titulo = "🔐 Todas las autorizaciones:\n"
+        
+        # Filtrar solo activas si se solicita
+        if solo_activas:
+            queryset = queryset.filter(usada=False, expirada=False)
+            titulo += "(Solo activas)\n"
+        
+        autorizaciones = queryset.order_by('-created_at')[:20]  # Máximo 20
+        
+        if not autorizaciones.exists():
+            return "No hay autorizaciones encontradas."
+        
+        resultado = [titulo]
+        for auth in autorizaciones:
+            # Determinar estado
+            if auth.usada:
+                estado = "✅ Usada"
+                fecha_estado = auth.usada_en.strftime("%d/%m %H:%M") if auth.usada_en else "?"
+            elif auth.expirada or auth.expira_en < timezone.now():
+                estado = "⏰ Expirada"
+                fecha_estado = auth.expira_en.strftime("%d/%m %H:%M")
+            else:
+                estado = "🔓 Activa"
+                fecha_estado = auth.expira_en.strftime("%d/%m %H:%M")
+            
+            # Mostrar información
+            uid_corto = auth.uid_dispositivo[:12] + "..." if len(auth.uid_dispositivo) > 15 else auth.uid_dispositivo
+            resultado.append(
+                f"{estado} | {auth.accion} | {uid_corto}\n"
+                f"   👤 User: {auth.telegram_user_id} | ⏰ {fecha_estado}"
+            )
+        
+        return "\n".join(resultado)
+        
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
+def limpiar_autorizaciones_expiradas() -> str:
+    """
+    Limpia (marca como expiradas) todas las autorizaciones que han superado su tiempo límite.
+    También elimina autorizaciones muy antiguas (más de 24 horas).
+    
+    Returns:
+        str: Resultado de la limpieza
+    """
+    try:
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        ahora = timezone.now()
+        hace_24h = ahora - timedelta(hours=24)
+        
+        # Marcar como expiradas las que han pasado su tiempo
+        expiradas = TelegramAutorizacion.objects.filter(
+            expira_en__lt=ahora,
+            expirada=False,
+            usada=False
+        ).update(expirada=True)
+        
+        # Eliminar autorizaciones muy antiguas (más de 24h)
+        eliminadas = TelegramAutorizacion.objects.filter(
+            created_at__lt=hace_24h
+        ).count()
+        
+        TelegramAutorizacion.objects.filter(
+            created_at__lt=hace_24h
+        ).delete()
+        
+        return f"✅ Limpieza completada:\n• {expiradas} autorizaciones marcadas como expiradas\n• {eliminadas} autorizaciones antiguas eliminadas"
+        
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+@tool
 def ver_logs_telegram(limit: int = 10) -> str:
     """
     Muestra los últimos logs de notificaciones de Telegram enviadas.
@@ -566,5 +770,9 @@ telegram_tools = [
     configurar_filtro_zonas,
     desuscribir_usuario_telegram,
     enviar_notificacion_telegram,
+    enviar_notificacion_prueba,
+    simular_evento_dispositivo,
+    listar_autorizaciones_telegram,
+    limpiar_autorizaciones_expiradas,
     ver_logs_telegram,
 ]

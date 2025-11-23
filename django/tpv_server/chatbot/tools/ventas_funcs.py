@@ -100,7 +100,6 @@ def get_sales_by_waiters(date_start: str, date_end: str, start_time: str, end_ti
                 camareros_data[camarero_id]["cantidad_a"] += total_sales
             elif estado == 'P':
                 camareros_data[camarero_id]["cantidad_p"] += total_sales
-            else:
 
         if not camareros_data:
             return []
@@ -222,7 +221,6 @@ def get_sales_by_waiter_id(waiter_id: int, date_start: str, date_end: str, start
                 sales_data["cantidad_a"] += total_sales
             elif status == 'P':
                 sales_data["cantidad_p"] += total_sales
-            else:
 
         # 6. Obtener nombre y apellido
         nombre_camarero = f"Camarero ID {waiter_id}"
@@ -1240,6 +1238,9 @@ def create_ticket_print_object(ticket_id: int):
                 # Añadir la línea con el código de autorización
                 lineas_recibo.append(f"Código autorización: {recibo['codigo_autorizacion']}")
             except (json.JSONDecodeError, KeyError) as e:
+                logger.error(f"Error al procesar el recibo de tarjeta del ticket {ticket_id}: {e}", exc_info=True)
+                return {"error": f"Error al procesar el recibo de tarjeta: {str(e)}"}
+
 
         # Calcular total del ticket
         total_ticket = ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total']

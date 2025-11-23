@@ -78,12 +78,15 @@ def _enviar_mensaje_telegram(bot_token: str, chat_id: int, mensaje: str,
     """
     Enviar mensaje a un usuario específico de Telegram y registrar en log
     """
-    log = TelegramNotificationLog(
-        event_type=event_type,
-        telegram_user_id=chat_id,
-        mensaje=mensaje,
-        metadata=metadata
-    )
+    # Crear log pero no intentar guardar todavía
+    log_data = {
+        'event_type': event_type,
+        'telegram_user_id': chat_id,
+        'mensaje': mensaje,
+        'metadata': metadata,
+        'enviado': False,
+        'error': None
+    }
     
     try:
         # Enviar vía API de Telegram
@@ -101,22 +104,58 @@ def _enviar_mensaje_telegram(bot_token: str, chat_id: int, mensaje: str,
         response = requests.post(url, json=data, timeout=10)
         
         if response.status_code == 200:
-            log.enviado = True
-            log.save()
+            log_data['enviado'] = True
+            _guardar_log_seguro(log_data)
             logger.debug(f"Mensaje enviado a {chat_id}")
             return True
         else:
             error_msg = response.json().get('description', 'Error desconocido')
-            log.error = f"HTTP {response.status_code}: {error_msg}"
-            log.save()
+            log_data['error'] = f"HTTP {response.status_code}: {error_msg}"
+            _guardar_log_seguro(log_data)
             logger.warning(f"Error enviando a {chat_id}: {error_msg}")
             return False
             
     except Exception as e:
-        log.error = str(e)
-        log.save()
+        log_data['error'] = str(e)
+        _guardar_log_seguro(log_data)
         logger.error(f"Excepción enviando a {chat_id}: {e}")
         return False
+
+
+def _guardar_log_seguro(log_data: dict):
+    """
+    Guardar log de forma segura, manejando errores de charset de MySQL
+    """
+    try:
+        log = TelegramNotificationLog(
+            event_type=log_data['event_type'],
+            telegram_user_id=log_data['telegram_user_id'],
+            mensaje=log_data['mensaje'],
+            metadata=log_data['metadata'],
+            enviado=log_data['enviado'],
+            error=log_data['error']
+        )
+        log.save()
+    except Exception as e:
+        # Si es error de charset, intentar guardar sin emojis
+        if '1366' in str(e) and 'Incorrect string value' in str(e):
+            try:
+                # Versión sin emojis para la BD (pero el mensaje original con emojis ya se envió)
+                mensaje_sin_emojis = log_data['mensaje'].encode('ascii', 'ignore').decode('ascii')
+                log = TelegramNotificationLog(
+                    event_type=log_data['event_type'],
+                    telegram_user_id=log_data['telegram_user_id'],
+                    mensaje=mensaje_sin_emojis,
+                    metadata=log_data['metadata'],
+                    enviado=log_data['enviado'],
+                    error=log_data['error']
+                )
+                log.save()
+                logger.warning(f"Log guardado sin emojis debido a charset MySQL")
+            except Exception as e2:
+                logger.error(f"Error guardando log incluso sin emojis: {e2}")
+        else:
+            logger.error(f"Error guardando log: {e}")
 
 
 # Función de conveniencia para el evento de nuevo dispositivo
@@ -146,119 +185,130 @@ def notificar_nuevo_dispositivo(uid: str, descripcion: str = None):
     webhook_url = telegram_config.get('WEBHOOK_URL', '')
     empresa = getattr(settings, 'EMPRESA', 'testTPV')
     base_url = getattr(settings, 'BASE_URL', 'https://tpvtest.valletpv.es')
+    bot_token = telegram_config.get('TOKEN', '')
     
-    if not webhook_url:
-        logger.error("Webhook URL no configurada")
+    # Decidir método de envío: webhook o directo
+    use_webhook = bool(webhook_url)
+    use_direct = bool(bot_token) and not use_webhook
+    
+    if not use_webhook and not use_direct:
+        logger.error("Ni webhook ni token de bot configurados")
         return 0
     
     # Enviar a cada suscriptor
     enviados = 0
     for subscription in subscriptions:
-        # Crear UN SOLO token (la acción viene en el callback_data del botón)
-        token = str(uuid.uuid4())
-        expira_en = timezone.now() + timedelta(minutes=10)
-        
-        # Guardar UNA autorización local (sin acción específica, se valida después)
-        try:
-            TelegramAutorizacion.objects.create(
-                token=token,
-                uid_dispositivo=uid,
-                telegram_user_id=subscription.usuario.telegram_user_id,
-                telegram_message_id=0,
-                accion='dispositivo_action',  # Acción genérica
-                empresa=empresa,
-                expira_en=expira_en
-            )
-            logger.info(f"Token creado localmente para UID {uid}")
-        except Exception as e:
-            logger.error(f"Error creando token local: {e}")
-            continue
-        
         # Construir mensaje
         mensaje = f"""
-🆕 <b>Nuevo Dispositivo Detectado</b>
+🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>
 
 📱 <b>UID:</b> <code>{uid}</code>
 📝 <b>Descripción:</b> {descripcion or 'Sin descripción'}
 🏢 <b>Empresa:</b> {empresa}
 
 ⚠️ El dispositivo está <b>INACTIVO</b> por seguridad.
-¿Deseas activarlo o mantenerlo desactivado?
+❓ ¿Deseas activarlo o mantenerlo desactivado?
 
-⏱️ Esta autorización expira en 10 minutos.
+⏰ Esta autorización expira en 10 minutos.
         """.strip()
         
-        # Botones inline con callback_data: accion|token (mismo token, diferente acción)
-        botones = [
-            [
-                {'text': '✅ Activar', 'callback_data': f"activate|{token}"},
-                {'text': '⏸️ Desactivar', 'callback_data': f"deactivate|{token}"}
-            ]
-        ]
-        
-        # Log local
-        log = TelegramNotificationLog(
-            event_type=event_type,
-            telegram_user_id=subscription.usuario.telegram_user_id,
-            mensaje=mensaje,
-            metadata={'uid': uid, 'descripcion': descripcion, 'empresa': empresa}
-        )
-        
-        # Obtener API Key para autenticar con el webhook
-        telegram_config = getattr(settings, 'TELEGRAM_BOT', {})
-        tpv_api_key = telegram_config.get('TPV_API_KEY', '')
-        
-        logger.info(f"Preparando envío al webhook: {webhook_url}/api/register_notification/")
-        
-        try:
-            # Enviar al webhook (router simple)
-            # El webhook recibe accion|token en callback_data y llama al callback_url con esos datos
-            registro_url = f"{webhook_url}/api/register_notification/"
-            headers = {'Authorization': f'Bearer {tpv_api_key}'}
-            
-            logger.info(f"Enviando POST a webhook con token {token[:8]}...")
-            
-            response = requests.post(registro_url, 
-                headers=headers,
-                json={
-                    'token': token,
-                    'callback_url': f"{base_url}/api/dispositivo/action",  # URL genérica que recibe accion
-                    'telegram_user_id': subscription.usuario.telegram_user_id,
-                    'mensaje': mensaje,
-                    'botones': botones,
-                    'expira_en': expira_en.isoformat(),
-                    'empresa': empresa,
-                    'uid_dispositivo': uid,
-                    'metadata': {'descripcion': descripcion}
-                }, 
-                timeout=10
+        if use_direct:
+            # ENVÍO DIRECTO - Sin botones por simplicidad
+            enviado = _enviar_mensaje_telegram(
+                bot_token=bot_token,
+                chat_id=subscription.usuario.telegram_user_id,
+                mensaje=mensaje,
+                event_type=event_type,
+                metadata={'uid': uid, 'descripcion': descripcion, 'empresa': empresa}
             )
-            
-            if response.status_code == 200:
-                result = response.json()
-                message_id = result.get('message_id')
-                
-                # Actualizar message_id en ambas autorizaciones locales (mismo token)
-                if message_id:
-                    TelegramAutorizacion.objects.filter(
-                        token=token,
-                        uid_dispositivo=uid
-                    ).update(telegram_message_id=message_id)
-                
-                log.enviado = True
-                log.save()
-                logger.info(f"Notificación enviada vía webhook para {subscription.usuario.nombre}")
+            if enviado:
                 enviados += 1
-            else:
-                error_msg = response.json().get('error', 'Error desconocido')
-                log.error = f"Webhook error: {error_msg}"
-                log.save()
-                logger.warning(f"Error en webhook: {error_msg}")
+                logger.info(f"Notificación enviada directamente a {subscription.usuario.nombre}")
                 
-        except Exception as e:
-            log.error = str(e)
-            log.save()
-            logger.error(f"Excepción con webhook: {e}")
+        elif use_webhook:
+            # ENVÍO VÍA WEBHOOK - Con botones y tokens
+            token = str(uuid.uuid4())
+            expira_en = timezone.now() + timedelta(minutes=10)
+            
+            # Guardar autorización local
+            try:
+                TelegramAutorizacion.objects.create(
+                    token=token,
+                    uid_dispositivo=uid,
+                    telegram_user_id=subscription.usuario.telegram_user_id,
+                    telegram_message_id=0,
+                    accion='dispositivo_action',
+                    empresa=empresa,
+                    expira_en=expira_en
+                )
+            except Exception as e:
+                logger.error(f"Error creando token local: {e}")
+                continue
+            
+            # Botones inline
+            botones = [
+                [
+                    {'text': '✅ Activar', 'callback_data': f"activate|{token}"},
+                    {'text': '🛑 Desactivar', 'callback_data': f"deactivate|{token}"}
+                ]
+            ]
+            
+            # Preparar datos del log
+            log_data = {
+                'event_type': event_type,
+                'telegram_user_id': subscription.usuario.telegram_user_id,
+                'mensaje': mensaje,
+                'metadata': {'uid': uid, 'descripcion': descripcion, 'empresa': empresa},
+                'enviado': False,
+                'error': None
+            }
+            
+            try:
+                # Enviar al webhook
+                tpv_api_key = telegram_config.get('TPV_API_KEY', '')
+                registro_url = f"{webhook_url}/api/register_notification/"
+                headers = {'Authorization': f'Bearer {tpv_api_key}'}
+                
+                response = requests.post(registro_url, 
+                    headers=headers,
+                    json={
+                        'token': token,
+                        'callback_url': f"{base_url}/api/dispositivo/action",
+                        'telegram_user_id': subscription.usuario.telegram_user_id,
+                        'mensaje': mensaje,
+                        'botones': botones,
+                        'expira_en': expira_en.isoformat(),
+                        'empresa': empresa,
+                        'uid_dispositivo': uid,
+                        'metadata': {'descripcion': descripcion}
+                    }, 
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    message_id = result.get('message_id')
+                    
+                    if message_id:
+                        TelegramAutorizacion.objects.filter(
+                            token=token,
+                            uid_dispositivo=uid
+                        ).update(telegram_message_id=message_id)
+                    
+                    log_data['enviado'] = True
+                    _guardar_log_seguro(log_data)
+                    logger.info(f"Notificación enviada vía webhook para {subscription.usuario.nombre}")
+                    enviados += 1
+                else:
+                    error_msg = response.json().get('error', 'Error desconocido')
+                    log_data['error'] = f"Webhook error: {error_msg}"
+                    _guardar_log_seguro(log_data)
+                    logger.warning(f"Error en webhook: {error_msg}")
+                    
+            except Exception as e:
+                log_data['error'] = str(e)
+                _guardar_log_seguro(log_data)
+                logger.error(f"Excepción con webhook: {e}")
     
     logger.info(f"Evento 'nuevo_dispositivo': {enviados}/{subscriptions.count()} notificaciones enviadas")
     return enviados
@@ -327,8 +377,7 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
     if len(lineas_pedido) > 10:
         resumen_lineas += f"... y {len(lineas_pedido) - 10} líneas más\n"
     
-    # Determinar emoji y texto según el tipo de cambio
-    tipo_emoji = "🔄" if tipo_cambio == "mesa_completa" else "📦"
+    # Determinar texto según el tipo de cambio
     tipo_texto = "Mesa Completa" if tipo_cambio == "mesa_completa" else "Líneas Parciales"
     
     # Enviar a cada suscriptor
@@ -341,23 +390,23 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
         
         # Mensaje personalizado según el tipo de cambio
         mensaje = f"""
-{tipo_emoji} <b>Cambio a Zona: {zona_destino_nombre}</b>
-<i>Tipo: {tipo_texto}</i>
+🔄 <b>Cambio a Zona: {zona_destino_nombre}</b>
+📋 <i>Tipo: {tipo_texto}</i>
 
 📍 <b>De:</b> {mesa_origen_nombre} (ID: {mesa_origen_id})
 📍 <b>A:</b> {mesa_destino_nombre} (ID: {mesa_destino_id})
-🎯 <b>Zona:</b> {zona_destino_nombre} (ID: {zona_destino_id})
-👤 <b>Camarero:</b> {camarero_nombre}
-⏰ <b>Hora:</b> {hora_apertura}
+🏷️ <b>Zona:</b> {zona_destino_nombre} (ID: {zona_destino_id})
+👨‍🍳 <b>Camarero:</b> {camarero_nombre}
+🕐 <b>Hora:</b> {hora_apertura}
 🏢 <b>Empresa:</b> {empresa}
 
-📋 <b>Líneas de pedido ({len(lineas_pedido)}):</b>
+🍽️ <b>Líneas de pedido ({len(lineas_pedido)}):</b>
 {resumen_lineas}
-💰 <b>Total:</b> {total:.2f}€
+💰 <b>Total:</b> {total:.2f} EUR
 
 ❓ ¿Deseas borrar esta mesa o mantenerla?
 
-⏱️ Esta autorización expira en 10 minutos.
+⏰ Esta autorización expira en 10 minutos.
         """.strip()
         
         # Callback data con formato corto
@@ -374,12 +423,12 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
             ]
         }
         
-        # Log de la notificación
-        log = TelegramNotificationLog(
-            event_type=event_type,
-            telegram_user_id=subscription.usuario.telegram_user_id,
-            mensaje=mensaje,
-            metadata={
+        # Preparar datos del log
+        log_data = {
+            'event_type': event_type,
+            'telegram_user_id': subscription.usuario.telegram_user_id,
+            'mensaje': mensaje,
+            'metadata': {
                 'mesa_origen_id': mesa_origen_id,
                 'mesa_origen_nombre': mesa_origen_nombre,
                 'mesa_destino_id': mesa_destino_id,
@@ -392,8 +441,10 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                 'infmesa_id': infmesa_id,
                 'total_lineas': len(lineas_pedido),
                 'total': total
-            }
-        )
+            },
+            'enviado': False,
+            'error': None
+        }
         
         try:
             # Enviar mensaje a Telegram
@@ -411,8 +462,8 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                 result = response.json()['result']
                 message_id = result['message_id']
                 
-                log.enviado = True
-                log.save()
+                log_data['enviado'] = True
+                _guardar_log_seguro(log_data)
                 
                 # Guardar autorizaciones localmente en la BD
                 try:
@@ -446,13 +497,13 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                 enviados += 1
             else:
                 error_msg = response.json().get('description', 'Error desconocido')
-                log.error = f"HTTP {response.status_code}: {error_msg}"
-                log.save()
+                log_data['error'] = f"HTTP {response.status_code}: {error_msg}"
+                _guardar_log_seguro(log_data)
                 logger.warning(f"Error enviando a {subscription.usuario.nombre}: {error_msg}")
                 
         except Exception as e:
-            log.error = str(e)
-            log.save()
+            log_data['error'] = str(e)
+            _guardar_log_seguro(log_data)
             logger.error(f"Excepción enviando a {subscription.usuario.nombre}: {e}")
     
     logger.info(f"Evento 'cambio_zona' ({zona_destino_nombre}): {enviados}/{len(subscriptions_filtradas)} notificaciones enviadas")
@@ -513,37 +564,37 @@ def editar_mensaje_dispositivo(telegram_user_id: int, message_id: int, uid: str,
         logger.error("Token de Telegram no configurado para editar mensaje")
         return False
     
-    # Determinar emoji y mensaje según la acción
+    # Determinar mensaje según la acción
     if accion == 'activado':
-        emoji = '✅'
         estado = 'ACTIVO'
         verbo = 'activado'
+        prefijo = '✅'
     else:  # desactivado
-        emoji = '⏸️'
         estado = 'INACTIVO'
         verbo = 'desactivado'
+        prefijo = '🛑'
     
     # Construir mensaje editado
     if ya_estaba:
         mensaje = f"""
-🆕 <b>Nuevo Dispositivo Detectado</b>
+🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>
 
 📱 <b>UID:</b> <code>{uid}</code>
 📝 <b>Descripción:</b> {descripcion or 'Sin descripción'}
 🏢 <b>Empresa:</b> {empresa}
 
-{emoji} <b>El dispositivo ya estaba {estado}</b>
+{prefijo} <b>El dispositivo ya estaba {estado}</b>
         """.strip()
     else:
         mensaje = f"""
-🆕 <b>Nuevo Dispositivo Detectado</b>
+🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>
 
 📱 <b>UID:</b> <code>{uid}</code>
 📝 <b>Descripción:</b> {descripcion or 'Sin descripción'}
 🏢 <b>Empresa:</b> {empresa}
 
-{emoji} <b>Dispositivo {verbo.upper()}</b>
-🔄 <b>Estado actual:</b> {estado}
+{prefijo} <b>Dispositivo {verbo.upper()}</b>
+📊 <b>Estado actual:</b> {estado}
         """.strip()
     
     # Editar mensaje eliminando botones

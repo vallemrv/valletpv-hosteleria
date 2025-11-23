@@ -39,6 +39,7 @@ def send_mensaje_devices(v):
         'type': 'send_message',
         'content': json.dumps(v)
         })
+        print(f"Mensaje enviado a devices: {v}")
     except Exception as e:
         print("[ERROR  devices ]"+ str(e))
 

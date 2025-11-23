@@ -45,9 +45,8 @@ def enviar_pedido_smart_receptor(pedido):
                 "op": "pedido",
                 "pedido_id": pedido.id,
                 "hora": pedido.hora,
-                "receptor": receptor.nomimp,
-                "nom_receptor": receptor_nombre,
-                "receptor_activo": receptor.activo,
+                "receptor": receptor.nombre.lower(),
+                "nom_impresora": receptor.nomimp,
                 "camarero": camarero.nombre + " " + camarero.apellidos,
                 "mesa": mesa.nombre,
                 "lineas": []
@@ -89,7 +88,7 @@ def enviar_urgente_smart_receptor(pedido_id=None, linea_ids=None):
         if not linea.tecla or not linea.tecla.familia or not linea.tecla.familia.receptor:
             continue
         
-        receptor = linea.tecla.familia.receptor.nomimp
+        receptor = linea.tecla.familia.receptor.nombre.lower()
         
         if receptor not in receptores_ids:
             receptores_ids[receptor] = []
@@ -125,7 +124,7 @@ def _notificar_lineas(op, lineas):
         if not tecla:
             continue
         
-        receptor = tecla.familia.receptor.nomimp
+        receptor = tecla.familia.receptor.nombre.lower()
         
         if receptor not in receptores_ids:
             receptores_ids[receptor] = set()

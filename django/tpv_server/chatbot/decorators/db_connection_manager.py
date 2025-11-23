@@ -49,5 +49,6 @@ def close_db_connections():
                 conn.close()
     except (InterfaceError, OperationalError) as e:
         # Estas excepciones son normales cuando las conexiones ya están cerradas
+        logger.error(f"Intento de cerrar conexión DB ya cerrada: {e}")
     except Exception as e:
         logger.error(f"Error al cerrar conexiones DB: {e}", exc_info=True)

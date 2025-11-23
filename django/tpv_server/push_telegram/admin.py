@@ -51,11 +51,11 @@ class TelegramSubscriptionAdmin(admin.ModelAdmin):
         if 'zonas' in obj.filtros:
             zonas_ids = obj.filtros['zonas']
             if isinstance(zonas_ids, list):
-                from gestion.models import Zonas
+                from gestion.models.mesas import Zonas
                 zonas = Zonas.objects.filter(pk__in=zonas_ids).values_list('nombre', flat=True)
                 return f"Zonas: {', '.join(zonas)}"
             else:
-                from gestion.models import Zonas
+                from gestion.models.mesas import Zonas
                 zona = Zonas.objects.filter(pk=zonas_ids).first()
                 return f"Zona: {zona.nombre if zona else zonas_ids}"
         return str(obj.filtros)
