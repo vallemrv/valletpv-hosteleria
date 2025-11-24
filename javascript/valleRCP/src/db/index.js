@@ -16,16 +16,16 @@ class PedidosDB {
     if (this.db && !this.db.objectStoreNames) {
       this.db = null // La conexión está cerrada, resetear
     }
-    
+
     if (this.db) {
       return this.db
     }
-    
+
     // Si ya está abriéndose, esperar a que termine
     if (this.opening) {
       return this.opening
     }
-    
+
     // Crear nueva promesa de apertura
     this.opening = new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION)
@@ -39,18 +39,18 @@ class PedidosDB {
       request.onsuccess = () => {
         this.db = request.result
         this.opening = null
-        
+
         // Manejar cierre inesperado
         this.db.onclose = () => {
           console.warn('IndexedDB cerrada inesperadamente')
           this.db = null
         }
-        
+
         // Manejar error de conexión
         this.db.onerror = (event) => {
           console.error('Error en conexión IndexedDB:', event.target.error)
         }
-        
+
         resolve(this.db)
       }
 
@@ -59,9 +59,9 @@ class PedidosDB {
 
         // Crear object store para pedidos si no existe
         if (!db.objectStoreNames.contains(STORE_PEDIDOS)) {
-          const pedidosStore = db.createObjectStore(STORE_PEDIDOS, { 
-            keyPath: 'id', 
-            autoIncrement: true 
+          const pedidosStore = db.createObjectStore(STORE_PEDIDOS, {
+            keyPath: 'id',
+            autoIncrement: true
           })
 
           // Índices para búsquedas eficientes
@@ -71,15 +71,15 @@ class PedidosDB {
           pedidosStore.createIndex('estado', 'estado', { unique: false })
         }
       }
-      
+
       request.onblocked = () => {
         console.warn('La apertura de IndexedDB está bloqueada. Cierra otras pestañas que usen esta aplicación.')
       }
     })
-    
+
     return this.opening
   }
-  
+
   // Cerrar la conexión a la base de datos
   close() {
     if (this.db) {
@@ -92,37 +92,37 @@ class PedidosDB {
   async guardarPedido(pedido) {
     try {
       await this.init()
-      
+
       return new Promise((resolve, reject) => {
         const transaction = this.db.transaction([STORE_PEDIDOS], 'readwrite')
         const store = transaction.objectStore(STORE_PEDIDOS)
 
-      // Hacer una copia profunda limpia del pedido
-      const pedidoLimpio = JSON.parse(JSON.stringify(pedido))
+        // Hacer una copia profunda limpia del pedido
+        const pedidoLimpio = JSON.parse(JSON.stringify(pedido))
 
-      // Agregar timestamp si no existe
-      const pedidoConTimestamp = {
-        ...pedidoLimpio,
-        timestamp: pedidoLimpio.timestamp || Date.now(),
-        estado: pedidoLimpio.estado || 'activo' // activo, completado, cancelado
-      }
+        // Agregar timestamp si no existe
+        const pedidoConTimestamp = {
+          ...pedidoLimpio,
+          timestamp: pedidoLimpio.timestamp || Date.now(),
+          estado: pedidoLimpio.estado || 'activo' // activo, completado, cancelado
+        }
 
-      // Extraer pedido_id de las líneas (todas deberían tener el mismo)
-      if (pedidoLimpio.lineas && pedidoLimpio.lineas.length > 0) {
-        pedidoConTimestamp.pedido_id = pedidoLimpio.lineas[0].pedido_id
-      }
+        // Extraer pedido_id de las líneas (todas deberían tener el mismo)
+        if (pedidoLimpio.lineas && pedidoLimpio.lineas.length > 0) {
+          pedidoConTimestamp.pedido_id = pedidoLimpio.lineas[0].pedido_id
+        }
 
-      const request = store.add(pedidoConTimestamp)
+        const request = store.add(pedidoConTimestamp)
 
-      request.onsuccess = () => {
-        resolve(request.result)
-      }
+        request.onsuccess = () => {
+          resolve(request.result)
+        }
 
-      request.onerror = () => {
-        console.error('Error al guardar pedido:', request.error)
-        reject(request.error)
-      }
-    })
+        request.onerror = () => {
+          console.error('Error al guardar pedido:', request.error)
+          reject(request.error)
+        }
+      })
     } catch (error) {
       console.error('Error en guardarPedido:', error)
       throw error
@@ -234,7 +234,7 @@ class PedidosDB {
       // Hacer una copia profunda limpia del pedido para evitar referencias circulares
       // y objetos Proxy de Vue que no son clonables
       const pedidoLimpio = JSON.parse(JSON.stringify(pedidoActualizado))
-      
+
       const pedidoConId = {
         ...pedidoLimpio,
         id,
@@ -355,6 +355,44 @@ class PedidosDB {
 
       request.onsuccess = () => {
         resolve(request.result)
+      }
+
+      request.onerror = () => {
+        reject(request.error)
+      }
+    })
+  }
+
+  // Eliminar pedidos por receptor (case-insensitive)
+  async eliminarPorReceptor(receptor) {
+    await this.init()
+
+    const receptorLower = receptor.toLowerCase()
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction([STORE_PEDIDOS], 'readwrite')
+      const store = transaction.objectStore(STORE_PEDIDOS)
+      const request = store.openCursor()
+
+      let eliminados = 0
+
+      request.onsuccess = (event) => {
+        const cursor = event.target.result
+        if (cursor) {
+          const pedido = cursor.value
+          const pedidoReceptor = pedido.receptor ? pedido.receptor.toLowerCase() : ''
+          const pedidoNomReceptor = pedido.nom_receptor ? pedido.nom_receptor.toLowerCase() : ''
+
+          // Eliminar si coincide con el receptor (case-insensitive)
+          if (pedidoReceptor === receptorLower || pedidoNomReceptor === receptorLower) {
+            cursor.delete()
+            eliminados++
+          }
+          cursor.continue()
+        } else {
+          console.log(`🗑️ IndexedDB: Eliminados ${eliminados} registros del receptor: ${receptor}`)
+          resolve(eliminados)
+        }
       }
 
       request.onerror = () => {

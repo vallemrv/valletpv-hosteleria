@@ -51,26 +51,30 @@ export default class VWebsocket {
     static activeSockets = {}; // Registro de sockets activos
 
     constructor(server, receptor, store) {
+        // Usar el nombre del receptor en minúsculas como identificador
+        const receptorKey = receptor.Nombre.toLowerCase();
+
         // Verificar si ya existe una conexión para este receptor
-        const existingSocket = VWebsocket.activeSockets[receptor.nomimp];
+        const existingSocket = VWebsocket.activeSockets[receptorKey];
         if (existingSocket) {
-            console.warn(`⚠️ Ya existe una conexión para el receptor: ${receptor.nomimp}. Cerrando la anterior.`);
+            console.warn(`⚠️ Ya existe una conexión para el receptor: ${receptor.Nombre}. Cerrando la anterior.`);
             existingSocket.disconnect();
-            delete VWebsocket.activeSockets[receptor.nomimp];
+            delete VWebsocket.activeSockets[receptorKey];
         }
 
         const wsProtocol = getWebSocketProtocol(server);
-        this.socketUrl = `${wsProtocol}/ws/comunicacion/${receptor.nomimp}`;
+        this.socketUrl = `${wsProtocol}/ws/comunicacion/${receptorKey}`;
         this.customSocket = null;
         this.store = store;
         this.receptor = receptor;
+        this.receptorKey = receptorKey; // Guardar para usarlo después
         this.reconnectTimer = new Timer(() => {
             this.disconnect();
             this.connect();
         }, this.reconnectAfterMs);
 
         // Registrar la nueva instancia
-        VWebsocket.activeSockets[receptor.nomimp] = this;
+        VWebsocket.activeSockets[receptorKey] = this;
     }
 
     reconnectAfterMs(tries) {
@@ -102,38 +106,34 @@ export default class VWebsocket {
                 this.reconnectTimer.scheduleTimeout();
             }
             // Eliminar del registro al cerrar la conexión
-            delete VWebsocket.activeSockets[this.receptor.nomimp];
+            delete VWebsocket.activeSockets[this.receptorKey];
         };
 
         this.customSocket.onerror = (event) => {
-            console.error(`Error en WebSocket para receptor: ${this.receptor.nomimp}`, event);
+            console.error(`Error en WebSocket para receptor: ${this.receptor.Nombre}`, event);
             this.store.onDisconnect();
         };
 
         this.customSocket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-
+                console.log('WebSocket received:', data);
                 // Extraer el mensaje (puede estar anidado)
                 const mensaje = typeof data.message === 'string'
                     ? JSON.parse(data.message)
                     : data.message || data;
 
                 // Verificar que el mensaje sea para este receptor
-                // PRIORIZAR coincidencia por nombre de receptor para evitar duplicados
+                // Comparación estricta por nombre de receptor (case-insensitive)
+                // servidor.receptor == store.receptor.Nombre.toLowerCase()
                 let esParaEsteReceptor = false;
-                
-                // Si el mensaje tiene nom_receptor y nosotros tenemos Nombre, comparar por nombre
-                if (mensaje.nom_receptor && this.receptor.Nombre) {
-                    esParaEsteReceptor = mensaje.nom_receptor === this.receptor.Nombre;
-                } 
-                // Si el mensaje no tiene nom_receptor pero nosotros sí tenemos Nombre,
-                // no es para este receptor (evita duplicados)
-                else if (!mensaje.nom_receptor && this.receptor.Nombre) {
-                    esParaEsteReceptor = false;
-                } 
-                // Solo usar nomimp si ninguno tiene información del nombre
-                else {
+
+                if (this.receptor.Nombre) {
+                    const incomingReceptor = mensaje.receptor ? mensaje.receptor.toString().toLowerCase() : '';
+                    const localReceptor = this.receptor.Nombre.toString().toLowerCase();
+                    esParaEsteReceptor = incomingReceptor === localReceptor;
+                } else {
+                    // Fallback solo si no tenemos Nombre local (caso raro)
                     esParaEsteReceptor = mensaje.receptor === this.receptor.nomimp;
                 }
 
@@ -184,7 +184,7 @@ export default class VWebsocket {
             this.customSocket.close();
         }
         // Eliminar del registro al desconectar
-        delete VWebsocket.activeSockets[this.receptor.nomimp];
+        delete VWebsocket.activeSockets[this.receptorKey];
     }
 
     static disconnectAll() {
