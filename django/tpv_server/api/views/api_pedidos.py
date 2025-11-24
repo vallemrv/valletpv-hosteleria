@@ -85,7 +85,6 @@ def get_pedidos_by_receptor(request):
         'servidos_set'
     )
     
-    
     # IDs de líneas y pedidos que el cliente tiene (ignorar duplicados)
     lineas_cliente_ids = set()
     pedidos_cliente_ids = set()
@@ -139,9 +138,8 @@ def get_pedidos_by_receptor(request):
                     pedidos_servidor[pedido_id] = {
                         "op": "pedido",
                         "hora": pedido.hora,
-                        "receptor": receptor.nomimp,
-                        "nom_receptor": receptor.nombre,
-                        "receptor_activo": receptor.activo,
+                        "receptor": receptor.nombre.lower(),
+                        "nom_impresora": receptor.nomimp,
                         "camarero": camarero.nombre + " " + camarero.apellidos,
                         "mesa": mesa_abierta.mesa.nombre,
                         "pedido_id": pedido_id,
@@ -171,9 +169,8 @@ def get_pedidos_by_receptor(request):
                 pedidos_servidor[pedido_id] = {
                     "op": "pedido",
                     "hora": pedido.hora,
-                    "receptor": receptor.nomimp,
-                    "nom_receptor": receptor.nombre,
-                    "receptor_activo": receptor.activo,
+                    "receptor": receptor.nombre.lower(),
+                    "nom_impresora": receptor.nomimp,
                     "camarero": camarero.nombre + " " + camarero.apellidos,
                     "mesa": mesa_abierta.mesa.nombre,
                     "pedido_id": pedido_id,
@@ -194,7 +191,6 @@ def get_pedidos_by_receptor(request):
         "pedidos": list(pedidos_servidor.values()),
         "rm": rm_ids
     }
-    
     
     return JsonResponse(resultado)
 

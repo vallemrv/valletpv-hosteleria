@@ -66,43 +66,13 @@ def enviar_pedido_smart_receptor(pedido):
         send_mensaje_devices(datos)
 
 
-def enviar_urgente_smart_receptor(pedido_id=None, linea_ids=None):
+def enviar_urgente_smart_receptor(lineas):
     """
-    Notifica urgencia a smart receptors.
+    Notifica urgencia a smart receptors enviando solo los IDs de las líneas.
     Parámetros:
-        - pedido_id: ID del pedido completo a marcar como urgente
-        - linea_ids: Lista de IDs de líneas específicas a marcar como urgente
+        - lineas: queryset de Lineaspedido
     """
-    if pedido_id:
-        # Marcar pedido completo como urgente
-        lineas = Lineaspedido.objects.filter(pedido_id=pedido_id).select_related('tecla__familia__receptor')
-    elif linea_ids:
-        # Marcar líneas específicas como urgentes
-        lineas = Lineaspedido.objects.filter(id__in=linea_ids).select_related('tecla__familia__receptor')
-    else:
-        return
-    
-    # Agrupar IDs por receptor
-    receptores_ids = {}
-    for linea in lineas:
-        if not linea.tecla or not linea.tecla.familia or not linea.tecla.familia.receptor:
-            continue
-        
-        receptor = linea.tecla.familia.receptor.nombre.lower()
-        
-        if receptor not in receptores_ids:
-            receptores_ids[receptor] = []
-        
-        receptores_ids[receptor].append(linea.id)
-    
-    # Enviar notificación a cada receptor
-    for receptor, ids in receptores_ids.items():
-        send_mensaje_devices({
-            "op": "marcar_urgente",
-            "receptor": receptor,
-            "ids": ids,
-            "pedido_id": pedido_id if pedido_id else None
-        })
+    _notificar_lineas("marcar_urgente", lineas)
 
 
 def _notificar_lineas(op, lineas):

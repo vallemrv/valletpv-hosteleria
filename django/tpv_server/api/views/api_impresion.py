@@ -72,13 +72,16 @@ def preimprimir(request):
 @verificar_uid_activo
 def reenviarpedido(request):
     idp = request.POST["idp"];
-    idr = request.POST["idr"];
+    idr = request.POST.get("idr");
     pedido = Pedidos.objects.get(pk=idp);
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
     
-    # Obtener líneas del receptor
-    lineas_receptor = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr)
+    # Obtener líneas del receptor (todas si idr es null)
+    if idr:
+        lineas_receptor = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).select_related('tecla__familia__receptor')
+    else:
+        lineas_receptor = pedido.lineaspedido_set.all().select_related('tecla__familia__receptor')
     
     # Borrar todos los registros de servido para estas líneas
     from gestion.models.pedidos import Servidos
@@ -92,9 +95,10 @@ def reenviarpedido(request):
                                      "estado",
                                      "pedido_id").annotate(can=Count('idart'))
     
+    
     # Notificar a impresoras tradicionales y smart receptors
     send_urgente(lineas, pedido.hora, camarero, mesa_a)
-    enviar_urgente_smart_receptor(pedido_id=idp)
+    enviar_urgente_smart_receptor(lineas_receptor)
     
     return HttpResponse("success")
 
@@ -108,7 +112,7 @@ def reenviarlinea(request):
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
     
     # Obtener líneas que coincidan
-    lineas_reenviar = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre)
+    lineas_reenviar = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).select_related('tecla__familia__receptor')
     
     # Borrar todos los registros de servido para estas líneas
     from gestion.models.pedidos import Servidos
@@ -122,12 +126,9 @@ def reenviarlinea(request):
                                      "estado",
                                      "pedido_id").annotate(can=Count('idart'))
     
-    # Obtener IDs de las líneas para smart receptors
-    linea_ids = list(lineas_reenviar.values_list('id', flat=True))
-    
     # Notificar a impresoras tradicionales y smart receptors
     send_urgente(lineas, pedido.hora, camarero, mesa_a)
-    enviar_urgente_smart_receptor(linea_ids=linea_ids)
+    enviar_urgente_smart_receptor(lineas_reenviar)
     
     return HttpResponse("success")
 
