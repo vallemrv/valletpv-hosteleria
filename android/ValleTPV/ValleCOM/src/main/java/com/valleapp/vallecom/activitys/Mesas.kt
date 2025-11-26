@@ -288,7 +288,7 @@ class Mesas : ActivityBase(), View.OnLongClickListener, IPedidos {
                                 // Determinar qué receptor usar según el contexto
                                 val finalReceptorId = if (selectedReceptorId >= (receptores?.size ?: 0)) {
                                     // Caso "Todos" (Unidos) - usar el receptor específico del tag
-                                    receptorId
+                                    "-1"
                                 } else {
                                     // Caso receptor específico seleccionado - verificar límites
                                     receptores?.get(selectedReceptorId)?.getString("ID")
