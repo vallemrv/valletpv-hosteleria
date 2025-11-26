@@ -10,6 +10,7 @@ from api import views
 from api.views import api_pedidos
 from api.views.api_dispositivos import create_uid, set_alias, activate_device, deactivate_device, dispositivo_action
 
+
 urlpatterns = [
     path("health", views.health_check, name="health_check"),
     path("chatbot/", include('chatbot.urls')),
@@ -24,10 +25,11 @@ urlpatterns = [
     path('sugerencias/', include("api.set_urls.sugerencias"), name="api_sugerencias"),
     path('receptores/', include("api.set_urls.receptores"), name="api_receptores"),
     path("autorizaciones/", include("api.set_urls.autorizaciones"), name="api_autorizaciones"),
+    path("mesas/", include("api.set_urls.mesas"), name="api_mesas"),
     path("sincronizar_pedidos", api_pedidos.get_pedidos_by_receptor, name="sincronizar_pedidos"),
     path("dispositivo/create_uid", create_uid, name="create_uid"),
     path("dispositivo/set_alias", set_alias, name="set_alias"),
     path("dispositivo/action", dispositivo_action, name="dispositivo_action"),
     path("dispositivo/activate", activate_device, name="activate_device"),
-    path("dispositivo/deactivate", deactivate_device, name="deactivate_device")
+    path("dispositivo/deactivate", deactivate_device, name="deactivate_device"),
 ]

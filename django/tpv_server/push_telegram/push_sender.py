@@ -4,11 +4,16 @@
 import logging
 import requests
 import uuid
+from django.db import transaction
 from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 from .models import TelegramEventType, TelegramSubscription, TelegramNotificationLog, TelegramAutorizacion
 from gestion.tools.config_logs import configurar_logging
+import requests
+import uuid
+from gestion.models.mesasabiertas import Mesasabiertas
+from gestion.models.mesas import Mesas
 
 logger = configurar_logging("push_telegram")
 
@@ -124,34 +129,45 @@ def _enviar_mensaje_telegram(bot_token: str, chat_id: int, mensaje: str,
 
 def _guardar_log_seguro(log_data: dict):
     """
-    Guardar log de forma segura, manejando errores de charset de MySQL
+    Guardar log de forma segura, manejando errores de charset de MySQL y transacciones.
     """
+    # Intentamos limpiar el mensaje de emojis preventivamente si sabemos que puede dar problemas,
+    # o confiamos en el manejo de errores.
+    
     try:
-        log = TelegramNotificationLog(
-            event_type=log_data['event_type'],
-            telegram_user_id=log_data['telegram_user_id'],
-            mensaje=log_data['mensaje'],
-            metadata=log_data['metadata'],
-            enviado=log_data['enviado'],
-            error=log_data['error']
-        )
-        log.save()
+        # Usamos un bloque atomic para crear un savepoint. 
+        # Si falla el save(), solo se revierte este bloque y no la transacción principal.
+        with transaction.atomic():
+            log = TelegramNotificationLog(
+                event_type=log_data['event_type'],
+                telegram_user_id=log_data['telegram_user_id'],
+                mensaje=log_data['mensaje'],
+                metadata=log_data['metadata'],
+                enviado=log_data['enviado'],
+                error=log_data['error']
+            )
+            log.save()
     except Exception as e:
-        # Si es error de charset, intentar guardar sin emojis
-        if '1366' in str(e) and 'Incorrect string value' in str(e):
+        # Si falla (por ejemplo, por charset), la transacción interna se ha revertido.
+        # La transacción externa sigue válida.
+        
+        error_str = str(e)
+        # Si es error de charset o similar
+        if '1366' in error_str or 'Incorrect string value' in error_str:
             try:
-                # Versión sin emojis para la BD (pero el mensaje original con emojis ya se envió)
-                mensaje_sin_emojis = log_data['mensaje'].encode('ascii', 'ignore').decode('ascii')
-                log = TelegramNotificationLog(
-                    event_type=log_data['event_type'],
-                    telegram_user_id=log_data['telegram_user_id'],
-                    mensaje=mensaje_sin_emojis,
-                    metadata=log_data['metadata'],
-                    enviado=log_data['enviado'],
-                    error=log_data['error']
-                )
-                log.save()
-                logger.warning(f"Log guardado sin emojis debido a charset MySQL")
+                # Intentamos guardar versión limpia en una nueva sub-transacción
+                with transaction.atomic():
+                    mensaje_sin_emojis = log_data['mensaje'].encode('ascii', 'ignore').decode('ascii')
+                    log = TelegramNotificationLog(
+                        event_type=log_data['event_type'],
+                        telegram_user_id=log_data['telegram_user_id'],
+                        mensaje=mensaje_sin_emojis,
+                        metadata=log_data['metadata'],
+                        enviado=log_data['enviado'],
+                        error=log_data['error']
+                    )
+                    log.save()
+                    logger.warning(f"Log guardado sin emojis debido a charset MySQL")
             except Exception as e2:
                 logger.error(f"Error guardando log incluso sin emojis: {e2}")
         else:
@@ -318,7 +334,8 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                          mesa_destino_id: int, mesa_destino_nombre: str,
                          zona_destino_id: int, zona_destino_nombre: str,
                          camarero_nombre: str, hora_apertura: str, 
-                         lineas_pedido: list, infmesa_id: str, tipo_cambio: str = "mesa_completa"):
+                         lineas_pedido: list, infmesa_id: str, tipo_cambio: str = "mesa_completa",
+                         lineas_ids: list = None):
     """
     Notificar cuando se cambia una mesa o líneas a una zona vigilada por un usuario.
     Cada usuario puede configurar qué zonas vigilar mediante filtros en su suscripción.
@@ -335,6 +352,7 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
         lineas_pedido: Lista de líneas de pedido
         infmesa_id: ID de infmesa
         tipo_cambio: "mesa_completa" o "lineas_parciales"
+        lineas_ids: Lista de IDs de líneas (solo para lineas_parciales)
     """
     try:
         event_type = TelegramEventType.objects.get(code='cambio_zona', activo=True)
@@ -361,10 +379,13 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
     # Obtener configuración
     telegram_config = getattr(settings, 'TELEGRAM_BOT', {})
     bot_token = telegram_config.get('TOKEN', '')
+    webhook_url = telegram_config.get('WEBHOOK_URL', '')
+    tpv_api_key = telegram_config.get('TPV_API_KEY', '')
+    base_url = getattr(settings, 'BASE_URL', 'https://tpvtest.valletpv.es')
     empresa = getattr(settings, 'EMPRESA', 'testTPV')
     
-    if not bot_token:
-        logger.error("Token de Telegram no configurado")
+    if not bot_token and not webhook_url:
+        logger.error("Ni Token de Telegram ni Webhook configurados")
         return 0
     
     # Construir resumen de líneas
@@ -377,15 +398,41 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
     if len(lineas_pedido) > 10:
         resumen_lineas += f"... y {len(lineas_pedido) - 10} líneas más\n"
     
-    # Determinar texto según el tipo de cambio
-    tipo_texto = "Mesa Completa" if tipo_cambio == "mesa_completa" else "Líneas Parciales"
+    # Determinar texto y acciones según el tipo de cambio
+    if tipo_cambio == "lineas_parciales":
+        tipo_texto = "Líneas Parciales"
+        accion_borrar = "borrar_lineas"
+        accion_mantener = "mantener_lineas"
+        texto_borrar = "🗑️ Borrar Líneas"
+        texto_mantener = "✅ Mantener Líneas"
+        pregunta = "¿Deseas borrar estas líneas o mantenerlas?"
+        
+        # Para líneas parciales, necesitamos pasar los IDs en el uid_dispositivo
+        # Formato: LINEAS:mesa_id:id1,id2,id3
+        if lineas_ids:
+            ids_str = ",".join(map(str, lineas_ids))
+            uid_auth = f"LINEAS:{mesa_destino_id}:{ids_str}"
+            # Truncar si es demasiado largo (max 255 chars)
+            if len(uid_auth) > 255:
+                logger.warning("Lista de IDs demasiado larga para autorización, truncando...")
+                uid_auth = uid_auth[:255]
+        else:
+            uid_auth = infmesa_id # Fallback
+            
+    else:
+        tipo_texto = "Mesa Completa"
+        accion_borrar = "borrar_mesa"
+        accion_mantener = "mantener_mesa"
+        texto_borrar = "🗑️ Borrar Mesa"
+        texto_mantener = "✅ Mantener Mesa"
+        pregunta = "¿Deseas borrar esta mesa o mantenerla?"
+        uid_auth = infmesa_id
     
     # Enviar a cada suscriptor
     enviados = 0
-    for subscription in subscriptions:
-        # Crear tokens de autorización temporal (expira en 10 minutos)
-        token_borrar = str(uuid.uuid4())
-        token_mantener = str(uuid.uuid4())
+    for subscription in subscriptions_filtradas:
+        # Crear token único para esta notificación
+        token = str(uuid.uuid4())
         expira_en = timezone.now() + timedelta(minutes=10)
         
         # Mensaje personalizado según el tipo de cambio
@@ -404,24 +451,10 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
 {resumen_lineas}
 💰 <b>Total:</b> {total:.2f} EUR
 
-❓ ¿Deseas borrar esta mesa o mantenerla?
+❓ {pregunta}
 
 ⏰ Esta autorización expira en 10 minutos.
         """.strip()
-        
-        # Callback data con formato corto
-        callback_borrar = f"borrar_mesa|{token_borrar}"
-        callback_mantener = f"mantener_mesa|{token_mantener}"
-        
-        # Crear botones inline
-        keyboard = {
-            'inline_keyboard': [
-                [
-                    {'text': '🗑️ Borrar Mesa', 'callback_data': callback_borrar},
-                    {'text': '✅ Mantener Mesa', 'callback_data': callback_mantener}
-                ]
-            ]
-        }
         
         # Preparar datos del log
         log_data = {
@@ -445,66 +478,157 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
             'enviado': False,
             'error': None
         }
-        
-        try:
-            # Enviar mensaje a Telegram
-            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-            data = {
-                'chat_id': subscription.usuario.telegram_user_id,
-                'text': mensaje,
-                'parse_mode': 'HTML',
-                'reply_markup': keyboard
-            }
-            
-            response = requests.post(url, json=data, timeout=10)
-            
-            if response.status_code == 200:
-                result = response.json()['result']
-                message_id = result['message_id']
+
+        # Si hay webhook configurado, usarlo preferentemente
+        if webhook_url:
+            try:
+                # Limpiar token
+                token = token.strip()
                 
-                log_data['enviado'] = True
-                _guardar_log_seguro(log_data)
-                
-                # Guardar autorizaciones localmente en la BD
+                # Guardar autorización local
                 try:
-                    # Registrar token de borrar
                     TelegramAutorizacion.objects.create(
-                        token=token_borrar,
-                        uid_dispositivo=infmesa_id,
+                        token=token,
+                        uid_dispositivo=uid_auth,
                         telegram_user_id=subscription.usuario.telegram_user_id,
-                        telegram_message_id=message_id,
-                        accion='borrar_mesa',
+                        telegram_message_id=0,
+                        accion='mesa_action', # Acción genérica, el detalle va en el botón
                         empresa=empresa,
                         expira_en=expira_en
                     )
+                    logger.info(f"Token {token} creado en BD localmente (dentro de transacción)")
                     
-                    # Registrar token de mantener
-                    TelegramAutorizacion.objects.create(
-                        token=token_mantener,
-                        uid_dispositivo=infmesa_id,
-                        telegram_user_id=subscription.usuario.telegram_user_id,
-                        telegram_message_id=message_id,
-                        accion='mantener_mesa',
-                        empresa=empresa,
-                        expira_en=expira_en
-                    )
+                    # Callback para confirmar commit
+                    def confirmar_commit_token(t=token):
+                        logger.info(f"Transacción confirmada para token {t}")
                     
-                    logger.info(f"Autorizaciones creadas localmente para mesa {mesa_destino_nombre}")
+                    transaction.on_commit(confirmar_commit_token)
+                    
                 except Exception as e:
-                    logger.error(f"Error creando autorizaciones: {e}")
+                    logger.error(f"Error creando TelegramAutorizacion para token {token}: {e}")
+                    # No relanzamos para intentar enviar la notificación de todos modos, 
+                    # aunque sin token en BD la acción fallará.
                 
-                logger.info(f"Notificación enviada a {subscription.usuario.nombre} para zona {zona_destino_nombre}")
-                enviados += 1
-            else:
-                error_msg = response.json().get('description', 'Error desconocido')
-                log_data['error'] = f"HTTP {response.status_code}: {error_msg}"
+                # Botones inline
+                botones = [
+                    [
+                        {'text': texto_borrar, 'callback_data': f"{accion_borrar}|{token}"},
+                        {'text': texto_mantener, 'callback_data': f"{accion_mantener}|{token}"}
+                    ]
+                ]
+                
+                # Enviar al webhook
+                registro_url = f"{webhook_url}/api/register_notification/"
+                headers = {'Authorization': f'Bearer {tpv_api_key}'}
+                
+                response = requests.post(registro_url, 
+                    headers=headers,
+                    json={
+                        'token': token,
+                        'callback_url': f"{base_url}/api/mesas/mesa_action",
+                        'telegram_user_id': subscription.usuario.telegram_user_id,
+                        'mensaje': mensaje,
+                        'botones': botones,
+                        'expira_en': expira_en.isoformat(),
+                        'empresa': empresa,
+                        'uid_dispositivo': uid_auth,
+                        'metadata': log_data['metadata']
+                    }, 
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    message_id = result.get('message_id')
+                    
+                    if message_id:
+                        TelegramAutorizacion.objects.filter(token=token).update(telegram_message_id=message_id)
+                    
+                    log_data['enviado'] = True
+                    _guardar_log_seguro(log_data)
+                    logger.info(f"Notificación enviada vía webhook para {subscription.usuario.nombre}")
+                    enviados += 1
+                else:
+                    error_msg = response.json().get('error', 'Error desconocido')
+                    log_data['error'] = f"Webhook error: {error_msg}"
+                    _guardar_log_seguro(log_data)
+                    logger.warning(f"Error en webhook: {error_msg}")
+                    
+            except Exception as e:
+                log_data['error'] = str(e)
                 _guardar_log_seguro(log_data)
-                logger.warning(f"Error enviando a {subscription.usuario.nombre}: {error_msg}")
+                logger.error(f"Excepción con webhook: {e}")
                 
-        except Exception as e:
-            log_data['error'] = str(e)
-            _guardar_log_seguro(log_data)
-            logger.error(f"Excepción enviando a {subscription.usuario.nombre}: {e}")
+        # Fallback a envío directo si no hay webhook (o si fallara, pero aquí es exclusivo)
+        elif bot_token:
+            try:
+                # Callback data con formato corto
+                # Nota: Sin webhook, el callback URL no se registra, así que el bot debe saber qué hacer
+                # o esto fallará al hacer click.
+                callback_borrar = f"{accion_borrar}|{token}"
+                callback_mantener = f"{accion_mantener}|{token}"
+                
+                # Crear botones inline
+                keyboard = {
+                    'inline_keyboard': [
+                        [
+                            {'text': texto_borrar, 'callback_data': callback_borrar},
+                            {'text': texto_mantener, 'callback_data': callback_mantener}
+                        ]
+                    ]
+                }
+                
+                # Enviar mensaje a Telegram
+                url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                data = {
+                    'chat_id': subscription.usuario.telegram_user_id,
+                    'text': mensaje,
+                    'parse_mode': 'HTML',
+                    'reply_markup': keyboard
+                }
+                
+                response = requests.post(url, json=data, timeout=10)
+                
+                if response.status_code == 200:
+                    result = response.json()['result']
+                    message_id = result['message_id']
+                    
+                    log_data['enviado'] = True
+                    _guardar_log_seguro(log_data)
+                    
+                    # Guardar autorización local
+                    try:
+                        TelegramAutorizacion.objects.create(
+                            token=token,
+                            uid_dispositivo=uid_auth,
+                            telegram_user_id=subscription.usuario.telegram_user_id,
+                            telegram_message_id=message_id,
+                            accion='mesa_action',
+                            empresa=empresa,
+                            expira_en=expira_en
+                        )
+                        logger.info(f"Token {token} creado en BD localmente (envío directo)")
+                        
+                        def confirmar_commit_token_directo(t=token):
+                            logger.info(f"Transacción confirmada para token {t} (envío directo)")
+                        
+                        transaction.on_commit(confirmar_commit_token_directo)
+                        
+                    except Exception as e:
+                        logger.error(f"Error creando TelegramAutorizacion directo para token {token}: {e}")
+                    
+                    logger.info(f"Notificación enviada a {subscription.usuario.nombre} para zona {zona_destino_nombre}")
+                    enviados += 1
+                else:
+                    error_msg = response.json().get('description', 'Error desconocido')
+                    log_data['error'] = f"HTTP {response.status_code}: {error_msg}"
+                    _guardar_log_seguro(log_data)
+                    logger.warning(f"Error enviando a {subscription.usuario.nombre}: {error_msg}")
+                    
+            except Exception as e:
+                log_data['error'] = str(e)
+                _guardar_log_seguro(log_data)
+                logger.error(f"Excepción enviando a {subscription.usuario.nombre}: {e}")
     
     logger.info(f"Evento 'cambio_zona' ({zona_destino_nombre}): {enviados}/{len(subscriptions_filtradas)} notificaciones enviadas")
     return enviados
@@ -520,7 +644,6 @@ def notificar_cambio_mesa_a_barra(mesa_origen_id: int, mesa_origen_nombre: str,
     Esta función existe solo para compatibilidad con código antiguo.
     """
     # Obtener la zona destino
-    from gestion.models.mesas import Mesas
     try:
         mesa = Mesas.objects.get(pk=mesa_destino_id)
         mesazona = mesa.mesaszona_set.select_related('zona').first()
@@ -541,6 +664,57 @@ def notificar_cambio_mesa_a_barra(mesa_origen_id: int, mesa_origen_nombre: str,
     except Exception as e:
         logger.error(f"Error en notificar_cambio_mesa_a_barra (deprecated): {e}")
     return 0
+
+
+def editar_mensaje_mesa(telegram_user_id: int, message_id: int, mesa_nombre: str, accion: str):
+    """
+    Editar el mensaje de cambio de mesa eliminando los botones y mostrando el resultado.
+    
+    Args:
+        telegram_user_id: ID del usuario de Telegram
+        message_id: ID del mensaje a editar
+        mesa_nombre: Nombre de la mesa
+        accion: 'borrada', 'mantenida', 'expirada' o texto libre
+    """
+    telegram_config = getattr(settings, 'TELEGRAM_BOT', {})
+    bot_token = telegram_config.get('TOKEN', '')
+    
+    if not bot_token:
+        logger.error("Token de Telegram no configurado")
+        return
+    
+    # Mensaje según la acción
+    if accion == 'borrada':
+        nuevo_texto = f"🗑️ Mesa {mesa_nombre} ha sido BORRADA\n\n✅ Acción completada exitosamente."
+    elif accion == 'mantenida':
+        nuevo_texto = f"✅ Mesa {mesa_nombre} se ha MANTENIDO\n\n✅ La mesa sigue activa."
+    elif accion == 'lineas_borradas':
+        nuevo_texto = f"🗑️ Líneas de {mesa_nombre} han sido BORRADAS\n\n✅ Acción completada exitosamente."
+    elif accion == 'lineas_mantenidas':
+        nuevo_texto = f"✅ Líneas de {mesa_nombre} se han MANTENIDO\n\n✅ Las líneas siguen activas."
+    elif accion == 'expirada':
+        nuevo_texto = f"⚠️ Acción EXPIRADA o INVÁLIDA\n\n❌ Esta solicitud ya no es válida."
+    else:
+        # Si no es una palabra clave, usar como texto directo
+        nuevo_texto = accion
+    
+    try:
+        url = f"https://api.telegram.org/bot{bot_token}/editMessageText"
+        data = {
+            'chat_id': telegram_user_id,
+            'message_id': message_id,
+            'text': nuevo_texto,
+            'parse_mode': 'HTML'
+        }
+        
+        response = requests.post(url, json=data, timeout=10)
+        
+        if response.status_code == 200:
+            logger.info(f"Mensaje de mesa editado correctamente para {telegram_user_id}")
+        else:
+            logger.warning(f"Error editando mensaje de mesa: {response.json()}")
+    except Exception as e:
+        logger.error(f"Excepción editando mensaje de mesa: {e}")
 
 
 def editar_mensaje_dispositivo(telegram_user_id: int, message_id: int, uid: str, descripcion: str, accion: str, ya_estaba: bool = False):
@@ -620,3 +794,54 @@ def editar_mensaje_dispositivo(telegram_user_id: int, message_id: int, uid: str,
     except Exception as e:
         logger.error(f"Excepción editando mensaje para {telegram_user_id}: {e}")
         return False
+
+
+def mesa_cambiada(mesa_destino, uid_origen, lineas, tipo_cambio="lineas_parciales"):
+    """
+    Verificar si la mesa destino tiene zonas vigiladas y enviar notificación.
+    Encapsula la lógica de preparación de datos y llamada a notificar_cambio_zona.
+    
+    Args:
+        mesa_destino: Objeto Mesasabiertas destino
+        uid_origen: UID de la infmesa origen
+        lineas: QuerySet o lista de objetos Lineaspedido
+        tipo_cambio: Tipo de cambio ("lineas_parciales" o "mesa_completa")
+    """
+    try:
+        # Verificar si la mesa destino tiene zonas vigiladas
+        mesazona_destino = mesa_destino.mesa.mesaszona_set.select_related('zona').first()
+        
+        if mesazona_destino:
+            # Obtener mesa origen
+            mesa_origen = Mesasabiertas.objects.filter(infmesa__pk=uid_origen).first()
+            mesa_origen_nombre = mesa_origen.mesa.nombre if mesa_origen else "Desconocida"
+            mesa_origen_id = mesa_origen.mesa_id if mesa_origen else 0
+            
+            # Preparar datos de líneas movidas
+            lineas_datos = []
+            lineas_ids = []
+            for linea in lineas:
+                precio = float(linea.precio) if hasattr(linea, 'precio') else 0.0
+                lineas_datos.append({
+                    'descripcion': linea.descripcion_t if hasattr(linea, 'descripcion_t') else 'Sin descripción',
+                    'precio': precio
+                })
+                lineas_ids.append(linea.id)
+            
+            # Enviar notificación genérica
+            notificar_cambio_zona(
+                mesa_origen_id=mesa_origen_id,
+                mesa_origen_nombre=mesa_origen_nombre,
+                mesa_destino_id=mesa_destino.mesa.id,
+                mesa_destino_nombre=mesa_destino.mesa.nombre,
+                zona_destino_id=mesazona_destino.zona_id,
+                zona_destino_nombre=mesazona_destino.zona.nombre,
+                camarero_nombre=f"{mesa_destino.infmesa.camarero.nombre} {mesa_destino.infmesa.camarero.apellidos}",
+                hora_apertura=mesa_destino.infmesa.hora,
+                lineas_pedido=lineas_datos,
+                infmesa_id=mesa_destino.infmesa.pk,
+                tipo_cambio=tipo_cambio,
+                lineas_ids=lineas_ids
+            )
+    except Exception as e:
+        logger.error(f"Error enviando notificación de movimiento de líneas en mesa_cambiada: {e}")

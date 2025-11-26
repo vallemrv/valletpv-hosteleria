@@ -14,6 +14,9 @@ from comunicacion.tools import (comunicar_cambios_devices,
 from gestion.models.camareros import Camareros
 from gestion.models.pedidos import Pedidos
 from gestion.models.teclados import Teclas
+from gestion.models.pedidos import Servidos
+from api.tools.impresion import imprimir_pedido
+
 
 from gestion.models.familias import Receptores
 from gestion.models.mesasabiertas import Mesasabiertas
@@ -61,9 +64,8 @@ def preimprimir(request):
         }
 
         if infmesa.numcopias <= 1:
-            comunicar_cambios_devices("md", "mesasabiertas", 
-                                    mesa_abierta.serialize(), 
-                                    {"op": "preimprimir"})
+            comunicar_cambios_devices("md", "mesas", 
+                                    mesa_abierta.mesa.serialize())
 
         send_mensaje_impresora(obj)
     return JsonResponse({})
@@ -71,23 +73,31 @@ def preimprimir(request):
 
 @verificar_uid_activo
 def reenviarpedido(request):
-    idp = request.POST["idp"];
-    idr = request.POST.get("idr");
-    pedido = Pedidos.objects.get(pk=idp);
+    idp = request.POST["idp"]
+    idr = request.POST.get("idr")
+    pedido = Pedidos.objects.get(pk=idp)
     camarero = Camareros.objects.get(pk=pedido.camarero_id)
     mesa_a = pedido.infmesa.mesasabiertas_set.first()
     
+    if str(idr) == "-1":
+        lineas_receptor = pedido.lineaspedido_set.all().select_related('tecla__familia__receptor')
+        for linea in lineas_receptor:
+            Servidos.objects.filter(linea=linea).delete()
+            comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
+            
+        imprimir_pedido(pedido)
+        enviar_urgente_smart_receptor(lineas_receptor)
+        return HttpResponse("success")
+
     # Obtener líneas del receptor (todas si idr es null)
     if idr:
         lineas_receptor = pedido.lineaspedido_set.filter(tecla__familia__receptor__pk=idr).select_related('tecla__familia__receptor')
     else:
         lineas_receptor = pedido.lineaspedido_set.all().select_related('tecla__familia__receptor')
     
-    # Borrar todos los registros de servido para estas líneas
-    from gestion.models.pedidos import Servidos
+   
     for linea in lineas_receptor:
         Servidos.objects.filter(linea=linea).delete()
-        # Notificar cambio a devices
         comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
     
     lineas = lineas_receptor.values("idart",
@@ -113,12 +123,9 @@ def reenviarlinea(request):
     
     # Obtener líneas que coincidan
     lineas_reenviar = pedido.lineaspedido_set.filter(idart=id, descripcion=nombre).select_related('tecla__familia__receptor')
-    
-    # Borrar todos los registros de servido para estas líneas
-    from gestion.models.pedidos import Servidos
+
     for linea in lineas_reenviar:
         Servidos.objects.filter(linea=linea).delete()
-        # Notificar cambio a devices
         comunicar_cambios_devices("md", "lineaspedido", linea.serialize())
     
     lineas = lineas_reenviar.values("idart",

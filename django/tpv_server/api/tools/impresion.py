@@ -12,11 +12,15 @@ from gestion.models.teclados import Teclas
 from gestion.models.familias import Receptores
 from gestion.models.pedidos import Pedidos
 from gestion.models.camareros import Camareros
+from gestion.tools.config_logs import configurar_logging
+from django.db.models import Prefetch
+# Agrupar líneas por idart para contar (equivalente a annotate(can=Count('idart')))
+from collections import defaultdict
 import json
-                          
+
+logger = configurar_logging("imprimir_pedido")                         
 
 def imprimir_pedido(pedido):
-    from django.db.models import Prefetch
     
     # Si recibimos un ID en lugar del objeto, lo buscamos (retrocompatibilidad)
     if isinstance(pedido, int):
@@ -32,28 +36,17 @@ def imprimir_pedido(pedido):
     camareo = Camareros.objects.get(pk=pedido.camarero_id)
     mesa = pedido.infmesa.mesasabiertas_set.all()[0].mesa
     
-    # Agrupar líneas por idart para contar (equivalente a annotate(can=Count('idart')))
-    from collections import defaultdict
-    lineas_agrupadas = defaultdict(lambda: {'linea': None, 'can': 0})
-    
-    for linea in pedido.lineaspedido_set.all():
-        key = linea.idart
-        if lineas_agrupadas[key]['linea'] is None:
-            lineas_agrupadas[key]['linea'] = linea
-        lineas_agrupadas[key]['can'] += 1
     
     receptores = {}
-    for data in lineas_agrupadas.values():
-        linea = data['linea']
-        can = data['can']
-        
+    
+    for linea in pedido.lineaspedido_set.all():
         if not linea.tecla or not linea.tecla.familia or not linea.tecla.familia.receptor:
-            print("Tecla no encontrada para idart:", linea.idart)
+            logger.warning("Tecla no encontrada para idart: %s", linea.idart)
             continue
-        
+            
         receptor = linea.tecla.familia.receptor
         receptor_nombre = receptor.nombre
-            
+        
         if receptor_nombre not in receptores:
             receptores[receptor_nombre] = {
                 "op": "pedido",
@@ -65,15 +58,27 @@ def imprimir_pedido(pedido):
                 "mesa": mesa.nombre,
                 "lineas": []
             }
+            
+        # Buscar si ya existe una línea igual en este receptor
+        encontrada = False
+        for l in receptores[receptor_nombre]['lineas']:
+            if (l['descripcion'] == linea.descripcion and 
+                l['estado'] == linea.estado and 
+                l['precio'] == linea.precio):
+                l['can'] += 1
+                encontrada = True
+                break
         
-        receptores[receptor_nombre]['lineas'].append({
-            "idart": linea.idart,
-            "descripcion": linea.descripcion,
-            "estado": linea.estado,
-            "pedido_id": linea.pedido_id,
-            "can": can
-        })
-    
+        if not encontrada:
+            receptores[receptor_nombre]['lineas'].append({
+                "idart": linea.idart,
+                "descripcion": linea.descripcion,
+                "estado": linea.estado,
+                "pedido_id": linea.pedido_id,
+                "precio": linea.precio,
+                "can": 1
+            })
+
     send_mensaje_impresora(receptores)
 
 def send_imprimir_ticket(request, id, es_factura=False):

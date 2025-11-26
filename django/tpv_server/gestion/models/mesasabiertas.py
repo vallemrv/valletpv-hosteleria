@@ -60,21 +60,27 @@ class Mesasabiertas(BaseModels):
     def cambiar_mesas_abiertas(idp, ids):
         from .mesas import Mesas, Mesaszona
         from .pedidos import Lineaspedido
+        from push_telegram.push_sender import mesa_cambiada
+        
         if idp == ids: return
         
-        mesaP = Mesasabiertas.objects.select_related('infmesa', 'mesa').filter(mesa__pk=idp).first()
-        mesaS = Mesasabiertas.objects.select_related('infmesa', 'mesa').filter(mesa__pk=ids).first()
-
-        # Verificar si necesitamos enviar notificaciones (solo cuando cambiamos de mesa, no en intercambio)
-        # La notificación se enviará solo si hay suscriptores vigilando la zona destino
-        zona_destino_es_barra = not mesaS  # Solo notificar en cambios simples, no intercambios
+        mesaP = Mesasabiertas.objects.select_related('infmesa', 'mesa').select_for_update().filter(mesa__pk=idp).first()
+        mesaS = Mesasabiertas.objects.select_related('infmesa', 'mesa').select_for_update().filter(mesa__pk=ids).first()
 
         if mesaP:
             if mesaS:
                 # Intercambiar infmesa
-                mesaP.infmesa, mesaS.infmesa = mesaS.infmesa, mesaP.infmesa
+                infmesa_id_p = mesaP.infmesa_id
+                infmesa_id_s = mesaS.infmesa_id
+                
+                mesaP.infmesa_id = infmesa_id_s
+                mesaS.infmesa_id = infmesa_id_p
+                
                 mesaP.save()
                 mesaS.save()
+                
+                mesaP.refresh_from_db()
+                mesaS.refresh_from_db()
                 
                 # Actualizar artículos y grupos
                 mesaP.infmesa.componer_articulos()
@@ -102,6 +108,8 @@ class Mesasabiertas(BaseModels):
                 # Solo mesaP existe, cambiar a ids
                 mesaP.mesa_id = ids
                 mesaP.save()
+                mesaP.refresh_from_db()
+                
                 mesaP.infmesa.componer_articulos()
                 mesaP.infmesa.unir_en_grupos()
                 
@@ -125,44 +133,9 @@ class Mesasabiertas(BaseModels):
                 mesa_cerrada = Mesas.objects.get(pk=idp)
                 comunicar_cambios_devices("md", "mesas", mesa_cerrada.serialize())
                 
-                # Si la zona destino tiene vigilancia, enviar notificación de Telegram
-                if zona_destino_es_barra:
-                    try:
-                        from push_telegram.push_sender import notificar_cambio_zona
-                        
-                        # Obtener datos de la zona destino
-                        mesa_destino = Mesas.objects.get(pk=ids)
-                        mesazona_dest = mesa_destino.mesaszona_set.select_related('zona').first()
-                        
-                        if mesazona_dest:
-                            # Preparar datos de líneas para la notificación
-                            lineas_datos = []
-                            for linea in lineas_afectadas:
-                                precio = float(linea.precio) if hasattr(linea, 'precio') else 0.0
-                                lineas_datos.append({
-                                    'descripcion': linea.descripcion_t if hasattr(linea, 'descripcion_t') else 'Sin descripción',
-                                    'precio': precio
-                                })
-                            
-                            # Enviar notificación genérica
-                            notificar_cambio_zona(
-                                mesa_origen_id=idp,
-                                mesa_origen_nombre=mesa_cerrada.nombre,
-                                mesa_destino_id=ids,
-                                mesa_destino_nombre=mesa_destino.nombre,
-                                zona_destino_id=mesazona_dest.zona_id,
-                                zona_destino_nombre=mesazona_dest.zona.nombre,
-                                camarero_nombre=f"{mesaP.infmesa.camarero.nombre} {mesaP.infmesa.camarero.apellidos}",
-                                hora_apertura=mesaP.infmesa.hora,
-                                lineas_pedido=lineas_datos,
-                                infmesa_id=mesaP.infmesa_id,
-                                tipo_cambio="mesa_completa"
-                            )
-                    except Exception as e:
-                        import logging
-                        logger = logging.getLogger('push_telegram')
-                        logger.error(f"Error enviando notificación de cambio de zona: {e}")
-
+                mesa_cambiada(mesaP, mesaP.infmesa_id, lineas_afectadas, tipo_cambio="mesa_completa")
+                 
+                
     @staticmethod
     @transaction.atomic
     def juntar_mesas_abiertas(idp, ids):

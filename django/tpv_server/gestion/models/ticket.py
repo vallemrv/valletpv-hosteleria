@@ -24,6 +24,9 @@ class Ticket(BaseModels):
     @transaction.atomic # El decorador ya maneja la transacción, no necesitamos "with transaction.atomic()" dentro.
     @log_excepciones
     def cerrar_cuenta(idm, idc, entrega,  idsCobrados, recibo=""):
+         # Import aquí para evitar circular import
+        from api.tools.smart_receptor import notificar_lineas_borradas
+       
         mesa = Mesasabiertas.objects.filter(mesa__pk=idm).select_related('infmesa').first()
         if not mesa:
             # Si la mesa no existe, no hacemos nada más.
@@ -64,11 +67,7 @@ class Ticket(BaseModels):
             # Marcamos la línea de pedido original como pagada
             linea.estado = 'C'
 
-        # Notificar a devices y smart receptors
-        comunicar_cambios_devices("rm", "lineaspedido", lineas_a_borrar)
         
-        # Import aquí para evitar circular import
-        from api.tools.smart_receptor import notificar_lineas_borradas
         notificar_lineas_borradas(lineas_a_procesar)
 
          # --- MEJORA 3: OPERACIONES BULK PARA MEJORAR RENDIMIENTO ---
@@ -78,6 +77,10 @@ class Ticket(BaseModels):
         
         # Actualizamos todas las Lineaspedido en una sola operación de base de datos
         Lineaspedido.objects.bulk_update(lineas_a_procesar, ['estado'])
+
+        # Notificar a devices y smart receptors
+        comunicar_cambios_devices("rm", "lineaspedido", lineas_a_borrar)
+        
 
         # Comprobar si la mesa se puede cerrar
         if not Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).exists():
@@ -89,8 +92,6 @@ class Ticket(BaseModels):
                 rm_list = [{'ID': int(i)} for i in remaining_lineas.values_list('id', flat=True)]
                 comunicar_cambios_devices("rm", "lineaspedido", rm_list)
                 
-                # Import aquí para evitar circular import
-                from api.tools.smart_receptor import notificar_lineas_borradas
                 notificar_lineas_borradas(remaining_lineas)
 
             mesa.delete()

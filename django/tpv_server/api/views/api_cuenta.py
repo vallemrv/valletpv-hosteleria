@@ -19,6 +19,7 @@ from datetime import datetime
 from gestion.tools.config_logs import logger_sync 
 from uuid import uuid4
 import json
+from push_telegram.push_sender import mesa_cambiada
 
 
 @verificar_uid_activo
@@ -206,44 +207,7 @@ def mvlineamultiple(request):
     pedido_destino.infmesa.componer_articulos()
 
     # Verificar si la mesa destino tiene zonas vigiladas y enviar notificación
-    try:
-        from gestion.models.mesas import Mesaszona
-        from push_telegram.push_sender import notificar_cambio_zona
-        
-        mesazona_destino = mesa.mesa.mesaszona_set.select_related('zona').first()
-        if mesazona_destino:
-            # Obtener mesa origen
-            mesa_origen = Mesasabiertas.objects.filter(infmesa__pk=uid).first()
-            mesa_origen_nombre = mesa_origen.mesa.nombre if mesa_origen else "Desconocida"
-            mesa_origen_id = mesa_origen.mesa_id if mesa_origen else 0
-            
-            # Preparar datos de líneas movidas
-            lineas_datos = []
-            for linea in lineas:
-                precio = float(linea.precio) if hasattr(linea, 'precio') else 0.0
-                lineas_datos.append({
-                    'descripcion': linea.descripcion_t if hasattr(linea, 'descripcion_t') else 'Sin descripción',
-                    'precio': precio
-                })
-            
-            # Enviar notificación genérica (solo si hay suscriptores vigilando esta zona)
-            notificar_cambio_zona(
-                mesa_origen_id=mesa_origen_id,
-                mesa_origen_nombre=mesa_origen_nombre,
-                mesa_destino_id=idm,
-                mesa_destino_nombre=mesa.mesa.nombre,
-                zona_destino_id=mesazona_destino.zona_id,
-                zona_destino_nombre=mesazona_destino.zona.nombre,
-                camarero_nombre=f"{pedido_destino.infmesa.camarero.nombre} {pedido_destino.infmesa.camarero.apellidos}",
-                hora_apertura=pedido_destino.hora,
-                lineas_pedido=lineas_datos,
-                infmesa_id=mesa.infmesa.pk,
-                tipo_cambio="lineas_parciales"
-            )
-    except Exception as e:
-        import logging
-        logger = logging.getLogger('push_telegram')
-        logger.error(f"Error enviando notificación de movimiento de líneas: {e}")
+    mesa_cambiada(mesa, uid, lineas, "lineas_parciales")
 
     # Verificar si quedan artículos en la mesa origen
     numart = Lineaspedido.objects.filter((Q(estado='P') | Q(estado='R')) & Q(infmesa__pk=uid)).count()
