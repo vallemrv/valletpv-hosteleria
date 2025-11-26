@@ -7,14 +7,16 @@ from comunicacion.tools import send_mensaje_devices
 from gestion.models.pedidos import Pedidos, Lineaspedido
 from gestion.models.camareros import Camareros
 from gestion.models.teclados import Teclas
+from gestion.tools.config_logs import configurar_logging
+from django.db.models import Prefetch
 
+logger = configurar_logging("smart_receptor")
 
 def enviar_pedido_smart_receptor(pedido):
     """
     Envía pedido a receptores inteligentes (smart receptors).
     No agrupa líneas, las envía una a una para que el receptor las gestione.
     """
-    from django.db.models import Prefetch
     
     # Si recibimos un ID en lugar del objeto, lo buscamos (retrocompatibilidad)
     if isinstance(pedido, int):
@@ -34,7 +36,7 @@ def enviar_pedido_smart_receptor(pedido):
     receptores = {}
     for linea in pedido.lineaspedido_set.all():
         if not linea.tecla or not linea.tecla.familia or not linea.tecla.familia.receptor:
-            print(f"Tecla no encontrada para idart: {linea.idart}")
+            logger.warning(f"Tecla no encontrada para idart: {linea.idart}")
             continue
         
         receptor = linea.tecla.familia.receptor

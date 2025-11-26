@@ -367,3 +367,6 @@ def dispositivo_action(request):
             'success': False,
             'mensaje': f'❌ Acción desconocida: {accion}'
         }, status=400)
+
+
+

@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import Q, Sum, Count, Value, FloatField
 from django.db.models.functions import Coalesce
 from django.db import transaction
-from comunicacion.tools import comunicar_cambios_devices
 from .basemodels import BaseModels
 from .camareros import Camareros
 from .composiciones import ComposicionTeclas, LineasCompuestas
@@ -41,6 +40,7 @@ class Infmesa(BaseModels):
     def unir_en_grupos(self):
         # ... (la lógica interna es compleja, pero podemos optimizar la creación)
         grupos = self.lineaspedido_set.filter(tecla_id__in=ComposicionTeclas.objects.values_list("tecla_id"))
+        ids_modificados = []
         for gr in grupos:
             for comp in ComposicionTeclas.objects.filter(tecla_id=gr.tecla_id):
                 cantidad_realizada = LineasCompuestas.objects.filter(composicion_id=comp.id, linea_principal_id=gr.id).count()
@@ -68,12 +68,12 @@ class Infmesa(BaseModels):
                     # Actualizamos todas las líneas a la vez
                     lineas_modificadas = self.lineaspedido_set.filter(pk__in=lineas_a_modificar_pks)
                     lineas_modificadas.update(precio=0, estado="M")
-                    for l_mod in lineas_modificadas:
-                        comunicar_cambios_devices("md", "lineaspedido", l_mod.serialize())
-
+                    ids_modificados.extend(lineas_a_modificar_pks)
+                   
                 if lineas_compuestas_a_crear:
                     # Creamos los objetos en lote
                     LineasCompuestas.objects.bulk_create(lineas_compuestas_a_crear)
+        return ids_modificados
 
     @transaction.atomic
     def componer_articulos(self):
@@ -82,6 +82,7 @@ class Infmesa(BaseModels):
         # (El código interno no cambia, pero ahora es más seguro)
         lineas = self.lineaspedido_set.filter(Q(es_compuesta=False) & (Q(estado="P") | Q(estado="M")))
         obj_comp = []
+        ids_modificados = []
         for l in lineas:
             if hasattr(l.tecla, "familia"):
                 familia = l.tecla.familia
@@ -96,13 +97,17 @@ class Infmesa(BaseModels):
                                 a.estado = "R"
                                 a.save()
                                 obj_comp.append(a.id)
+                                ids_modificados.append(a.id)
                                 cantidad -= 1
                                 l.cantidad += 1
                                 l.save()
+                                ids_modificados.append(l.id)
                             if cantidad == 0:
                                 l.es_compuesta = True
                                 l.save()
+                                ids_modificados.append(l.id)
                                 break;
+        return ids_modificados
 
         
     # En tu clase Infmesa, REEMPLAZA tu método serialize por este:

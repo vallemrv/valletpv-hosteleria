@@ -26,7 +26,7 @@ def marcar_rojo(request):
     infmesa.numcopias = infmesa.numcopias + 1
     infmesa.save()
     if infmesa.numcopias <= 1:
-        comunicar_cambios_devices("md", "mesasabiertas", mesa_abierta.serialize())
+        comunicar_cambios_devices("md", "mesas", mesa_abierta.mesa.serialize())
     return JsonResponse("success")
 
 
@@ -37,6 +37,7 @@ def pedir(request):
     idc = int(request.POST["idc"])
     uid_device = request.POST["uid_device"] if "uid_device" in request.POST else str(uuid4())
     lineas = json.loads(request.POST["pedido"])
+    
 
     pedido = Pedidos.agregar_nuevas_lineas(idm,idc,lineas, uid_device)
     if pedido:

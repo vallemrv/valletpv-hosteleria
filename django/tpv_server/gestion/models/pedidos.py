@@ -24,7 +24,7 @@ class Pedidos(BaseModels):
     @log_excepciones
     def agregar_nuevas_lineas(idm, idc, lineas, uid_device):
        
-        # --- Lógica de Pedido y Mesa (sin cambios) ---
+         # --- Lógica de Pedido y Mesa (sin cambios) ---
         if Pedidos.objects.filter(uid_device=uid_device).exists():
             return None
 
@@ -68,36 +68,13 @@ class Pedidos(BaseModels):
                 id_local=pd.get("ID", None)
             )
             lineas_objs.append(linea)
-            lineas_a_eliminar.append({"ID": pd.get("ID")})
+            if "IDArt" not in pd and "ID" in pd:
+                lineas_a_eliminar.append({"ID": pd.get("ID")})
 
         # Crear todas las líneas en una sola query
         if lineas_objs:
             Lineaspedido.objects.bulk_create(lineas_objs)
-
-            # --- Re-consultar para obtener PKs y serializar ---
-            # Subqueries para la serialización optimizada
-            mesa_abierta_sq = Mesasabiertas.objects.filter(infmesa_id=OuterRef('infmesa_id'))
-            id_mesa_sq = mesa_abierta_sq.values('mesa_id')[:1]
-            nom_mesa_sq = mesa_abierta_sq.values('mesa__nombre')[:1]
-            zona_id_sq = Mesaszona.objects.filter(
-                mesa__mesasabiertas__infmesa_id=OuterRef('infmesa_id')
-            ).values('zona_id')[:1]
-
-            # Consultamos las líneas recién creadas, ahora con PKs
-            lineas_creadas = Lineaspedido.objects.filter(pedido=pedido).select_related(
-                'pedido', 'tecla__familia__receptor'
-            ).annotate(
-                servido_count=Count('servidos'),
-                id_mesa=Subquery(id_mesa_sq),
-                nom_mesa=Subquery(nom_mesa_sq),
-                id_zona=Subquery(zona_id_sq)
-            )
             
-            # Serializamos y comunicamos la inserción
-            lineas_serializadas = [l.serialize(prefetched=True) for l in lineas_creadas]
-            if lineas_serializadas:
-                comunicar_cambios_devices("insert", "lineaspedido", lineas_serializadas)
-
         if lineas_a_eliminar:
             comunicar_cambios_devices("rm", "lineaspedido", lineas_a_eliminar)
         
@@ -106,8 +83,50 @@ class Pedidos(BaseModels):
         # --- Actualización y comunicación (con la corrección) ---
         infmesa.numcopias = 0
         infmesa.save()
-        infmesa.componer_articulos()
-        infmesa.unir_en_grupos()
+        ids_modificados = []
+        ids_modificados.extend(infmesa.componer_articulos())
+        ids_modificados.extend(infmesa.unir_en_grupos())
+
+        # --- Re-consultar para obtener PKs y serializar ---
+        # Subqueries para la serialización optimizada
+        mesa_abierta_sq = Mesasabiertas.objects.filter(infmesa_id=OuterRef('infmesa_id'))
+        id_mesa_sq = mesa_abierta_sq.values('mesa_id')[:1]
+        nom_mesa_sq = mesa_abierta_sq.values('mesa__nombre')[:1]
+        zona_id_sq = Mesaszona.objects.filter(
+            mesa__mesasabiertas__infmesa_id=OuterRef('infmesa_id')
+        ).values('zona_id')[:1]
+
+        # Consultamos las líneas recién creadas, ahora con PKs
+        lineas_creadas = Lineaspedido.objects.filter(pedido=pedido).select_related(
+            'pedido', 'tecla__familia__receptor'
+        ).annotate(
+            servido_count=Count('servidos'),
+            id_mesa=Subquery(id_mesa_sq),
+            nom_mesa=Subquery(nom_mesa_sq),
+            id_zona=Subquery(zona_id_sq)
+        )
+        
+        # Serializamos y comunicamos la inserción
+        lineas_serializadas = [l.serialize(prefetched=True) for l in lineas_creadas]
+        if lineas_serializadas:
+            comunicar_cambios_devices("insert", "lineaspedido", lineas_serializadas)
+
+        # Consultamos y notificamos las líneas modificadas (excluyendo las que acabamos de crear/insertar)
+        ids_nuevos = [l.id for l in lineas_creadas]
+        ids_modificados_viejos = list(set([id for id in ids_modificados if id not in ids_nuevos]))
+        
+        if ids_modificados_viejos:
+             lineas_mod_qs = Lineaspedido.objects.filter(pk__in=ids_modificados_viejos).select_related(
+                'pedido', 'tecla__familia__receptor'
+            ).annotate(
+                servido_count=Count('servidos'),
+                id_mesa=Subquery(id_mesa_sq),
+                nom_mesa=Subquery(nom_mesa_sq),
+                id_zona=Subquery(zona_id_sq)
+            )
+             lineas_mod_serializadas = [l.serialize(prefetched=True) for l in lineas_mod_qs]
+             if lineas_mod_serializadas:
+                 comunicar_cambios_devices("md", "lineaspedido", lineas_mod_serializadas)
 
         return pedido
 
@@ -136,11 +155,10 @@ class Lineaspedido(BaseModels):
     descripcion_t = models.CharField("Descripción ticket", db_column='Descripcion_t', max_length=300, null=True, blank=True)
     id_local = models.BigIntegerField(db_column='IDLocal', null=True)  # Cambiado a BigIntegerField para valores grandes
    
-
-
           
     def modifiar_composicion(self):
         mesa_a = Mesasabiertas.objects.filter(infmesa=self.infmesa).first()
+        cambios = []
         if self.estado == "R":
             self.lrToP(mesa_a)
             for l in self.infmesa.lineaspedido_set.filter(es_compuesta=True):
@@ -149,8 +167,9 @@ class Lineaspedido(BaseModels):
                     l.es_compuesta = False
                     l.cantidad -= 1
                     l.save()
-                    comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+                    cambios.append(l.serialize())
                     break
+            
 
         elif self.es_compuesta:
             composicion = self.tecla.familia.compToList()
@@ -160,12 +179,15 @@ class Lineaspedido(BaseModels):
                         break
                     
                     l.lrToP(mesa_a)
-                    comunicar_cambios_devices("md", "lineaspedido", l.serialize())
+                    cambios.append(l.serialize())
                     self.cantidad -= 1
 
                 self.es_compuesta = False
                 self.save()
-            comunicar_cambios_devices("md", "lineaspedido", self.serialize())
+            cambios.append(self.serialize())
+        
+        if cambios:
+            comunicar_cambios_devices("md", "lineaspedido", cambios)
 
           
 
@@ -198,7 +220,6 @@ class Lineaspedido(BaseModels):
                 continue
             id_mesa = int(id_mesa_raw)
             if id_mesa not in mesas_abiertas_info:
-                print(f"Lineaspedido ID: {client_id} - Mesa ID: {id_mesa} not found in open tables. Marking for removal."   )
                 result.append({'tb': cls.__name__.lower(), 'op': 'rm', 'obj': {'ID': int(client_id)}})
 
         # --- Subqueries CORREGIDAS ---
@@ -252,7 +273,6 @@ class Lineaspedido(BaseModels):
                 # le decimos al cliente que lo borre y pasamos al siguiente.
                 if server_record.estado in ['C', 'A']:
                     logger.debug(f"Server record ID: {client_id} has state '{server_record.estado}'. Marking for removal from client.")
-                    print(f"Lineaspedido ID: {client_id} - State: {server_record.estado} - marking for removal")
                     result.append({'tb': cls.__name__.lower(), 'op': 'rm', 'obj': {'ID': int(client_id)}})
                     continue  # Importante: Saltamos al siguiente registro
 
@@ -263,7 +283,6 @@ class Lineaspedido(BaseModels):
             else:
                 # Si el registro del cliente no se encuentra en el servidor, se marca para borrar
                 logger.debug(f"Server record not found for Lineaspedido ID: {client_id} - marking for removal")
-                print(f"Lineaspedido ID: {client_id} - not found on server - marking for removal")
                 result.append({'tb': cls.__name__.lower(), 'op': 'rm', 'obj': {'ID': int(client_id)}})
 
     
@@ -464,28 +483,6 @@ class Lineaspedido(BaseModels):
         return Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
 
 
-    def save(self, *args, **kwargs):
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
-        
-        # Si el estado es 'C' (Cobrada), se envía como eliminación
-        if self.estado in ['C', 'A']:
-            comunicar_cambios_devices("rm", "lineaspedido", {"ID": self.id})
-        else:
-            op = "insert" if is_new else "md"
-            comunicar_cambios_devices(op, "lineaspedido", self.serialize())
-
-    def delete(self, *args, **kwargs):
-        # Obtener ID antes de borrar
-        linea_id = self.id
-        
-        # Borrar el objeto
-        super().delete(*args, **kwargs)
-        
-        # Comunicar eliminación a devices
-        comunicar_cambios_devices("rm", "lineaspedido", {"ID": linea_id})
-
-    
     class Meta:
         db_table = 'lineaspedido'
 

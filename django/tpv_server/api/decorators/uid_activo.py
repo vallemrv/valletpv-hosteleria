@@ -2,7 +2,10 @@ from functools import wraps
 from django.views.decorators.csrf import csrf_exempt
 from tokenapi.http import JsonResponseForbidden
 from gestion.models.dispositivos import Dispositivo
+from gestion.tools.config_logs import configurar_logging
 import json
+
+logger = configurar_logging("uid_activo")
 
 @csrf_exempt
 def verificar_uid_activo(view_func):
@@ -26,7 +29,7 @@ def verificar_uid_activo(view_func):
                 request.json_data = data
                 uid = data.get('uid')
             except (json.JSONDecodeError, TypeError):
-                print("[VERIFICAR_UID] El cuerpo parecía JSON pero no se pudo parsear")
+                logger.warning("[VERIFICAR_UID] El cuerpo parecía JSON pero no se pudo parsear")
                 pass # Si falla el parseo, se intentarán otros métodos
         
         # Si no se encontró UID en el cuerpo JSON (o no era JSON),

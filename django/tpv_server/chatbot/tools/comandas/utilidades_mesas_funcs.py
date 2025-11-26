@@ -257,7 +257,7 @@ def mover_lineas_entre_mesas(
                     infmesa=nuevo_infmesa,
                     mesa=mesa_destino_fisica
                 )
-                comunicar_cambios_devices("md", "mesasabiertas", {"id": mesa_destino.id, "abierta": 1, "num": 0 })
+                comunicar_cambios_devices("md", "mesas", mesa_destino.mesa.serialize())
             else:
                 nuevo_infmesa = mesa_destino.infmesa
             
