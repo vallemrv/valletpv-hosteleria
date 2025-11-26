@@ -107,7 +107,7 @@ abstract class ServiceBase : Service(), IControllerWS {
 
 
     override fun sincronizar() {
-        syncDevice(arrayOf("camareros", "lineaspedido",  "mesas", "mesasabiertas", "sugerencias", "receptores", "zonas", "seccionescom", "teclas"))
+        syncDevice(arrayOf("camareros", "lineaspedido",  "mesas", "sugerencias", "receptores", "zonas", "seccionescom", "teclas"))
     }
 
     override fun procesarRespose(o: JSONObject) {

@@ -12,7 +12,7 @@
         <div class="text-h3 font-weight-black text-center mb-4">
           Mesa {{ urgentOrder.mesa || urgentOrder.pedido_id }}
         </div>
-        
+
         <div class="text-h5 text-center mb-6">
           <v-icon>mdi-account</v-icon> {{ urgentOrder.camarero || 'Sin camarero' }}
         </div>
@@ -22,11 +22,7 @@
         <div v-if="urgentOrder.lineas && urgentOrder.lineas.length > 0">
           <div class="text-h6 mb-2 font-weight-bold text-error">Artículos Urgentes:</div>
           <v-list density="compact">
-            <v-list-item 
-              v-for="linea in lineasUrgentes" 
-              :key="linea.id"
-              class="px-0"
-            >
+            <v-list-item v-for="linea in lineasUrgentes" :key="linea.id" class="px-0">
               <template v-slot:prepend>
                 <v-avatar color="red-darken-4" size="50" class="mr-3 elevation-4">
                   <span class="text-h5 font-weight-black text-white">{{ linea.cantidad || 1 }}</span>
@@ -39,14 +35,7 @@
       </v-card-text>
 
       <v-card-actions class="pa-4 pt-0">
-        <v-btn 
-          block 
-          color="error" 
-          variant="elevated" 
-          size="x-large" 
-          @click="closeDialog"
-          class="font-weight-bold"
-        >
+        <v-btn block color="error" variant="elevated" size="x-large" @click="closeDialog" class="font-weight-bold">
           ENTENDIDO
         </v-btn>
       </v-card-actions>
@@ -65,8 +54,27 @@ const urgentOrder = computed(() => store.urgentOrderToShow);
 
 const lineasUrgentes = computed(() => {
   if (!urgentOrder.value || !urgentOrder.value.lineas) return [];
+
   // Filtrar solo las líneas que son urgentes
-  return urgentOrder.value.lineas.filter(l => l.urgente);
+  const urgentes = urgentOrder.value.lineas.filter(l => l.urgente);
+
+  // Agrupar por descripción y estado
+  const agrupadas = urgentes.reduce((acc, linea) => {
+    const key = `${linea.descripcion}_${linea.estado || ''}`;
+
+    if (!acc[key]) {
+      acc[key] = {
+        ...linea,
+        cantidad: 0,
+        id: key // Usar la clave como ID para el v-for
+      };
+    }
+
+    acc[key].cantidad += Number(linea.cantidad || 1);
+    return acc;
+  }, {});
+
+  return Object.values(agrupadas);
 });
 
 // Watch for changes in the store's urgent order
@@ -96,9 +104,11 @@ const closeDialog = () => {
   0% {
     box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
   }
+
   70% {
     box-shadow: 0 0 0 20px rgba(211, 47, 47, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
   }

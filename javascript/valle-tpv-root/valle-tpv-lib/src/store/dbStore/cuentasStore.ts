@@ -499,7 +499,6 @@ export const useCuentaStore = defineStore('lineaspedido', {
         if (idx !== -1) {
           this.items[idx] = updated;
         }
-
       }
     },
     async insert(cuenta: Cuenta) {
