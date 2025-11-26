@@ -115,6 +115,8 @@
     :show="showPedidos"
     :receptor="receptorActual"
   ></valle-pedidos>
+  
+  <urgent-order-dialog />
 </template>
 
 <script>
@@ -124,9 +126,10 @@ import { computed, onMounted, ref, watch } from 'vue';
 import VistaPrincipal from "@/components/VistaPrincipal.vue";
 import VallePedidos from "@/components/VallePedidos.vue";
 import ConnectionStatus from "@/components/ConnectionStatus.vue";
+import UrgentOrderDialog from "@/components/UrgentOrderDialog.vue";
 
 export default {
-  components: { VistaPrincipal, VallePedidos, ConnectionStatus },
+  components: { VistaPrincipal, VallePedidos, ConnectionStatus, UrgentOrderDialog },
   setup() {
     const store = useMainStore();
     
@@ -141,6 +144,7 @@ export default {
     const isConnecting = ref(false);
     const ws = ref([]);
     const receptores_sel = ref([]);
+    const receptoresAnteriores = ref([]); // Guardar selección anterior
     const showPedidos = ref(false);
 
     // Computed properties
@@ -150,10 +154,11 @@ export default {
     const receptores = computed(() => store.receptores);
     const empresa = computed(() => store.empresa);
     
-    // Receptor actual (primer receptor seleccionado o null para ver todos)
+    // Receptor actual (array de nombres de receptores seleccionados)
     const receptorActual = computed(() => {
       const recs = getReceptores();
-      return recs.length > 0 ? recs[0].nomimp : null;
+      // Devolver array de nombres para soportar múltiples receptores
+      return recs.length > 0 ? recs.map(r => r.Nombre) : null;
     });
     
     // URLs calculadas
@@ -220,10 +225,32 @@ export default {
       } else {
         // Eliminar de la selección
         receptores_sel.value = receptores_sel.value.filter((e) => e != r.ID);
+      }
+      
+      // Eliminar duplicados finales
+      receptores_sel.value = [...new Set(receptores_sel.value)];
+    };
 
-        // Cerrar inmediatamente la conexión WebSocket de este receptor si existe
+    const receptores_change = async () => {
+      // Identificar receptores que fueron DESELECCIONADOS
+      const receptoresDeseleccionados = receptoresAnteriores.value.filter(anteriorID => 
+        !receptores_sel.value.includes(anteriorID)
+      );
+      
+      // Obtener los objetos completos de los receptores deseleccionados
+      const receptoresAEliminar = receptores.value.filter(r => 
+        receptoresDeseleccionados.includes(r.ID)
+      );
+      
+      console.log('🔍 Receptores a eliminar:', receptoresAEliminar.map(r => r.Nombre));
+      
+      // Para cada receptor deseleccionado:
+      for (const r of receptoresAEliminar) {
+        console.log(`🗑️ Eliminando receptor: ${r.Nombre}`);
+        
+        // 1. Cerrar WebSocket
         try {
-          const idx = ws.value.findIndex((w) => w.receptor === r.nomimp);
+          const idx = ws.value.findIndex((w) => w.receptor.Nombre === r.Nombre);
           if (idx !== -1) {
             ws.value[idx].disconnect();
             ws.value.splice(idx, 1);
@@ -231,20 +258,19 @@ export default {
         } catch (err) {
           console.warn(`No se pudo cerrar la conexión de ${r.Nombre}:`, err);
         }
-
-        // Persistir el cambio para evitar reconexiones posteriores
-        try {
-          localStorage.receptores = JSON.stringify(receptores_sel.value);
-        } catch (_) {}
+        
+        // 2. Eliminar pedidos de memoria y DB
+        await store.eliminarPedidosPorReceptor(r.Nombre);
       }
       
-      // Eliminar duplicados finales
-      receptores_sel.value = [...new Set(receptores_sel.value)];
-    };
-
-    const receptores_change = () => {
-      showSelDialog.value = false;
+      // Guardar la nueva selección
       localStorage.receptores = JSON.stringify(receptores_sel.value);
+      receptoresAnteriores.value = [...receptores_sel.value]; // Actualizar anterior
+      
+      // Cerrar el diálogo
+      showSelDialog.value = false;
+      
+      // Conectar solo los receptores seleccionados (esto sincronizará los nuevos)
       connect();
     };
 
@@ -449,9 +475,11 @@ export default {
             const storedReceptores = JSON.parse(localStorage.receptores);
             // Eliminar duplicados del localStorage
             receptores_sel.value = [...new Set(storedReceptores)];
+            receptoresAnteriores.value = [...receptores_sel.value]; // Inicializar anterior
           } catch (e) {
             console.error('Error parsing localStorage.receptores:', e);
             receptores_sel.value = [];
+            receptoresAnteriores.value = [];
           }
         }
         if (!receptores.value || receptores.value.length <= 0) {

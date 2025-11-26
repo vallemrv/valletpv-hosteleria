@@ -23,8 +23,4 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch - dejar pasar todas las peticiones sin interceptar
-self.addEventListener('fetch', (event) => {
-  // No hacer nada, dejar que las peticiones pasen normalmente
-  return;
-});
+

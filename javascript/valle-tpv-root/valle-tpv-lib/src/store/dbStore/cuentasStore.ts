@@ -7,7 +7,7 @@ import { useInstruccionesStore } from '../instruccionesStore';
 import { useCamarerosStore } from './camarerosStore';
 import { useMesasStore } from './mesasStore';
 import { useEmpresasStore } from './empresasStore';
-          
+
 
 export const useCuentaStore = defineStore('lineaspedido', {
   state: () => ({
@@ -25,18 +25,18 @@ export const useCuentaStore = defineStore('lineaspedido', {
     cuentaDetalladaPorMesa: (state) => {
       return (idMesa: number) => {
         // Filtrar cuentas de la mesa específica para estados P y N
-        const cuentasMesa = state.items.filter(cuenta => 
+        const cuentasMesa = state.items.filter(cuenta =>
           cuenta.IDMesa === idMesa && (cuenta.Estado === 'P' ||
             cuenta.Estado === 'M' || cuenta.Estado === 'N')
         );
-        
+
         // Agrupar por descripcion_t, precio y estado para contar cantidades
         const agrupado = new Map<string, CuentaItem>();
-        
+
         cuentasMesa.forEach(cuenta => {
           const clave = `${cuenta.descripcion_t}_${cuenta.Precio}_${cuenta.Estado}`;
           const cuentaIdNum = Number(cuenta.ID);
-          
+
           if (agrupado.has(clave)) {
             const item = agrupado.get(clave)!;
             item.cantidad += 1;
@@ -56,46 +56,46 @@ export const useCuentaStore = defineStore('lineaspedido', {
             });
           }
         });
-        
+
         // Convertir Map a Array y ordenar por último pedido (descendente)
         return Array.from(agrupado.values()).sort((a, b) => (b.ultimoPedido || 0) - (a.ultimoPedido || 0));
       };
     },
-    
+
     // Getter para buscar cuentas por mesa y estado
     lineasNuevas: (state) => {
       return (idMesa: number): Cuenta[] => {
-        return state.items.filter(cuenta => 
+        return state.items.filter(cuenta =>
           cuenta.IDMesa === idMesa && cuenta.Estado === 'N'
         );
       };
     },
-    
+
     // Getter para obtener todas las líneas de una mesa sin agrupar
     lineasPorMesa: (state) => {
       return (idMesa: number) => {
-        return state.items.filter(cuenta => 
+        return state.items.filter(cuenta =>
           cuenta.IDMesa === idMesa
         );
       };
     },
-    
+
     // Getter para agrupar por Descripcion (no descripcion_t) - devuelve CuentaItem[]
     cuentaAgrupadaPorPedido: (state) => {
       return (idMesa: number): CuentaItem[] => {
         // Filtrar cuentas de la mesa específica Y por estado
-        const cuentasMesa = state.items.filter(cuenta => 
-          cuenta.IDMesa === idMesa  && (cuenta.Estado === 'P' ||
-            cuenta.Estado === 'M' || cuenta.Estado === 'N' )
+        const cuentasMesa = state.items.filter(cuenta =>
+          cuenta.IDMesa === idMesa && (cuenta.Estado === 'P' ||
+            cuenta.Estado === 'M' || cuenta.Estado === 'N')
         );
-        
+
         // Agrupar por Descripcion y Precio para contar cantidades
         const agrupado = new Map<string, CuentaItem>();
-        
+
         cuentasMesa.forEach(cuenta => {
           const clave = `${cuenta.Descripcion}_${cuenta.Precio}_${cuenta.Estado}`;
           const cuentaIdNum = Number(cuenta.ID);
-          
+
           if (agrupado.has(clave)) {
             const item = agrupado.get(clave)!;
             item.cantidad += 1;
@@ -115,20 +115,20 @@ export const useCuentaStore = defineStore('lineaspedido', {
             });
           }
         });
-        
+
         // Convertir Map a Array y ordenar por último pedido (descendente)
         return Array.from(agrupado.values()).sort((a, b) => (b.ultimoPedido || 0) - (a.ultimoPedido || 0));
       };
     },
-    
+
     // Getter para obtener líneas individuales por mesa, descripción y cantidad
     desgloseLineas: (state) => {
       return (mesa_id: number, descripcion: string, cantidad: number): Cuenta[] => {
         // Filtrar por mesa y descripción
-       const lineasFiltradas = state.items.filter(cuenta => 
+        const lineasFiltradas = state.items.filter(cuenta =>
           cuenta.IDMesa === mesa_id && cuenta.descripcion_t === descripcion
         );
-        
+
         // Retornar solo la cantidad solicitada
         return lineasFiltradas.slice(0, cantidad);
       };
@@ -138,7 +138,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
     limpiarInfoCobro() {
       this.infoCobro = null;
     },
-    async imprimirCuenta (mesa: Mesa | null) {
+    async imprimirCuenta(mesa: Mesa | null) {
       if (mesa) {
         mesa.num += 1;
         await db.update('mesas', mesa.ID, mesa);
@@ -147,7 +147,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
           'api/impresion/preimprimir',
           { idm: mesa.ID }
         );
-        
+
       }
     },
     async cobrarMesa(idMesa: number, infoCobro: InfoCobro, itemsCobrados: CuentaItem[]) {
@@ -246,7 +246,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
 
       try {
         // 3. Obtener TODAS las líneas nuevas para esta mesa DE UNA SOLA VEZ.
-        const lineasParaAparcar = this.items.filter(c => 
+        const lineasParaAparcar = this.items.filter(c =>
           c.IDMesa === idMesa && c.Estado === 'N'
         );
 
@@ -255,14 +255,14 @@ export const useCuentaStore = defineStore('lineaspedido', {
           return; // La función termina aquí.
         }
 
-        
+
         // 5. ¡CRÍTICO! Actualizar el estado de TODAS las líneas a 'P' INMEDIATAMENTE.
         // Usamos Promise.all para hacer todas las actualizaciones de estado en paralelo y esperar a que terminen.
-        const updates = lineasParaAparcar.map(cuenta => 
+        const updates = lineasParaAparcar.map(cuenta =>
           this.update({ ...cuenta, Estado: "P" })
         );
         await Promise.all(updates);
-        
+
         // Ahora que el estado está actualizado, las siguientes llamadas a `aparcarMesa` no encontrarán nada en el paso 3.
 
         // 6. Encolar UNA SOLA instrucción con TODAS las líneas que acabamos de actualizar.
@@ -272,9 +272,9 @@ export const useCuentaStore = defineStore('lineaspedido', {
 
         await instruccionesStore.encolarInstruccion(
           'api/cuenta/add',
-          { 
-            idm: idMesa, 
-            idc: idCamarero, 
+          {
+            idm: idMesa,
+            idc: idCamarero,
             uid_device: Date.now(),
             // Mapeamos el array que cogimos al principio
             pedido: JSON.stringify(lineasParaAparcar.map(c => ({
@@ -317,7 +317,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
         }
 
         // 5. Eliminar todas las líneas
-        for(const linea of lineasValidas) {
+        for (const linea of lineasValidas) {
           await this.rm(linea.ID!);
         }
 
@@ -362,38 +362,38 @@ export const useCuentaStore = defineStore('lineaspedido', {
 
       try {
         // 4. Obtener líneas de ambas mesas
-        const lineasOrigen = this.items.filter(cuenta => 
-            cuenta.IDMesa === id_origen
-          );
-        const lineasDestino = this.items.filter(cuenta => 
-            cuenta.IDMesa === id_destino
-          );
+        const lineasOrigen = this.items.filter(cuenta =>
+          cuenta.IDMesa === id_origen
+        );
+        const lineasDestino = this.items.filter(cuenta =>
+          cuenta.IDMesa === id_destino
+        );
 
         // 5. Verificar que la mesa origen tenga productos
         if (lineasOrigen.length === 0) {
           console.warn(`La mesa origen (${id_origen}) no tiene productos. No se puede mover.`);
           return false;
         }
-        
+
         if (lineasDestino.length === 0) {
           // Mesa destino está cerrada: mover todas las líneas de origen a destino
           for (const linea of lineasOrigen) {
             await this.update({ ...linea, IDMesa: id_destino });
           }
-          
+
           const mesasStore = useMesasStore();
-          
+
           // Cerrar mesa origen y abrir mesa destino
           await mesasStore.cerrarMesa(id_origen);
           await mesasStore.abrirMesa(id_destino);
-          
+
         } else {
           // Mesa destino tiene líneas: intercambiar líneas entre ambas mesas
           // Cambiar líneas de origen a destino
           for (const linea of lineasOrigen) {
             await this.update({ ...linea, IDMesa: id_destino });
           }
-          
+
           // Cambiar líneas de destino a origen
           for (const linea of lineasDestino) {
             await this.update({ ...linea, IDMesa: id_origen });
@@ -499,6 +499,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
         if (idx !== -1) {
           this.items[idx] = updated;
         }
+
       }
     },
     async insert(cuenta: Cuenta) {
@@ -515,7 +516,7 @@ export const useCuentaStore = defineStore('lineaspedido', {
         this.items = cuentas;
         this.isLoadDB = true;
       }
-      
+
     },
     async comprobarCuenta(idm: number) {
       const empresasStore = useEmpresasStore();

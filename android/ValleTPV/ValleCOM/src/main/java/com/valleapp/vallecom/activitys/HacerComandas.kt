@@ -404,11 +404,11 @@ class HacerComandas : ActivityBase(), INota, IComanda, ITeclados {
         }
     }
 
-    override fun asociarBotonera(view: View) {
+    override fun asociarBotonera(v: View) {
         val json = JSON()
         try {
             val pref = json.deserializar("preferencias.dat", this)
-            pref?.put("sec", view.tag.toString())
+            pref?.put("sec", v.tag.toString())
             json.serializar("preferencias.dat", pref, cx)
             customToast.showBottom("Asociacion realizada")
         } catch (e: Exception) {
@@ -493,25 +493,29 @@ class HacerComandas : ActivityBase(), INota, IComanda, ITeclados {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            try {
-                val art = JSONObject(data?.getStringExtra("art") ?: "")
-                nota.addArt(art, can)
-            } catch (e: JSONException) {
-                Log.e("HacerComandas", "Error al obtener artículo del buscador", e)
-            }
-        } else if (requestCode == 200 && resultCode == RESULT_OK) {
-            val sug = data?.getStringExtra("sug") ?: ""
-            nota.addSug(sug)
-        } else if (requestCode == 300 && resultCode == RESULT_OK) {
-            val idPedido = data?.getStringExtra("IDPedido") ?: ""
-            val lPedidos = dbCuenta.filter("estado = 'P' AND IDPedido = $idPedido")
-            for (i in 0 until lPedidos.length()) {
+        when (requestCode) {
+            100 if resultCode == RESULT_OK -> {
                 try {
-                    val art = lPedidos.getJSONObject(i)
-                    nota.addArt(art, art.getInt("Can"))
+                    val art = JSONObject(data?.getStringExtra("art") ?: "")
+                    nota.addArt(art, can)
                 } catch (e: JSONException) {
-                    Log.e("HacerComandas", "Error al agregar artículo del refill", e)
+                    Log.e("HacerComandas", "Error al obtener artículo del buscador", e)
+                }
+            }
+            200 if resultCode == RESULT_OK -> {
+                val sug = data?.getStringExtra("sug") ?: ""
+                nota.addSug(sug)
+            }
+            300 if resultCode == RESULT_OK -> {
+                val idPedido = data?.getStringExtra("IDPedido") ?: ""
+                val lPedidos = dbCuenta.filter("estado = 'P' AND IDPedido = $idPedido")
+                for (i in 0 until lPedidos.length()) {
+                    try {
+                        val art = lPedidos.getJSONObject(i)
+                        nota.addArt(art, art.getInt("Can"))
+                    } catch (e: JSONException) {
+                        Log.e("HacerComandas", "Error al agregar artículo del refill", e)
+                    }
                 }
             }
         }

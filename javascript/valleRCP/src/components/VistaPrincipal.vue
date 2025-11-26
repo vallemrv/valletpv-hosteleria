@@ -99,7 +99,7 @@ import { useMainStore } from '@/stores/main'
 
 const props = defineProps({
   receptor: {
-    type: String,
+    type: [String, Array],
     default: null
   }
 })

@@ -26,7 +26,9 @@ export const useMainStore = defineStore('main', {
     pedidosEnMemoria: [],
     dbInitialized: false,
     // Callback para cerrar vista de servidos
-    cerrarServidosCallback: null
+    cerrarServidosCallback: null,
+    // Pedido urgente para mostrar en popup
+    urgentOrderToShow: null
   }),
 
   getters: {
@@ -37,38 +39,36 @@ export const useMainStore = defineStore('main', {
     getListadoData: (state) => state.listado,
     getReceptoresData: (state) => state.receptores,
 
-    // Pedidos activos en memoria
-    pedidosActivos: (state) => {
-      return state.pedidosEnMemoria.filter(p => p.estado === 'activo')
-    },
+    // Pedidos activos en memoria (todos los que hay en memoria son activos)
+    pedidosActivos: (state) => state.pedidosEnMemoria,
 
     // Pedidos por receptor
     pedidosPorReceptor: (state) => (receptor) => {
-      return state.pedidosEnMemoria.filter(p =>
-        p.estado === 'activo' &&
-        (p.receptor === receptor || p.nom_receptor === receptor)
-      )
+      const receptorLower = receptor ? receptor.toLowerCase() : '';
+      return state.pedidosEnMemoria.filter(p => {
+        const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+        const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : '';
+        return p.estado === 'activo' && (pReceptor === receptorLower || pNomReceptor === receptorLower);
+      })
     },
 
-    // Pedidos completados
-    pedidosCompletados: (state) => {
-      return state.pedidosEnMemoria.filter(p => p.estado === 'completado')
-    },
+
 
     // Pedidos con líneas servidas
     pedidosConServidos: (state) => {
       return state.pedidosEnMemoria.filter(p =>
-        p.estado === 'activo' &&
         p.lineas?.some(l => l.servido === true)
       )
     },
 
     // Líneas servidas por receptor
     lineasServidasPorReceptor: (state) => (receptor) => {
-      const pedidos = state.pedidosEnMemoria.filter(p =>
-        p.estado === 'activo' &&
-        (p.receptor === receptor || p.nom_receptor === receptor)
-      )
+      const receptorLower = receptor ? receptor.toLowerCase() : '';
+      const pedidos = state.pedidosEnMemoria.filter(p => {
+        const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+        const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : '';
+        return pReceptor === receptorLower || pNomReceptor === receptorLower;
+      })
 
       const lineasServidas = []
       pedidos.forEach(pedido => {
@@ -93,14 +93,12 @@ export const useMainStore = defineStore('main', {
 
     // Pedidos urgentes
     pedidosUrgentes: (state) => {
-      return state.pedidosEnMemoria.filter(p =>
-        p.estado === 'activo' && p.urgente === true
-      )
+      return state.pedidosEnMemoria.filter(p => p.urgente === true)
     },
 
     // Líneas urgentes
     lineasUrgentes: (state) => {
-      const pedidosActivos = state.pedidosEnMemoria.filter(p => p.estado === 'activo')
+      const pedidosActivos = state.pedidosEnMemoria
       const lineasUrgentes = []
 
       pedidosActivos.forEach(pedido => {
@@ -128,7 +126,7 @@ export const useMainStore = defineStore('main', {
 
     // Agrupar pedidos activos por camarero
     pedidosPorCamarero: (state) => {
-      const pedidosActivos = state.pedidosEnMemoria.filter(p => p.estado === 'activo')
+      const pedidosActivos = state.pedidosEnMemoria
       const agrupado = {}
 
       pedidosActivos.forEach(pedido => {
@@ -144,7 +142,7 @@ export const useMainStore = defineStore('main', {
 
     // Agrupar pedidos activos por receptor
     pedidosAgrupadosPorReceptor: (state) => {
-      const pedidosActivos = state.pedidosEnMemoria.filter(p => p.estado === 'activo')
+      const pedidosActivos = state.pedidosEnMemoria
       const agrupado = {}
 
       pedidosActivos.forEach(pedido => {
@@ -160,7 +158,7 @@ export const useMainStore = defineStore('main', {
 
     // Agrupar líneas por artículo (idart y descripción) - para ver cuántos del mismo artículo hay
     lineasAgrupadasPorArticulo: (state) => {
-      const pedidosActivos = state.pedidosEnMemoria.filter(p => p.estado === 'activo')
+      const pedidosActivos = state.pedidosEnMemoria
       const agrupado = {}
 
       pedidosActivos.forEach(pedido => {
@@ -205,28 +203,33 @@ export const useMainStore = defineStore('main', {
 
     // Vista principal: Agrupar por pedido > artículos (ordenados por pedido_id)
     // Muestra: pedidos urgentes (aunque estén servidos) + pedidos con líneas pendientes
-    vistaPrincipal: (state) => (receptor = null) => {
+    vistaPrincipal: (state) => (receptores = null) => {
       let pedidosActivos = state.pedidosEnMemoria.filter(p => {
-        if (p.estado !== 'activo') return false
 
         // Mostrar si es urgente (sin importar estado servido)
         if (p.urgente === true || (p.lineas && p.lineas.some(l => l.urgente === true))) {
           return true
         }
 
-        // Mostrar si tiene al menos una línea pendiente
-        if (p.lineas && p.lineas.some(l => l.servido !== true)) {
-          return true
-        }
-
-        return false
+        // Si no es urgente, debe tener líneas pendientes
+        if (!p.lineas || p.lineas.length === 0) return false
+        return p.lineas.some(l => l.servido === false)
       })
 
-      // Filtrar por receptor si se especifica
-      if (receptor) {
-        pedidosActivos = pedidosActivos.filter(p =>
-          p.receptor === receptor || p.nom_receptor === receptor
-        )
+      // Filtrar por receptores si se especifican
+      if (receptores) {
+        // Normalizar a array de strings en minúsculas
+        const receptoresLower = (Array.isArray(receptores) ? receptores : [receptores])
+          .map(r => r ? r.toString().toLowerCase() : '')
+          .filter(r => r !== '');
+
+        if (receptoresLower.length > 0) {
+          pedidosActivos = pedidosActivos.filter(p => {
+            const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+            const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : '';
+            return receptoresLower.includes(pReceptor) || receptoresLower.includes(pNomReceptor);
+          })
+        }
       }
 
       // Ordenar por pedido_id (del más pequeño al más grande)
@@ -282,68 +285,45 @@ export const useMainStore = defineStore('main', {
       return pedidosTransformados
     },
 
-    // Vista de pedidos servidos: Agrupados por camarero
-    vistaPrincipalServidos: (state) => (receptor = null) => {
+    // Vista de pedidos servidos: Lista plana ordenada descendente
+    vistaPrincipalServidos: (state) => (receptores = null) => {
       let pedidosServidos = state.pedidosEnMemoria.filter(p => {
-        if (p.estado !== 'activo') return false
-
         // Debe tener líneas y TODAS deben estar servidas
         if (!p.lineas || p.lineas.length === 0) return false
-
         return p.lineas.every(l => l.servido === true)
       })
 
-      // Filtrar por receptor si se especifica
-      if (receptor) {
-        pedidosServidos = pedidosServidos.filter(p =>
-          p.receptor === receptor || p.nom_receptor === receptor
-        )
-      }
+      // Filtrar por receptores si se especifican
+      if (receptores) {
+        // Normalizar a array de strings en minúsculas
+        const receptoresLower = (Array.isArray(receptores) ? receptores : [receptores])
+          .map(r => r ? r.toString().toLowerCase() : '')
+          .filter(r => r !== '');
 
-      // Primero, agrupar líneas por pedido_id (en caso de que haya múltiples registros)
-      const pedidosConsolidados = {}
-
-      pedidosServidos.forEach(pedido => {
-        const key = pedido.pedido_id || pedido.id
-
-        if (!pedidosConsolidados[key]) {
-          pedidosConsolidados[key] = {
-            id: pedido.id,
-            pedido_id: pedido.pedido_id,
-            mesa: pedido.mesa,
-            camarero: pedido.camarero,
-            hora: pedido.hora,
-            receptor: pedido.nom_receptor || pedido.receptor,
-            lineas: []
-          }
-        }
-
-        // Agregar líneas (evitando duplicados por ID)
-        if (pedido.lineas) {
-          const lineasExistentes = new Set(pedidosConsolidados[key].lineas.map(l => l.id))
-          pedido.lineas.forEach(linea => {
-            if (!lineasExistentes.has(linea.id)) {
-              pedidosConsolidados[key].lineas.push(linea)
-            }
+        if (receptoresLower.length > 0) {
+          pedidosServidos = pedidosServidos.filter(p => {
+            const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+            const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : '';
+            return receptoresLower.includes(pReceptor) || receptoresLower.includes(pNomReceptor);
           })
         }
-      })
+      }
 
-      // Ahora agrupar por camarero
-      const camareros = {}
-
-      Object.values(pedidosConsolidados).forEach(pedido => {
-        // Buscar el nombre del camarero en diferentes campos posibles
-        const nombreCamarero = pedido.camarero || pedido.nom_camarero || pedido.usuario || pedido.vendedor || pedido.camarero_nombre || 'Sin camarero'
-
-        if (!camareros[nombreCamarero]) {
-          camareros[nombreCamarero] = {
-            camarero: nombreCamarero,
-            pedidosArray: []
-          }
+      // Ordenar por timestamp descendente (del más reciente al más antiguo)
+      pedidosServidos.sort((a, b) => {
+        // Priorizar timestamp si existe
+        if (a.timestamp && b.timestamp) {
+          return b.timestamp - a.timestamp
         }
 
-        // Transformar pedido: agrupar líneas por artículo
+        // Fallback a pedido_id
+        const idA = parseInt(a.pedido_id) || a.id || 0
+        const idB = parseInt(b.pedido_id) || b.id || 0
+        return idB - idA // Descendente
+      })
+
+      // Transformar cada pedido para agrupar sus líneas por artículo
+      return pedidosServidos.map(pedido => {
         const articulos = {}
 
         if (pedido.lineas) {
@@ -366,7 +346,7 @@ export const useMainStore = defineStore('main', {
           })
         }
 
-        camareros[nombreCamarero].pedidosArray.push({
+        return {
           id: pedido.id,
           pedido_id: pedido.pedido_id,
           mesa: pedido.mesa,
@@ -374,59 +354,11 @@ export const useMainStore = defineStore('main', {
           hora: pedido.hora,
           receptor: pedido.receptor,
           articulosArray: Object.values(articulos)
-        })
-      })
-
-      // Convertir a array y ordenar camareros alfabéticamente
-      const result = Object.values(camareros).sort((a, b) =>
-        a.camarero.localeCompare(b.camarero)
-      )
-
-      // Ordenar pedidos dentro de cada camarero por pedido_id
-      result.forEach(camarero => {
-        camarero.pedidosArray.sort((a, b) => {
-          const idA = a.pedido_id || a.id || 0
-          const idB = b.pedido_id || b.id || 0
-          return idA - idB
-        })
-      })
-
-      return result
-    },
-
-    // Estadísticas
-    estadisticas: (state) => {
-      const activos = state.pedidosEnMemoria.filter(p => p.estado === 'activo')
-      const completados = state.pedidosEnMemoria.filter(p => p.estado === 'completado')
-
-      let lineasActivas = 0
-      let lineasServidas = 0
-      let lineasUrgentes = 0
-      let pedidosUrgentes = 0
-
-      activos.forEach(p => {
-        if (p.urgente === true) {
-          pedidosUrgentes++
-        }
-
-        if (p.lineas) {
-          lineasActivas += p.lineas.length
-          lineasServidas += p.lineas.filter(l => l.servido === true).length
-          lineasUrgentes += p.lineas.filter(l => l.urgente === true).length
         }
       })
-
-      return {
-        total: state.pedidosEnMemoria.length,
-        activos: activos.length,
-        completados: completados.length,
-        lineasActivas,
-        lineasServidas,
-        lineasPendientes: lineasActivas - lineasServidas,
-        pedidosUrgentes,
-        lineasUrgentes
-      }
     },
+
+
     getEmpresaData: (state) => state.empresa,
     getDeviceUID: (state) => state.deviceUID,
     // Estado de reconexión
@@ -501,6 +433,14 @@ export const useMainStore = defineStore('main', {
 
     setReconnectAttempts(attempts) {
       this.reconnectAttempts = attempts
+    },
+
+    setUrgentOrderToShow(pedido) {
+      this.urgentOrderToShow = pedido
+    },
+
+    clearUrgentOrder() {
+      this.urgentOrderToShow = null
     },
 
     async obtenerListado() {
@@ -727,7 +667,7 @@ export const useMainStore = defineStore('main', {
         this.pedidosEnMemoria = pedidos
 
         // Actualizar items con pedidos activos para compatibilidad
-        this.items = pedidos.filter(p => p.estado === 'activo')
+        this.items = pedidos
       } catch (error) {
         console.error('Error al cargar pedidos:', error)
         throw error
@@ -739,7 +679,7 @@ export const useMainStore = defineStore('main', {
       // NORMALIZAR EL PEDIDO ANTES DE PROCESARLO
       const pedidoNormalizado = {
         ...pedido,
-        estado: 'activo', // Asegurar que el pedido tenga estado activo
+        // estado: 'activo', // ELIMINADO: Ya no usamos estado
         timestamp: Date.now(), // Añadir timestamp
         lineas: pedido.lineas.map(linea => ({
           ...linea,
@@ -748,8 +688,14 @@ export const useMainStore = defineStore('main', {
         }))
       }
 
-      // Comprobar si el pedido ya existe en memoria
-      const pedidoExistente = this.pedidosEnMemoria.find(p => p.pedido_id === pedidoNormalizado.pedido_id)
+      // Comprobar si el pedido ya existe en memoria (mismo ID y mismo RECEPTOR)
+      // Normalizar receptores para comparación
+      const receptorNormalizado = pedidoNormalizado.receptor ? pedidoNormalizado.receptor.toLowerCase() : '';
+
+      const pedidoExistente = this.pedidosEnMemoria.find(p => {
+        const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+        return p.pedido_id === pedidoNormalizado.pedido_id && pReceptor === receptorNormalizado;
+      })
 
       if (!pedidoExistente) {
         try {
@@ -759,7 +705,7 @@ export const useMainStore = defineStore('main', {
           this.pedidosEnMemoria.push(pedidoConId)
 
           // Actualizar items para UI (pedidos activos)
-          this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
+          this.items = this.pedidosEnMemoria
 
           // Forzar reactividad recreando el array
           this.pedidosEnMemoria = [...this.pedidosEnMemoria]
@@ -782,68 +728,29 @@ export const useMainStore = defineStore('main', {
         }
       } else {
         // Lógica para actualizar pedidos existentes
-        // (Aquí se podría implementar la lógica de actualización si fuera necesario)
-      }
-    },
+        // Si el pedido ya existe, lo actualizamos con la nueva información
+        try {
+          // Mantener el ID interno de IndexedDB
+          pedidoNormalizado.id = pedidoExistente.id;
 
-    // Marcar pedido como completado
-    async completarPedido(pedidoId) {
-      try {
-        // Actualizar en IndexedDB
-        await pedidosDB.actualizarEstado(pedidoId, 'completado')
+          // Actualizar en DB
+          await pedidosDB.actualizarPedido(pedidoExistente.id, toRaw(pedidoNormalizado));
 
-        // Actualizar en memoria
-        const pedido = this.pedidosEnMemoria.find(p => p.id === pedidoId)
-        if (pedido) {
-          pedido.estado = 'completado'
-          pedido.updated_at = Date.now()
-        }
-
-        // Remover de items (solo pedidos activos)
-        this.items = this.items.filter(p => p.id !== pedidoId)
-      } catch (error) {
-        console.error('Error al completar pedido:', error)
-        throw error
-      }
-    },
-
-    // Cancelar pedido
-    async cancelarPedido(pedidoId) {
-      try {
-        await pedidosDB.actualizarEstado(pedidoId, 'cancelado')
-
-        const pedido = this.pedidosEnMemoria.find(p => p.id === pedidoId)
-        if (pedido) {
-          pedido.estado = 'cancelado'
-          pedido.updated_at = Date.now()
-        }
-
-        this.items = this.items.filter(p => p.id !== pedidoId)
-      } catch (error) {
-        console.error('Error al cancelar pedido:', error)
-        throw error
-      }
-    },
-
-    // Actualizar estado de una línea específica
-    async actualizarEstadoLinea(pedidoId, lineaId, nuevoEstado) {
-      try {
-        // Actualizar en IndexedDB
-        await pedidosDB.actualizarEstadoLinea(pedidoId, lineaId, nuevoEstado)
-
-        // Actualizar en memoria
-        const pedido = this.pedidosEnMemoria.find(p => p.id === pedidoId)
-        if (pedido && pedido.lineas) {
-          const linea = pedido.lineas.find(l => l.id === lineaId)
-          if (linea) {
-            linea.estado = nuevoEstado
+          // Actualizar en memoria (reemplazar objeto)
+          const index = this.pedidosEnMemoria.findIndex(p => p.id === pedidoExistente.id);
+          if (index !== -1) {
+            this.pedidosEnMemoria[index] = pedidoNormalizado;
+            // Forzar reactividad
+            this.pedidosEnMemoria = [...this.pedidosEnMemoria];
+            this.items = this.pedidosEnMemoria;
           }
+        } catch (error) {
+          console.error('Error al actualizar el pedido existente:', error);
         }
-      } catch (error) {
-        console.error('Error al actualizar estado de línea:', error)
-        throw error
       }
     },
+
+
 
     // Marcar líneas como servidas
     async servirLineas(idsLineas) {
@@ -853,7 +760,7 @@ export const useMainStore = defineStore('main', {
 
         // Recorrer todos los pedidos activos
         for (const pedido of this.pedidosEnMemoria) {
-          if (pedido.estado === 'activo' && pedido.lineas) {
+          if (pedido.lineas) {
             let pedidoModificado = false
 
             // Buscar líneas a marcar como servidas
@@ -932,7 +839,7 @@ export const useMainStore = defineStore('main', {
 
         // Recorrer todos los pedidos activos
         for (const pedido of this.pedidosEnMemoria) {
-          if (pedido.estado === 'activo' && pedido.lineas) {
+          if (pedido.lineas) {
             const lineasOriginales = pedido.lineas.length
 
             // Filtrar las líneas que no están en la lista de IDs a borrar
@@ -962,8 +869,9 @@ export const useMainStore = defineStore('main', {
         // Eliminar pedidos vacíos de memoria
         this.pedidosEnMemoria = this.pedidosEnMemoria.filter(p => !pedidosVacios.includes(p.id))
 
-        // Actualizar items (pedidos activos para la UI)
-        this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
+        // Forzar actualización de UI
+        this.items = this.pedidosEnMemoria;
+        this.pedidosEnMemoria = [...this.pedidosEnMemoria];
 
         return { lineasBorradas, pedidosEliminados: pedidosVacios.length }
       } catch (error) {
@@ -981,7 +889,7 @@ export const useMainStore = defineStore('main', {
 
         // Recorrer todos los pedidos activos
         for (const pedido of this.pedidosEnMemoria) {
-          if (pedido.estado === 'activo' && pedido.lineas) {
+          if (pedido.lineas) {
             let pedidoModificado = false
 
             // Si se especifica pedido_id, marcar todas las líneas de ese pedido
@@ -1036,12 +944,23 @@ export const useMainStore = defineStore('main', {
           )
 
           if (pedidoUrgente) {
+            // Mostrar popup en la aplicación
+            this.setUrgentOrderToShow(pedidoUrgente);
+
             new Notification('¡URGENTE!', {
               body: `${pedidoUrgente.mesa || 'Mesa'} - ${lineasMarcadas} línea(s) marcadas como urgentes`,
               icon: '/img/icons/android-chrome-192x192.png',
               tag: `urgente-${Date.now()}`,
               requireInteraction: true  // Mantener notificación hasta que se cierre
             })
+          }
+        } else {
+          // Si no hay notificaciones nativas, mostrar popup igual
+          const pedidoUrgente = this.pedidosEnMemoria.find(p =>
+            p.pedido_id === pedidoId || p.lineas?.some(l => idsLineas.includes(l.id))
+          )
+          if (pedidoUrgente) {
+            this.setUrgentOrderToShow(pedidoUrgente);
           }
         }
 
@@ -1063,6 +982,31 @@ export const useMainStore = defineStore('main', {
       } catch (error) {
         console.error('Error al eliminar pedido:', error)
         throw error
+      }
+    },
+
+    // Eliminar pedidos de un receptor específico de la memoria y DB
+    async eliminarPedidosPorReceptor(nombreReceptor) {
+      if (!nombreReceptor) return;
+      const receptorLower = nombreReceptor.toLowerCase();
+
+      try {
+        // 1. Eliminar de IndexedDB (usando el índice 'receptor')
+        await pedidosDB.eliminarPorReceptor(receptorLower);
+
+        // 2. Eliminar de memoria (case-insensitive)
+        this.pedidosEnMemoria = this.pedidosEnMemoria.filter(p => {
+          const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+          const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : '';
+          return pReceptor !== receptorLower && pNomReceptor !== receptorLower;
+        });
+
+        // 3. Actualizar items
+        this.items = this.pedidosEnMemoria;
+
+        console.log(`✅ Eliminados todos los pedidos del receptor: ${nombreReceptor}`);
+      } catch (error) {
+        console.error(`Error al eliminar pedidos del receptor ${nombreReceptor}:`, error);
       }
     },
 
@@ -1096,16 +1040,17 @@ export const useMainStore = defineStore('main', {
         const nombreReceptor = typeof receptorInput === 'object' ? receptorInput.Nombre : null;
 
         // Obtener pedidos locales de este receptor
-        // PRIORIZAR el filtrado por nom_receptor si está disponible
+        // Filtrar usando la misma lógica: receptor (case-insensitive) == nombreReceptor
         const pedidosLocales = this.pedidosEnMemoria.filter(p => {
-          if (p.estado !== 'activo') return false;
-          
-          // Si tenemos nom_receptor disponible, filtrar por él para evitar duplicados
-          if (nombreReceptor && p.nom_receptor) {
-            return p.nom_receptor === nombreReceptor;
+
+          if (nombreReceptor) {
+            const pReceptor = p.receptor ? p.receptor.toLowerCase() : '';
+            const pNomReceptor = p.nom_receptor ? p.nom_receptor.toLowerCase() : ''; // Por compatibilidad
+            const targetReceptor = nombreReceptor.toLowerCase();
+            return pReceptor === targetReceptor || pNomReceptor === targetReceptor;
           }
-          
-          // Fallback: usar receptor (nomimp) solo si no hay nom_receptor
+
+          // Fallback: usar receptor (nomimp) solo si no hay nombreReceptor
           return p.receptor === nomimp;
         })
 
@@ -1147,20 +1092,15 @@ export const useMainStore = defineStore('main', {
 
               // Agregar el pedido (op: "pedido" indica que es nuevo o actualizado)
               if (pedido.op === 'pedido') {
-                // Filtrar por nombre de receptor PRIORITARIAMENTE para evitar duplicados
+                // Filtrar por nombre de receptor (case-insensitive)
                 let esParaEste = false;
-                
-                // Si ambos tienen nom_receptor, comparar por nom_receptor
-                if (pedido.nom_receptor && nombreReceptor) {
-                  esParaEste = pedido.nom_receptor === nombreReceptor;
-                } 
-                // Si el pedido no tiene nom_receptor pero nosotros sí tenemos nombreReceptor,
-                // no es para este receptor (evita duplicados)
-                else if (!pedido.nom_receptor && nombreReceptor) {
-                  esParaEste = false;
-                } 
-                // Solo usar nomimp si ninguno tiene nom_receptor
-                else {
+
+                if (nombreReceptor) {
+                  const incomingReceptor = pedido.receptor ? pedido.receptor.toString().toLowerCase() : '';
+                  const localReceptor = nombreReceptor.toString().toLowerCase();
+                  esParaEste = incomingReceptor === localReceptor;
+                } else {
+                  // Fallback
                   esParaEste = pedido.receptor === nomimp;
                 }
 
@@ -1177,7 +1117,7 @@ export const useMainStore = defineStore('main', {
           }
 
           // Forzar actualización de items para que Vue reactive los cambios
-          this.items = this.pedidosEnMemoria.filter(p => p.estado === 'activo')
+          this.items = this.pedidosEnMemoria
 
           return {
             pedidos: response.pedidos?.length || 0,

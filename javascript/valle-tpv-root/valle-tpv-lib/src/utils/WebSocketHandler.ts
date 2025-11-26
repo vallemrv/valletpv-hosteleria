@@ -1,5 +1,5 @@
-import {useConnectionStore} from '../store/connectionStore';
-import {useInstruccionesStore} from '../store/instruccionesStore';
+import { useConnectionStore } from '../store/connectionStore';
+import { useInstruccionesStore } from '../store/instruccionesStore';
 import dbInstance from '../db/indexedDB';
 import { useMesasStore } from '../store/dbStore/mesasStore';
 import { useCuentaStore } from '../store/dbStore/cuentasStore';
@@ -39,7 +39,7 @@ class WebSocketHandler {
     this.isSyncing = false;
     this.shouldReconnect = true; // Por defecto sí debe reconectar
     this.instructionQueue = new InstructionQueue(); // Instanciar cola de instrucciones
-    
+
     // Configurar callback para que el InstructionQueue actualice directamente el store
     this.instructionQueue.setExternalNotifyCallback((action, value) => {
       switch (action) {
@@ -66,7 +66,7 @@ class WebSocketHandler {
   connect(): void {
     const url = `${this.servidor}${this.endpoint}?uid=${this.uid_device}`;
     this.socket = new WebSocket(url);
-    
+
     // Habilitar reconexión automática al conectar
     this.shouldReconnect = true;
 
@@ -78,7 +78,7 @@ class WebSocketHandler {
     this.socket.onmessage = (event: MessageEvent) => {
       try {
         let mensajes = JSON.parse(event.data);
-        this.modifyClientDB(mensajes); 
+        this.modifyClientDB(mensajes);
       } catch (error) {
         console.error('Error al procesar el mensaje:', error);
       }
@@ -87,7 +87,7 @@ class WebSocketHandler {
     this.socket.onclose = () => {
       console.warn('Conexión WebSocket cerrada.');
       this.connectionStore.setConnected(false);
-      
+
       // Solo reconectar si está configurado para hacerlo
       if (this.shouldReconnect) {
         setTimeout(() => this.connect(), this.reconnectInterval);
@@ -130,7 +130,6 @@ class WebSocketHandler {
   private async processSingleOperation(tb: string, op: string, obj: any): Promise<void> {
     // Inicializar el store correspondiente usando switch
     let store: any = null;
-
     switch (tb) {
       case 'mesas':
       case 'mesasabiertas':
@@ -142,7 +141,7 @@ class WebSocketHandler {
           }
           mesaLocal.abierta = obj.abierta;
           mesaLocal.num = obj.num;
-          op='md'; // Forzar operación de modificación
+          op = 'md'; // Forzar operación de modificación
           obj = mesaLocal; // Reemplazar obj con la mesa local actualizada
         }
         store = useMesasStore();
@@ -195,20 +194,20 @@ class WebSocketHandler {
   private async startInitialSync(): Promise<void> {
     // Cancelar cualquier sincronización en curso
     this.cancelCurrentSync();
-    
+
     // Crear nuevo controlador para esta sincronización
     this.syncController = new AbortController();
     this.isSyncing = true;
-    
+
     try {
       // PASO 1: Primero procesar la cola de instrucciones pendientes si las hay
       await this.processInstructionQueueBeforeSync();
-      
+
       // PASO 2: Verificar si la sincronización fue cancelada antes de continuar
       if (this.syncController?.signal.aborted) {
         throw new Error('Sync cancelled');
       }
-      
+
       // PASO 3: Proceder con la sincronización normal de las tablas del WebSocket
       await this.syncAllTables();
     } catch (error) {
@@ -227,26 +226,26 @@ class WebSocketHandler {
     try {
       // Verificar si hay instrucciones pendientes en la cola
       const pendingInstructionsBeforeProcess = await dbInstance.getAll('instructionQueue');
-      
+
       if (pendingInstructionsBeforeProcess.length > 0) {
         console.info(`🔄 Procesando ${pendingInstructionsBeforeProcess.length} instrucción(es) pendiente(s) antes de sincronizar WebSocket...`);
-        
+
         // Procesar toda la cola de instrucciones
         // El InstructionQueue automáticamente actualizará el store vía el callback configurado
         await this.instructionQueue.processQueueFromSync();
-        
+
         // Verificar si la sincronización fue cancelada durante el procesamiento
         if (this.syncController?.signal.aborted) {
           throw new Error('Sync cancelled');
         }
-        
+
         // Verificar cuántas instrucciones quedan después del procesamiento
         const pendingInstructionsAfterProcess = await dbInstance.getAll('instructionQueue');
         console.info(`✅ Cola procesada. Instrucciones restantes: ${pendingInstructionsAfterProcess.length}`);
-        
+
         // Esperar unos segundos después de procesar la cola para dar tiempo a que se completen las operaciones
         await this.delay(3000);
-        
+
         // Verificar nuevamente si la sincronización fue cancelada después del delay
         if (this.syncController?.signal.aborted) {
           throw new Error('Sync cancelled');
@@ -257,14 +256,14 @@ class WebSocketHandler {
         throw error; // Re-lanzar para que se maneje en startInitialSync
       }
       console.error('❌ Error procesando cola de instrucciones antes de sincronizar:', error);
-      
+
       // Incluso si hay error, intentar actualizar el contador del store por seguridad
       try {
         await this.instruccionesStore.refreshFromDB();
       } catch (refreshError) {
         console.error('Error refrescando store después de error:', refreshError);
       }
-      
+
       // Continuar con la sincronización del WebSocket incluso si hay errores en la cola
     }
   }
@@ -283,15 +282,15 @@ class WebSocketHandler {
       if (this.syncController?.signal.aborted) {
         throw new Error('Sync cancelled');
       }
-      
+
       try {
-        const  thereChanges = await dbInstance.syncWithServer(table, this.uid_device, this.servidor);
+        const thereChanges = await dbInstance.syncWithServer(table, this.uid_device, this.servidor);
 
         // Verificar nuevamente antes de actualizar store
         if (this.syncController?.signal.aborted) {
           throw new Error('Sync cancelled');
         }
-        
+
         if (thereChanges) {
           await this.refreshStore(table);
         }
@@ -316,7 +315,7 @@ class WebSocketHandler {
   private async delay(ms: number): Promise<void> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(resolve, ms);
-      
+
       // Si se cancela, rechazar la promesa
       if (this.syncController?.signal) {
         this.syncController.signal.addEventListener('abort', () => {
@@ -376,16 +375,16 @@ class WebSocketHandler {
   disconnect(): void {
     // Cancelar cualquier sincronización en curso
     this.cancelCurrentSync();
-    
+
     // Deshabilitar reconexión automática
     this.shouldReconnect = false;
-    
+
     if (this.socket) {
       this.socket.close();
       this.socket = null;
     }
     this.connectionStore.setConnected(false);
-    
+
   }
 
   // Método público para ejecutar sincronización manual
