@@ -20,10 +20,7 @@
 
     <div class="cuenta-container">
       <div class="cuenta-lista-container">
-        <UiCuentaLista
-          :items="cuentaItems"
-          @delete-item="onDeleteItem"
-        />
+        <UiCuentaLista :items="cuentaItems" @delete-item="onDeleteItem" />
       </div>
 
       <div class="cantidad-container">
@@ -36,112 +33,54 @@
 
       <div class="secciones-container">
         <div class="secciones-list">
-          
-          <UiBotonAsociable
-            v-for="seccion in seccionesVisibles"
-            :key="seccion.id"
-            :texto="seccion.nombre"
-            icon="mdi-group"
-            :selected="seccionSeleccionada?.id === seccion.id"
-            :asociado="seccionesStore.seccionAsociada?.id === seccion.id"
-            @click="seleccionarSeccion(seccion)"
-            @toggle-asociacion="toggleAsociarSeccion(seccion, $event)"
-          />
 
-          <UiBotonAsociable
-            texto="Buscar"
-            icon="mdi-magnify"
-            :selected="false"
-            :asociado="false"
-            :showCheckbox="false"
-            @click="buscarSeccion"
-            class="buscar-btn"
-          />
+          <UiBotonAsociable v-for="seccion in seccionesVisibles" :key="seccion.id" :texto="seccion.nombre"
+            icon="mdi-group" :selected="seccionSeleccionada?.id === seccion.id"
+            :asociado="seccionesStore.seccionAsociada?.id === seccion.id" @click="seleccionarSeccion(seccion)"
+            @toggle-asociacion="toggleAsociarSeccion(seccion, $event)" />
+
+          <UiBotonAsociable texto="Buscar" icon="mdi-magnify" :selected="false" :asociado="false" :showCheckbox="false"
+            @click="buscarSeccion" class="buscar-btn" />
 
         </div>
       </div>
-      </div>
+    </div>
 
-     <UiVariosDialog
-       v-model="dialogVarios"
-       @on_action="onDialogVariosAction"
-     />
+    <UiVariosDialog v-model="dialogVarios" @on_action="onDialogVariosAction" />
 
-     <UiCobroDialog
-       v-model="dialogCobro"
-       :items="itemsToCobrar"
-       :mostrar-teclado="!empresasStore.empresaActiva?.usa_cash_keeper"
-       @pagoConfirmado="onDialogCobroAction"
-     />
+    <UiCobroDialog v-model="dialogCobro" :items="itemsToCobrar"
+      :mostrar-teclado="!empresasStore.empresaActiva?.usa_cash_keeper" @pagoConfirmado="onDialogCobroAction" />
 
-     <UiCashKeeperDialog
-       v-model="dialogCashKeeper"
-       :total-cobro="totalACobrar"
-       @cobro-completado="onCashKeeperCompletado"
-       @cobro-cancelado="onCashKeeperCancelado"
-     />
+    <UiCashKeeperDialog v-model="dialogCashKeeper" :total-cobro="totalACobrar"
+      @cobro-completado="onCashKeeperCompletado" @cobro-cancelado="onCashKeeperCancelado" />
 
-     <UiPinPadDialog
-       v-model="dialogPinPad"
-       :total-cobro="totalACobrar"
-       :mesa-id="String(mesasStore.mesaSel?.ID || 0)"
-       @pago-completado="onPinPadCompletado"
-       @pago-cancelado="onPinPadCancelado"
-     />
+    <UiPinPadDialog v-model="dialogPinPad" :total-cobro="totalACobrar" :mesa-id="String(mesasStore.mesaSel?.ID || 0)"
+      @pago-completado="onPinPadCompletado" @pago-cancelado="onPinPadCancelado" />
 
-     <UiSepararTicketDialog
-       v-model="dialogDividirCuenta"
-       :items="itemsToCobrar"
-       @separacionConfirmada="onConfirmarSeparacion"
-     />
+    <UiSepararTicketDialog v-model="dialogDividirCuenta" :items="itemsToCobrar"
+      @separacionConfirmada="onConfirmarSeparacion" />
 
-     <UiBorrarDialog
-       v-model="dialogBorrar"
-       :item="itemABorrar"
-       :nombre_mesa="mesasStore.mesaSel?.Nombre || ''"
-       @anulacionConfirmada="onDialogBorrarAction"
-     />
+    <UiBorrarDialog v-model="dialogBorrar" :item="itemABorrar" :nombre_mesa="mesasStore.mesaSel?.Nombre || ''"
+      @anulacionConfirmada="onDialogBorrarAction" />
 
-     <UiAutorizacionDialog
-       v-model="mostrarAutorizacion"
-       :camareros="camarerosConPermiso"
-       :parametros="parametrosAutorizacion"
-       @autorizacionSolicitada="onAutorizacionSolicitada"
-       @autorizacionCancelada="onAutorizacionCancelada"
-     />
+    <UiAutorizacionDialog v-model="mostrarAutorizacion" :camareros="camarerosConPermiso"
+      :parametros="parametrosAutorizacion" @autorizacionSolicitada="onAutorizacionSolicitada"
+      @autorizacionCancelada="onAutorizacionCancelada" />
 
-     <UiTaskbarBusqueda 
-      :visible="mostrarTaskbarBusqueda"
-      @close="cerrarTaskbarBusqueda"
-    />
+    <UiTaskbarBusqueda :visible="mostrarTaskbarBusqueda" @close="cerrarTaskbarBusqueda" />
 
     <!-- Diálogo para selección de sugerencias -->
-    <UiSeleccionarSugerenciaDialog
-      v-if="idTeclaParaSugerencia"
-      v-model="dialogSeleccionarSugerencia"
-      :id-tecla="idTeclaParaSugerencia"
-      @sugerencia-seleccionada="onSugerenciaSeleccionada"
-      @cancelado="onSugerenciaCancelada"
-    />
+    <UiSeleccionarSugerenciaDialog v-if="idTeclaParaSugerencia" v-model="dialogSeleccionarSugerencia"
+      :id-tecla="idTeclaParaSugerencia" @sugerencia-seleccionada="onSugerenciaSeleccionada"
+      @cancelado="onSugerenciaCancelada" />
 
     <!-- Snackbar para mensajes de autorización -->
-    <UiSnackbar
-      v-model="mostrarSnackbar"
-      :message="mensajeSnackbar"
-      type="success"
-      :timeout="4000"
-      location="bottom center"
-      @close="mostrarSnackbar = false"
-    />
-    
+    <UiSnackbar v-model="mostrarSnackbar" :message="mensajeSnackbar" type="success" :timeout="4000"
+      location="bottom center" @close="mostrarSnackbar = false" />
+
     <!-- Snackbar genérico para notificaciones -->
-    <UiSnackbar 
-      v-model="snackbar.show" 
-      :message="snackbar.text"
-      :type="snackbar.type"
-      :timeout="2000"
-      location="bottom center"
-    />
+    <UiSnackbar v-model="snackbar.show" :message="snackbar.text" :type="snackbar.type" :timeout="2000"
+      location="bottom center" />
 
   </UiMainWindows>
 </template>
@@ -149,17 +88,19 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useMesasStore, useCuentaStore,
-         useSeccionesStore, 
-         useTeclasStore, 
-         Cuenta, Seccion, Tecla,
-         useCamarerosStore, 
-         useCantidadStore, 
-         useEmpresasStore,
-         useSugerenciasStore,
-         UiSeleccionarSugerenciaDialog,
-         type CuentaItem,
-         type InfoCobro} from 'valle-tpv-lib';
+import {
+  useMesasStore, useCuentaStore,
+  useSeccionesStore,
+  useTeclasStore,
+  Cuenta, Seccion, Tecla,
+  useCamarerosStore,
+  useCantidadStore,
+  useEmpresasStore,
+  useSugerenciasStore,
+  UiSeleccionarSugerenciaDialog,
+  type CuentaItem,
+  type InfoCobro
+} from 'valle-tpv-lib';
 
 
 
@@ -177,7 +118,7 @@ const sugerenciasStore = useSugerenciasStore();
 // Computed para el título que incluye la mesa seleccionada
 const tituloVista = computed(() => {
   const mesaSeleccionada = mesasStore.mesaSel;
-  return mesaSeleccionada 
+  return mesaSeleccionada
     ? `Cuenta - ${mesaSeleccionada.Nombre || `Mesa ${mesaSeleccionada.ID}`}`
     : 'Cuenta';
 });
@@ -245,32 +186,32 @@ const tiempoInactividad = 20000; // 20 segundos
 
 // Computed para verificar si hay diálogos activos que deben pausar el temporizador
 const dialogosActivos = computed(() => {
-  return dialogCobro.value || 
-         dialogDividirCuenta.value || 
-         dialogCashKeeper.value || 
-         dialogPinPad.value || 
-         dialogVarios.value || 
-         dialogBorrar.value ||
-         mostrarAutorizacion.value ||
-         dialogSeleccionarSugerencia.value ||
-         mostrarTaskbarBusqueda.value;
+  return dialogCobro.value ||
+    dialogDividirCuenta.value ||
+    dialogCashKeeper.value ||
+    dialogPinPad.value ||
+    dialogVarios.value ||
+    dialogBorrar.value ||
+    mostrarAutorizacion.value ||
+    dialogSeleccionarSugerencia.value ||
+    mostrarTaskbarBusqueda.value;
 });
 
 // Función para iniciar/reiniciar el temporizador
 function iniciarTemporizador() {
   limpiarTemporizador();
-  
+
   // No iniciar temporizador si hay diálogos activos
   if (dialogosActivos.value) {
     return;
   }
-  
+
   temporizadorInactividad.value = setTimeout(async () => {
     // Verificar nuevamente si hay diálogos activos antes de redirigir
     if (!dialogosActivos.value) {
       // Comprobar si hay líneas en la mesa
       const lineasActuales = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
-      
+
       if (lineasActuales.length === 0) {
         // Si no hay líneas, cerrar la mesa
         await mesasStore.cerrarMesa(mesasStore.mesaSel?.ID || 0);
@@ -278,7 +219,7 @@ function iniciarTemporizador() {
         // Si hay líneas, aparcar la mesa
         await cuentaStore.aparcarMesa(mesasStore.mesaSel?.ID || 0);
       }
-      
+
       router.replace("/mesas"); // Volver a la vista principal
     }
   }, tiempoInactividad);
@@ -307,40 +248,40 @@ watch(dialogosActivos, (activos) => {
 });
 
 async function onDialogCobroAction(infoCobro: InfoCobro, itemsCobrados: CuentaItem[]) {
-    const empresaActiva = empresasStore.empresaActiva;
-    
-    // Verificar si usa CashKeeper o PinPad según el tipo de pago
-    if (infoCobro.tipo === 'efectivo' && empresaActiva?.usa_cash_keeper) {
-      // Guardar items para cobrar y abrir diálogo de CashKeeper
-      itemsToCobrar.value = itemsCobrados;
-      dialogCashKeeper.value = true;
-      return;
-    }
-    
-    if (infoCobro.tipo === 'tarjeta' && empresaActiva?.usa_pinpad) {
-      // Guardar items para cobrar y abrir diálogo de PinPad
-      itemsToCobrar.value = itemsCobrados;
-      dialogPinPad.value = true;
-      return;
-    }
-    
-    // Cobro normal sin dispositivos especiales
-    await cuentaStore.cobrarMesa(mesasStore.mesaSel?.ID || 0, infoCobro, itemsCobrados);
-    showSnackbar('Cobro realizado correctamente', 'success');
-    
-    // Verificar si después del cobro la mesa quedó sin líneas
-    const lineasRestantes = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
-    if (lineasRestantes.length === 0) {
-      await mesasStore.cerrarMesa(mesasStore.mesaSel?.ID || 0);
-      limpiarTemporizador();
-      router.replace("/mesas");
-    }
+  const empresaActiva = empresasStore.empresaActiva;
+
+  // Verificar si usa CashKeeper o PinPad según el tipo de pago
+  if (infoCobro.tipo === 'efectivo' && empresaActiva?.usa_cash_keeper) {
+    // Guardar items para cobrar y abrir diálogo de CashKeeper
+    itemsToCobrar.value = itemsCobrados;
+    dialogCashKeeper.value = true;
+    return;
+  }
+
+  if (infoCobro.tipo === 'tarjeta' && empresaActiva?.usa_pinpad) {
+    // Guardar items para cobrar y abrir diálogo de PinPad
+    itemsToCobrar.value = itemsCobrados;
+    dialogPinPad.value = true;
+    return;
+  }
+
+  // Cobro normal sin dispositivos especiales
+  await cuentaStore.cobrarMesa(mesasStore.mesaSel?.ID || 0, infoCobro, itemsCobrados);
+  showSnackbar('Cobro realizado correctamente', 'success');
+
+  // Verificar si después del cobro la mesa quedó sin líneas
+  const lineasRestantes = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
+  if (lineasRestantes.length === 0) {
+    await mesasStore.cerrarMesa(mesasStore.mesaSel?.ID || 0);
+    limpiarTemporizador();
+    router.replace("/mesas");
+  }
 }
 
-async function onConfirmarSeparacion( itemsSeparados: CuentaItem[]) {
-   dialogCobro.value = true;
-   itemsToCobrar.value = itemsSeparados;
-   showSnackbar('Cuenta dividida correctamente', 'info');
+async function onConfirmarSeparacion(itemsSeparados: CuentaItem[]) {
+  dialogCobro.value = true;
+  itemsToCobrar.value = itemsSeparados;
+  showSnackbar('Cuenta dividida correctamente', 'info');
 }
 
 // Funciones para manejar los eventos de CashKeeper
@@ -349,7 +290,7 @@ async function onCashKeeperCompletado(infoCobro: InfoCobro) {
   await cuentaStore.cobrarMesa(mesasStore.mesaSel?.ID || 0, infoCobro, itemsToCobrar.value);
   showSnackbar('Cobro con CashKeeper realizado correctamente', 'success');
   dialogCashKeeper.value = false;
-  
+
   // Verificar si después del cobro la mesa quedó sin líneas
   const lineasRestantes = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
   if (lineasRestantes.length === 0) {
@@ -367,10 +308,10 @@ function onCashKeeperCancelado() {
 // Funciones para manejar los eventos de PinPad
 async function onPinPadCompletado(recibo: any) {
   const totalCobrado = itemsToCobrar.value.reduce((sum, item) => sum + item.total, 0);
-  
+
   // Serializar el recibo a JSON string para enviar al servidor
   const reciboJson = recibo ? JSON.stringify(recibo) : '';
-  
+
   const infoCobro: InfoCobro = {
     tipo: 'tarjeta',
     totalEntregado: 0,
@@ -378,11 +319,11 @@ async function onPinPadCompletado(recibo: any) {
     totalCobrado: totalCobrado,
     recibo: reciboJson
   };
-  
+
   await cuentaStore.cobrarMesa(mesasStore.mesaSel?.ID || 0, infoCobro, itemsToCobrar.value);
   showSnackbar('Pago con tarjeta realizado correctamente', 'success');
   dialogPinPad.value = false;
-  
+
   // Verificar si después del cobro la mesa quedó sin líneas
   const lineasRestantes = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
   if (lineasRestantes.length === 0) {
@@ -399,11 +340,11 @@ function onPinPadCancelado() {
 
 async function onDialogBorrarAction(motivo: string) {
   const item = itemABorrar.value;
-  
+
   if (item == null) return;
- 
+
   const lineas: Cuenta[] = await cuentaStore.desgloseLineas(
-    mesasStore.mesaSel?.ID || 0, item.descripcion, item.cantidad);
+    mesasStore.mesaSel?.ID || 0, item.descripcion, item.precio, item.cantidad);
 
   // Verificar si hay camareros con permiso de borrar_lineas
   if (camarerosConPermiso.value.length > 0) {
@@ -426,7 +367,7 @@ async function onDialogBorrarAction(motivo: string) {
     // Si no hay camareros con permiso, proceder con el borrado normal
     await cuentaStore.rmConMotivo(mesasStore.mesaSel?.ID || 0, motivo, lineas);
     showSnackbar('Líneas eliminadas de la cuenta', 'info');
-    
+
     if (cuentaItems.value.length === 0) {
       mesasStore.cerrarMesa(mesasStore.mesaSel?.ID || 0);
     }
@@ -446,7 +387,7 @@ function onDialogVariosAction(action: { id: string; data?: any }) {
       p2: action.data.precio,
       hay_existencias: 1
     });
-    
+
     pedirProducto(producto);
     dialogVarios.value = false; // Cerrar el diálogo
     showSnackbar('Producto añadido a la cuenta', 'success');
@@ -460,10 +401,10 @@ async function onAutorizacionSolicitada() {
   // Mostrar snackbar de confirmación
   mensajeSnackbar.value = 'Se ha solicitado autorización para borrar las líneas';
   mostrarSnackbar.value = true;
-  
+
   // Cerrar el diálogo de autorización
   mostrarAutorizacion.value = false;
-  
+
   // Limpiar el item a borrar
   itemABorrar.value = null;
 }
@@ -477,10 +418,10 @@ function onAutorizacionCancelada() {
 // Métodos de navegación
 async function irAMesas() {
   limpiarTemporizador();
-  
+
   // Comprobar si hay líneas en la mesa
   const lineasActuales = cuentaStore.cuentaDetalladaPorMesa(mesasStore.mesaSel?.ID || 0);
-  
+
   if (lineasActuales.length === 0) {
     // Si no hay líneas, cerrar la mesa
     await mesasStore.cerrarMesa(mesasStore.mesaSel?.ID || 0);
@@ -488,7 +429,7 @@ async function irAMesas() {
     // Si hay líneas, aparcar la mesa
     await cuentaStore.aparcarMesa(mesasStore.mesaSel?.ID || 0);
   }
-  
+
   router.replace("/mesas");
 }
 
@@ -509,11 +450,11 @@ function varios() {
   dialogVarios.value = true;
 }
 
-async function dividirCuenta() {   
-   await cuentaStore.aparcarMesa(mesasStore.mesaSel?.ID || 0);
-   // Usar getter que agrupa por Descripcion (no descripcion_t)
-   itemsToCobrar.value = cuentaStore.cuentaAgrupadaPorPedido(mesasStore.mesaSel?.ID || 0);
-   dialogDividirCuenta.value = true;
+async function dividirCuenta() {
+  await cuentaStore.aparcarMesa(mesasStore.mesaSel?.ID || 0);
+  // Usar getter que agrupa por Descripcion (no descripcion_t)
+  itemsToCobrar.value = cuentaStore.cuentaAgrupadaPorPedido(mesasStore.mesaSel?.ID || 0);
+  dialogDividirCuenta.value = true;
 }
 
 // AÑADIDO: Función para togglear la asociación de una sección
@@ -534,47 +475,47 @@ function toggleAsociarSeccion(seccion: Seccion, asociar: boolean | null) {
 // Métodos de cuenta
 async function onDeleteItem(item: CuentaItem) {
 
-    const itemModificado: CuentaItem ={
-      cantidad: cantidadStore.cantidad <= item.cantidad ? cantidadStore.cantidad : item.cantidad,
-      descripcion: item.descripcion,
-      precio: item.precio,
-      total: item.total,
-    }
+  const itemModificado: CuentaItem = {
+    cantidad: cantidadStore.cantidad <= item.cantidad ? cantidadStore.cantidad : item.cantidad,
+    descripcion: item.descripcion,
+    precio: item.precio,
+    total: item.total,
+  }
 
-    if (item.estado === 'N'){
-      const lineas: Cuenta[] = await cuentaStore.desgloseLineas(
-        mesasStore.mesaSel?.ID || 0, item.descripcion, itemModificado.cantidad);
-      
-      // Borrar directamente sin diálogo
-      for (let linea of lineas) {
-        if (linea.ID) {
-          await cuentaStore.rm(linea.ID);
-        }
+  if (item.estado === 'N') {
+    const lineas: Cuenta[] = await cuentaStore.desgloseLineas(
+      mesasStore.mesaSel?.ID || 0, item.descripcion, item.precio, itemModificado.cantidad);
+
+    // Borrar directamente sin diálogo
+    for (let linea of lineas) {
+      if (linea.ID) {
+        await cuentaStore.rm(linea.ID);
       }
-      
-      showSnackbar('Elemento eliminado de la cuenta', 'info');
-      cantidadStore.reset();
-      return;
     }
 
-    itemABorrar.value = itemModificado;
-    dialogBorrar.value = true;
+    showSnackbar('Elemento eliminado de la cuenta', 'info');
     cantidadStore.reset();
+    return;
+  }
+
+  itemABorrar.value = itemModificado;
+  dialogBorrar.value = true;
+  cantidadStore.reset();
 }
 
 // Métodos de productos
 function onProductoClick(producto: Tecla) {
- mostrarTaskbarBusqueda.value = false;
- teclasStore.tipo = 'seccion';
- teclasStore.textoBusqueda = null;
- if (producto.tipo === 'CM'){
+  mostrarTaskbarBusqueda.value = false;
+  teclasStore.tipo = 'seccion';
+  teclasStore.textoBusqueda = null;
+  if (producto.tipo === 'CM') {
     teclasStore.setTeclaPadreSeleccionada(producto);
-  }else{
+  } else {
     teclasStore.setTeclaPadreSeleccionada(null);
-    
-   // Verificar si el producto tiene sugerencias con incremento > 0
-   const sugerencias = sugerenciasStore.sugPorTeclaConIncremento(String(producto.ID));
-   if (sugerencias && sugerencias.length > 0) {
+
+    // Verificar si el producto tiene sugerencias con incremento > 0
+    const sugerencias = sugerenciasStore.sugPorTeclaConIncremento(String(producto.ID));
+    if (sugerencias && sugerencias.length > 0) {
       // Abrir diálogo para seleccionar sugerencias
       idTeclaParaSugerencia.value = String(producto.ID);
       productoParaSugerencia.value = producto;
@@ -584,10 +525,10 @@ function onProductoClick(producto: Tecla) {
       pedirProducto(producto);
     }
   }
-  
+
 }
 
-function pedirProducto(producto: Tecla){
+function pedirProducto(producto: Tecla) {
   for (let i = 0; i < cantidadStore.cantidad; i++) {
     let cuenta = new Cuenta(
       {
@@ -601,16 +542,16 @@ function pedirProducto(producto: Tecla){
         Precio: mesasStore.mesaSel?.Tarifa == 1 ? producto.p1 : producto.p2,
       }
     );
-      cuentaStore.insert(cuenta);
-      mesasStore.abrirMesa(mesasStore.mesaSel?.ID || 0);
-    }
-    cantidadStore.reset();
+    cuentaStore.insert(cuenta);
+    mesasStore.abrirMesa(mesasStore.mesaSel?.ID || 0);
+  }
+  cantidadStore.reset();
 }
 
 // Handlers del diálogo de sugerencias
 function onSugerenciaSeleccionada(sugerencias: any[]) {
   if (!productoParaSugerencia.value) return;
-  
+
   // Hacer una copia del producto original
   const productoModificado = new Tecla({
     ...productoParaSugerencia.value,
@@ -620,10 +561,10 @@ function onSugerenciaSeleccionada(sugerencias: any[]) {
     // Modificar descripción con sugerencias
     descripcion_r: `${productoParaSugerencia.value.descripcion_r} (${sugerencias.map(s => s.sugerencia).join(', ')})`
   });
-  
+
   // Usar la función pedirProducto normal
   pedirProducto(productoModificado);
-  
+
   // Cerrar diálogo y limpiar
   dialogSeleccionarSugerencia.value = false;
   idTeclaParaSugerencia.value = null;
@@ -635,7 +576,7 @@ function onSugerenciaCancelada() {
   if (productoParaSugerencia.value) {
     pedirProducto(productoParaSugerencia.value);
   }
-  
+
   // Cerrar diálogo y limpiar
   dialogSeleccionarSugerencia.value = false;
   idTeclaParaSugerencia.value = null;
@@ -672,18 +613,18 @@ onMounted(async () => {
   await mesasStore.initStore();
   await seccionesStore.initStore();
   await teclasStore.initStore();
-  await cuentaStore.initStore(); 
+  await cuentaStore.initStore();
   await sugerenciasStore.initStore();
   await cuentaStore.comprobarCuenta(mesasStore.mesaSel?.ID || 0);
   cantidadStore.reset();
-  
+
   // Configurar listeners para detectar actividad
   const eventos = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-  
+
   eventos.forEach(evento => {
     document.addEventListener(evento, manejarActividad, true);
   });
-  
+
   // Iniciar temporizador
   iniciarTemporizador();
 });
@@ -691,9 +632,9 @@ onMounted(async () => {
 onUnmounted(() => {
   // Limpiar temporizador y listeners
   limpiarTemporizador();
-  
+
   const eventos = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-  
+
   eventos.forEach(evento => {
     document.removeEventListener(evento, manejarActividad, true);
   });
@@ -737,7 +678,7 @@ onUnmounted(() => {
 }
 
 .secciones-container {
-  flex:10;
+  flex: 10;
   height: 100%;
   overflow: hidden;
   background: var(--v-theme-surface);
@@ -749,7 +690,8 @@ onUnmounted(() => {
 /* --- CAMBIOS PRINCIPALES PARA LA COLUMNA DE SECCIONES --- */
 .secciones-list {
   display: grid;
-  grid-template-rows: repeat(7, 1fr); /* 6 filas de igual altura */
+  grid-template-rows: repeat(7, 1fr);
+  /* 6 filas de igual altura */
   gap: 8px;
   height: 100%;
   /* Se elimina el overflow-y: auto; */
@@ -763,12 +705,13 @@ onUnmounted(() => {
 }
 
 .buscar-btn :deep(.zona-btn:hover) {
-   background-color: rgba(var(--v-theme-primary), 0.1) !important;
+  background-color: rgba(var(--v-theme-primary), 0.1) !important;
 }
 
 .buscar-btn :deep(.zona-text) {
   font-size: 0.9rem !important;
 }
+
 /* --- FIN DE CAMBIOS EN SECCIONES --- */
 
 

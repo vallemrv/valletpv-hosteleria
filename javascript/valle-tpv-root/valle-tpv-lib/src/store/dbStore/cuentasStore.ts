@@ -121,12 +121,14 @@ export const useCuentaStore = defineStore('lineaspedido', {
       };
     },
 
-    // Getter para obtener líneas individuales por mesa, descripción y cantidad
+    // Getter para obtener líneas individuales por mesa, descripción, precio y cantidad
     desgloseLineas: (state) => {
-      return (mesa_id: number, descripcion: string, cantidad: number): Cuenta[] => {
-        // Filtrar por mesa y descripción
+      return (mesa_id: number, descripcion: string, precio: number, cantidad: number): Cuenta[] => {
+        // Filtrar por mesa, descripción y precio
         const lineasFiltradas = state.items.filter(cuenta =>
-          cuenta.IDMesa === mesa_id && cuenta.descripcion_t === descripcion
+          cuenta.IDMesa === mesa_id &&
+          cuenta.descripcion_t === descripcion &&
+          cuenta.Precio === precio
         );
 
         // Retornar solo la cantidad solicitada

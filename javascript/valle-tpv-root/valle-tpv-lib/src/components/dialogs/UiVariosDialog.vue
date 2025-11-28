@@ -1,74 +1,30 @@
 <template>
-  <UiDialogScaffold
-    v-model="dialogVarios"
-    title="Crear Producto Varios"
-    icon="mdi-package-variant-plus"
-    width="500px"
-    :actions="dialogActions"
-    @on_action="onDialogAction"
-  >
+  <UiDialogScaffold v-model="dialogVarios" title="Crear Producto Varios" icon="mdi-package-variant-plus" width="500px"
+    :actions="dialogActions" @on_action="onDialogAction">
     <div class="varios-form">
       <v-form>
-        <v-text-field
-          v-model.number="variosForm.cantidad"
-          label="Cantidad"
-          hint="1"
-          type="number"
-          min="1"
-          outlined
-          dense
-          readonly
-          class="mb-4"
-          @click="openKeyboard('cantidad')"
-        />
-        <v-text-field
-          v-model="variosForm.descripcion"
-          label="Descripción"
-          hint="Varios"
-          outlined
-          dense
-          readonly
-          class="mb-4"
-          @click="openKeyboard('descripcion')"
-        />
-        <v-text-field
-          v-model.number="variosForm.precio"
-          label="Precio"
-          hint="Precio"
-          type="number"
-          min="0"
-          step="0.01"
-          outlined
-          dense
-          readonly
-          @click="openKeyboard('precio')"
-        />
+        <v-text-field v-model.number="variosForm.cantidad" label="Cantidad" hint="1" type="number" min="1" outlined
+          dense readonly class="mb-4" @click="openKeyboard('cantidad')" />
+        <v-text-field v-model="variosForm.descripcion" label="Descripción" hint="Varios" outlined dense readonly
+          class="mb-4" @click="openKeyboard('descripcion')" />
+        <v-text-field v-model.number="variosForm.precio" label="Precio" hint="Precio" type="number" min="0" step="0.01"
+          outlined dense readonly @click="openKeyboard('precio')" />
       </v-form>
     </div>
   </UiDialogScaffold>
 
   <!-- Diálogo del Teclado Numérico -->
-  <UiNumericKeyboard
-    v-model="showNumericKeyboard"
-    :title="keyboardTitle"
-    :value="getActiveFieldValue()"
-    :show-decimal="activeField === 'precio'"
-    @on_action="onNumericAction"
-  />
+  <UiNumericKeyboard v-model="showNumericKeyboard" :title="keyboardTitle" :value="getActiveFieldValue()"
+    :show-decimal="activeField === 'precio'" @on_action="onNumericAction" />
 
   <!-- Diálogo del Teclado de Letras -->
-  <UiLetterKeyboard
-    v-model="showLetterKeyboard"
-    :title="keyboardTitle"
-    :value="variosForm.descripcion || ''"
-    :max-length="100"
-    @on_action="onLetterAction"
-  />
+  <UiLetterKeyboard v-model="showLetterKeyboard" :title="keyboardTitle" :value="variosForm.descripcion || ''"
+    :max-length="100" @on_action="onLetterAction" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import  UiDialogScaffold from './UiDialogScaffold.vue';
+import UiDialogScaffold from './UiDialogScaffold.vue';
 import UiNumericKeyboard from './UiNumericKeyboard.vue';
 import UiLetterKeyboard from './UiLetterKeyboard.vue';
 
@@ -105,6 +61,8 @@ const variosForm = ref({
   precio: null as number | null
 });
 
+const isProcessing = ref(false);
+
 // Título del teclado
 const keyboardTitle = computed(() => {
   if (activeField.value === 'cantidad') return 'Cantidad';
@@ -125,13 +83,14 @@ watch(() => props.modelValue, (newValue) => {
     activeField.value = null;
     showNumericKeyboard.value = false;
     showLetterKeyboard.value = false;
+    isProcessing.value = false;
   }
 });
 
 // Abrir el teclado correspondiente
 function openKeyboard(field: 'cantidad' | 'descripcion' | 'precio') {
   activeField.value = field;
-  
+
   if (field === 'cantidad' || field === 'precio') {
     showNumericKeyboard.value = true;
     showLetterKeyboard.value = false;
@@ -155,7 +114,7 @@ function getActiveFieldValue(): string {
 function onNumericAction(action: { id: string; data?: string }) {
   if (action.id === 'aceptar' && action.data) {
     const value = action.data.replace(',', '.');
-    
+
     if (activeField.value === 'cantidad') {
       const num = parseFloat(value);
       variosForm.value.cantidad = isNaN(num) ? null : Math.max(1, Math.floor(num));
@@ -164,7 +123,7 @@ function onNumericAction(action: { id: string; data?: string }) {
       variosForm.value.precio = isNaN(num) ? null : Math.max(0, num);
     }
   }
-  
+
   showNumericKeyboard.value = false;
   activeField.value = null;
 }
@@ -174,7 +133,7 @@ function onLetterAction(action: { id: string; data?: string }) {
   if (action.id === 'aceptar') {
     variosForm.value.descripcion = action.data || null;
   }
-  
+
   showLetterKeyboard.value = false;
   activeField.value = null;
 }
@@ -186,8 +145,11 @@ const dialogActions = ref([
 ]);
 
 // Manejar acciones del diálogo
-function onDialogAction(id: string) { 
+function onDialogAction(id: string) {
   if (id === 'aceptar') {
+    if (isProcessing.value) return;
+    isProcessing.value = true;
+
     const varios = {
       cantidad: variosForm.value.cantidad || 1,
       descripcion: variosForm.value.descripcion || 'Varios',
@@ -199,5 +161,3 @@ function onDialogAction(id: string) {
   }
 }
 </script>
-
-

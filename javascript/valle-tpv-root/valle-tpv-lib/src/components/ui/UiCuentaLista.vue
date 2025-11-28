@@ -10,11 +10,7 @@
 
     <!-- Lista de items -->
     <div class="cuenta-items-list">
-      <div 
-        v-for="(item, index) in items" 
-        :key="item.id || index"
-        class="cuenta-item"
-      >
+      <div v-for="(item, index) in items" :key="item.id || index" class="cuenta-item">
         <div class="item-content">
           <!-- Cantidad -->
           <div class="item-cantidad">
@@ -38,17 +34,11 @@
 
           <!-- Botón borrar -->
           <div class="item-actions">
-            <v-btn
-              class="delete-btn"
-              icon="mdi-delete"
-              size="small"
-              variant="text"
-              color="error"
-              @click="onDeleteItem(item, index)"
-            />
+            <v-btn class="delete-btn" icon="mdi-delete" size="small" variant="text" color="error"
+              @click="onDeleteItem(item, index)" />
           </div>
         </div>
-     </div>
+      </div>
 
       <!-- Mensaje cuando no hay items -->
       <div v-if="items.length === 0" class="empty-state">
@@ -138,7 +128,8 @@ function onDeleteItem(item: CuentaItem, index: number) {
 .cuenta-items-list {
   flex: 1;
   overflow-y: auto;
-  padding: 12px; /* Espacio para las 'cards' */
+  padding: 12px;
+  /* Espacio para las 'cards' */
 }
 
 .cuenta-item {
@@ -178,11 +169,13 @@ function onDeleteItem(item: CuentaItem, index: number) {
   width: 40px;
   height: 40px;
   background: rgba(var(--v-theme-primary), 0.1);
-  border-radius: 50%; /* Círculo */
+  border-radius: 50%;
+  /* Círculo */
   color: var(--v-theme-primary);
   font-size: 1.1rem;
   font-weight: 600;
 }
+
 .item-cantidad .cantidad-value::after {
   content: 'x';
   font-size: 0.7rem;
@@ -194,7 +187,8 @@ function onDeleteItem(item: CuentaItem, index: number) {
 /* Descripción y Precio Unitario */
 .item-descripcion {
   display: flex;
-  flex-direction: column; /* Apilamos nombre y precio */
+  flex-direction: column;
+  /* Apilamos nombre y precio */
   align-items: flex-start;
   gap: 2px;
 }
@@ -205,6 +199,7 @@ function onDeleteItem(item: CuentaItem, index: number) {
   font-weight: 600;
   line-height: 1.3;
 }
+
 .item-precio {
   font-size: 0.95rem;
   font-weight: 400;
@@ -243,13 +238,16 @@ function onDeleteItem(item: CuentaItem, index: number) {
 .cuenta-items-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .cuenta-items-list::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .cuenta-items-list::-webkit-scrollbar-thumb {
   background: rgba(var(--v-theme-on-surface), 0.15);
   border-radius: 3px;
 }
+
 .cuenta-items-list::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--v-theme-on-surface), 0.3);
 }
