@@ -203,6 +203,11 @@ class TelegramAutorizacion(models.Model):
         default='testTPV',
         help_text="Identificador de la empresa/instancia TPV"
     )
+    mensaje = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Mensaje original enviado (para poder editarlo manteniendo el contenido)"
+    )
     usada = models.BooleanField(
         default=False,
         help_text="¿Se ha usado esta autorización?"

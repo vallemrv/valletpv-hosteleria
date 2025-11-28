@@ -25,6 +25,16 @@ class Command(BaseCommand):
                 'code': 'cambio_zona',
                 'nombre': 'Cambio de Zona',
                 'descripcion': 'Se notifica cuando se cambia una mesa a una zona vigilada'
+            },
+            {
+                'code': 'cierre_caja',
+                'nombre': 'Cierre de Caja',
+                'descripcion': 'Se notifica cuando se realiza un cierre de caja'
+            },
+            {
+                'code': 'descuadre_caja',
+                'nombre': 'Descuadre de Caja',
+                'descripcion': 'Se notifica cuando se detecta un descuadre en el cierre de caja'
             }
         ]
         
@@ -62,5 +72,6 @@ class Command(BaseCommand):
             "IMPORTANTE: Puedes configurar filtros para las suscripciones:"
         ))
         self.stdout.write("  - Ejemplo para 'cambio_zona': {\"zonas\": [1, 2, 3]}")
+        self.stdout.write("  - Ejemplo para 'descuadre_caja': {\"min_descuadre\": 10.0}")
         self.stdout.write("  - Sin filtros: {} (aplica a todos los casos)")
 
