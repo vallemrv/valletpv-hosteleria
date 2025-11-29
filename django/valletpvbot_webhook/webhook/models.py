@@ -84,6 +84,3 @@ class TokenCallbackMapping(models.Model):
         self.usada = True
         self.usada_en = timezone.now()
         self.save(update_fields=['usada', 'usada_en'])
-
-
-

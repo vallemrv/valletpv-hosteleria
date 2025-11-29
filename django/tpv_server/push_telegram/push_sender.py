@@ -8,7 +8,7 @@ from django.db import transaction
 from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
-from .models import TelegramEventType, TelegramSubscription, TelegramNotificationLog, TelegramAutorizacion
+from .models import TelegramEventType, TelegramSubscription, TelegramNotificationLog
 from gestion.tools.config_logs import configurar_logging
 import requests
 import uuid
@@ -246,20 +246,7 @@ def notificar_nuevo_dispositivo(uid: str, descripcion: str = None):
             token = str(uuid.uuid4())
             expira_en = timezone.now() + timedelta(minutes=10)
             
-            # Guardar autorización local
-            try:
-                TelegramAutorizacion.objects.create(
-                    token=token,
-                    uid_dispositivo=uid,
-                    telegram_user_id=subscription.usuario.telegram_user_id,
-                    telegram_message_id=0,
-                    accion='dispositivo_action',
-                    empresa=empresa,
-                    expira_en=expira_en
-                )
-            except Exception as e:
-                logger.error(f"Error creando token local: {e}")
-                continue
+
             
             # Botones inline
             botones = [
@@ -305,13 +292,7 @@ def notificar_nuevo_dispositivo(uid: str, descripcion: str = None):
                     result = response.json()
                     message_id = result.get('message_id')
                     
-                    if message_id:
-                        TelegramAutorizacion.objects.filter(
-                            token=token,
-                            uid_dispositivo=uid
-                        ).update(telegram_message_id=message_id)
-                    
-                    log_data['enviado'] = True
+
                     _guardar_log_seguro(log_data)
                     logger.info(f"Notificación enviada vía webhook para {subscription.usuario.nombre}")
                     enviados += 1
@@ -485,29 +466,10 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                 # Limpiar token
                 token = token.strip()
                 
-                # Guardar autorización local
-                try:
-                    TelegramAutorizacion.objects.create(
-                        token=token,
-                        uid_dispositivo=uid_auth,
-                        telegram_user_id=subscription.usuario.telegram_user_id,
-                        telegram_message_id=0,
-                        accion='mesa_action', # Acción genérica, el detalle va en el botón
-                        empresa=empresa,
-                        expira_en=expira_en
-                    )
-                    logger.info(f"Token {token} creado en BD localmente (dentro de transacción)")
-                    
-                    # Callback para confirmar commit
-                    def confirmar_commit_token(t=token):
-                        logger.info(f"Transacción confirmada para token {t}")
-                    
-                    transaction.on_commit(confirmar_commit_token)
-                    
-                except Exception as e:
-                    logger.error(f"Error creando TelegramAutorizacion para token {token}: {e}")
-                    # No relanzamos para intentar enviar la notificación de todos modos, 
-                    # aunque sin token en BD la acción fallará.
+                # Limpiar token
+                token = token.strip()
+                
+                # Botones inline
                 
                 # Botones inline
                 botones = [
@@ -541,10 +503,7 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                     result = response.json()
                     message_id = result.get('message_id')
                     
-                    if message_id:
-                        TelegramAutorizacion.objects.filter(token=token).update(telegram_message_id=message_id)
-                    
-                    log_data['enviado'] = True
+
                     _guardar_log_seguro(log_data)
                     logger.info(f"Notificación enviada vía webhook para {subscription.usuario.nombre}")
                     enviados += 1
@@ -595,27 +554,6 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
                     
                     log_data['enviado'] = True
                     _guardar_log_seguro(log_data)
-                    
-                    # Guardar autorización local
-                    try:
-                        TelegramAutorizacion.objects.create(
-                            token=token,
-                            uid_dispositivo=uid_auth,
-                            telegram_user_id=subscription.usuario.telegram_user_id,
-                            telegram_message_id=message_id,
-                            accion='mesa_action',
-                            empresa=empresa,
-                            expira_en=expira_en
-                        )
-                        logger.info(f"Token {token} creado en BD localmente (envío directo)")
-                        
-                        def confirmar_commit_token_directo(t=token):
-                            logger.info(f"Transacción confirmada para token {t} (envío directo)")
-                        
-                        transaction.on_commit(confirmar_commit_token_directo)
-                        
-                    except Exception as e:
-                        logger.error(f"Error creando TelegramAutorizacion directo para token {token}: {e}")
                     
                     logger.info(f"Notificación enviada a {subscription.usuario.nombre} para zona {zona_destino_nombre}")
                     enviados += 1
@@ -692,8 +630,6 @@ def editar_mensaje_mesa(telegram_user_id: int, message_id: int, mesa_nombre: str
         nuevo_texto = f"🗑️ Líneas de {mesa_nombre} han sido BORRADAS\n\n✅ Acción completada exitosamente."
     elif accion == 'lineas_mantenidas':
         nuevo_texto = f"✅ Líneas de {mesa_nombre} se han MANTENIDO\n\n✅ Las líneas siguen activas."
-    elif accion == 'expirada':
-        nuevo_texto = f"⚠️ Acción EXPIRADA o INVÁLIDA\n\n❌ Esta solicitud ya no es válida."
     else:
         # Si no es una palabra clave, usar como texto directo
         nuevo_texto = accion

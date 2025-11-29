@@ -68,7 +68,7 @@ class Pedidos(BaseModels):
                 id_local=pd.get("ID", None)
             )
             lineas_objs.append(linea)
-            if "IDArt" not in pd and "ID" in pd:
+            if "ID" in pd:
                 lineas_a_eliminar.append({"ID": pd.get("ID")})
 
         # Crear todas las líneas en una sola query
@@ -187,9 +187,7 @@ class Lineaspedido(BaseModels):
             cambios.append(self.serialize())
         
         if cambios:
-            comunicar_cambios_devices("md", "lineaspedido", cambios)
-
-          
+            comunicar_cambios_devices("md", "lineaspedido", cambios)       
 
     def lrToP(self, mesa_a):
         
@@ -202,8 +200,6 @@ class Lineaspedido(BaseModels):
         self.precio = self.tecla.p1 if tarifa == 1 else self.tecla.p2
         self.estado = "P"
         self.save()
-
-     
 
     @classmethod
     def compare_regs(cls, regs):
@@ -328,7 +324,6 @@ class Lineaspedido(BaseModels):
         return True
 
     # Reemplaza el método serialize entero en la clase Lineaspedido
-
     def serialize(self, prefetched=False):
        
         if prefetched:
@@ -432,7 +427,6 @@ class Lineaspedido(BaseModels):
             
         return Lineaspedido.objects.filter(estado='P', infmesa__pk=uid).count()
     
-
     # Reemplaza tu método borrar_linea_pedido
     @staticmethod
     @transaction.atomic # <-- Asegura la atomicidad de la operación
