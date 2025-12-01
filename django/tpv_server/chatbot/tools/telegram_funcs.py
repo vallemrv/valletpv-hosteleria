@@ -13,8 +13,7 @@ from push_telegram.models import (
     TelegramEventType, 
     TelegramSubscription, 
     TelegramNotificationLog,
-    TelegramUser,
-    TelegramAutorizacion
+    TelegramUser
 )
 from push_telegram.push_sender import enviar_push_telegram
 
@@ -38,16 +37,9 @@ def listar_usuarios_telegram() -> str:
         subs_count = usuario.subscriptions.filter(activo=True).count()
         desc = f" - {usuario.descripcion}" if usuario.descripcion else ""
         
-        # Contar autorizaciones activas
-        auth_count = TelegramAutorizacion.objects.filter(
-            telegram_user_id=usuario.telegram_user_id,
-            usada=False,
-            expirada=False
-        ).count()
-        
         resultado.append(
             f"• {usuario.nombre} (ID: {usuario.telegram_user_id}){desc}\n"
-            f"  📋 Suscripciones: {subs_count} | 🔐 Autorizaciones: {auth_count}"
+            f"  📋 Suscripciones: {subs_count}"
         )
     
     return "\n".join(resultado)
@@ -613,112 +605,7 @@ def simular_evento_dispositivo(uid: str, descripcion: str = "Dispositivo de prue
         return f"❌ Error en simulación: {str(e)}"
 
 
-@tool
-def listar_autorizaciones_telegram(nombre_o_id: Optional[str] = None, solo_activas: bool = True) -> str:
-    """
-    Lista las autorizaciones temporales de Telegram (tokens para botones).
-    Útil para verificar qué autorizaciones están pendientes o han expirado.
-    
-    Args:
-        nombre_o_id: Nombre del usuario o ID de Telegram (opcional, muestra todas si no se especifica)
-        solo_activas: Si True, solo muestra autorizaciones no usadas y no expiradas
-        
-    Returns:
-        str: Lista de autorizaciones con su estado
-    """
-    try:
-        # Filtrar por usuario si se especifica
-        queryset = TelegramAutorizacion.objects.all()
-        
-        if nombre_o_id:
-            # Intentar buscar por nombre primero
-            try:
-                usuario = TelegramUser.objects.get(nombre__iexact=nombre_o_id, activo=True)
-                queryset = queryset.filter(telegram_user_id=usuario.telegram_user_id)
-                titulo = f"🔐 Autorizaciones para {usuario.nombre}:\n"
-            except TelegramUser.DoesNotExist:
-                # Intentar como ID numérico
-                try:
-                    telegram_user_id = int(nombre_o_id)
-                    queryset = queryset.filter(telegram_user_id=telegram_user_id)
-                    titulo = f"🔐 Autorizaciones para ID {telegram_user_id}:\n"
-                except ValueError:
-                    return f"❌ Usuario '{nombre_o_id}' no encontrado"
-        else:
-            titulo = "🔐 Todas las autorizaciones:\n"
-        
-        # Filtrar solo activas si se solicita
-        if solo_activas:
-            queryset = queryset.filter(usada=False, expirada=False)
-            titulo += "(Solo activas)\n"
-        
-        autorizaciones = queryset.order_by('-created_at')[:20]  # Máximo 20
-        
-        if not autorizaciones.exists():
-            return "No hay autorizaciones encontradas."
-        
-        resultado = [titulo]
-        for auth in autorizaciones:
-            # Determinar estado
-            if auth.usada:
-                estado = "✅ Usada"
-                fecha_estado = auth.usada_en.strftime("%d/%m %H:%M") if auth.usada_en else "?"
-            elif auth.expirada or auth.expira_en < timezone.now():
-                estado = "⏰ Expirada"
-                fecha_estado = auth.expira_en.strftime("%d/%m %H:%M")
-            else:
-                estado = "🔓 Activa"
-                fecha_estado = auth.expira_en.strftime("%d/%m %H:%M")
-            
-            # Mostrar información
-            uid_corto = auth.uid_dispositivo[:12] + "..." if len(auth.uid_dispositivo) > 15 else auth.uid_dispositivo
-            resultado.append(
-                f"{estado} | {auth.accion} | {uid_corto}\n"
-                f"   👤 User: {auth.telegram_user_id} | ⏰ {fecha_estado}"
-            )
-        
-        return "\n".join(resultado)
-        
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
 
-
-@tool
-def limpiar_autorizaciones_expiradas() -> str:
-    """
-    Limpia (marca como expiradas) todas las autorizaciones que han superado su tiempo límite.
-    También elimina autorizaciones muy antiguas (más de 24 horas).
-    
-    Returns:
-        str: Resultado de la limpieza
-    """
-    try:
-        from django.utils import timezone
-        from datetime import timedelta
-        
-        ahora = timezone.now()
-        hace_24h = ahora - timedelta(hours=24)
-        
-        # Marcar como expiradas las que han pasado su tiempo
-        expiradas = TelegramAutorizacion.objects.filter(
-            expira_en__lt=ahora,
-            expirada=False,
-            usada=False
-        ).update(expirada=True)
-        
-        # Eliminar autorizaciones muy antiguas (más de 24h)
-        eliminadas = TelegramAutorizacion.objects.filter(
-            created_at__lt=hace_24h
-        ).count()
-        
-        TelegramAutorizacion.objects.filter(
-            created_at__lt=hace_24h
-        ).delete()
-        
-        return f"✅ Limpieza completada:\n• {expiradas} autorizaciones marcadas como expiradas\n• {eliminadas} autorizaciones antiguas eliminadas"
-        
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
 
 
 @tool
@@ -772,7 +659,5 @@ telegram_tools = [
     enviar_notificacion_telegram,
     enviar_notificacion_prueba,
     simular_evento_dispositivo,
-    listar_autorizaciones_telegram,
-    limpiar_autorizaciones_expiradas,
     ver_logs_telegram,
 ]

@@ -8,7 +8,7 @@
 import json
 from gestion.models.mesas import Mesas, Zonas, Mesasabiertas
 from gestion.models.pedidos import Lineaspedido
-from push_telegram.models import TelegramAutorizacion, TelegramUser
+from push_telegram.models import TelegramUser
 from gestion.models.camareros import Camareros
 from push_telegram.push_sender import editar_mensaje_mesa
 from django.utils import timezone
@@ -63,6 +63,7 @@ def lsmesasabiertas(request):
 
     return JsonResponse(lstObj)
 
+
 @csrf_exempt
 @log_excepciones("api_mesas.log")
 def mesa_action(request):
@@ -76,6 +77,10 @@ def mesa_action(request):
     # Intentar obtener parámetros de POST o JSON body
     token = request.POST.get('token')
     accion = request.POST.get('accion')
+    infmesa_id = request.POST.get('uid_dispositivo')
+    telegram_user_id = request.POST.get('telegram_user_id')
+    
+    logger.info(f"mesa_action POST: {request.POST}")
     
     # Si no están en POST, intentar leer JSON body
     if not token or not accion:
@@ -84,74 +89,49 @@ def mesa_action(request):
                 data = json.loads(request.body)
                 token = data.get('token')
                 accion = data.get('accion')
+                infmesa_id = data.get('uid_dispositivo')
+                telegram_user_id = data.get('telegram_user_id')
+                
+                # Si hay metadata en el JSON body
+                if not infmesa_id and 'metadata' in data:
+                    meta = data['metadata']
+                    if isinstance(meta, str):
+                        try:
+                            meta = json.loads(meta)
+                        except:
+                            pass
+                    if isinstance(meta, dict):
+                        infmesa_id = meta.get('infmesa_id') or meta.get('uid')
         except Exception as e:
             logger.warning(f"Error parseando JSON body: {e}")
-    
-    if not token:
-        logger.warning("Intento de acción de mesa sin token")
-        return JsonResponse({
-            'error': 'Parámetro requerido: token',
-            'success': False,
-            'mensaje': '❌ Token no recibido'
-        }, status=400)
-    
-    if not accion:
-        logger.warning("Intento de acción de mesa sin especificar acción")
-        return JsonResponse({
-            'error': 'Parámetro requerido: accion',
-            'success': False,
-            'mensaje': '❌ Acción no especificada'
-        }, status=400)
-    
-    # Limpiar token
-    token = token.strip()
-    
-    logger.info(f"Solicitud de acción de mesa '{accion}' con token: '{token}'")
-    
-    # Buscar y validar autorización
-    try:
-        autorizacion = TelegramAutorizacion.objects.get(token=token)
-    except TelegramAutorizacion.DoesNotExist:
-        logger.error(f"Token no encontrado en BD: '{token}'")
-        # Debug: listar últimos tokens creados para ver si hay alguno parecido
-        last_tokens = TelegramAutorizacion.objects.all().order_by('-created_at')[:5]
-        logger.info(f"Últimos 5 tokens en BD: {[t.token for t in last_tokens]}")
-        
-        # Devolver 200 con success=False para evitar 404 en el cliente
-        return JsonResponse({
-            'error': 'Token no válido o expirado',
-            'success': False,
-            'mensaje': '❌ Token no válido o expirado'
-        }, status=200)
-    
-    # Validar que sea válido
-    if not autorizacion.is_valida():
-        logger.warning(f"Token inválido o expirado: {token}")
-        
-        # Intentar editar el mensaje para indicar que expiró
-        try:
-            editar_mensaje_mesa(
-                telegram_user_id=autorizacion.telegram_user_id,
-                message_id=autorizacion.telegram_message_id,
-                mesa_nombre="Desconocida",
-                accion='expirada'
-            )
-        except Exception as e:
-            logger.warning(f"No se pudo editar mensaje expirado: {e}")
             
+    # Intentar recuperar infmesa_id de metadata en POST si no vino directo
+    if not infmesa_id and request.POST.get('metadata'):
+        try:
+            meta_str = request.POST.get('metadata')
+            meta = json.loads(meta_str)
+            infmesa_id = meta.get('infmesa_id') or meta.get('uid')
+            logger.info(f"Recuperado infmesa_id de metadata: {infmesa_id}")
+        except Exception as e:
+            logger.warning(f"Error parseando metadata: {e}")
+    
+    if not token or not accion:
         return JsonResponse({
-            'error': 'Token expirado o ya usado',
+            'error': 'Faltan parámetros requeridos',
             'success': False,
-            'mensaje': '❌ Token expirado o ya utilizado'
-        }, status=200)
+            'mensaje': '❌ Datos incompletos'
+        }, status=400)
     
-    # Obtener infmesa_id del dispositivo (en este caso es el ID de la mesa)
-    infmesa_id = autorizacion.uid_dispositivo
-    
-    # Marcar token como usado
-    autorizacion.usada = True
-    autorizacion.usada_en = timezone.now()
-    autorizacion.save(update_fields=['usada', 'usada_en'])
+    if not infmesa_id:
+        # Fallback para compatibilidad si no llega uid_dispositivo
+        logger.warning("No se recibió uid_dispositivo en mesa_action")
+        return JsonResponse({
+            'error': 'Falta uid_dispositivo',
+            'success': False,
+            'mensaje': '❌ Error de datos'
+        }, status=400)
+
+    logger.info(f"Acción '{accion}' para uid '{infmesa_id}' (Token: {token})")
     
     # Ejecutar acción
     if accion in ['borrar', 'borrar_mesa']:
@@ -171,23 +151,21 @@ def mesa_action(request):
             mesa_id = mesa_abierta.mesa_id
             
             # Obtener camarero adecuado para la acción
-            
-            # 1. Buscar camarero con permiso de borrar mesa
             camarero = Camareros.objects.filter(permisos__contains="borrar_mesa", activo=1).first()
-            
-            # 2. Si no hay, usar el primer camarero activo
             if not camarero:
                 camarero = Camareros.objects.filter(activo=1).first()
             
-            # ID del camarero a usar
             idc = camarero.id if camarero else 0
             nombre_camarero = f"{camarero.nombre} {camarero.apellidos}" if camarero else "Sistema"
             
             # Obtener nombre del usuario de Telegram
-            telegram_user = TelegramUser.objects.filter(telegram_user_id=autorizacion.telegram_user_id).first()
-            nombre_telegram = telegram_user.nombre if telegram_user else f"ID {autorizacion.telegram_user_id}"
+            nombre_telegram = f"ID {telegram_user_id}"
+            if telegram_user_id:
+                telegram_user = TelegramUser.objects.filter(telegram_user_id=telegram_user_id).first()
+                if telegram_user:
+                    nombre_telegram = telegram_user.nombre
             
-            # Borrar la mesa usando el método existente
+            # Borrar la mesa
             Mesasabiertas.borrar_mesa_abierta(
                 idm=mesa_id,
                 idc=idc,
@@ -196,20 +174,13 @@ def mesa_action(request):
             
             logger.info(f"🗑️ Mesa borrada - ID: {mesa_id}, Nombre: {mesa_nombre}")
             
-            # Editar mensaje de Telegram
-            try:
-                editar_mensaje_mesa(
-                    telegram_user_id=autorizacion.telegram_user_id,
-                    message_id=autorizacion.telegram_message_id,
-                    mesa_nombre=mesa_nombre,
-                    accion='borrada'
-                )
-            except Exception as e:
-                logger.warning(f"Error editando mensaje: {e}")
+            # Texto para actualizar el mensaje en Telegram
+            new_text = f"🗑️ Mesa {mesa_nombre} ha sido BORRADA\n\n✅ Acción completada exitosamente."
             
             return JsonResponse({
                 'success': True,
                 'mensaje': f'🗑️ Mesa {mesa_nombre} borrada correctamente',
+                'new_text': new_text,
                 'mesa_id': mesa_id,
                 'mesa_nombre': mesa_nombre
             })
@@ -225,23 +196,18 @@ def mesa_action(request):
     elif accion in ['mantener', 'mantener_mesa']:
         logger.info(f"✅ Mesa mantenida - infmesa_id: {infmesa_id}")
         
-        # Editar mensaje de Telegram
-        try:
-            mesa_abierta = Mesasabiertas.objects.filter(infmesa_id=infmesa_id).first()
-            mesa_nombre = mesa_abierta.mesa.nombre if mesa_abierta else "Desconocida"
+        # Intentar obtener nombre para el mensaje
+        mesa_nombre = "Mesa"
+        mesa_abierta = Mesasabiertas.objects.filter(infmesa_id=infmesa_id).first()
+        if mesa_abierta:
+            mesa_nombre = mesa_abierta.mesa.nombre
             
-            editar_mensaje_mesa(
-                telegram_user_id=autorizacion.telegram_user_id,
-                message_id=autorizacion.telegram_message_id,
-                mesa_nombre=mesa_nombre,
-                accion='mantenida'
-            )
-        except Exception as e:
-            logger.warning(f"Error editando mensaje: {e}")
+        new_text = f"✅ Mesa {mesa_nombre} se ha MANTENIDO\n\n✅ La mesa sigue activa."
         
         return JsonResponse({
             'success': True,
             'mensaje': '✅ Mesa mantenida correctamente',
+            'new_text': new_text,
             'infmesa_id': infmesa_id
         })
 
@@ -259,22 +225,20 @@ def mesa_action(request):
             ids_str = parts[2]
             ids = [int(x) for x in ids_str.split(",")]
             
-            # Obtener camarero adecuado para la acción
-            
-            # 1. Buscar camarero con permiso de borrar línea
+            # Obtener camarero
             camarero = Camareros.objects.filter(permisos__contains="borrar_linea", activo=1).first()
-            
-            # 2. Si no hay, usar el primer camarero activo
             if not camarero:
                 camarero = Camareros.objects.filter(activo=1).first()
             
-            # ID del camarero a usar (o 0 si no hay ninguno, aunque debería haber)
             idc = camarero.id if camarero else 0
             nombre_camarero = f"{camarero.nombre} {camarero.apellidos}" if camarero else "Sistema"
             
             # Obtener nombre del usuario de Telegram
-            telegram_user = TelegramUser.objects.filter(telegram_user_id=autorizacion.telegram_user_id).first()
-            nombre_telegram = telegram_user.nombre if telegram_user else f"ID {autorizacion.telegram_user_id}"
+            nombre_telegram = f"ID {telegram_user_id}"
+            if telegram_user_id:
+                telegram_user = TelegramUser.objects.filter(telegram_user_id=telegram_user_id).first()
+                if telegram_user:
+                    nombre_telegram = telegram_user.nombre
             
             # Borrar líneas
             Lineaspedido.borrar_linea_pedido_by_ids(
@@ -286,20 +250,12 @@ def mesa_action(request):
             
             logger.info(f"🗑️ Líneas borradas - Mesa ID: {mesa_id}, IDs: {ids}")
             
-            # Editar mensaje de Telegram
-            try:
-                editar_mensaje_mesa(
-                    telegram_user_id=autorizacion.telegram_user_id,
-                    message_id=autorizacion.telegram_message_id,
-                    mesa_nombre=f"Mesa {mesa_id}",
-                    accion='lineas_borradas'
-                )
-            except Exception as e:
-                logger.warning(f"Error editando mensaje: {e}")
+            new_text = f"🗑️ Líneas de Mesa {mesa_id} han sido BORRADAS\n\n✅ Acción completada exitosamente."
             
             return JsonResponse({
                 'success': True,
-                'mensaje': '🗑️ Líneas borradas correctamente'
+                'mensaje': '🗑️ Líneas borradas correctamente',
+                'new_text': new_text
             })
             
         except Exception as e:
@@ -313,20 +269,12 @@ def mesa_action(request):
     elif accion == 'mantener_lineas':
         logger.info(f"✅ Líneas mantenidas")
         
-        # Editar mensaje de Telegram
-        try:
-            editar_mensaje_mesa(
-                telegram_user_id=autorizacion.telegram_user_id,
-                message_id=autorizacion.telegram_message_id,
-                mesa_nombre="Mesa",
-                accion='lineas_mantenidas'
-            )
-        except Exception as e:
-            logger.warning(f"Error editando mensaje: {e}")
+        new_text = f"✅ Líneas se han MANTENIDO\n\n✅ Las líneas siguen activas."
         
         return JsonResponse({
             'success': True,
-            'mensaje': '✅ Líneas mantenidas correctamente'
+            'mensaje': '✅ Líneas mantenidas correctamente',
+            'new_text': new_text
         })
     
     else:

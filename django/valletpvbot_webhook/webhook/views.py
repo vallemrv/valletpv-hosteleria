@@ -13,6 +13,7 @@ import json
 
 from .models import TokenCallbackMapping
 from .telegram_service import TelegramService
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -143,14 +144,46 @@ def process_callback_query(callback_data):
         # Validar
         if not mapping.is_valida():
             logger.warning(f"✗ Token expirado: {token[:8]}...")
+            
+            # Editar el mensaje para indicar que ha expirado
+            if mapping.telegram_message_id:
+                telegram_service = TelegramService()
+                
+                # Recuperar mensaje original de metadata
+                mensaje_original = mapping.metadata.get('mensaje_original', '')
+                
+                if mensaje_original:
+                    nuevo_texto = f"{mensaje_original}\n\n⚠️ <b>Acción EXPIRADA</b>\n❌ El tiempo límite ha excedido."
+                else:
+                    nuevo_texto = f"⚠️ <b>Acción EXPIRADA</b>\n\n❌ Esta solicitud ya no es válida (tiempo límite excedido)."
+                
+                telegram_service.edit_message(
+                    chat_id=telegram_id,
+                    message_id=mapping.telegram_message_id,
+                    text=nuevo_texto,
+                    reply_markup=None # Quitar botones
+                )
+            
             answer_callback_query(callback_id, "❌ Token expirado")
             return
         
         # Llamar al TPV
         logger.info(f"→ Llamando TPV: {mapping.callback_url}")
+        
+        # Datos a enviar al TPV
+        post_data = {
+            'token': token, 
+            'accion': accion,
+            'uid_dispositivo': mapping.uid_dispositivo,
+            'telegram_user_id': mapping.telegram_user_id,
+        }
+        # Añadir metadata si existe
+        if mapping.metadata:
+            post_data['metadata'] = json.dumps(mapping.metadata)
+
         response = requests.post(
             mapping.callback_url,
-            data={'token': token, 'accion': accion},
+            data=post_data,
             timeout=10
         )
         
@@ -158,8 +191,29 @@ def process_callback_query(callback_data):
             result = response.json()
             if result.get('success'):
                 mapping.marcar_usada()
-                mensaje = result.get('mensaje', '✅ Hecho')
-                answer_callback_query(callback_id, mensaje)
+                mensaje_toast = result.get('mensaje', '✅ Hecho')
+                answer_callback_query(callback_id, mensaje_toast)
+                
+                # Si el TPV devuelve un nuevo texto, editamos el mensaje original
+                nuevo_texto = result.get('new_text')
+                if nuevo_texto and mapping.telegram_message_id:
+                    telegram_service = TelegramService()
+                    
+                    # Recuperar mensaje original de metadata para mantener contexto
+                    mensaje_original = mapping.metadata.get('mensaje_original', '')
+                    
+                    if mensaje_original:
+                        texto_final = f"{mensaje_original}\n\n{nuevo_texto}"
+                    else:
+                        texto_final = nuevo_texto
+                        
+                    telegram_service.edit_message(
+                        chat_id=telegram_id,
+                        message_id=mapping.telegram_message_id,
+                        text=texto_final,
+                        reply_markup=None # Quitar botones
+                    )
+                
                 logger.info(f"✓ OK: {accion}")
             else:
                 error = result.get('error', 'Error')
@@ -246,6 +300,11 @@ def register_notification(request):
         if not expira_en:
             return JsonResponse({'error': 'expira_en inválido'}, status=400)
         
+        # Preparar metadata con el mensaje original para poder restaurarlo si expira
+        metadata = data.get('metadata', {})
+        if isinstance(metadata, dict):
+            metadata['mensaje_original'] = data['mensaje']
+
         # Guardar mapeo
         mapping = TokenCallbackMapping.objects.create(
             token=data['token'],
@@ -254,7 +313,7 @@ def register_notification(request):
             expira_en=expira_en,
             empresa=data.get('empresa', ''),
             uid_dispositivo=data.get('uid_dispositivo', ''),
-            metadata=data.get('metadata', {})
+            metadata=metadata
         )
         
         logger.info(f"✓ Registrado: {data['token'][:8]}... → {data['callback_url']}")

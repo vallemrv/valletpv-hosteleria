@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.utils import timezone
 from gestion.models.dispositivos import Dispositivo
-from push_telegram.models import TelegramAutorizacion
+from django.conf import settings
 from gestion.tools.config_logs import configurar_logging
 from gestion.decorators.log_excepciones import log_excepciones
 
@@ -79,49 +79,27 @@ def set_alias(request):
 @log_excepciones("api_dispositivos.log")
 def activate_device(request):
     """
-    Endpoint para activar un dispositivo validando el token de Telegram.
-    Este endpoint es llamado por el webhook tras validar el callback de Telegram.
+    Endpoint para activar un dispositivo.
     """
     if request.method != 'POST' and request.method != 'GET':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
-    # Obtener token del request
+    # Obtener token del request (para logging) y uid
     token = request.POST.get('token') or request.GET.get('token')
+    uid = request.POST.get('uid_dispositivo') or request.GET.get('uid')
     
-    if not token:
-        logger.warning("Intento de activación sin token")
-        return JsonResponse({'error': 'Parámetro requerido: token', 'success': False}, status=400)
+    if not uid:
+        logger.warning("Intento de activación sin uid")
+        return JsonResponse({'error': 'Parámetro requerido: uid_dispositivo', 'success': False}, status=400)
     
-    logger.info(f"Solicitud de activación con token: {token[:8]}...")
-    
-    # Buscar y validar la autorización
-    try:
-        autorizacion = TelegramAutorizacion.objects.get(token=token)
-    except TelegramAutorizacion.DoesNotExist:
-        logger.error(f"Token no encontrado: {token}")
-        return JsonResponse({'error': 'Token no válido o expirado', 'success': False}, status=404)
-    
-    # Validar que la autorización sea válida
-    if not autorizacion.is_valida():
-        logger.warning(f"Token inválido o expirado: {token}")
-        return JsonResponse({'error': 'Token expirado o ya usado', 'success': False}, status=400)
-    
-    # Validar que la acción sea correcta
-    if autorizacion.accion != 'activate_device':
-        logger.warning(f"Token con acción incorrecta: {autorizacion.accion}")
-        return JsonResponse({'error': 'Token no válido para esta acción', 'success': False}, status=400)
+    logger.info(f"Solicitud de activación para UID: {uid}")
     
     # Buscar el dispositivo
     try:
-        dispositivo = Dispositivo.objects.get(uid=autorizacion.uid_dispositivo)
+        dispositivo = Dispositivo.objects.get(uid=uid)
     except Dispositivo.DoesNotExist:
-        logger.error(f"Dispositivo no encontrado: {autorizacion.uid_dispositivo}")
+        logger.error(f"Dispositivo no encontrado: {uid}")
         return JsonResponse({'error': 'Dispositivo no encontrado', 'success': False}, status=404)
-    
-    # Marcar token como usado
-    autorizacion.usada = True
-    autorizacion.usada_en = timezone.now()
-    autorizacion.save(update_fields=['usada', 'usada_en'])
     
     # Activar dispositivo
     was_active = dispositivo.activo
@@ -130,27 +108,25 @@ def activate_device(request):
     
     logger.info(f"✅ Dispositivo activado - UID: {dispositivo.uid}, Was active: {was_active}")
     
-    # Editar mensaje de Telegram eliminando botones
-    try:
-        from push_telegram.push_sender import editar_mensaje_dispositivo
-        editar_mensaje_dispositivo(
-            telegram_user_id=autorizacion.telegram_user_id,
-            message_id=autorizacion.telegram_message_id,
-            uid=dispositivo.uid,
-            descripcion=dispositivo.descripcion,
-            accion='activado',
-            ya_estaba=was_active
-        )
-    except Exception as e:
-        logger.warning(f"Error editando mensaje Telegram: {e}")
+    # Construir texto para actualizar mensaje
+    estado = 'ACTIVO'
+    prefijo = '✅'
+    verbo = 'activado'
+    empresa = getattr(settings, 'EMPRESA', 'testTPV')
     
+    if was_active:
+        new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>El dispositivo ya estaba {estado}</b>"
+    else:
+        new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>Dispositivo {verbo.upper()}</b>\n📊 <b>Estado actual:</b> {estado}"
+
     return JsonResponse({
         'success': True,
         'message': 'Dispositivo activado correctamente' if not was_active else 'Dispositivo ya estaba activo',
         'uid': dispositivo.uid,
         'descripcion': dispositivo.descripcion,
         'activo': dispositivo.activo,
-        'was_active': was_active
+        'was_active': was_active,
+        'new_text': new_text
     })
 
 
@@ -158,49 +134,27 @@ def activate_device(request):
 @log_excepciones("api_dispositivos.log")
 def deactivate_device(request):
     """
-    Endpoint para desactivar un dispositivo validando el token de Telegram.
-    Este endpoint es llamado por el webhook tras validar el callback de Telegram.
+    Endpoint para desactivar un dispositivo.
     """
     if request.method != 'POST' and request.method != 'GET':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
-    # Obtener token del request
+    # Obtener token del request (para logging) y uid
     token = request.GET.get('token') or request.POST.get('token')
+    uid = request.POST.get('uid_dispositivo') or request.GET.get('uid')
     
-    if not token:
-        logger.warning("Intento de desactivación sin token")
-        return JsonResponse({'error': 'Parámetro requerido: token', 'success': False}, status=400)
+    if not uid:
+        logger.warning("Intento de desactivación sin uid")
+        return JsonResponse({'error': 'Parámetro requerido: uid_dispositivo', 'success': False}, status=400)
     
-    logger.info(f"Solicitud de desactivación con token: {token[:8]}...")
-    
-    # Buscar y validar la autorización
-    try:
-        autorizacion = TelegramAutorizacion.objects.get(token=token)
-    except TelegramAutorizacion.DoesNotExist:
-        logger.error(f"Token no encontrado: {token}")
-        return JsonResponse({'error': 'Token no válido o expirado', 'success': False}, status=404)
-    
-    # Validar que la autorización sea válida
-    if not autorizacion.is_valida():
-        logger.warning(f"Token inválido o expirado: {token}")
-        return JsonResponse({'error': 'Token expirado o ya usado', 'success': False}, status=400)
-    
-    # Validar que la acción sea correcta
-    if autorizacion.accion != 'deactivate_device':
-        logger.warning(f"Token con acción incorrecta: {autorizacion.accion}")
-        return JsonResponse({'error': 'Token no válido para esta acción', 'success': False}, status=400)
+    logger.info(f"Solicitud de desactivación para UID: {uid}")
     
     # Buscar el dispositivo
     try:
-        dispositivo = Dispositivo.objects.get(uid=autorizacion.uid_dispositivo)
+        dispositivo = Dispositivo.objects.get(uid=uid)
     except Dispositivo.DoesNotExist:
-        logger.error(f"Dispositivo no encontrado: {autorizacion.uid_dispositivo}")
+        logger.error(f"Dispositivo no encontrado: {uid}")
         return JsonResponse({'error': 'Dispositivo no encontrado', 'success': False}, status=404)
-    
-    # Marcar token como usado
-    autorizacion.usada = True
-    autorizacion.usada_en = timezone.now()
-    autorizacion.save(update_fields=['usada', 'usada_en'])
     
     # Desactivar dispositivo
     was_inactive = not dispositivo.activo
@@ -209,19 +163,16 @@ def deactivate_device(request):
     
     logger.info(f"⏸️ Dispositivo desactivado - UID: {dispositivo.uid}, Was inactive: {was_inactive}")
     
-    # Editar mensaje de Telegram eliminando botones
-    try:
-        from push_telegram.push_sender import editar_mensaje_dispositivo
-        editar_mensaje_dispositivo(
-            telegram_user_id=autorizacion.telegram_user_id,
-            message_id=autorizacion.telegram_message_id,
-            uid=dispositivo.uid,
-            descripcion=dispositivo.descripcion,
-            accion='desactivado',
-            ya_estaba=was_inactive
-        )
-    except Exception as e:
-        logger.warning(f"Error editando mensaje Telegram: {e}")
+    # Construir texto para actualizar mensaje
+    estado = 'INACTIVO'
+    prefijo = '🛑'
+    verbo = 'desactivado'
+    empresa = getattr(settings, 'EMPRESA', 'testTPV')
+    
+    if was_inactive:
+        new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>El dispositivo ya estaba {estado}</b>"
+    else:
+        new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>Dispositivo {verbo.upper()}</b>\n📊 <b>Estado actual:</b> {estado}"
     
     return JsonResponse({
         'success': True,
@@ -229,7 +180,8 @@ def deactivate_device(request):
         'uid': dispositivo.uid,
         'descripcion': dispositivo.descripcion,
         'activo': dispositivo.activo,
-        'was_inactive': was_inactive
+        'was_inactive': was_inactive,
+        'new_text': new_text
     })
 
 
@@ -246,7 +198,20 @@ def dispositivo_action(request):
     # Obtener parámetros
     token = request.POST.get('token')
     accion = request.POST.get('accion')
+    uid = request.POST.get('uid_dispositivo')
     
+    # Si no están en POST, intentar leer JSON body
+    if not token or not accion:
+        try:
+            if request.body:
+                import json
+                data = json.loads(request.body)
+                token = data.get('token')
+                accion = data.get('accion')
+                uid = data.get('uid_dispositivo')
+        except Exception as e:
+            logger.warning(f"Error parseando JSON body: {e}")
+
     if not token:
         logger.warning("Intento de acción sin token")
         return JsonResponse({
@@ -262,73 +227,54 @@ def dispositivo_action(request):
             'success': False,
             'mensaje': '❌ Acción no especificada'
         }, status=400)
-    
-    logger.info(f"Solicitud de acción '{accion}' con token: {token[:8]}...")
-    
-    # Buscar y validar autorización
-    try:
-        autorizacion = TelegramAutorizacion.objects.get(token=token)
-    except TelegramAutorizacion.DoesNotExist:
-        logger.error(f"Token no encontrado: {token}")
+        
+    if not uid:
+        logger.warning("Intento de acción sin uid_dispositivo")
         return JsonResponse({
-            'error': 'Token no válido o expirado',
+            'error': 'Parámetro requerido: uid_dispositivo',
             'success': False,
-            'mensaje': '❌ Token no válido o expirado'
-        }, status=404)
-    
-    # Validar que sea válido
-    if not autorizacion.is_valida():
-        logger.warning(f"Token inválido o expirado: {token}")
-        return JsonResponse({
-            'error': 'Token expirado o ya usado',
-            'success': False,
-            'mensaje': '❌ Token expirado o ya utilizado'
+            'mensaje': '❌ UID no recibido'
         }, status=400)
+    
+    logger.info(f"Solicitud de acción '{accion}' para UID: {uid}")
     
     # Buscar dispositivo
     try:
-        dispositivo = Dispositivo.objects.get(uid=autorizacion.uid_dispositivo)
+        dispositivo = Dispositivo.objects.get(uid=uid)
     except Dispositivo.DoesNotExist:
-        logger.error(f"Dispositivo no encontrado: {autorizacion.uid_dispositivo}")
+        logger.error(f"Dispositivo no encontrado: {uid}")
         return JsonResponse({
             'error': 'Dispositivo no encontrado',
             'success': False,
             'mensaje': '❌ Dispositivo no encontrado'
         }, status=404)
     
-    # Marcar token como usado
-    autorizacion.usada = True
-    autorizacion.usada_en = timezone.now()
-    autorizacion.save(update_fields=['usada', 'usada_en'])
+    empresa = getattr(settings, 'EMPRESA', 'testTPV')
     
-    # Ejecutar acción (la acción viene del webhook, no de la BD)
+    # Ejecutar acción
     if accion == 'activate':
         was_active = dispositivo.activo
         dispositivo.activo = True
         dispositivo.save(update_fields=['activo'])
         
-        # Editar mensaje de Telegram
-        try:
-            from push_telegram.push_sender import editar_mensaje_dispositivo
-            editar_mensaje_dispositivo(
-                telegram_user_id=autorizacion.telegram_user_id,
-                message_id=autorizacion.telegram_message_id,
-                uid=dispositivo.uid,
-                descripcion=dispositivo.descripcion,
-                accion='activado',
-                ya_estaba=was_active
-            )
-        except Exception as e:
-            logger.warning(f"Error editando mensaje: {e}")
-        
         logger.info(f"✅ Dispositivo activado - UID: {dispositivo.uid}")
+        
+        estado = 'ACTIVO'
+        prefijo = '✅'
+        verbo = 'activado'
+        
+        if was_active:
+            new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>El dispositivo ya estaba {estado}</b>"
+        else:
+            new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>Dispositivo {verbo.upper()}</b>\n📊 <b>Estado actual:</b> {estado}"
         
         return JsonResponse({
             'success': True,
             'mensaje': '✅ Dispositivo activado' if not was_active else '✅ Ya estaba activo',
             'uid': dispositivo.uid,
             'descripcion': dispositivo.descripcion,
-            'activo': True
+            'activo': True,
+            'new_text': new_text
         })
         
     elif accion == 'deactivate':
@@ -336,28 +282,24 @@ def dispositivo_action(request):
         dispositivo.activo = False
         dispositivo.save(update_fields=['activo'])
         
-        # Editar mensaje de Telegram
-        try:
-            from push_telegram.push_sender import editar_mensaje_dispositivo
-            editar_mensaje_dispositivo(
-                telegram_user_id=autorizacion.telegram_user_id,
-                message_id=autorizacion.telegram_message_id,
-                uid=dispositivo.uid,
-                descripcion=dispositivo.descripcion,
-                accion='desactivado',
-                ya_estaba=was_inactive
-            )
-        except Exception as e:
-            logger.warning(f"Error editando mensaje: {e}")
-        
         logger.info(f"⏸️ Dispositivo desactivado - UID: {dispositivo.uid}")
+        
+        estado = 'INACTIVO'
+        prefijo = '🛑'
+        verbo = 'desactivado'
+        
+        if was_inactive:
+            new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>El dispositivo ya estaba {estado}</b>"
+        else:
+            new_text = f"🆕 <b>[NUEVO DISPOSITIVO DETECTADO]</b>\n\n📱 <b>UID:</b> <code>{uid}</code>\n📝 <b>Descripción:</b> {dispositivo.descripcion}\n🏢 <b>Empresa:</b> {empresa}\n\n{prefijo} <b>Dispositivo {verbo.upper()}</b>\n📊 <b>Estado actual:</b> {estado}"
         
         return JsonResponse({
             'success': True,
             'mensaje': '⏸️ Dispositivo desactivado' if not was_inactive else '⏸️ Ya estaba inactivo',
             'uid': dispositivo.uid,
             'descripcion': dispositivo.descripcion,
-            'activo': False
+            'activo': False,
+            'new_text': new_text
         })
         
     else:
