@@ -20,3 +20,5 @@ schedule
 chromadb
 sentence-transformers
 reportlab
+qrcode
+Pillow

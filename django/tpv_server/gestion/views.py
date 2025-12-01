@@ -243,16 +243,44 @@ def factura_view(request, ticket_id, uid):
                 if not datos_cliente.get(campo):
                     return JsonResponse({'error': f'El campo {campo} es requerido'}, status=400)
             
+            # --- Lógica de Facturación VeriFactu ---
+            # 1. Verificar si ya está facturado
+            if ticket.esta_facturada:
+                 return JsonResponse({'error': 'Este ticket ya ha sido facturado'}, status=400)
+
+            # 2. Crear objeto Factura
+            from gestion.models.ticket import Factura
+            factura = Factura.objects.create(
+                ticket=ticket,
+                nombre_razon=datos_cliente['nombre'],
+                nif=datos_cliente['nif'],
+                direccion=datos_cliente['direccion'],
+                cp=datos_cliente['cp'],
+                poblacion=datos_cliente['poblacion'],
+                provincia=datos_cliente.get('provincia', ''),
+                email=datos_cliente.get('email', '')
+            )
+            
+            # 3. Generar VeriFactu (Hash, QR, Encadenamiento)
+            from gestion.services.verifactu_service import VerifactuService
+            VerifactuService.generar_alta_factura_completa(factura, ticket)
+            
+            # 4. Marcar ticket como canjeado
+            ticket.esta_facturada = True
+            ticket.save()
+            
+            # 5. Generar PDF (Usando los datos de la nueva Factura)
             # Calcular total con IVA
             total_con_iva = 0
             for linea in ticket.ticketlineas_set.all():
                 if linea.linea.precio > 0:
                     total_con_iva += float(linea.linea.precio)
             
-            # Generar PDF
+            # Generar PDF (modificamos para pasar el objeto factura si es necesario, 
+            # o mantenemos compatibilidad pasando ticket y datos)
             filename = generar_pdf_factura(ticket, datos_cliente, total_con_iva)
             
-            # Guardar nombre del archivo en el ticket
+            # Guardar nombre del archivo en el ticket (para compatibilidad con vista actual)
             ticket.url_factura = filename
             ticket.save()
             

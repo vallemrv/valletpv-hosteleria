@@ -190,3 +190,4 @@ server*/
 *.bak
 *.backup# Scripts locales de deploy
 deploy_local.sh
+copy_config_data.py

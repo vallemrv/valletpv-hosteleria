@@ -139,7 +139,8 @@ def handler_enviar_imprimir_ticket(id, receptor_activo, abrircajon, es_factura, 
         "efectivo": ticket.entrega,
         'total': ticket.ticketlineas_set.all().aggregate(Total=Sum("linea__precio"))['Total'],
         "url_factura": url_factura,
-        "recibo": lineas_recibo
+        "recibo": lineas_recibo,
+        "qr_code": ticket.qr_code
     }
 
  
