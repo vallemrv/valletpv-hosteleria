@@ -1,7 +1,7 @@
 <template>
   <UiMainWindows title="Gestión de Camareros" icon="mdi-account-group" nombre="Administrador" :tareasPendientes="0">
     <template #actions>
-      <UiActionButton icon="mdi-plus" @click="dialog = true">Agregar Camarero</UiActionButton>
+      <UiActionButton icon="mdi-plus" @click="showAlertDialog = true">Agregar Camarero</UiActionButton>
       <UiActionButton v-if="camarerosAuth.length > 0" icon="mdi-cash-register" @click="irAlTPV">Ir al TPV
       </UiActionButton>
     </template>
@@ -13,7 +13,7 @@
             Camareros No Autorizados
           </v-card-title>
           <v-divider />
-          <div class="scroll-list" ref="listNoAuth">
+          <div class="scroll-list">
             <v-list>
               <v-list-item v-for="camarero in camarerosNoAuth" :key="camarero.id"
                 @click="toggleAutorizado(camarero.id, 1)">
@@ -40,7 +40,7 @@
             Camareros Autorizados
           </v-card-title>
           <v-divider />
-          <div class="scroll-list" ref="listAuth">
+          <div class="scroll-list">
             <v-list>
               <v-list-item v-for="camarero in camarerosAuth" :key="camarero.id"
                 @click="toggleAutorizado(camarero.id, 0)">
@@ -59,6 +59,13 @@
       </v-col>
     </v-row>
 
+
+    <UiDialogScaffold v-model="showAlertDialog" title="Atención" :actions="alertDialogActions"
+      @on_action="handleAlertDialogAction">
+      <div class="pa-4 text-center text-h6">
+        esto crea un camarero nuevo si lo que quieres es agregar un camarero eligelo de la lista
+      </div>
+    </UiDialogScaffold>
 
     <UiDialogScaffold v-model="dialog" title="Nuevo Camarero" :actions="dialogActions" @on_action="handleDialogAction">
       <v-row>
@@ -88,10 +95,11 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCamarerosStore, useTouchScroll } from 'valle-tpv-lib';
+import { useCamarerosStore } from 'valle-tpv-lib';
 import UiLetterKeyboard from '@/lib/components/dialogs/UiLetterKeyboard.vue';
 
 const dialog = ref(false);
+const showAlertDialog = ref(false);
 const nombre = ref('');
 const apellidos = ref('');
 const camarerosStore = useCamarerosStore();
@@ -114,16 +122,16 @@ const activeFieldValue = computed(() => {
 });
 
 // Referencias para las listas con scroll
-const listNoAuth = ref<HTMLElement | null>(null);
-const listAuth = ref<HTMLElement | null>(null);
-
-// Habilitar scroll táctil en las listas (para Ubuntu/Linux con Xorg)
-useTouchScroll(listNoAuth);
-useTouchScroll(listAuth);
+// Referencias para las listas con scroll eliminadas ya que usamos scroll nativo
 
 const dialogActions = [
   { id: 'cancel', text: 'Cancelar', color: 'grey' },
   { id: 'save', text: 'Guardar', color: 'primary' }
+];
+
+const alertDialogActions = [
+  { id: 'cancel', text: 'Cancelar', color: 'grey' },
+  { id: 'create', text: 'Crear Nuevo', color: 'primary' }
 ];
 
 const router = useRouter();
@@ -170,6 +178,15 @@ function handleDialogAction(actionId: string) {
     dialog.value = false;
   } else if (actionId === 'save') {
     guardarCamarero();
+  }
+}
+
+function handleAlertDialogAction(actionId: string) {
+  if (actionId === 'cancel') {
+    showAlertDialog.value = false;
+  } else if (actionId === 'create') {
+    showAlertDialog.value = false;
+    dialog.value = true;
   }
 }
 
