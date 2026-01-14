@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "@tauri-apps/api": "^2.8.0",
     "@vite-pwa/assets-generator": "^1.0.0",
     "dexie": "^4.0.11",
     "pinia": "^3.0.3",

@@ -1,0 +1,13 @@
+{
+  "name": "valle-tpv-electron",
+  "version": "1.0.0",
+  "description": "Valle TPV Electron Kiosk",
+  "main": "electron-main.js",
+  "scripts": {
+    "electron": "electron .",
+    "electron:dev": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^33.3.1"
+  }
+}

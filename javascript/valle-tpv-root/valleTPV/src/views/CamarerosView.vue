@@ -70,10 +70,12 @@ import { useRouter } from 'vue-router';
 import { onMounted, computed, ref } from 'vue';
 import { useCamarerosStore, Camarero, useEmpresasStore, useConnectionStore } from 'valle-tpv-lib'; // Ajusta la ruta si es necesario
 import { UiArqueoConCashKeeperDialog } from 'valle-tpv-lib';
+import { useTauri } from '@/composables/useTauri';
 
 const router = useRouter();
 const camarerosStore = useCamarerosStore();
 const empresasStore = useEmpresasStore();
+const { cerrarAplicacion, apagarOrdenador } = useTauri();
 const connectionStore = useConnectionStore();
 const camarerosAuth = computed(() => camarerosStore.camarerosAuth);
 
@@ -109,7 +111,10 @@ onMounted(async () => {
 
 const menuItems = [
   { icon: 'mdi-domain', text: 'Empresas', id: 'empresas' },
-  { icon: 'mdi-cash-multiple', text: 'Arqueo caja', id: 'arqueo' }
+  { icon: 'mdi-cash-multiple', text: 'Arqueo caja', id: 'arqueo' },
+  { divider: true } as any,
+  { icon: 'mdi-power', text: 'Salir', id: 'salir' },
+  { icon: 'mdi-power-standby', text: 'Apagar ordenador', id: 'apagar' }
 ];
 
 function goCamareros() {
@@ -219,6 +224,20 @@ function handleMenuSelect(id: string) {
       router.push({ name: 'Arqueo' });
     }
     return;
+  if (id === 'salir') {
+    // Confirmar antes de salir
+    if (confirm('¿Deseas salir de la aplicación?')) {
+      cerrarAplicacion();
+    }
+    return;
+  }
+  if (id === 'apagar') {
+    // Confirmar antes de apagar
+    if (confirm('¿Deseas apagar el ordenador?\n\nEsto cerrará todas las aplicaciones y apagará el equipo.')) {
+      apagarOrdenador();
+    }
+    return;
+  }
   }
 }
 

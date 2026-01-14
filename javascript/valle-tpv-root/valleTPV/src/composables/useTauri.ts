@@ -1,31 +1,54 @@
 // src/composables/useTauri.ts
-import { invoke } from '@tauri-apps/api/core'
-
-// Extender el tipo Window para incluir __TAURI__
-declare global {
-  interface Window {
-    __TAURI__?: any
-  }
-}
+// Funciones para interactuar con Electron
 
 export const useTauri = () => {
-  // Función de ejemplo para invocar comandos de Rust
-  const saludar = async (nombre: string): Promise<string> => {
+  // Verificar si estamos en entorno Electron
+  const isElectron = (): boolean => {
+    return typeof window !== 'undefined' && (window as any).require !== undefined
+  }
+
+  // Cerrar la aplicación (compatible con Electron y navegador)
+  const cerrarAplicacion = async (): Promise<void> => {
     try {
-      return await invoke('saludar', { nombre })
+      // Si está en Electron
+      if (isElectron()) {
+        const { ipcRenderer } = (window as any).require('electron')
+        ipcRenderer.send('close-app')
+        return
+      }
+
+      // Si es navegador web, intentar cerrar ventana
+      window.close()
+      
+      // Si no se puede cerrar (bloqueado por navegador), mostrar mensaje
+      setTimeout(() => {
+        alert('Para salir de la aplicación, cierra esta pestaña o ventana del navegador.')
+      }, 100)
     } catch (error) {
-      console.error('Error al invocar comando Tauri:', error)
-      return `Hola ${nombre} desde JavaScript (fallback)`
+      console.error('Error al cerrar la aplicación:', error)
     }
   }
 
-  // Verificar si estamos en entorno Tauri
-  const isTauri = (): boolean => {
-    return typeof window !== 'undefined' && window.__TAURI__ !== undefined
+  // Apagar el ordenador
+  const apagarOrdenador = async (): Promise<void> => {
+    try {
+      // Si está en Electron
+      if (isElectron()) {
+        const { ipcRenderer } = (window as any).require('electron')
+        ipcRenderer.send('shutdown-computer')
+        return
+      }
+
+      // Si es navegador web, no es posible apagar el ordenador
+      alert('Esta función solo está disponible en la versión de escritorio.')
+    } catch (error) {
+      console.error('Error al apagar el ordenador:', error)
+    }
   }
 
   return {
-    saludar,
-    isTauri
+    isElectron,
+    cerrarAplicacion,
+    apagarOrdenador
   }
 }
