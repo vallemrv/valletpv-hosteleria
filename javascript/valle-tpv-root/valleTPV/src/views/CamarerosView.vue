@@ -112,7 +112,6 @@ onMounted(async () => {
 const menuItems = [
   { icon: 'mdi-domain', text: 'Empresas', id: 'empresas' },
   { icon: 'mdi-cash-multiple', text: 'Arqueo caja', id: 'arqueo' },
-  { divider: true } as any,
   { icon: 'mdi-power', text: 'Salir', id: 'salir' },
   { icon: 'mdi-power-standby', text: 'Apagar ordenador', id: 'apagar' }
 ];
@@ -224,6 +223,7 @@ function handleMenuSelect(id: string) {
       router.push({ name: 'Arqueo' });
     }
     return;
+  }
   if (id === 'salir') {
     // Confirmar antes de salir
     if (confirm('¿Deseas salir de la aplicación?')) {
@@ -237,7 +237,6 @@ function handleMenuSelect(id: string) {
       apagarOrdenador();
     }
     return;
-  }
   }
 }
 
