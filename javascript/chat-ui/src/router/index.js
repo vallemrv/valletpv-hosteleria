@@ -7,6 +7,16 @@ const routes = [
     name: 'Chat',
     component: ChatView,
   },
+  {
+    path: '/tools',
+    name: 'Tools',
+    component: () => import('../views/ToolsView.vue'),
+  },
+  {
+    path: '/tools/waiters',
+    name: 'WaitersTool',
+    component: () => import('../views/tools/WaitersTool.vue'),
+  },
 ];
 
 const router = createRouter({

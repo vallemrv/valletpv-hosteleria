@@ -8,7 +8,7 @@
 import json
 from gestion.models.mesas import Mesas, Zonas, Mesasabiertas
 from gestion.models.pedidos import Lineaspedido
-from push_telegram.models import TelegramUser
+from push_telegram.models import TelegramUser, TelegramNotificationLog
 from gestion.models.camareros import Camareros
 from push_telegram.push_sender import editar_mensaje_mesa
 from django.utils import timezone
@@ -122,6 +122,22 @@ def mesa_action(request):
             'mensaje': '❌ Datos incompletos'
         }, status=400)
     
+    # Helper para obtener texto original
+    def get_original_text(user_id, **kwargs):
+        try:
+            qs = TelegramNotificationLog.objects.filter(telegram_user_id=user_id)
+            for k, v in kwargs.items():
+                qs = qs.filter(**{f"metadata__{k}": v})
+            log = qs.order_by('-created_at').first()
+            if log and log.mensaje:
+                # Limpiar mensaje de expiración
+                msg = log.mensaje.replace("⏰ Esta autorización expira en 60 minutos.", "")
+                msg = msg.replace("⏰ Esta autorización expira en 10 minutos.", "")
+                return msg.strip() + "\n\n"
+        except Exception as e:
+            logger.error(f"Error recuperando texto original: {e}")
+        return ""
+
     if not infmesa_id:
         # Fallback para compatibilidad si no llega uid_dispositivo
         logger.warning("No se recibió uid_dispositivo en mesa_action")
@@ -175,7 +191,8 @@ def mesa_action(request):
             logger.info(f"🗑️ Mesa borrada - ID: {mesa_id}, Nombre: {mesa_nombre}")
             
             # Texto para actualizar el mensaje en Telegram
-            new_text = f"🗑️ Mesa {mesa_nombre} ha sido BORRADA\n\n✅ Acción completada exitosamente."
+            prefix = get_original_text(telegram_user_id, infmesa_id=infmesa_id)
+            new_text = f"{prefix}🗑️ Mesa {mesa_nombre} ha sido BORRADA\n✅ Acción completada exitosamente."
             
             return JsonResponse({
                 'success': True,
@@ -202,7 +219,8 @@ def mesa_action(request):
         if mesa_abierta:
             mesa_nombre = mesa_abierta.mesa.nombre
             
-        new_text = f"✅ Mesa {mesa_nombre} se ha MANTENIDO\n\n✅ La mesa sigue activa."
+        prefix = get_original_text(telegram_user_id, infmesa_id=infmesa_id)
+        new_text = f"{prefix}✅ Mesa {mesa_nombre} se ha MANTENIDO\n✅ La mesa sigue activa."
         
         return JsonResponse({
             'success': True,
@@ -250,7 +268,8 @@ def mesa_action(request):
             
             logger.info(f"🗑️ Líneas borradas - Mesa ID: {mesa_id}, IDs: {ids}")
             
-            new_text = f"🗑️ Líneas de Mesa {mesa_id} han sido BORRADAS\n\n✅ Acción completada exitosamente."
+            prefix = get_original_text(telegram_user_id, mesa_destino_id=mesa_id, tipo_cambio='lineas_parciales')
+            new_text = f"{prefix}🗑️ Líneas de Mesa {mesa_id} han sido BORRADAS\n✅ Acción completada exitosamente."
             
             return JsonResponse({
                 'success': True,
@@ -269,7 +288,20 @@ def mesa_action(request):
     elif accion == 'mantener_lineas':
         logger.info(f"✅ Líneas mantenidas")
         
-        new_text = f"✅ Líneas se han MANTENIDO\n\n✅ Las líneas siguen activas."
+        mesa_id = 0
+        if infmesa_id.startswith("LINEAS:"):
+            try:
+                parts = infmesa_id.split(":")
+                if len(parts) >= 2:
+                    mesa_id = int(parts[1])
+            except:
+                pass
+
+        prefix = ""
+        if mesa_id:
+             prefix = get_original_text(telegram_user_id, mesa_destino_id=mesa_id, tipo_cambio='lineas_parciales')
+
+        new_text = f"{prefix}✅ Líneas se han MANTENIDO\n✅ Las líneas siguen activas."
         
         return JsonResponse({
             'success': True,

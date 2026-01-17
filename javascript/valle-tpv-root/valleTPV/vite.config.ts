@@ -5,7 +5,6 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import vueDevTools from 'vite-plugin-vue-devtools';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,7 +24,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       vueJsx(),
-      vueDevTools(),
       VitePWA({
         registerType: 'autoUpdate',
         devOptions: {
@@ -76,10 +74,10 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             // Vue core en un chunk
-            if (id.includes('node_modules/vue/') || 
-                id.includes('node_modules/@vue/') ||
-                id.includes('node_modules/vue-router/') ||
-                id.includes('node_modules/pinia/')) {
+            if (id.includes('node_modules/vue/') ||
+              id.includes('node_modules/@vue/') ||
+              id.includes('node_modules/vue-router/') ||
+              id.includes('node_modules/pinia/')) {
               return 'vue-vendor';
             }
             // Vuetify en otro chunk

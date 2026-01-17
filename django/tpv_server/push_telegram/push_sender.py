@@ -414,16 +414,16 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
     for subscription in subscriptions_filtradas:
         # Crear token único para esta notificación
         token = str(uuid.uuid4())
-        expira_en = timezone.now() + timedelta(minutes=10)
+        expira_en = timezone.now() + timedelta(minutes=60)
         
         # Mensaje personalizado según el tipo de cambio
         mensaje = f"""
 🔄 <b>Cambio a Zona: {zona_destino_nombre}</b>
 📋 <i>Tipo: {tipo_texto}</i>
 
-📍 <b>De:</b> {mesa_origen_nombre} (ID: {mesa_origen_id})
-📍 <b>A:</b> {mesa_destino_nombre} (ID: {mesa_destino_id})
-🏷️ <b>Zona:</b> {zona_destino_nombre} (ID: {zona_destino_id})
+📍 <b>De:</b> {mesa_origen_nombre}
+📍 <b>A:</b> {mesa_destino_nombre}
+🏷️ <b>Zona:</b> {zona_destino_nombre}
 👨‍🍳 <b>Camarero:</b> {camarero_nombre}
 🕐 <b>Hora:</b> {hora_apertura}
 🏢 <b>Empresa:</b> {empresa}
@@ -434,7 +434,7 @@ def notificar_cambio_zona(mesa_origen_id: int, mesa_origen_nombre: str,
 
 ❓ {pregunta}
 
-⏰ Esta autorización expira en 10 minutos.
+⏰ Esta autorización expira en 60 minutos.
         """.strip()
         
         # Preparar datos del log

@@ -3,20 +3,20 @@
   "private": true,
   "workspaces": [
     "valle-tpv-lib",
-    "valleTPV"
+    "valleTPV",
+    "electron-kiosk"
   ],
   "scripts": {
-    "sync": "powershell -ExecutionPolicy Bypass -File sync-lib-windows.ps1",
-    "sync:linux": "bash sync-lib.sh",
+    "sync": "node scripts/sync-lib.js",
     "build:lib": "npm run build -w valle-tpv-lib",
-    "build:app": "npm run build -w valleTPV",
-    "build": "npm run build:lib && npm run build:app",
-    "dev:app": "npm run dev -w valleTPV",
-    "dev": "npm run sync && npm run dev:app",
-    "install:all": "npm install",
-    "tauri": "cargo tauri",
-    "tauri:dev": "if [ \"$(uname)\" = \"Linux\" ]; then WEBKIT_DISABLE_DMABUF_RENDERER=1 cargo tauri dev; else cargo tauri dev; fi",
-    "tauri:build": "cargo tauri build",
-    "tauri:build:debug": "cargo tauri build --debug"
+    "build:web": "npm run build -w valleTPV",
+    "build": "node scripts/build.js",
+    "dev:web": "npm run dev -w valleTPV",
+    "dev": "node scripts/dev.js",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "birpc": "^4.0.0",
+    "hookable": "^6.0.1"
   }
 }

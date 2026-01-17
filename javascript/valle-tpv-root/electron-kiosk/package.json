@@ -5,9 +5,32 @@
   "main": "electron-main.js",
   "scripts": {
     "electron": "electron .",
-    "electron:dev": "electron . --dev"
+    "electron:dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.valletpv.kiosk",
+    "productName": "ValleTPV",
+    "files": [
+      "electron-main.js",
+      "web-dist/**/*"
+    ],
+    "directories": {
+      "output": "dist-electron"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility"
+    },
+    "win": {
+      "target": "nsis"
+    }
   },
   "devDependencies": {
-    "electron": "^33.3.1"
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
   }
 }

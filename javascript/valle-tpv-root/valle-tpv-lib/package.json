@@ -40,6 +40,6 @@
     "eslint-plugin-vue": "^9.31.0",
     "pinia": "^2.1.7",
     "typescript": "^5.9.2",
-    "vite": "^7.1.2"
+    "vite": "^6.0.7"
   }
 }

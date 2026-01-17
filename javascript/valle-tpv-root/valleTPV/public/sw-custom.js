@@ -1,3 +1,6 @@
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 (function() {
   "use strict";
   var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
@@ -3142,16 +3145,15 @@
     DexieYProvider
   } = Dexie;
   class Camarero {
-    id;
-    nombre;
-    apellidos;
-    activo;
-    pass_field;
-    permisos;
-    autorizado;
-    email;
-    static schema = "++id, nombre, apellidos, activo, autorizado, pass_field, permisos, email";
     constructor({ id, nombre, apellidos, activo = 1, pass_field = "", permisos = [], autorizado = 1, email = null }) {
+      __publicField(this, "id");
+      __publicField(this, "nombre");
+      __publicField(this, "apellidos");
+      __publicField(this, "activo");
+      __publicField(this, "pass_field");
+      __publicField(this, "permisos");
+      __publicField(this, "autorizado");
+      __publicField(this, "email");
       this.id = id || Date.now();
       this.nombre = nombre;
       this.apellidos = apellidos;
@@ -3167,19 +3169,19 @@
       }
     }
   }
+  __publicField(Camarero, "schema", "++id, nombre, apellidos, activo, autorizado, pass_field, permisos, email");
   class Empresa {
-    uid;
-    id;
-    descripcion;
-    nombre;
-    url_servidor;
-    usa_cash_keeper;
-    url_cash_keeper;
-    usa_pinpad;
-    url_pinpad;
-    activa;
-    static schema = "++id, uid, nombre, activa, descripcion, url_servidor, usa_cash_keeper, url_cash_keeper, usa_pinpad, url_pinpad";
     constructor({ uid, id, nombre, descripcion, url_servidor, activa = 1, usa_cash_keeper = 0, url_cash_keeper = "", usa_pinpad = 0, url_pinpad = "" }) {
+      __publicField(this, "uid");
+      __publicField(this, "id");
+      __publicField(this, "descripcion");
+      __publicField(this, "nombre");
+      __publicField(this, "url_servidor");
+      __publicField(this, "usa_cash_keeper");
+      __publicField(this, "url_cash_keeper");
+      __publicField(this, "usa_pinpad");
+      __publicField(this, "url_pinpad");
+      __publicField(this, "activa");
       this.uid = uid;
       this.id = id || Date.now();
       this.nombre = nombre;
@@ -3197,25 +3199,25 @@
       }
     }
   }
+  __publicField(Empresa, "schema", "++id, uid, nombre, activa, descripcion, url_servidor, usa_cash_keeper, url_cash_keeper, usa_pinpad, url_pinpad");
   class Tecla {
-    ID;
-    nombre;
-    IDFamilia = null;
-    IDSeccion = null;
-    IDSeccionCom = null;
-    Precio = null;
-    RGB = null;
-    p1;
-    p2;
-    tag = null;
-    orden = null;
-    tipo = null;
-    descripcion_t;
-    descripcion_r;
-    IDParentTecla = null;
-    hay_existencias = 1;
-    static schema = "++ID, nombre, p1, p2, IDFamilia, IDParentTecla, IDSeccion, IDSeccionCom, Precio, RGB, tag, orden, tipo, descripcion_t, descripcion_r, hay_existencias";
     constructor({ ID, nombre, p1, p2, descripcion_t, descripcion_r, tag = null, orden = null, tipo = null, hay_existencias = 1, IDFamilia = 0, IDParentTecla = null, IDSeccion = 0, IDSeccionCom = 0, Precio = 0, RGB = "" }) {
+      __publicField(this, "ID");
+      __publicField(this, "nombre");
+      __publicField(this, "IDFamilia", null);
+      __publicField(this, "IDSeccion", null);
+      __publicField(this, "IDSeccionCom", null);
+      __publicField(this, "Precio", null);
+      __publicField(this, "RGB", null);
+      __publicField(this, "p1");
+      __publicField(this, "p2");
+      __publicField(this, "tag", null);
+      __publicField(this, "orden", null);
+      __publicField(this, "tipo", null);
+      __publicField(this, "descripcion_t");
+      __publicField(this, "descripcion_r");
+      __publicField(this, "IDParentTecla", null);
+      __publicField(this, "hay_existencias", 1);
       this.ID = ID || Date.now();
       this.nombre = nombre;
       this.p1 = p1;
@@ -3234,23 +3236,23 @@
       this.hay_existencias = hay_existencias;
     }
   }
+  __publicField(Tecla, "schema", "++ID, nombre, p1, p2, IDFamilia, IDParentTecla, IDSeccion, IDSeccionCom, Precio, RGB, tag, orden, tipo, descripcion_t, descripcion_r, hay_existencias");
   class Cuenta {
-    ID;
-    Estado;
-    Descripcion;
-    descripcion_t;
-    Precio;
-    IDPedido;
-    IDMesa;
-    IDArt;
-    receptor;
-    camarero;
-    nomMesa;
-    IDZona;
-    servido;
-    UID;
-    static schema = "++ID, Estado, Descripcion, Descripcion_t, Precio, IDPedido, IDMesa, IDArt, Receptor, Camarero, NomMesa, IDZona, Servido, UID";
     constructor({ ID = null, Estado = "N", Descripcion, descripcion_t, Precio, IDMesa, IDArt = -1, camarero, nomMesa }) {
+      __publicField(this, "ID");
+      __publicField(this, "Estado");
+      __publicField(this, "Descripcion");
+      __publicField(this, "descripcion_t");
+      __publicField(this, "Precio");
+      __publicField(this, "IDPedido");
+      __publicField(this, "IDMesa");
+      __publicField(this, "IDArt");
+      __publicField(this, "receptor");
+      __publicField(this, "camarero");
+      __publicField(this, "nomMesa");
+      __publicField(this, "IDZona");
+      __publicField(this, "servido");
+      __publicField(this, "UID");
       this.ID = ID || Date.now();
       this.Estado = Estado;
       this.Descripcion = Descripcion;
@@ -3267,12 +3269,12 @@
       this.UID = Date.now().toString();
     }
   }
+  __publicField(Cuenta, "schema", "++ID, Estado, Descripcion, Descripcion_t, Precio, IDPedido, IDMesa, IDArt, Receptor, Camarero, NomMesa, IDZona, Servido, UID");
   class Seccion {
-    id;
-    nombre;
-    icono;
-    static schema = "++id, nombre, icono";
     constructor({ id, nombre, icono = null }) {
+      __publicField(this, "id");
+      __publicField(this, "nombre");
+      __publicField(this, "icono");
       this.id = id || Date.now();
       this.nombre = nombre;
       this.icono = icono;
@@ -3283,13 +3285,13 @@
       }
     }
   }
+  __publicField(Seccion, "schema", "++id, nombre, icono");
   class Sugerencia {
-    id;
-    tecla;
-    sugerencia;
-    incremento;
-    static schema = "++id, tecla, sugerencia, incremento";
     constructor({ id, tecla, sugerencia, incremento = 0 }) {
+      __publicField(this, "id");
+      __publicField(this, "tecla");
+      __publicField(this, "sugerencia");
+      __publicField(this, "incremento");
       this.id = id;
       this.tecla = tecla;
       this.sugerencia = sugerencia;
@@ -3301,17 +3303,17 @@
       }
     }
   }
+  __publicField(Sugerencia, "schema", "++id, tecla, sugerencia, incremento");
   class Mesa {
-    ID;
-    Nombre;
-    RGB;
-    abierta;
-    IDZona;
-    num;
-    Orden;
-    Tarifa;
-    static schema = "++ID, Nombre, RGB, abierta, IDZona, num, Orden, Tarifa";
     constructor({ ID, Nombre, RGB, abierta, IDZona, num, Orden, Tarifa }) {
+      __publicField(this, "ID");
+      __publicField(this, "Nombre");
+      __publicField(this, "RGB");
+      __publicField(this, "abierta");
+      __publicField(this, "IDZona");
+      __publicField(this, "num");
+      __publicField(this, "Orden");
+      __publicField(this, "Tarifa");
       this.ID = ID;
       this.Nombre = Nombre;
       this.RGB = RGB;
@@ -3322,14 +3324,14 @@
       this.Tarifa = Tarifa;
     }
   }
+  __publicField(Mesa, "schema", "++ID, Nombre, RGB, abierta, IDZona, num, Orden, Tarifa");
   class Zona {
-    id;
-    nombre;
-    rgb;
-    tarifa;
-    icon;
-    static schema = "++id, nombre, rgb, tarifa, icon";
     constructor({ id, nombre, rgb, tarifa, icon = null }) {
+      __publicField(this, "id");
+      __publicField(this, "nombre");
+      __publicField(this, "rgb");
+      __publicField(this, "tarifa");
+      __publicField(this, "icon");
       this.id = id;
       this.nombre = nombre;
       this.rgb = rgb;
@@ -3337,24 +3339,25 @@
       this.icon = icon;
     }
   }
+  __publicField(Zona, "schema", "++id, nombre, rgb, tarifa, icon");
   class Instruction {
-    id;
-    url;
-    endpoint;
-    data;
-    timestamp;
-    // Para mejor trazabilidad
-    attempts;
-    // Para contar reintentos
-    static get schema() {
-      return "++id";
-    }
     constructor(url, endpoint, data) {
+      __publicField(this, "id");
+      __publicField(this, "url");
+      __publicField(this, "endpoint");
+      __publicField(this, "data");
+      __publicField(this, "timestamp");
+      // Para mejor trazabilidad
+      __publicField(this, "attempts");
       this.url = url;
       this.endpoint = endpoint;
       this.data = data;
       this.timestamp = Date.now();
       this.attempts = 0;
+    }
+    // Para contar reintentos
+    static get schema() {
+      return "++id";
     }
   }
   const schemas = {
@@ -3369,8 +3372,8 @@
     instructionQueue: Instruction.schema
   };
   class DB {
-    db;
     constructor(dbName = "ValleTPVDatabase") {
+      __publicField(this, "db");
       this.db = new Dexie(dbName);
       this.db.version(2).stores(schemas);
     }
@@ -3439,22 +3442,24 @@
   }
   const dbInstance = new DB();
   class InstructionQueue {
-    retryTimeouts = /* @__PURE__ */ new Map();
-    MAX_QUICK_ATTEMPTS = 3;
-    // Intentos rápidos para errores temporales
-    MAX_TOTAL_ATTEMPTS = 50;
-    // Máximo total antes de eliminar definitivamente
-    BASE_DELAY = 5e3;
-    // 5 segundos base
-    MAX_DELAY = 3e5;
-    // 5 minutos máximo entre reintentos
-    LONG_DELAY = 6e4;
-    // 1 minuto para reintentos largos
-    retryTimeout = null;
-    // Timeout único para reintentar toda la cola
-    isProcessing = false;
-    // Bandera para evitar procesamiento concurrente
-    externalNotifyCallback;
+    constructor() {
+      __publicField(this, "retryTimeouts", /* @__PURE__ */ new Map());
+      __publicField(this, "MAX_QUICK_ATTEMPTS", 3);
+      // Intentos rápidos para errores temporales
+      __publicField(this, "MAX_TOTAL_ATTEMPTS", 50);
+      // Máximo total antes de eliminar definitivamente
+      __publicField(this, "BASE_DELAY", 5e3);
+      // 5 segundos base
+      __publicField(this, "MAX_DELAY", 3e5);
+      // 5 minutos máximo entre reintentos
+      __publicField(this, "LONG_DELAY", 6e4);
+      // 1 minuto para reintentos largos
+      __publicField(this, "retryTimeout", null);
+      // Timeout único para reintentar toda la cola
+      __publicField(this, "isProcessing", false);
+      // Bandera para evitar procesamiento concurrente
+      __publicField(this, "externalNotifyCallback");
+    }
     // Callback alternativo
     // Método para configurar callback externo (usado desde WebSocketHandler)
     setExternalNotifyCallback(callback) {

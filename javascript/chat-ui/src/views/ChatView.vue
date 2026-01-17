@@ -4,6 +4,10 @@
     <v-app-bar app class="app-bar" flat>
       <v-toolbar-title class="app-title" @click="resetChat">ValleBot</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn v-if="companyData" icon @click="$router.push('/tools')">
+        <v-icon>mdi-tools</v-icon>
+        <v-tooltip activator="parent" location="bottom">Herramientas</v-tooltip>
+      </v-btn>
       <v-btn v-if="companyData" icon @click="resetChat">
         <v-icon>mdi-refresh</v-icon>
       </v-btn>
@@ -23,7 +27,7 @@
       <!-- Welcome message cuando no hay empresa -->
       <div v-if="!companyData" class="welcome-container">
         <div class="welcome-content">
-          <v-img :src="logoValleBot" class="responsive-logo mb-4" alt="Logo ValleBot" />
+          <v-img :src="logoValleBot" class="responsive-logo mb-4 mx-auto" alt="Logo ValleBot" />
           <v-card class="pa-4 pa-sm-6" elevation="6">
             Para chatear con una empresa, primero hay que crear una empresa.
           </v-card>
