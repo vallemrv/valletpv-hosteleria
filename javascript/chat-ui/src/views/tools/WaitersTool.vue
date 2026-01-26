@@ -23,38 +23,105 @@
            <v-btn color="primary" class="mt-4" @click="loadData">Reintentar</v-btn>
         </div>
 
-        <v-list v-else lines="two" rounded="lg" class="waiter-list">
-          <v-list-item
-            v-for="waiter in activeWaiters"
-            :key="waiter.id"
-            :title="`${waiter.nombre} ${waiter.apellidos || ''}`"
-            :subtitle="waiter.autorizado ? 'Autorizado' : 'No autorizado'"
-          >
-            <template v-slot:prepend>
-              <v-avatar color="surface-variant">
-                <v-icon icon="mdi-account"></v-icon>
-              </v-avatar>
-            </template>
+        <div v-else>
+           <v-row>
+             <!-- Authorized Waiters -->
+             <v-col cols="12" md="6">
+                <div class="text-h6 mb-2 px-1 text-primary font-weight-bold">
+                  <v-icon start color="primary">mdi-account-check</v-icon>
+                  Autorizados
+                </div>
+                <v-list lines="two" rounded="lg" class="waiter-list elevation-1">
+                  <template v-if="authorizedWaiters.length > 0">
+                    <v-list-item
+                      v-for="waiter in authorizedWaiters"
+                      :key="waiter.id"
+                      :title="`${waiter.nombre} ${waiter.apellidos || ''}`"
+                      subtitle="Autorizado"
+                    >
+                      <template v-slot:prepend>
+                        <v-avatar color="success" variant="tonal">
+                          <v-icon color="success">mdi-account</v-icon>
+                        </v-avatar>
+                      </template>
 
-            <template v-slot:append>
-              <v-switch
-                :model-value="waiter.autorizado"
-                @update:model-value="waiterStore.toggleAuthorization(waiter)"
-                color="success"
-                hide-details
-                inset
-              ></v-switch>
-            </template>
-          </v-list-item>
-          
-          <v-list-item v-if="activeWaiters.length === 0">
-             <div class="text-center pa-4 text-medium-emphasis">
-               Waiters: {{ waiterStore.waiters.length }} | Active: 0
-               <br>
-               No hay camareros activos registrados
-             </div>
-          </v-list-item>
-        </v-list>
+                      <template v-slot:append>
+                        <v-btn
+                          icon="mdi-delete"
+                          variant="text"
+                          color="error"
+                          class="mr-2"
+                          @click="waiterStore.deactivateWaiter(waiter)"
+                        ></v-btn>
+                        <v-switch
+                          :model-value="true"
+                          @update:model-value="waiterStore.toggleAuthorization(waiter)"
+                          color="success"
+                          hide-details
+                          inset
+                        ></v-switch>
+                      </template>
+                    </v-list-item>
+                  </template>
+                  <v-list-item v-else>
+                     <div class="text-center pa-4 text-medium-emphasis text-caption">
+                       No hay camareros autorizados
+                     </div>
+                  </v-list-item>
+                </v-list>
+             </v-col>
+
+             <!-- Unauthorized Waiters -->
+             <v-col cols="12" md="6">
+                <div class="text-h6 mb-2 px-1 text-grey font-weight-bold">
+                  <v-icon start color="grey">mdi-account-cancel</v-icon>
+                  No Autorizados
+                </div>
+                <v-list lines="two" rounded="lg" class="waiter-list elevation-1">
+                   <template v-if="unauthorizedWaiters.length > 0">
+                      <v-list-item
+                        v-for="waiter in unauthorizedWaiters"
+                        :key="waiter.id"
+                        :title="`${waiter.nombre} ${waiter.apellidos || ''}`"
+                        subtitle="No autorizado"
+                      >
+                        <template v-slot:prepend>
+                          <v-avatar color="grey-lighten-2" variant="tonal">
+                            <v-icon color="grey-darken-1">mdi-account-off</v-icon>
+                          </v-avatar>
+                        </template>
+
+                        <template v-slot:append>
+                            <v-btn
+                              icon="mdi-delete"
+                              variant="text"
+                              color="error"
+                              class="mr-2"
+                              @click="waiterStore.deactivateWaiter(waiter)"
+                            ></v-btn>
+                          <v-switch
+                            :model-value="false"
+                            @update:model-value="waiterStore.toggleAuthorization(waiter)"
+                            color="success"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </template>
+                      </v-list-item>
+                   </template>
+                   <v-list-item v-else>
+                     <div class="text-center pa-4 text-medium-emphasis text-caption">
+                       No hay camareros pendientes
+                     </div>
+                  </v-list-item>
+                </v-list>
+             </v-col>
+           </v-row>
+
+           <div v-if="activeWaiters.length === 0" class="mt-4 text-center text-medium-emphasis">
+              No hay camareros activos registrados
+           </div>
+        </div>
       </v-container>
     </div>
   </div>
@@ -75,16 +142,25 @@ export default {
 
     const activeWaiters = computed(() => {
         return waiterStore.waiters.filter(w => {
-            // Handle various truthy values just in case
             return w.activo === true || w.activo === 1 || w.activo === '1' || w.activo === 'true';
         });
+    });
+
+    const isAuthorized = (w) => w.autorizado == 1 || w.autorizado === true;
+
+    const authorizedWaiters = computed(() => {
+        return activeWaiters.value.filter(w => isAuthorized(w));
+    });
+
+    const unauthorizedWaiters = computed(() => {
+        return activeWaiters.value.filter(w => !isAuthorized(w));
     });
 
     onMounted(() => {
       loadData();
     });
 
-    return { waiterStore, loadData, activeWaiters };
+    return { waiterStore, loadData, activeWaiters, authorizedWaiters, unauthorizedWaiters };
   },
 
 };

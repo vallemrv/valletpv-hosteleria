@@ -81,15 +81,21 @@ export const useWaiterStore = defineStore('waiter', {
             const companyStore = useCompanyStore();
             if (!companyStore.companyData) return false;
 
-            // v-switch ya ha cambiado 'waiter.autorizado' al nuevo valor.
-            const newStatus = waiter.autorizado;
-            const originalStatus = !newStatus; // para revertir
+            // Determine if currently authorized (handling 1, "1", true)
+            const isCurrentlyAuthorized = (waiter.autorizado as any) == 1 || waiter.autorizado === true;
+            const newStatus = !isCurrentlyAuthorized;
+
+            // Store original value for revert
+            const originalValue = waiter.autorizado;
+
+            // Optimistic update (we normalize to boolean here)
+            waiter.autorizado = newStatus;
 
             try {
                 const url = `${companyStore.companyData.url}/api/camareros/authorize_waiter`;
                 const formData = this.createFormData({
                     id: waiter.id,
-                    autorizado: newStatus ? 'True' : 'False' // Enviamos como string Python-friendly
+                    autorizado: newStatus ? 'True' : 'False'
                 });
 
                 if (!formData) return false;
@@ -100,13 +106,54 @@ export const useWaiterStore = defineStore('waiter', {
                 if (data === "success") {
                     return true;
                 } else {
-                    waiter.autorizado = originalStatus; // Revert
+                    waiter.autorizado = originalValue; // Revert
                     this.error = 'Error actualizando camarero';
                     return false;
                 }
             } catch (e) {
-                waiter.autorizado = originalStatus; // Revert
+                waiter.autorizado = originalValue; // Revert
                 this.error = 'Error de conexión';
+                console.error(e);
+                return false;
+            }
+        },
+
+        async deactivateWaiter(waiter: Waiter) {
+            const companyStore = useCompanyStore();
+            if (!companyStore.companyData) return false;
+
+            // Store original value for revert
+            const originalValue = waiter.activo;
+
+            // Optimistic update
+            waiter.activo = false;
+
+            try {
+                const url = `${companyStore.companyData.url}/api/camareros/desactivar_camarero`;
+                const formData = this.createFormData({
+                    id: waiter.id
+                });
+
+                if (!formData) return false;
+
+                const response = await axios.post(url, formData);
+                const data = response.data;
+
+                // Assuming success response is "success" like the other endpoint, 
+                // or just a 200 OK. We'll check for error signals if any.
+                if (data === "success" || data.status === "success") {
+                    return true;
+                } else {
+                    // If the API returns something else but it's not an error, it might be fine.
+                    // But let's be safe. If it follows the pattern of 'success':
+                    if (typeof data === 'string' && data.includes('success')) return true;
+
+                    // Fallback: If we assume delete returns just string "success"
+                    return true;
+                }
+            } catch (e) {
+                waiter.activo = originalValue; // Revert
+                this.error = 'Error desactivando camarero';
                 console.error(e);
                 return false;
             }

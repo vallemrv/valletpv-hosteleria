@@ -32,4 +32,5 @@ urlpatterns = [
     path("dispositivo/action", dispositivo_action, name="dispositivo_action"),
     path("dispositivo/activate", activate_device, name="activate_device"),
     path("dispositivo/deactivate", deactivate_device, name="deactivate_device"),
+    path("planing/", include("api.set_urls.planing"), name="api_planing"),
 ]

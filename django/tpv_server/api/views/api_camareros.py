@@ -36,9 +36,14 @@ def camarero_add(request):
 @verificar_uid_activo
 def authorize_waiter(request):
     waiter_id = request.POST["id"]
-    autorizado = request.POST["autorizado"]
+    autorizado = request.POST.get("autorizado", "False")
     cam = Camareros.objects.get(pk=waiter_id)
-    cam.autorizado = autorizado
+    
+    if str(autorizado).lower() in ["true", "1"]:
+        cam.autorizado = 1
+    else:
+        cam.autorizado = 0
+        
     cam.save()
     return JsonResponse("success")
 
@@ -80,3 +85,11 @@ def comprobar(request):
         return JsonResponse({"error": "Formato JSON inválido"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+@verificar_uid_activo
+def desactivar_camarero(request):
+    id = request.POST["id"]
+    cam = Camareros.objects.get(pk=id)
+    cam.activo = 0
+    cam.save()
+    return JsonResponse("success")
